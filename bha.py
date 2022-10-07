@@ -1,41 +1,48 @@
+from dateutil import relativedelta as rd
+from datetime import date
 from prefect import flow, task
 from requests import get
 
 BASE_URL = 'https://www.britishhorseracing.com'
 RATINGS_CSVS_URL = f'{BASE_URL}/feeds/v4/ratings/csv'
-
 BASE_DESTINATION = 'files/bha'
 
+UPDATE_DAY = 1  # Tuesday
+TODAY = date.today()
+LAST_UPDATE_DATE = TODAY + rd.relativedelta(weeks=-1, weekday=UPDATE_DAY)
+LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
 
-@task
+
 def download_file(url):
     response = get(url)
-    print(response.status_code)
+    response.raise_for_status()
     return response.content
 
 
-@task
 def write_file(content, filename):
     with open(filename, 'wb+') as f:
         f.write(content)
 
 
-@flow
+@task(tags=["BHA"])
 def download_bha_ratings():
     content = download_file(f'{RATINGS_CSVS_URL}/ratings.csv')
-    write_file(content, f'{BASE_DESTINATION}/bha_ratings_20221004.csv')
+    filename = f'{BASE_DESTINATION}/bha_ratings_{LAST_UPDATE_STR}.csv'
+    write_file(content, filename)
 
 
-@flow
+@task(tags=["BHA"])
 def download_bha_rating_changes():
     content = download_file(f'{RATINGS_CSVS_URL}/ratings.csv?diff')
-    write_file(content, f'{BASE_DESTINATION}/bha_rating_changes_20221004.csv')
+    filename = f'{BASE_DESTINATION}/bha_rating_changes_{LAST_UPDATE_STR}.csv'
+    write_file(content, filename)
 
 
-@flow
+@task(tags=["BHA"])
 def download_bha_performance_figures():
     content = download_file(f'{RATINGS_CSVS_URL}/performance-figures.csv')
-    write_file(content, f'{BASE_DESTINATION}/bha_perf_figs_20221004.csv')
+    filename = f'{BASE_DESTINATION}/bha_perf_figs_{LAST_UPDATE_STR}.csv'
+    write_file(content, filename)
 
 
 @flow
