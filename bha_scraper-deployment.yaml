@@ -1,0 +1,36 @@
+###
+### A complete description of a Prefect Deployment for flow 'bha-scraper'
+###
+name: bha-local
+description: null
+version: 9048fcc23416fb1510ad8d300c951c43
+# The work queue that will handle this deployment's runs
+work_queue_name: test
+tags: []
+parameters: {}
+schedule: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: bha-scraper
+manifest_path: null
+storage: null
+path: C:\Users\Peaky\source\repos\handykapp-etl
+entrypoint: bha.py:bha_scraper
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties: {}
+  required: null
+  definitions: null
