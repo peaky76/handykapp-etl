@@ -1,7 +1,8 @@
 from dateutil import relativedelta as rd
 from datetime import date
+from helpers import download_file, write_file
 from prefect import flow, task
-from requests import get
+
 
 BASE_URL = 'https://www.britishhorseracing.com'
 RATINGS_CSVS_URL = f'{BASE_URL}/feeds/v4/ratings/csv'
@@ -11,17 +12,6 @@ UPDATE_DAY = 1  # Tuesday
 TODAY = date.today()
 LAST_UPDATE_DATE = TODAY + rd.relativedelta(weeks=-1, weekday=UPDATE_DAY)
 LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
-
-
-def download_file(url):
-    response = get(url)
-    response.raise_for_status()
-    return response.content
-
-
-def write_file(content, filename):
-    with open(filename, 'wb+') as f:
-        f.write(content)
 
 
 @task(tags=["BHA"])
