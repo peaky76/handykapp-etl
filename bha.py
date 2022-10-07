@@ -6,7 +6,7 @@ from prefect import flow, task
 
 BASE_URL = 'https://www.britishhorseracing.com'
 RATINGS_CSVS_URL = f'{BASE_URL}/feeds/v4/ratings/csv'
-BASE_DESTINATION = 'files/bha'
+BASE_DESTINATION = 'handykapp/bha'
 
 UPDATE_DAY = 1  # Tuesday
 TODAY = date.today()

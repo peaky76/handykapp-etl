@@ -1,4 +1,6 @@
+from do_client import client
 from requests import get
+
 
 def download_file(url):
     response = get(url)
@@ -7,5 +9,10 @@ def download_file(url):
 
 
 def write_file(content, filename):
-    with open(filename, 'wb+') as f:
-        f.write(content)
+    client.put_object(Bucket='peaky76',
+                      Key=filename,
+                      Body=content,
+                      ACL='private')
+
+    # with open(filename, 'wb+') as f:
+    #     f.write(content)
