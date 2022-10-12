@@ -4,7 +4,7 @@ from requests import get
 BUCKET_NAME = 'peaky76'
 
 
-def download_file(url, params=None, headers=None):
+def fetch_content(url, params=None, headers=None):
     response = get(url, params=params, headers=headers)
     response.raise_for_status()
     return response.content

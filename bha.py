@@ -1,6 +1,6 @@
 from dateutil import relativedelta as rd
 from datetime import date
-from helpers import download_file, write_file
+from helpers import fetch_content, write_file
 from prefect import flow, task
 
 
@@ -16,21 +16,21 @@ LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
 
 @task(tags=["BHA"])
 def download_bha_ratings():
-    content = download_file(f'{RATINGS_CSVS_URL}/ratings.csv')
+    content = fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv')
     filename = f'{BASE_DESTINATION}/bha_ratings_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
 
 @task(tags=["BHA"])
 def download_bha_rating_changes():
-    content = download_file(f'{RATINGS_CSVS_URL}/ratings.csv?diff')
+    content = fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv?diff')
     filename = f'{BASE_DESTINATION}/bha_rating_changes_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
 
 @task(tags=["BHA"])
 def download_bha_performance_figures():
-    content = download_file(f'{RATINGS_CSVS_URL}/performance-figures.csv')
+    content = fetch_content(f'{RATINGS_CSVS_URL}/performance-figures.csv')
     filename = f'{BASE_DESTINATION}/bha_perf_figs_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
