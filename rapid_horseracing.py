@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
-from helpers import download_file, get_files, write_file
+from helpers import fetch_content, get_files, write_file
 from os import getenv
 from prefect import flow, task
 from time import sleep
@@ -25,7 +25,7 @@ def download_rapid_racecards(date):  # date - YYYY-MM-DD
     params = {'date': date}
     headers = get_headers(source)
 
-    content = download_file(source, params, headers)
+    content = fetch_content(source, params, headers)
     date_str = date.replace('-', '')
     filename = f"{BASE_DESTINATION}/rapid_api_racecards_{date_str}.json"
     write_file(content, filename)
