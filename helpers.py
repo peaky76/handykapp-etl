@@ -11,10 +11,14 @@ def fetch_content(url, params=None, headers=None):
     return response.content
 
 
-def get_files(dirname):
+def get_files(dirname, modified_after=None):
     response = client.list_objects(Bucket=BUCKET_NAME,
                                    Prefix=dirname)
     files = response.get('Contents', [])
+
+    if modified_after:
+        files = [f for f in files if f.get('LastModified') > modified_after]
+
     return [key for file in files if '.' in (key := file.get('Key'))]
 
 
