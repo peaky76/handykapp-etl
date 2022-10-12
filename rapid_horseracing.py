@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from dotenv import load_dotenv
 from helpers import fetch_content, get_files, read_json, write_file
 from os import getenv
@@ -21,6 +21,23 @@ def get_headers(url):
        "x-rapidapi-host": url.split("//")[1].split("/")[0],
        "x-rapidapi-key": getenv('RAPID_API_KEY')
     }
+
+# @task(tags=["Rapid"])
+# def race_detail(race_id):
+#     source = f'{BASE_URL}/race/{race_id}'
+#     destination = ''
+#     headers = RapidAPIExtractors._get_headers(source)
+#     log_description = f'race {race_id} from Rapid API'
+#     return Fetcher(source, destination, headers=headers, log_description=log_description)    
+
+# @task(tags=["Rapid"])
+# def fetch_results(date):
+#     source = '{BASE_URL}/results'
+#     destination = ''
+#     headers = RapidAPIExtractors._get_headers(source)
+#     params = {'date': date}
+#     log_description = f'UK & IRE results for {date} from Rapid API'        
+#     return Fetcher(source, destination, headers=headers, log_description=log_description, params=params)
 
 
 @task(tags=["Rapid"])
@@ -60,7 +77,7 @@ def get_next_racecard_date():
 
 @flow
 def rapid_horseracing_fetcher():
-    files = get_files(BASE_DESTINATION)
+    files = get_files(BASE_DESTINATION, datetime.now(timezone.utc) - timedelta(days=3))
     print(get_race_ids(files[0]))
     # count = 10
     # while count < LIMITS['day']:
