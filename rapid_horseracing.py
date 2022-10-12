@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
-from helpers import fetch_content, get_files, write_file
+from helpers import fetch_content, get_files, read_json, write_file
 from os import getenv
 from prefect import flow, task
 from time import sleep
@@ -12,10 +12,14 @@ BASE_DESTINATION = 'handykapp/rapid_horseracing'
 LIMITS = {'day': 50, 'minute': 10}
 
 
+def get_file_date(filename):
+    return filename.split('.')[0][-8:]
+
+
 def get_headers(url):
     return {
-        "x-rapidapi-host": url.split("//")[1].split("/")[0],
-        "x-rapidapi-key": getenv('RAPID_API_KEY')
+       "x-rapidapi-host": url.split("//")[1].split("/")[0],
+       "x-rapidapi-key": getenv('RAPID_API_KEY')
     }
 
 
@@ -32,13 +36,18 @@ def download_rapid_racecards(date):  # date - YYYY-MM-DD
 
 
 @task(tags=["Rapid"])
+def get_race_ids(file):
+    return [race['id_race'] for race in read_json(file)]
+
+
+@task(tags=["Rapid"])
 def get_next_racecard_date():
     start_date = date.fromisoformat('2020-01-01')
     end_date = date.today()
     test_date = start_date
 
     files = get_files(BASE_DESTINATION)
-    file_date_strs = [name.split('.')[0][-8:] for name in files]
+    file_date_strs = [get_file_date(filename) for filename in files]
     file_dates = [datetime.strptime(x, '%Y%m%d').date() for x in file_date_strs]
 
     while test_date <= end_date:
@@ -51,12 +60,14 @@ def get_next_racecard_date():
 
 @flow
 def rapid_horseracing_fetcher():
-    count = 10
-    while count < LIMITS['day']:
-        date = get_next_racecard_date()
-        download_rapid_racecards(date)
-        count += 1
-        sleep(60 // LIMITS['minute'])
+    files = get_files(BASE_DESTINATION)
+    print(get_race_ids(files[0]))
+    # count = 10
+    # while count < LIMITS['day']:
+    #     date = get_next_racecard_date()
+    #     download_rapid_racecards(date)
+    #     count += 1
+    #     sleep(60 // LIMITS['minute'])
 
 
 if __name__ == "__main__":

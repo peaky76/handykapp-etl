@@ -1,4 +1,5 @@
 from do_client import client
+from json import loads
 from requests import get
 
 BUCKET_NAME = 'peaky76'
@@ -15,6 +16,11 @@ def get_files(dirname):
                                    Prefix=dirname)
     files = response.get('Contents', [])
     return [key for file in files if '.' in (key := file.get('Key'))]
+
+
+def read_json(file):
+    obj = client.get_object(Bucket=BUCKET_NAME, Key=file)
+    return loads(obj['Body'].read())
 
 
 def write_file(content, filename):
