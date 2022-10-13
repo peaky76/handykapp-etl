@@ -77,14 +77,14 @@ def get_next_racecard_date():
 
 @flow
 def rapid_horseracing_fetcher():
-    files = get_files(BASE_DESTINATION, datetime.now(timezone.utc) - timedelta(days=3))
-    print(get_race_ids(files[0]))
-    # count = 10
-    # while count < LIMITS['day']:
-    #     date = get_next_racecard_date()
-    #     download_rapid_racecards(date)
-    #     count += 1
-    #     sleep(60 // LIMITS['minute'])
+    # files = get_files(BASE_DESTINATION, datetime.now(timezone.utc) - timedelta(days=3))
+    # print(get_race_ids(files[0]))
+    count = 1
+    while count < LIMITS['day']:
+        date = get_next_racecard_date()
+        download_rapid_racecards(date)
+        count += 1
+        sleep(60 // LIMITS['minute'])
 
 
 if __name__ == "__main__":
