@@ -41,7 +41,7 @@ def get_headers(url):
 
 
 @task(tags=["Rapid"])
-def download_rapid_racecards(date):  # date - YYYY-MM-DD
+def extract_rapid_racecards(date):  # date - YYYY-MM-DD
     source = f'{BASE_URL}/racecards'
     params = {'date': date}
     headers = get_headers(source)
@@ -76,16 +76,10 @@ def get_next_racecard_date():
 
 
 @flow
-def rapid_horseracing_fetcher():
-    # files = get_files(BASE_DESTINATION, datetime.now(timezone.utc) - timedelta(days=3))
-    # print(get_race_ids(files[0]))
-    count = 1
-    while count < LIMITS['day']:
-        date = get_next_racecard_date()
-        download_rapid_racecards(date)
-        count += 1
-        sleep(60 // LIMITS['minute'])
+def rapid_horseracing_extractor():
+    date = get_next_racecard_date()
+    extract_rapid_racecards(date)
 
 
 if __name__ == "__main__":
-    rapid_horseracing_fetcher()
+    rapid_horseracing_extractor()
