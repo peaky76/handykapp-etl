@@ -1,1 +1,0 @@
-web: prefect agent start -q "default"

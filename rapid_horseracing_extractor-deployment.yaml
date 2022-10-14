@@ -9,7 +9,7 @@ work_queue_name: default
 tags: []
 parameters: {}
 schedule:
-  cron: 1-50 0 * * *
+  cron: 1-50 1 * * *
   timezone: Europe/London
   day_or: true
 infra_overrides: {}
