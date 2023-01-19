@@ -15,31 +15,46 @@ LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
 
 
 @task(tags=["BHA"])
-def extract_bha_ratings():
-    content = fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv')
+def fetch_bha_ratings():
+    return fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv')
+
+
+@task(tags=["BHA"])
+def fetch_bha_rating_changes():
+    return fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv?diff')
+
+
+@task(tags=["BHA"])
+def fetch_bha_performance_figures():
+    return fetch_content(f'{RATINGS_CSVS_URL}/performance-figures.csv')
+
+
+@task(tags=["BHA"])
+def save_bha_ratings(content):
     filename = f'{BASE_DESTINATION}/bha_ratings_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
 
 @task(tags=["BHA"])
-def extract_bha_rating_changes():
-    content = fetch_content(f'{RATINGS_CSVS_URL}/ratings.csv?diff')
+def save_bha_rating_changes(content):
     filename = f'{BASE_DESTINATION}/bha_rating_changes_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
 
 @task(tags=["BHA"])
-def extract_bha_performance_figures():
-    content = fetch_content(f'{RATINGS_CSVS_URL}/performance-figures.csv')
+def save_bha_performance_figures(content):
     filename = f'{BASE_DESTINATION}/bha_perf_figs_{LAST_UPDATE_STR}.csv'
     write_file(content, filename)
 
 
 @flow
 def bha_extractor():
-    extract_bha_ratings()
-    extract_bha_rating_changes()
-    extract_bha_performance_figures()
+    bha_ratings = fetch_bha_ratings()
+    save_bha_ratings(bha_ratings)
+    bha_rating_changes = fetch_bha_rating_changes()
+    save_bha_rating_changes(bha_rating_changes)
+    bha_performance_figures = fetch_bha_performance_figures()
+    save_bha_performance_figures(bha_performance_figures)
 
 
 if __name__ == "__main__":
