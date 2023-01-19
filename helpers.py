@@ -1,4 +1,4 @@
-from do_client import client
+from digital_ocean_client import client
 from json import loads
 from requests import get
 
