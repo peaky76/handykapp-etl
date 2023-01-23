@@ -18,4 +18,8 @@ jobs:
             mkdir handykapp-etl
             cd handykapp-etl
             git clone git@github.com:peaky76/handykapp-etl.git
-            echo 'Deployment successful to Digital Ocean'
+            if [ "$?" = "0" ]; then
+              echo "Deployment successful to Digital Ocean"
+            else
+              echo "Unable to clone directory"
+            fi
