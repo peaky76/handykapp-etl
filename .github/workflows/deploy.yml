@@ -13,13 +13,6 @@ jobs:
           host: ${{secrets.SSH_HOST}}
           key: ${{secrets.SSH_KEY}}
           username: ${{secrets.SSH_USERNAME}}
-          
-          script: |
-            mkdir handykapp-etl
-            cd handykapp-etl
-            git clone git@github.com:peaky76/handykapp-etl.git
-            if [ "$?" = "0" ]; then
-              echo "Deployment successful to Digital Ocean"
-            else
-              echo "Unable to clone directory"
-            fi
+        run: ./.github/scripts/clone.sh
+        shell: bash
+            
