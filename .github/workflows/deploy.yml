@@ -7,12 +7,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy handykapp-etl
+      - name: SSH into remote
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{secrets.SSH_HOST}}
           key: ${{secrets.SSH_KEY}}
           username: ${{secrets.SSH_USERNAME}}
-        run: ./.github/scripts/clone.sh
-        shell: bash
-            
+      - name: Set-up remote directory            
+        script: |
+          mkdir handykapp-etl
+          cd handykapp-etl 
