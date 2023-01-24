@@ -16,5 +16,6 @@ jobs:
           script_stop: true
           script: |
             cd handykapp-etl && git pull git@github.com:peaky76/handykapp-etl.git
+            poetry lock
             poetry install  
             echo 'Deployment successful to Digital Ocean'
