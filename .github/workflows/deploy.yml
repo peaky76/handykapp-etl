@@ -15,7 +15,5 @@ jobs:
           username: ${{secrets.SSH_USERNAME}}          
           script_stop: true
           script: |
-            mkdir handykapp-etl
-            cd handykapp-etl
-            git clone git@github.com:peaky76/handykapp-etl.git
+            mkdir handykapp-etl && cd handykapp-etl && git clone git@github.com:peaky76/handykapp-etl.git || cd handykapp-etl && git pull 
             echo 'Deployment successful to Digital Ocean'
