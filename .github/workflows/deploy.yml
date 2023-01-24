@@ -15,6 +15,6 @@ jobs:
           username: ${{secrets.SSH_USERNAME}}          
           script_stop: true
           script: |
-            cd handykapp-etl && git pull || git clone git@github.com:peaky76/handykapp-etl.git
+            cd handykapp-etl && git pull || git clone git@github.com:peaky76/handykapp-etl.git && cd handykapp-etl
             poetry install  
             echo 'Deployment successful to Digital Ocean'
