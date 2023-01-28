@@ -5,7 +5,7 @@ aiosqlite==0.17.0
 alembic==1.8.1
 anyio==3.6.1
 apprise==1.0.0
-asgi-lifespan==1.0.1
+asgi-lifespan==2.0.0
 async-timeout==4.0.2
 asyncpg==0.26.0
 attrs==22.1.0
