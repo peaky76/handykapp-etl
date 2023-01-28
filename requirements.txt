@@ -80,6 +80,6 @@ toml==0.10.2
 typer==0.6.1
 typing_extensions==4.3.0
 urllib3==1.26.12
-uvicorn==0.18.3
+uvicorn==0.20.0
 websocket-client==1.4.1
 yarl==1.8.1
