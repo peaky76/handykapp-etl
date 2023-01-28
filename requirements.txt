@@ -62,7 +62,7 @@ python-dotenv==0.21.0
 python-slugify==6.1.2
 pytz==2022.4
 pytzdata==2020.1
-pywin32==304;platform_system == "Windows"
+pywin32==305;platform_system == "Windows"
 PyYAML==6.0
 readchar==4.0.3
 requests==2.28.1
