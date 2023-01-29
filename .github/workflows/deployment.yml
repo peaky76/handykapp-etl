@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout master branch
         uses: actions/checkout@v3
-        with:
-          path: "../../../.."
 
       - name: Install dependencies
         run: poetry install
