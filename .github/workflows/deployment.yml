@@ -14,4 +14,4 @@ jobs:
 
       - name: Install dependencies
         run: poetry install
-        working-directory: $GITHUB_WORKSPACE
+        working-directory: ""
