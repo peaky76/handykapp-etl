@@ -1,15 +1,17 @@
-FROM python:3.10
+FROM prefecthq/prefect:2.7.10-python3.10
 
-RUN mkdir /src
+# Install poetry
+RUN pip install --upgrade pip
+RUN pip install poetry
 
-COPY /src /src
-COPY pyproject.toml /src 
+# Copy the project to image
+COPY /src /opt/handykapp-etl/src
+COPY README.md pyproject.toml poetry.lock deploy.sh /opt/handykapp-etl/
+WORKDIR /opt/handykapp-etl
 
-WORKDIR /src
-ENV PYTHONPATH=${PYTHONPATH}:${PWD} 
-
-RUN pip3 install poetry
+# Install packages in the system Python
 RUN poetry config virtualenvs.create false
+RUN poetry config virtualenvs.prefer-active-python true
 RUN poetry install --no-dev
 
-CMD [ "./deploy.sh" ]
+ENTRYPOINT ["./deploy.sh"]
