@@ -14,4 +14,4 @@ RUN poetry config virtualenvs.create false
 RUN poetry config virtualenvs.prefer-active-python true
 RUN poetry install --only main
 
-ENTRYPOINT ["./deploy.sh"]
+# ENTRYPOINT ["./deploy.sh"]
