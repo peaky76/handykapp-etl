@@ -1,0 +1,64 @@
+###
+### A complete description of a Prefect Deployment for flow 'bha-extractor'
+###
+name: standard
+description: null
+version: cdaa6a5c274ee435bb631e5c304777b6
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+work_pool_name: null
+tags: []
+parameters: {}
+schedule:
+  cron: 0 23 * * 2
+  timezone: null
+  day_or: true
+is_schedule_active: null
+infra_overrides: {}
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: bha-extractor
+manifest_path: null
+infrastructure:
+  type: docker-container
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  image: prefecthq/prefect:2.7.10-python3.11
+  image_pull_policy: null
+  image_registry: null
+  networks: []
+  network_mode: null
+  auto_remove: false
+  volumes: []
+  stream_output: true
+  memswap_limit: null
+  mem_limit: null
+  privileged: false
+  _block_document_id: 07b05cab-de00-4f28-887b-568cc3a2c936
+  _block_document_name: handykapp-etl
+  _is_anonymous: false
+  block_type_slug: docker-container
+  _block_type_slug: docker-container
+storage:
+  repository: https://github.com/peaky76/handykapp-etl
+  reference: null
+  access_token: '**********'
+  include_git_objects: true
+  _block_document_id: 1eb242d8-d4c0-4e85-8117-509c616989d6
+  _block_document_name: handykapp-etl
+  _is_anonymous: false
+  block_type_slug: github
+  _block_type_slug: github
+path: ''
+entrypoint: ..\flows\bha.py:bha_extractor
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties: {}
+  required: null
+  definitions: null
+timestamp: '2023-02-03T23:36:56.005564+00:00'
