@@ -1,0 +1,51 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master branch
+        uses: actions/checkout@v3
+
+      - name: Set up python 3.10
+        uses: actions/setup-python@v3
+
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.3.2
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Set up cache
+        uses: actions/cache@v2
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+      - name: Enter poetry shell
+        run: poetry shell
+
+      - name: Prefect login
+        run: prefect cloud login -k ${{ secrets.PREFECT_API_KEY }} -w {{ secrets.PREFECT_API_WORKSPACE }}
+
+      - name: Create deployments
+        run: |
+          cd deployments
+          prefect deployment build ../flows/bha.py:bha_extractor -n standard -sb github/handykapp-etl -ib docker-container/handykapp-etl -q default -o bha-deployment.yaml --cron "0 23 * * 2"
+          prefect deployment build ../flows/rapid_horseracing.py:rapid_horseracing_extractor -n standard -sb github/handykapp-etl -ib docker-container/handykapp-etl -q default -o rapid-horseracing-deployment.yaml --cron "1-50 1 * * *"
+
+      - name: Apply deployments
+        run: |
+          prefect deployment apply bha-deployment.yaml
+          prefect deployment apply rapid-horseracing-deployment.yaml
