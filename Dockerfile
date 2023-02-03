@@ -12,6 +12,6 @@ WORKDIR /opt/handykapp-etl
 # Install packages in the system Python
 RUN poetry config virtualenvs.create false
 RUN poetry config virtualenvs.prefer-active-python true
-RUN poetry install --no-dev
+RUN poetry install --only main
 
 ENTRYPOINT ["./deploy.sh"]
