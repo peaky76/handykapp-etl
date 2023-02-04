@@ -6,14 +6,14 @@ description: null
 version: cdaa6a5c274ee435bb631e5c304777b6
 # The work queue that will handle this deployment's runs
 work_queue_name: default
-work_pool_name: null
+work_pool_name: default-agent-pool
 tags: []
 parameters: {}
 schedule:
   cron: 0 23 * * 2
   timezone: null
   day_or: true
-is_schedule_active: null
+is_schedule_active: true
 infra_overrides: {}
 
 ###
@@ -54,11 +54,11 @@ storage:
   block_type_slug: github
   _block_type_slug: github
 path: ''
-entrypoint: ..\flows\bha.py:bha_extractor
+entrypoint: flows\bha.py:bha_extractor
 parameter_openapi_schema:
   title: Parameters
   type: object
   properties: {}
   required: null
   definitions: null
-timestamp: '2023-02-03T23:36:56.005564+00:00'
+timestamp: '2023-02-04T00:39:24.639444+00:00'

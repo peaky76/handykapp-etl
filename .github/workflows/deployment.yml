@@ -37,13 +37,4 @@ jobs:
         run: poetry run prefect cloud login -k ${{ secrets.PREFECT_API_KEY }} -w ${{ secrets.PREFECT_API_WORKSPACE }}
 
       - name: Create deployments
-        run: |
-          cd deployments
-          poetry run prefect deployment build ../flows/bha.py:bha_extractor -n standard -sb github/handykapp-etl -ib docker-container/handykapp-etl -q default -o bha-deployment.yaml --cron "0 23 * * 2"
-          poetry run prefect deployment build ../flows/rapid_horseracing.py:rapid_horseracing_extractor -n standard -sb github/handykapp-etl -ib docker-container/handykapp-etl -q default -o rapid-horseracing-deployment.yaml --cron "1-50 1 * * *"
-
-      - name: Apply deployments
-        run: |
-          cd deployments
-          poetry run prefect deployment apply bha-deployment.yaml
-          poetry run prefect deployment apply rapid-horseracing-deployment.yaml
+        run: ./create_deployments.sh
