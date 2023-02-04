@@ -44,5 +44,6 @@ jobs:
 
       - name: Apply deployments
         run: |
+          cd deployments
           poetry run prefect deployment apply bha-deployment.yaml
           poetry run prefect deployment apply rapid-horseracing-deployment.yaml
