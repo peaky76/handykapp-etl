@@ -78,11 +78,18 @@ def get_next_racecard_date():
 
 
 @flow
+def get_all_race_ids():
+    files = get_files(RACECARDS_DESTINATION)
+    ids = [id for file in files for id in get_race_ids(file)]
+    print(ids)
+
+
+@flow
 def rapid_horseracing_extractor():
-    # Add another day's racing to the racecards folder 
+    # Add another day's racing to the racecards folder
     date = get_next_racecard_date()
     extract_racecards(date)
 
 
 if __name__ == "__main__":
-    rapid_horseracing_extractor()
+    get_all_race_ids()
