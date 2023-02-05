@@ -9,6 +9,8 @@ from time import sleep
 load_dotenv()
 BASE_URL = 'https://horse-racing.p.rapidapi.com'
 BASE_DESTINATION = 'handykapp/rapid_horseracing'
+RACECARDS_DESTINATION = f"{BASE_DESTINATION}/racecards"
+RESULTS_DESTINATION = f"{BASE_DESTINATION}/results"
 LIMITS = {'day': 50, 'minute': 10}
 
 
@@ -41,14 +43,14 @@ def get_headers(url):
 
 
 @task(tags=["Rapid"])
-def extract_rapid_racecards(date):  # date - YYYY-MM-DD
+def extract_racecards(date):  # date - YYYY-MM-DD
     source = f'{BASE_URL}/racecards'
     params = {'date': date}
     headers = get_headers(source)
 
     content = fetch_content(source, params, headers)
     date_str = date.replace('-', '')
-    filename = f"{BASE_DESTINATION}/rapid_api_racecards_{date_str}.json"
+    filename = f"{RACECARDS_DESTINATION}/rapid_api_racecards_{date_str}.json"
     write_file(content, filename)
 
 
@@ -63,7 +65,7 @@ def get_next_racecard_date():
     end_date = date.today()
     test_date = start_date
 
-    files = get_files(BASE_DESTINATION)
+    files = get_files(RACECARDS_DESTINATION)
     file_date_strs = [get_file_date(filename) for filename in files]
     file_dates = [datetime.strptime(x, '%Y%m%d').date() for x in file_date_strs]
 
@@ -77,8 +79,9 @@ def get_next_racecard_date():
 
 @flow
 def rapid_horseracing_extractor():
+    # Add another day's racing to the racecards folder 
     date = get_next_racecard_date()
-    extract_rapid_racecards(date)
+    extract_racecards(date)
 
 
 if __name__ == "__main__":
