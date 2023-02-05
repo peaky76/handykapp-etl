@@ -37,6 +37,4 @@ jobs:
         run: poetry run prefect cloud login -k ${{ secrets.PREFECT_API_KEY }} -w ${{ secrets.PREFECT_API_WORKSPACE }}
 
       - name: Create deployments
-        run: |
-          git update-index --chmod=+x ./create_deployments.sh
-          ./create_deployments.sh
+        run: poetry run ./create_deployments.sh
