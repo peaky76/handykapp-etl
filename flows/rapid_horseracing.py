@@ -1,12 +1,13 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 import json
 from dotenv import load_dotenv
 import pytz
 from helpers import fetch_content, get_files, read_json, write_file
 from os import getenv
 from prefect import flow, task
-from time import sleep
+from time import localtime, sleep
 
+# NB: In RapidAPI, results are called race details
 
 load_dotenv()
 BASE_URL = "https://horse-racing.p.rapidapi.com/"
@@ -27,22 +28,15 @@ def get_headers(url):
        "x-rapidapi-key": getenv("RAPID_API_KEY")
     }
 
-# @task(tags=["Rapid"])
-# def race_detail(race_id):
-#     source = f"{BASE_URL}/race/{race_id}"
-#     destination = ""
-#     headers = RapidAPIExtractors._get_headers(source)
-#     log_description = f"race {race_id} from Rapid API"
-#     return Fetcher(source, destination, headers=headers, log_description=log_description)    
 
-# @task(tags=["Rapid"])
-# def fetch_results(date):
-#     source = "{BASE_URL}/results"
-#     destination = ""
-#     headers = RapidAPIExtractors._get_headers(source)
-#     params = {"date": date}
-#     log_description = f"UK & IRE results for {date} from Rapid API"        
-#     return Fetcher(source, destination, headers=headers, log_description=log_description, params=params)
+@task(tags=["Rapid"])
+def extract_result(race_id):
+    source = f"{BASE_URL}race/{race_id}"
+    headers = get_headers(source)
+
+    content = fetch_content(source, headers=headers)
+    filename = f"{RESULTS_DESTINATION}rapid_api_result_{race_id}.json"
+    write_file(content, filename)
 
 
 @task(tags=["Rapid"])
@@ -106,7 +100,15 @@ def rapid_horseracing_extractor():
     # Add another day"s racing to the racecards folder
     date = get_next_racecard_date()
     extract_racecards(date)
+
+    # Update the list of results to fetch
     update_results_to_do_list()
+
+    # Fetch a number of results within the limits presented
+    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 3]
+    for race_id in races_batch:
+        extract_result(race_id)
+        sleep(90)
 
 
 if __name__ == "__main__":
