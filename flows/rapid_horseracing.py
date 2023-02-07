@@ -2,16 +2,16 @@ import json
 import pytz
 from datetime import date, datetime, timedelta
 from time import sleep
-from dotenv import load_dotenv
-from os import getenv
+# from dotenv import load_dotenv
+# from os import getenv
 from prefect import flow, task
 from helpers import fetch_content, get_files, read_json, write_file
 from prefect.blocks.system import Secret
 
 # NB: In RapidAPI, results are called race details
 
-load_dotenv()
-Secret(value=getenv('RAPID_API_KEY')).save('rapid-api-key', overwrite=True)
+# load_dotenv()
+# Secret(value=getenv('RAPID_API_KEY')).save('rapid-api-key', overwrite=True)
 BASE_URL = "https://horse-racing.p.rapidapi.com/"
 BASE_DESTINATION = "handykapp/rapid_horseracing/"
 RACECARDS_DESTINATION = f"{BASE_DESTINATION}racecards/"
@@ -104,13 +104,13 @@ def rapid_horseracing_extractor():
     extract_racecards(date)
 
     # Update the list of results to fetch
-    # update_results_to_do_list()
+    update_results_to_do_list()
 
     # Fetch a number of results within the limits presented
-    # races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 3]
-    # for race_id in races_batch:
-    #     extract_result(race_id)
-    #     sleep(90)
+    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 3]
+    for race_id in races_batch:
+        extract_result(race_id)
+        sleep(90)
 
 
 if __name__ == "__main__":
