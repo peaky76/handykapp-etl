@@ -16,7 +16,6 @@ BASE_URL = "https://horse-racing.p.rapidapi.com/"
 BASE_DESTINATION = "handykapp/rapid_horseracing/"
 RACECARDS_DESTINATION = f"{BASE_DESTINATION}racecards/"
 RESULTS_DESTINATION = f"{BASE_DESTINATION}results/"
-TODAY = date.today()
 LIMITS = {"day": 50, "minute": 10}
 
 
@@ -61,7 +60,7 @@ def get_race_ids(file):
 @task(tags=["Rapid"])
 def get_next_racecard_date():
     start_date = date.fromisoformat("2020-01-01")
-    end_date = TODAY
+    end_date = date.today()
     test_date = start_date
 
     files = get_files(RACECARDS_DESTINATION)
@@ -80,7 +79,7 @@ def get_next_racecard_date():
 def update_results_to_do_list():
     filename = f"{BASE_DESTINATION}results_to_do_list.json"
     current_status = read_json(filename)
-    last_checked = pytz.utc.localize(datetime.strptime(current_status["last_checked"], "%Y-%m-%d")) if current_status["last_checked"] else None
+    last_checked = datetime.strptime(current_status["last_checked"], "%Y-%m-%d %H:%M:%S.%f%z") if current_status["last_checked"] else None
 
     racecard_files = get_files(RACECARDS_DESTINATION, last_checked)
     result_files = get_files(RESULTS_DESTINATION)
@@ -90,7 +89,7 @@ def update_results_to_do_list():
     to_do_race_ids = current_status["results_to_do"] + new_race_ids
 
     content = json.dumps({
-        "last_checked": str(last_checked),
+        "last_checked": str(datetime.now(pytz.utc)),
         "results_to_do": [race_id for race_id in to_do_race_ids if race_id not in done_race_ids],
         "results_done": done_race_ids
     })
