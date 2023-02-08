@@ -12,11 +12,16 @@ jobs:
       - name: Checkout master branch
         uses: actions/checkout@v3
 
-      - name: Update python version file
-        run: ./update_python_version.sh
+      - name: Extract python version
+        id: python-version
+        run: |
+          python_version=$(grep '^python =' pyproject.toml | awk -F'"' '{print $2}')
+          echo "::set-output name=python-version::$python_version"
 
-      - name: Set up python 3.10
+      - name: Set up python version
         uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python-version.outputs.python-version }}
 
       - name: Install poetry
         uses: snok/install-poetry@v1
