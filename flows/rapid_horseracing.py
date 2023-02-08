@@ -30,7 +30,7 @@ def get_headers(url):
     }
 
 
-@task(tags=["Rapid"], flow_run_name="extract_result_{race_id}")
+@task(tags=["Rapid"], task_run_name="extract_result_{race_id}")
 def extract_result(race_id):
     source = f"{BASE_URL}race/{race_id}"
     headers = get_headers(source)
@@ -40,7 +40,7 @@ def extract_result(race_id):
     write_file(content, filename)
 
 
-@task(tags=["Rapid"], flow_run_name="extract_racecards_{date}")
+@task(tags=["Rapid"], task_run_name="extract_racecards_{date}")
 def extract_racecards(date):  # date - YYYY-MM-DD
     source = f"{BASE_URL}racecards"
     params = {"date": date}
