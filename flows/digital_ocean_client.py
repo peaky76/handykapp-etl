@@ -1,12 +1,6 @@
 import boto3
-# from dotenv import load_dotenv
-# from os import getenv
 from prefect.blocks.system import Secret
 
-
-# load_dotenv()
-# Secret(value=getenv('SPACES_KEY')).save('spaces-key', overwrite=True)
-# Secret(value=getenv('SPACES_SECRET')).save('spaces-secret', overwrite=True)
 
 session = boto3.session.Session()
 client = session.client('s3',
