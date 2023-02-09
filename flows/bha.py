@@ -4,9 +4,13 @@ from helpers import fetch_content, write_file
 from prefect import flow, task
 
 
-BASE_URL = 'https://www.britishhorseracing.com/'
-RATINGS_CSVS_URL = f'{BASE_URL}feeds/v4/ratings/csv/'
-BASE_DESTINATION = 'handykapp/bha/'
+SOURCE = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
+DESTINATION = "handykapp/bha/"
+FILES = {
+    "ratings": "ratings.csv",
+    "rating_changes": "ratings.csv?diff",
+    "perf_figs": "performance-figures.csv",
+}
 
 UPDATE_DAY = 1  # Tuesday
 TODAY = date.today()
@@ -14,47 +18,22 @@ LAST_UPDATE_DATE = TODAY + rd.relativedelta(weeks=-1, weekday=UPDATE_DAY)
 LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
 
 
-@task(tags=["BHA"])
-def fetch_bha_ratings():
-    return fetch_content(f'{RATINGS_CSVS_URL}ratings.csv')
+@task(tags=["BHA"], task_run_name="fetch_bha_{data}")
+def fetch(data):
+    return fetch_content(f"{SOURCE}{FILES[data]}")
 
 
-@task(tags=["BHA"])
-def fetch_bha_rating_changes():
-    return fetch_content(f'{RATINGS_CSVS_URL}ratings.csv?diff')
-
-
-@task(tags=["BHA"])
-def fetch_bha_performance_figures():
-    return fetch_content(f'{RATINGS_CSVS_URL}performance-figures.csv')
-
-
-@task(tags=["BHA"])
-def save_bha_ratings(content):
-    filename = f'{BASE_DESTINATION}bha_ratings_{LAST_UPDATE_STR}.csv'
-    write_file(content, filename)
-
-
-@task(tags=["BHA"])
-def save_bha_rating_changes(content):
-    filename = f'{BASE_DESTINATION}bha_rating_changes_{LAST_UPDATE_STR}.csv'
-    write_file(content, filename)
-
-
-@task(tags=["BHA"])
-def save_bha_performance_figures(content):
-    filename = f'{BASE_DESTINATION}bha_perf_figs_{LAST_UPDATE_STR}.csv'
+@task(tags=["BHA"], task_run_name="save_bha_{data}")
+def save(data, content):
+    filename = (f"{DESTINATION}bha_{data}_{LAST_UPDATE_STR}.csv")
     write_file(content, filename)
 
 
 @flow
 def bha_extractor():
-    bha_ratings = fetch_bha_ratings()
-    save_bha_ratings(bha_ratings)
-    bha_rating_changes = fetch_bha_rating_changes()
-    save_bha_rating_changes(bha_rating_changes)
-    bha_performance_figures = fetch_bha_performance_figures()
-    save_bha_performance_figures(bha_performance_figures)
+    for data in FILES:
+        content = fetch(data)
+        save(data, content)
 
 
 if __name__ == "__main__":
