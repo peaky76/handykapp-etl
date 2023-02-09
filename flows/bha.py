@@ -14,7 +14,7 @@ FILES = {
 
 UPDATE_DAY = 1  # Tuesday
 TODAY = date.today()
-LAST_UPDATE_DATE = TODAY + rd.relativedelta(weeks=-1, weekday=UPDATE_DAY)
+LAST_UPDATE_DATE = TODAY + rd.relativedelta(days=-6, weekday=UPDATE_DAY)
 LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
 
 
