@@ -102,7 +102,7 @@ def rapid_horseracing_extractor():
     update_results_to_do_list()
 
     # Fetch a number of results within the limits presented
-    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 3]
+    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 2]
     for race_id in races_batch:
         extract_result(race_id)
         sleep(90)
