@@ -6,7 +6,7 @@ authors = ["Robert Peacock <robertjamespeacock@gmail.com>"]
 
 [tool.poetry.dependencies]
 boto3 = "^1.26.73"
-prefect = "^2.8.0"
+prefect = "^2.8.2"
 python = "^3.10.0"
 python-dateutil = "^2.8.2"
 python-dotenv = "^0.21.0"
