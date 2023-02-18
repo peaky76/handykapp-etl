@@ -1204,14 +1204,14 @@ pytzdata = ">=2020.1"
 
 [[package]]
 name = "prefect"
-version = "2.8.0"
+version = "2.8.2"
 description = "Workflow orchestration and management."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prefect-2.8.0-py3-none-any.whl", hash = "sha256:0b174dcfadde2df60da2ff9ff9ecd95919e6d0e3658c40a10a349fe6fbd2d810"},
-    {file = "prefect-2.8.0.tar.gz", hash = "sha256:c3d0d7cdc4a1230ee0ad4e7142c88610fca00abc0a05c5ad5f6c7a105fc8a159"},
+    {file = "prefect-2.8.2-py3-none-any.whl", hash = "sha256:6b749aa9132f3b864d28981bc9f9bad572f1162c677d29da149bd987fea76c43"},
+    {file = "prefect-2.8.2.tar.gz", hash = "sha256:34304456ee8d7fd26b55db4f2504fd704405fb873d1069a4850983e96a53f656"},
 ]
 
 [package.dependencies]
@@ -2143,4 +2143,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.0"
-content-hash = "ae8a9e5173d675a3d05e2cf88c47d2abff7b1aa8db0578b1e6637cfcca2e5c84"
+content-hash = "95c126b4b356fb1970fb198990b5386e28767c176b298c56df255a5cf8acad9f"
