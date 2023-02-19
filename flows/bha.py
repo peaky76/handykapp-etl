@@ -1,6 +1,6 @@
 from dateutil import relativedelta as rd
 from datetime import date
-from helpers import fetch_content, write_file
+from flows.helpers import fetch_content, write_file
 from prefect import flow, task
 
 
@@ -15,7 +15,7 @@ FILES = {
 UPDATE_DAY = 1  # Tuesday
 TODAY = date.today()
 LAST_UPDATE_DATE = TODAY + rd.relativedelta(days=-6, weekday=UPDATE_DAY)
-LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace('-', '')
+LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace("-", "")
 
 
 @task(tags=["BHA"], task_run_name="fetch_bha_{data}")
@@ -25,7 +25,7 @@ def fetch(data):
 
 @task(tags=["BHA"], task_run_name="save_bha_{data}")
 def save(data, content):
-    filename = (f"{DESTINATION}bha_{data}_{LAST_UPDATE_STR}.csv")
+    filename = f"{DESTINATION}bha_{data}_{LAST_UPDATE_STR}.csv"
     write_file(content, filename)
 
 
