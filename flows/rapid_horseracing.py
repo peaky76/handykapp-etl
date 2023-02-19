@@ -3,7 +3,7 @@ import pytz
 from datetime import date, datetime, timedelta
 from time import sleep
 from prefect import flow, task
-from helpers import fetch_content, get_files, read_json, write_file
+from flows.helpers import fetch_content, get_files, read_json, write_file
 from prefect.blocks.system import Secret
 
 # NB: In RapidAPI, results are called race details
@@ -16,13 +16,13 @@ LIMITS = {"day": 50, "minute": 10}
 
 
 def get_file_date(filename):
-    return filename.split('.')[0][-8:]
+    return filename.split(".")[0][-8:]
 
 
 def get_headers(url):
     return {
-       "x-rapidapi-host": url.split('//')[1].split('/')[0],
-       "x-rapidapi-key": Secret.load("rapid-api-key").get()
+        "x-rapidapi-host": url.split("//")[1].split("/")[0],
+        "x-rapidapi-key": Secret.load("rapid-api-key").get(),
     }
 
 
@@ -43,7 +43,7 @@ def extract_racecards(date):  # date - YYYY-MM-DD
     headers = get_headers(source)
 
     content = fetch_content(source, params, headers)
-    date_str = date.replace('-', '')
+    date_str = date.replace("-", "")
     filename = f"{RACECARDS_DESTINATION}rapid_api_racecards_{date_str}.json"
     write_file(content, filename)
 
@@ -75,20 +75,30 @@ def get_next_racecard_date():
 def update_results_to_do_list():
     filename = f"{BASE_DESTINATION}results_to_do_list.json"
     current_status = read_json(filename)
-    last_checked = datetime.strptime(current_status["last_checked"], "%Y-%m-%d %H:%M:%S.%f%z") if current_status["last_checked"] else None
+    last_checked = (
+        datetime.strptime(current_status["last_checked"], "%Y-%m-%d %H:%M:%S.%f%z")
+        if current_status["last_checked"]
+        else None
+    )
 
     racecard_files = get_files(RACECARDS_DESTINATION, last_checked)
     result_files = get_files(RESULTS_DESTINATION)
 
-    new_race_ids = [race_id for file in racecard_files for race_id in get_race_ids(file)]
-    done_race_ids = [filename.split('.')[0].split('_')[-1] for filename in result_files]
+    new_race_ids = [
+        race_id for file in racecard_files for race_id in get_race_ids(file)
+    ]
+    done_race_ids = [filename.split(".")[0].split("_")[-1] for filename in result_files]
     to_do_race_ids = current_status["results_to_do"] + new_race_ids
 
-    content = json.dumps({
-        "last_checked": str(datetime.now(pytz.utc)),
-        "results_to_do": [race_id for race_id in to_do_race_ids if race_id not in done_race_ids],
-        "results_done": done_race_ids
-    })
+    content = json.dumps(
+        {
+            "last_checked": str(datetime.now(pytz.utc)),
+            "results_to_do": [
+                race_id for race_id in to_do_race_ids if race_id not in done_race_ids
+            ],
+            "results_done": done_race_ids,
+        }
+    )
     write_file(content, filename)
 
 
@@ -102,7 +112,9 @@ def rapid_horseracing_extractor():
     update_results_to_do_list()
 
     # Fetch a number of results within the limits presented
-    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")["results_to_do"][:LIMITS["day"] - 2]
+    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")[
+        "results_to_do"
+    ][: LIMITS["day"] - 2]
     for race_id in races_batch:
         extract_result(race_id)
         sleep(90)

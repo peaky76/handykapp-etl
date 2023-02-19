@@ -1,9 +1,11 @@
 import csv
 import json
-from digital_ocean_client import client
+from datetime import date
+from dateutil import relativedelta as rd
+from flows.digital_ocean_client import client
 from requests import get
 
-BUCKET_NAME = 'peaky76'
+BUCKET_NAME = "peaky76"
 
 
 def fetch_content(url, params=None, headers=None):
@@ -13,30 +15,30 @@ def fetch_content(url, params=None, headers=None):
 
 
 def get_files(dirname, modified_after=None):
-    response = client.list_objects(Bucket=BUCKET_NAME,
-                                   Prefix=dirname)
-    files = response.get('Contents', [])
+    response = client.list_objects(Bucket=BUCKET_NAME, Prefix=dirname)
+    files = response.get("Contents", [])
 
     if modified_after:
-        files = [f for f in files if f.get('LastModified') > modified_after]
+        files = [f for f in files if f.get("LastModified") > modified_after]
 
-    return [key for file in files if '.' in (key := file.get('Key'))]
+    return [key for file in files if "." in (key := file.get("Key"))]
 
 
 def read_file(file_path):
     obj = client.get_object(Bucket=BUCKET_NAME, Key=file_path)
-    stream = obj['Body'].read().decode('utf-8')
-    format = file_path.split('.')[-1]
+    stream = obj["Body"].read().decode("utf-8")
+    format = file_path.split(".")[-1]
     output = {
-        'csv': lambda x: [row for row in csv.reader(x.splitlines())],
-        'json': lambda x: json.loads(x)
+        "csv": lambda x: [row for row in csv.reader(x.splitlines())],
+        "json": lambda x: json.loads(x),
     }
 
     return output[format](stream)
 
 
 def write_file(content, filename):
-    client.put_object(Bucket=BUCKET_NAME,
-                      Key=filename,
-                      Body=content,
-                      ACL='private')
+    client.put_object(Bucket=BUCKET_NAME, Key=filename, Body=content, ACL="private")
+
+
+def get_last_occurrence_of(weekday_int):
+    return date.today() + rd.relativedelta(days=-6, weekday=weekday_int)
