@@ -16,7 +16,7 @@ jobs:
         id: python-version
         run: |
           python_version=$(grep '^python =' pyproject.toml | awk -F'"' '{print $2}')
-          echo "::set-output name=python-version::$python_version"
+          echo "python-version=$python_version" >> $GITHUB_OUTPUT
 
       - name: Set up python version
         uses: actions/setup-python@v4
