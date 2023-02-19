@@ -1,6 +1,6 @@
 from dateutil import relativedelta as rd
 from datetime import date
-from flows.helpers import fetch_content, write_file
+from flows.helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
 
 
@@ -13,9 +13,7 @@ FILES = {
 }
 
 UPDATE_DAY = 1  # Tuesday
-TODAY = date.today()
-LAST_UPDATE_DATE = TODAY + rd.relativedelta(days=-6, weekday=UPDATE_DAY)
-LAST_UPDATE_STR = str(LAST_UPDATE_DATE).replace("-", "")
+LAST_UPDATE_STR = str(get_last_occurrence_of(UPDATE_DAY)).replace("-", "")
 
 
 @task(tags=["BHA"], task_run_name="fetch_bha_{data}")
