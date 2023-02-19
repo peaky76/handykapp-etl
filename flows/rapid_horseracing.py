@@ -3,7 +3,7 @@ import pytz
 from datetime import date, datetime, timedelta
 from time import sleep
 from prefect import flow, task
-from flows.helpers import fetch_content, get_files, read_json, write_file
+from flows.helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
 
 # NB: In RapidAPI, results are called race details
@@ -50,7 +50,7 @@ def extract_racecards(date):  # date - YYYY-MM-DD
 
 @task(tags=["Rapid"])
 def get_race_ids(file):
-    return [race["id_race"] for race in read_json(file)]
+    return [race["id_race"] for race in read_file(file)]
 
 
 @task(tags=["Rapid"])
@@ -74,7 +74,7 @@ def get_next_racecard_date():
 @flow
 def update_results_to_do_list():
     filename = f"{BASE_DESTINATION}results_to_do_list.json"
-    current_status = read_json(filename)
+    current_status = read_file(filename)
     last_checked = (
         datetime.strptime(current_status["last_checked"], "%Y-%m-%d %H:%M:%S.%f%z")
         if current_status["last_checked"]
@@ -112,7 +112,7 @@ def rapid_horseracing_extractor():
     update_results_to_do_list()
 
     # Fetch a number of results within the limits presented
-    races_batch = read_json(f"{BASE_DESTINATION}results_to_do_list.json")[
+    races_batch = read_file(f"{BASE_DESTINATION}results_to_do_list.json")[
         "results_to_do"
     ][: LIMITS["day"] - 2]
     for race_id in races_batch:
