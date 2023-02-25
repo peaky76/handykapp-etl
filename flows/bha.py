@@ -1,11 +1,11 @@
+# To allow running as a script
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from flows.helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
-
-# To allow running as a script
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 SOURCE = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"

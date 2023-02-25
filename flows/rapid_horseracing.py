@@ -1,15 +1,15 @@
+# To allow running as a script
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import json
 import pendulum
 from time import sleep
 from prefect import flow, task
 from flows.helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
-
-# To allow running as a script
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 # NB: In RapidAPI, results are called race details
