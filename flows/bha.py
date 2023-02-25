@@ -13,7 +13,7 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["bha"]["source"]
-DESTINATION = api_info["bha"]["destination"]
+DESTINATION = api_info["bha"]["space_dir"]
 FILES = {
     "ratings": "ratings.csv",
     "rating_changes": "ratings.csv?diff",
