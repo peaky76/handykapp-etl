@@ -3,8 +3,15 @@ import pytz
 from datetime import date, datetime, timedelta
 from time import sleep
 from prefect import flow, task
-from helpers import fetch_content, get_files, read_file, write_file
+from flows.helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
+
+# To allow running as a script
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 # NB: In RapidAPI, results are called race details
 
