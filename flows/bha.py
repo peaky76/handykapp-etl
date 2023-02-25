@@ -6,10 +6,14 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from flows.helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
+import yaml
 
 
-SOURCE = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
-DESTINATION = "handykapp/bha/"
+with open("api_info.yml", "r") as f:
+    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+
+SOURCE = api_info["bha"]["source"]
+DESTINATION = api_info["bha"]["destination"]
 FILES = {
     "ratings": "ratings.csv",
     "rating_changes": "ratings.csv?diff",
