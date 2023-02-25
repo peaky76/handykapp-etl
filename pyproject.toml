@@ -11,6 +11,7 @@ python = "^3.10.0"
 python-dotenv = "^0.21.0"
 pendulum = "^2.1.2"
 pymongo = "^4.3.3"
+petl = "^1.7.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
