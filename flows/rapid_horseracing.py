@@ -1,6 +1,5 @@
 import json
-import pytz
-from datetime import date, datetime, timedelta
+import pendulum
 from time import sleep
 from prefect import flow, task
 from flows.helpers import fetch_content, get_files, read_file, write_file
@@ -62,18 +61,18 @@ def get_race_ids(file):
 
 @task(tags=["Rapid"])
 def get_next_racecard_date():
-    start_date = date.fromisoformat("2020-01-01")
-    end_date = date.today()
+    start_date = pendulum.parse("2020-01-01")
+    end_date = pendulum.now()
     test_date = start_date
 
     files = get_files(RACECARDS_DESTINATION)
     file_date_strs = [get_file_date(filename) for filename in files]
-    file_dates = [datetime.strptime(x, "%Y%m%d").date() for x in file_date_strs]
+    file_dates = [pendulum.from_format(x, "YYYYMMDD") for x in file_date_strs]
 
     while test_date <= end_date:
         if test_date not in file_dates:
-            return test_date.strftime("%Y-%m-%d")
-        test_date += timedelta(days=1)
+            return test_date.format("YYYY-MM-DD")
+        test_date += pendulum.duration(days=1)
 
     return None
 
@@ -83,7 +82,7 @@ def update_results_to_do_list():
     filename = f"{BASE_DESTINATION}results_to_do_list.json"
     current_status = read_file(filename)
     last_checked = (
-        datetime.strptime(current_status["last_checked"], "%Y-%m-%d %H:%M:%S.%f%z")
+        pendulum.parse(current_status["last_checked"])
         if current_status["last_checked"]
         else None
     )
@@ -99,7 +98,7 @@ def update_results_to_do_list():
 
     content = json.dumps(
         {
-            "last_checked": str(datetime.now(pytz.utc)),
+            "last_checked": str(pendulum.now()),
             "results_to_do": [
                 race_id for race_id in to_do_race_ids if race_id not in done_race_ids
             ],
