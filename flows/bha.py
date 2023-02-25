@@ -1,5 +1,3 @@
-from dateutil import relativedelta as rd
-from datetime import date
 from helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
 
