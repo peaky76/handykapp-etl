@@ -3,7 +3,7 @@ from prefect.blocks.system import Secret
 
 
 session = boto3.session.Session()
-client = session.client(
+spaces_client = session.client(
     "s3",
     region_name="ams3",
     endpoint_url="https://ams3.digitaloceanspaces.com",

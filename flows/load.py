@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from flows.mongo_client import client
+from clients import mongo_client as client
 from prefect import flow, task
 
 
