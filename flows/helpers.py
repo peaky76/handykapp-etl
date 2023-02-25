@@ -2,7 +2,7 @@ import csv
 import json
 from datetime import date
 from dateutil import relativedelta as rd
-from flows.digital_ocean_client import client
+from digital_ocean_client import client
 from requests import get
 
 BUCKET_NAME = "peaky76"
