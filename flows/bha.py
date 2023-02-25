@@ -16,7 +16,7 @@ FILES = {
     "perf_figs": "performance-figures.csv",
 }
 
-UPDATE_DAY = 1  # Tuesday
+UPDATE_DAY = 2  # Tuesday
 LAST_UPDATE_STR = str(get_last_occurrence_of(UPDATE_DAY)).replace("-", "")
 
 

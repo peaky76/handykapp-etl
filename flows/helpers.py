@@ -1,7 +1,6 @@
 import csv
 import json
-from datetime import date
-from dateutil import relativedelta as rd
+import pendulum
 from flows.digital_ocean_client import client
 from requests import get
 
@@ -40,5 +39,5 @@ def write_file(content, filename):
     client.put_object(Bucket=BUCKET_NAME, Key=filename, Body=content, ACL="private")
 
 
-def get_last_occurrence_of(weekday_int):
-    return date.today() + rd.relativedelta(days=-6, weekday=weekday_int)
+def get_last_occurrence_of(weekday):
+    return pendulum.now().add(days=1).previous(weekday)
