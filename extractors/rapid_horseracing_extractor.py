@@ -8,7 +8,7 @@ import json
 import pendulum
 from time import sleep
 from prefect import flow, task
-from flows.helpers import fetch_content, get_files, read_file, write_file
+from helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
 
 
