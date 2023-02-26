@@ -29,13 +29,13 @@ def read_file(file_path):
         "csv": lambda x: [row for row in csv.reader(x.splitlines())],
         "json": lambda x: json.loads(x),
     }
-
-    return output[format](stream_file(file_path))
+    stream = stream_file(file_path).decode("utf-8")
+    return output[format](stream)
 
 
 def stream_file(file_path):
     obj = client.get_object(Bucket=BUCKET_NAME, Key=file_path)
-    return obj["Body"].read().decode("utf-8")
+    return obj["Body"].read()
 
 
 def write_file(content, filename):
