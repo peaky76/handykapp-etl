@@ -48,10 +48,22 @@ def prune_ratings_csv(csv):
     )
 
 
+@task(tags=["BHA"])
+def select_dams(data):
+    return sorted(list(set([x["dam"] for x in data])))
+
+
+@task(tags=["BHA"])
+def select_sires(data):
+    return sorted(list(set([x["sire"] for x in data])))
+
+
 @flow
 def bha_transformer():
     source = petl.MemorySource(stream_file(get_ratings_files()[-1]))
-    prune_ratings_csv(source)
+    data = prune_ratings_csv(source)
+    sires = select_sires(data)
+    dams = select_dams(data)
 
 
 if __name__ == "__main__":
