@@ -44,7 +44,7 @@ def prune_ratings_csv(csv):
         petl.fromcsv(csv)
         .cut(used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
-        .tojson()
+        .dicts()
     )
 
 
