@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from flows.helpers import get_files, read_file
 from prefect import flow, task
 import pendulum
+import petl
 import yaml
 
 
@@ -27,7 +28,7 @@ def get_ratings_files(date=None):
 
 @flow
 def bha_transformer():
-    data = read_file(f"{SOURCE}bha_ratings_20230221.csv")
+    data = read_file(get_ratings_files()[-1])
     print(data)
 
 
