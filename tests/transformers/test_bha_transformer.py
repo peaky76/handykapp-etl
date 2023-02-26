@@ -1,5 +1,6 @@
 from prefect.testing.utilities import prefect_test_harness
-from transformers.bha_transformer import bha_transformer, get_ratings_files
+from transformers.bha_transformer import get_ratings_files, prune_ratings_csv
+import petl
 
 
 def test_get_ratings_files_only_returns_ratings_files(mocker):

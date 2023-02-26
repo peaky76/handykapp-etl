@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from helpers import get_files, read_file
+from helpers import get_files, read_file, stream_file
 from prefect import flow, task
 import pendulum
 import petl
@@ -16,7 +16,7 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["space_dir"]
 
 
-@task(tags=["BHA"], task_run_name="get_ratings_files")
+@task(tags=["BHA"])
 def get_ratings_files(date=None):
     files = [file for file in get_files(SOURCE) if "ratings" in file]
     if date:
@@ -26,10 +26,32 @@ def get_ratings_files(date=None):
     return files
 
 
+@task(tags=["BHA"])
+def prune_ratings_csv(csv):
+    used_fields = (
+        "Name",
+        "Year",
+        "Sex",
+        "Sire",
+        "Dam",
+        "Trainer",
+        "Flat rating",
+        "AWT rating",
+        "Chase rating",
+        "Hurdle rating",
+    )
+    return (
+        petl.fromcsv(csv)
+        .cut(used_fields)
+        .rename({x: x.replace(" rating", "").lower() for x in used_fields})
+        .tojson()
+    )
+
+
 @flow
 def bha_transformer():
-    data = read_file(get_ratings_files()[-1])
-    print(data)
+    source = petl.MemorySource(stream_file(get_ratings_files()[-1]))
+    prune_ratings_csv(source)
 
 
 if __name__ == "__main__":
