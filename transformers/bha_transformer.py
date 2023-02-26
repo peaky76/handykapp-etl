@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from flows.helpers import get_files, read_file
+from helpers import get_files, read_file
 from prefect import flow, task
 import pendulum
 import petl

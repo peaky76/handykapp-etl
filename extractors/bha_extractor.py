@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from flows.helpers import fetch_content, write_file, get_last_occurrence_of
+from helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
 import yaml
 
