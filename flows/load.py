@@ -14,7 +14,7 @@ def drop_database():
 
 
 @flow
-def create_fresh_database():
+def create_sample_database():
     frankel = {
         "name": "Frankel",
         "country": "GB",
@@ -27,5 +27,14 @@ def create_fresh_database():
     id = collection.insert_one(frankel)
 
 
+@flow
+def load_database_afresh():
+    drop_database()
+    # load_sires()
+    # load_dams()
+    # load_horses()
+    # load_ratings()
+
+
 if __name__ == "__main__":
-    create_fresh_database()
+    create_sample_database()
