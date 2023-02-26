@@ -13,6 +13,26 @@ def drop_database():
     client.drop_database("handykapp")
 
 
+@task
+def load_sires():
+    pass  # TODO
+
+
+@task
+def load_dams():
+    pass  # TODO
+
+
+@task
+def load_horses():
+    pass  # TODO
+
+
+@task
+def load_ratings():
+    pass  # TODO
+
+
 @flow
 def create_sample_database():
     frankel = {
