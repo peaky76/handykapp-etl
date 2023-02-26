@@ -24,15 +24,18 @@ def get_files(dirname, modified_after=None):
 
 
 def read_file(file_path):
-    obj = client.get_object(Bucket=BUCKET_NAME, Key=file_path)
-    stream = obj["Body"].read().decode("utf-8")
     format = file_path.split(".")[-1]
     output = {
         "csv": lambda x: [row for row in csv.reader(x.splitlines())],
         "json": lambda x: json.loads(x),
     }
 
-    return output[format](stream)
+    return output[format](stream_file(file_path))
+
+
+def stream_file(file_path):
+    obj = client.get_object(Bucket=BUCKET_NAME, Key=file_path)
+    return obj["Body"].read().decode("utf-8")
 
 
 def write_file(content, filename):
