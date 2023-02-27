@@ -5,7 +5,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, read_file, stream_file
 from prefect import flow, task
-import pendulum
 import petl
 import yaml
 
@@ -26,14 +25,14 @@ def parse_sex(sex):
     return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
 
 
-@task(tags=["BHA"])
-def get_ratings_files(date=None):
-    files = [file for file in get_files(SOURCE) if "ratings" in file]
-    if date:
-        files = [
-            file for file in files if pendulum.parse(date).format("YYYYMMDD") in file
-        ]
-    return files
+@task(tags=["BHA"], task_run_name="get_{date}_{type}_file")
+def get_file(type="ratings", date="latest"):
+    idx = -1 if date == "latest" else 0
+    search_string = "" if date == "latest" else date
+    files = [
+        file for file in get_files(SOURCE) if type in file and search_string in file
+    ]
+    return files[idx] if files else None
 
 
 @task(tags=["BHA"])
@@ -70,10 +69,11 @@ def select_sires(data):
 
 @flow
 def bha_transformer():
-    source = petl.MemorySource(stream_file(get_ratings_files()[-1]))
-    data = prune_ratings_csv(source)
-    sires = select_sires(data)
-    dams = select_dams(data)
+    print(files)
+    # source = petl.MemorySource(stream_file(get_ratings_files()[-1]))
+    # data = prune_ratings_csv(source)
+    # sires = select_sires(data)
+    # dams = select_dams(data)
 
 
 if __name__ == "__main__":
