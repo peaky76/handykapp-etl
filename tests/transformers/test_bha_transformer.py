@@ -4,6 +4,8 @@ from transformers.bha_transformer import (
     parse_horse,
     parse_sex,
     prune_ratings_csv,
+    select_dams,
+    select_sires,
 )
 import petl
 
@@ -54,3 +56,23 @@ def test_parse_sex_returns_correct_value_for_filly():
 
 def test_parse_sex_returns_correct_value_for_mare():
     assert "F" == parse_sex("MARE")
+
+
+def test_select_dams():
+    data = [
+        {"dam": "DAM1"},
+        {"dam": "DAM2"},
+        {"dam": "DAM1"},
+        {"dam": "DAM3"},
+    ]
+    assert ["DAM1", "DAM2", "DAM3"] == select_dams.fn(data)
+
+
+def test_select_sires():
+    data = [
+        {"sire": "SIRE1"},
+        {"sire": "SIRE2"},
+        {"sire": "SIRE1"},
+        {"sire": "SIRE3"},
+    ]
+    assert ["SIRE1", "SIRE2", "SIRE3"] == select_sires.fn(data)
