@@ -36,7 +36,7 @@ def get_file(type="ratings", date="latest"):
 
 
 @task(tags=["BHA"])
-def prune_ratings_csv(csv):
+def transform_ratings_csv(csv):
     used_fields = (
         "Name",
         "Year",
@@ -53,6 +53,8 @@ def prune_ratings_csv(csv):
         petl.fromcsv(csv)
         .cut(used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
+        .rename({"awt": "aw"})
+        .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
         .dicts()
     )
 
@@ -69,11 +71,11 @@ def select_sires(data):
 
 @flow
 def bha_transformer():
-    print(files)
-    # source = petl.MemorySource(stream_file(get_ratings_files()[-1]))
-    # data = prune_ratings_csv(source)
-    # sires = select_sires(data)
-    # dams = select_dams(data)
+    source = petl.MemorySource(stream_file(get_file()))
+    data = transform_ratings_csv(source)
+    sires = select_sires(data)
+    dams = select_dams(data)
+    print(sires)
 
 
 if __name__ == "__main__":

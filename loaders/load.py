@@ -7,11 +7,12 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from helpers import stream_file
 from transformers.bha_transformer import (
-    prune_ratings_csv,
+    get_file,
     select_dams,
     select_sires,
     parse_horse,
     parse_sex,
+    transform_ratings_csv,
 )
 from prefect import flow, task, get_run_logger
 import petl
@@ -20,7 +21,7 @@ import yaml
 with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
-SOURCE = api_info["bha"]["space_dir"]
+SOURCE = api_info["bha"]["spaces"]["dir"]
 
 db = client.handykapp
 collection = db.horses
@@ -57,10 +58,10 @@ def load_horse_detail(horses, sires_ids, dams_ids):
                 "dam": dams_ids.get(horse["dam"], None),
                 "trainer": horse["trainer"],
                 "ratings": {
-                    "flat": int(horse["flat"]) if horse["flat"] else None,
-                    "aw": int(horse["awt"]) if horse["awt"] else None,
-                    "chase": int(horse["chase"]) if horse["chase"] else None,
-                    "hurdle": int(horse["hurdle"]) if horse["hurdle"] else None,
+                    "flat": horse["flat"],
+                    "aw": horse["aw"],
+                    "chase": horse["chase"],
+                    "hurdle": horse["hurdle"],
                 },
             }
         )
@@ -87,8 +88,8 @@ def create_sample_database():
 
 @flow
 def load_database_afresh():
-    source = petl.MemorySource(stream_file(f"{SOURCE}bha_ratings_20230221.csv"))
-    data = prune_ratings_csv(source)
+    source = petl.MemorySource(stream_file(get_file()))
+    data = transform_ratings_csv(source)
     sires = select_sires(data)
     dams = select_dams(data)
     drop_database()
