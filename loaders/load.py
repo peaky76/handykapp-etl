@@ -12,6 +12,7 @@ from transformers.bha_transformer import (
     select_sires,
     parse_horse,
     parse_sex,
+    select_trainers,
     transform_ratings_csv,
 )
 from prefect import flow, task, get_run_logger
@@ -31,6 +32,15 @@ def drop_database():
     client.drop_database("handykapp")
 
 
+@task(tags=["BHA"])
+def load_people(people):
+    return_val = {}
+    for person in people:
+        id = db.people.insert_one({"name": person})
+        return_val[person] = id.inserted_id
+    return return_val
+
+
 @task(tags=["BHA"], task_run_name="load_basics")
 def load_parents(horses, sex):
     return_val = {}
@@ -42,7 +52,7 @@ def load_parents(horses, sex):
 
 
 @task(tags=["BHA"], task_run_name="load_details")
-def load_horse_detail(horses, sires_ids, dams_ids):
+def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
     logger = get_run_logger()
     for i, horse in enumerate(horses):
         name, country = parse_horse(horse["name"])
@@ -55,7 +65,7 @@ def load_horse_detail(horses, sires_ids, dams_ids):
                 "year": horse["year"],
                 "sire": sires_ids.get(horse["sire"], None),
                 "dam": dams_ids.get(horse["dam"], None),
-                "trainer": horse["trainer"],
+                "trainer": trainer_ids.get(horse["trainer"], None),
                 "ratings": {
                     "flat": horse["flat"],
                     "aw": horse["aw"],
@@ -91,10 +101,12 @@ def load_database_afresh():
     data = transform_ratings_csv(source)
     sires = select_sires(data)
     dams = select_dams(data)
+    trainers = select_trainers(data)
     drop_database()
     sires_ids = load_parents(sires, "M")
     dams_ids = load_parents(dams, "F")
-    load_horse_detail(data, sires_ids, dams_ids)
+    trainer_ids = load_people(trainers)
+    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
     # load_ratings()
 
 
