@@ -24,7 +24,6 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["spaces"]["dir"]
 
 db = client.handykapp
-collection = db.horses
 
 
 @task
@@ -37,7 +36,7 @@ def load_parents(horses, sex):
     return_val = {}
     for horse in horses:
         name, country = parse_horse(horse)
-        id = collection.insert_one({"name": name, "country": country, "sex": sex})
+        id = db.horses.insert_one({"name": name, "country": country, "sex": sex})
         return_val[horse] = id.inserted_id
     return return_val
 
@@ -48,7 +47,7 @@ def load_horse_detail(horses, sires_ids, dams_ids):
     for i, horse in enumerate(horses):
         name, country = parse_horse(horse["name"])
         sex = parse_sex(horse["sex"])
-        collection.insert_one(
+        db.horses.insert_one(
             {
                 "name": name,
                 "country": country,
@@ -83,7 +82,7 @@ def create_sample_database():
     }
 
     drop_database()
-    id = collection.insert_one(frankel)
+    db.horses.insert_one(frankel)
 
 
 @flow
