@@ -6,21 +6,17 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import fetch_content, write_file, get_last_occurrence_of
 from prefect import flow, task
+import pendulum
 import yaml
 
 
 with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
-SOURCE = api_info["bha"]["source"]
-DESTINATION = api_info["bha"]["space_dir"]
-FILES = {
-    "ratings": "ratings.csv",
-    "rating_changes": "ratings.csv?diff",
-    "perf_figs": "performance-figures.csv",
-}
-
-UPDATE_DAY = 2  # Tuesday
+SOURCE = api_info["bha"]["source"]["dir"]
+FILES = api_info["bha"]["source"]["files"]
+DESTINATION = api_info["bha"]["spaces"]["dir"]
+UPDATE_DAY = pendulum.TUESDAY
 LAST_UPDATE_STR = str(get_last_occurrence_of(UPDATE_DAY)).replace("-", "")
 
 

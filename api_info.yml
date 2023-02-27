@@ -1,3 +1,10 @@
 bha:
-  source: "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
-  space_dir: "handykapp/bha/"
+  source: 
+    dir: "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
+    files:  
+      ratings: "ratings.csv",
+      rating_changes: "ratings.csv?diff",
+      perf_figs: "performance-figures.csv"
+  spaces: 
+    dir: "handykapp/bha/"
+    

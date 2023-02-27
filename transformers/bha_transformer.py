@@ -13,7 +13,7 @@ import yaml
 with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
-SOURCE = api_info["bha"]["space_dir"]
+SOURCE = api_info["bha"]["spaces"]["dir"]
 
 
 def parse_horse(horse):
