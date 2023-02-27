@@ -6,7 +6,13 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from helpers import stream_file
-from transformers.bha_transformer import prune_ratings_csv, select_dams, select_sires
+from transformers.bha_transformer import (
+    prune_ratings_csv,
+    select_dams,
+    select_sires,
+    parse_horse,
+    parse_sex,
+)
 from prefect import flow, task, get_run_logger
 import petl
 import yaml
@@ -18,16 +24,6 @@ SOURCE = api_info["bha"]["space_dir"]
 
 db = client.handykapp
 collection = db.horses
-
-
-def parse_horse(horse):
-    split_string = horse.replace(")", "").split(" (")
-    name, country = split_string if len(split_string) == 2 else (horse, None)
-    return (name, country)
-
-
-def parse_sex(sex):
-    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
 
 
 @task
