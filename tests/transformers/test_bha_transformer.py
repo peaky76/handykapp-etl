@@ -1,33 +1,13 @@
 from prefect.testing.utilities import prefect_test_harness
 from transformers.bha_transformer import (
-    get_ratings_files,
+    get_file,
     parse_horse,
     parse_sex,
     prune_ratings_csv,
     select_dams,
     select_sires,
+    SOURCE,
 )
-import petl
-
-
-def test_get_ratings_files_only_returns_ratings_files(mocker):
-    with prefect_test_harness():
-        mocker.patch("transformers.bha_transformer.get_files").return_value = [
-            "bha_ratings_20210101.csv",
-            "bha_rating_changes_20210101.csv",
-            "bha_perf_figs_20210101.csv",
-        ]
-        assert ["bha_ratings_20210101.csv"] == get_ratings_files.fn()
-
-
-def test_get_ratings_files_only_returns_files_for_specified_date(mocker):
-    with prefect_test_harness():
-        mocker.patch("transformers.bha_transformer.get_files").return_value = [
-            "bha_ratings_20210101.csv",
-            "bha_ratings_20210202.csv",
-            "bha_ratings_20210303.csv",
-        ]
-        assert ["bha_ratings_20210101.csv"] == get_ratings_files.fn("2021-01-01")
 
 
 def test_parse_horse_returns_correct_dict_when_country_supplied():
@@ -56,6 +36,47 @@ def test_parse_sex_returns_correct_value_for_filly():
 
 def test_parse_sex_returns_correct_value_for_mare():
     assert "F" == parse_sex("MARE")
+
+
+def test_get_file_returns_latest_ratings_by_default(mocker):
+    mocker.patch(
+        "transformers.bha_transformer.get_files",
+        return_value=[
+            "handykapp/bha/bha_ratings_20200101.csv",
+            "handykapp/bha/bha_ratings_20200201.csv",
+            "handykapp/bha/bha_rating_changes_20200301.csv",
+        ],
+    )
+    assert "handykapp/bha/bha_ratings_20200201.csv" == get_file.fn()
+
+
+def test_get_file_returns_perf_figs_if_requested(mocker):
+    mocker.patch(
+        "transformers.bha_transformer.get_files",
+        return_value=[
+            "handykapp/bha/bha_perf_figs_20200101.csv",
+            "handykapp/bha/bha_ratings_20200201.csv",
+            "handykapp/bha/bha_ratings_20200301.csv",
+        ],
+    )
+    assert "handykapp/bha/bha_perf_figs_20200101.csv" == get_file.fn(type="perf_figs")
+
+
+def test_get_file_returns_ratings_for_date_if_requested(mocker):
+    mocker.patch(
+        "transformers.bha_transformer.get_files",
+        return_value=[
+            "handykapp/bha/bha_ratings_20200101.csv",
+            "handykapp/bha/bha_ratings_20200201.csv",
+            "handykapp/bha/bha_ratings_20200301.csv",
+        ],
+    )
+    assert "handykapp/bha/bha_ratings_20200201.csv" == get_file.fn(date="20200201")
+
+
+def test_get_file_returns_none_if_no_files_found(mocker):
+    mocker.patch("transformers.bha_transformer.get_files", return_value=[])
+    assert None == get_file.fn()
 
 
 def test_select_dams():
