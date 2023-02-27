@@ -16,6 +16,16 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["space_dir"]
 
 
+def parse_horse(horse):
+    split_string = horse.replace(")", "").split(" (")
+    name, country = split_string if len(split_string) == 2 else (horse, None)
+    return (name, country)
+
+
+def parse_sex(sex):
+    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
+
+
 @task(tags=["BHA"])
 def get_ratings_files(date=None):
     files = [file for file in get_files(SOURCE) if "ratings" in file]
