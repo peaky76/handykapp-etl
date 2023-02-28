@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from helpers import stream_file
 from transformers.bha_transformer import (
-    get_file,
+    get_csv,
     select_dams,
     select_sires,
     parse_horse,
@@ -16,6 +16,7 @@ from transformers.bha_transformer import (
     transform_ratings_csv,
 )
 from prefect import flow, task, get_run_logger
+from pymongo import ASCENDING, DESCENDING
 import petl
 import yaml
 
@@ -30,6 +31,21 @@ db = client.handykapp
 @task
 def drop_database():
     client.drop_database("handykapp")
+
+
+@task
+def spec_database():
+    db.horses.create_index(
+        [("name", ASCENDING), ("country", ASCENDING), ("year", ASCENDING)], unique=True
+    )
+    db.horses.create_index("name")
+    db.people.create_index("name", unique=True)
+    db.racecourses.create_index(
+        [("name", ASCENDING), ("country", ASCENDING)], unique=True
+    )
+    db.races.create_index(
+        [("racecourse", ASCENDING), ("datetime", ASCENDING)], unique=True
+    )
 
 
 @task(tags=["BHA"])
@@ -92,21 +108,23 @@ def create_sample_database():
     }
 
     drop_database()
+    spec_database()
     db.horses.insert_one(frankel)
 
 
 @flow
 def load_database_afresh():
-    source = petl.MemorySource(stream_file(get_file()))
+    source = petl.MemorySource(stream_file(get_csv()))
     data = transform_ratings_csv(source)
-    sires = select_sires(data)
-    dams = select_dams(data)
-    trainers = select_trainers(data)
+    sires = select_sires(data.dicts())
+    # dams = select_dams(data)
+    # trainers = select_trainers(data)
     drop_database()
+    spec_database()
     sires_ids = load_parents(sires, "M")
-    dams_ids = load_parents(dams, "F")
-    trainer_ids = load_people(trainers)
-    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    # dams_ids = load_parents(dams, "F")
+    # trainer_ids = load_people(trainers)
+    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
     # load_ratings()
 
 
