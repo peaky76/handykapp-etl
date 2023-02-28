@@ -1,9 +1,8 @@
 from prefect.testing.utilities import prefect_test_harness
-from transformers.bha_transformer import (
+from src.transformers.bha_transformer import (
     get_file,
     parse_horse,
     parse_sex,
-    prune_ratings_csv,
     select_dams,
     select_sires,
     SOURCE,
@@ -40,7 +39,7 @@ def test_parse_sex_returns_correct_value_for_mare():
 
 def test_get_file_returns_latest_ratings_by_default(mocker):
     mocker.patch(
-        "transformers.bha_transformer.get_files",
+        "src.transformers.bha_transformer.get_files",
         return_value=[
             "handykapp/bha/bha_ratings_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -52,7 +51,7 @@ def test_get_file_returns_latest_ratings_by_default(mocker):
 
 def test_get_file_returns_perf_figs_if_requested(mocker):
     mocker.patch(
-        "transformers.bha_transformer.get_files",
+        "src.transformers.bha_transformer.get_files",
         return_value=[
             "handykapp/bha/bha_perf_figs_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -64,7 +63,7 @@ def test_get_file_returns_perf_figs_if_requested(mocker):
 
 def test_get_file_returns_ratings_for_date_if_requested(mocker):
     mocker.patch(
-        "transformers.bha_transformer.get_files",
+        "src.transformers.bha_transformer.get_files",
         return_value=[
             "handykapp/bha/bha_ratings_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -75,7 +74,7 @@ def test_get_file_returns_ratings_for_date_if_requested(mocker):
 
 
 def test_get_file_returns_none_if_no_files_found(mocker):
-    mocker.patch("transformers.bha_transformer.get_files", return_value=[])
+    mocker.patch("src.transformers.bha_transformer.get_files", return_value=[])
     assert None == get_file.fn()
 
 
