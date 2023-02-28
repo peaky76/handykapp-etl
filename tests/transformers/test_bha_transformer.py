@@ -1,8 +1,10 @@
 from prefect.testing.utilities import prefect_test_harness
+import pytest
 from src.transformers.bha_transformer import (
     get_csv,
     parse_horse,
     parse_sex,
+    read_csv,
     select_dams,
     select_sires,
     SOURCE,
@@ -10,6 +12,21 @@ from src.transformers.bha_transformer import (
     validate_sex,
     validate_year,
 )
+
+
+@pytest.fixture
+def mock_csv_data():
+    return [
+        "Name,Year,Sex,Sire,Dam,Trainer,Flat rating,Diff Flat,Flat Clltrl,AWT rating,Diff AWT,AWT Clltrl,Chase rating,Diff Chase,Chase Clltrl,Hurdle rating,Diff Hurdle,Hurdle Clltrl"
+        "A BOY NAMED IVY (IRE),2018,GELDING,MARKAZ (IRE),ST ATHAN (GB),,79,,,,,,,,,,,",
+        "A DAY TO DREAM (IRE),2020,GELDING,ADAAY (IRE),TARA TOO (IRE),Ollie Pears,49,,,,,,,,,,,",
+        "A DEFINITE GETAWAY (IRE),2018,GELDING,GETAWAY (GER),DEF IT VIC (IRE),Ben Pauling,,,,,,,,,,112,,",
+    ]
+
+
+@pytest.fixture
+def mock_csv_bytearray(mock_csv_data):
+    return bytearray("\n".join(mock_csv_data), "utf-8")
 
 
 def test_parse_horse_returns_correct_dict_when_country_supplied():
