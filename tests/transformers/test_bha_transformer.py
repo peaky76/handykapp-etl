@@ -6,6 +6,7 @@ from src.transformers.bha_transformer import (
     select_dams,
     select_sires,
     SOURCE,
+    validate_rating,
 )
 
 
@@ -35,6 +36,26 @@ def test_parse_sex_returns_correct_value_for_filly():
 
 def test_parse_sex_returns_correct_value_for_mare():
     assert "F" == parse_sex("MARE")
+
+
+def test_validate_rating_passes_for_none():
+    assert validate_rating(None)
+
+
+def test_validate_rating_passes_for_empty_string():
+    assert validate_rating("")
+
+
+def test_validate_rating_passes_for_str_in_range():
+    assert validate_rating("99")
+
+
+def test_validate_rating_fails_for_str_below_range():
+    assert not validate_rating("-1")
+
+
+def test_validate_rating_fails_for_str_above_range():
+    assert not validate_rating("999")
 
 
 def test_get_csv_returns_latest_ratings_by_default(mocker):
