@@ -1,6 +1,6 @@
 from prefect.testing.utilities import prefect_test_harness
 from src.transformers.bha_transformer import (
-    get_file,
+    get_csv,
     parse_horse,
     parse_sex,
     select_dams,
@@ -37,7 +37,7 @@ def test_parse_sex_returns_correct_value_for_mare():
     assert "F" == parse_sex("MARE")
 
 
-def test_get_file_returns_latest_ratings_by_default(mocker):
+def test_get_csv_returns_latest_ratings_by_default(mocker):
     mocker.patch(
         "src.transformers.bha_transformer.get_files",
         return_value=[
@@ -46,10 +46,10 @@ def test_get_file_returns_latest_ratings_by_default(mocker):
             "handykapp/bha/bha_rating_changes_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_ratings_20200201.csv" == get_file.fn()
+    assert "handykapp/bha/bha_ratings_20200201.csv" == get_csv.fn()
 
 
-def test_get_file_returns_perf_figs_if_requested(mocker):
+def test_get_csv_returns_perf_figs_if_requested(mocker):
     mocker.patch(
         "src.transformers.bha_transformer.get_files",
         return_value=[
@@ -58,10 +58,10 @@ def test_get_file_returns_perf_figs_if_requested(mocker):
             "handykapp/bha/bha_ratings_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_perf_figs_20200101.csv" == get_file.fn(type="perf_figs")
+    assert "handykapp/bha/bha_perf_figs_20200101.csv" == get_csv.fn(type="perf_figs")
 
 
-def test_get_file_returns_ratings_for_date_if_requested(mocker):
+def test_get_csv_returns_ratings_for_date_if_requested(mocker):
     mocker.patch(
         "src.transformers.bha_transformer.get_files",
         return_value=[
@@ -70,12 +70,12 @@ def test_get_file_returns_ratings_for_date_if_requested(mocker):
             "handykapp/bha/bha_ratings_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_ratings_20200201.csv" == get_file.fn(date="20200201")
+    assert "handykapp/bha/bha_ratings_20200201.csv" == get_csv.fn(date="20200201")
 
 
-def test_get_file_returns_none_if_no_files_found(mocker):
+def test_get_csv_returns_none_if_no_files_found(mocker):
     mocker.patch("src.transformers.bha_transformer.get_files", return_value=[])
-    assert None == get_file.fn()
+    assert None == get_csv.fn()
 
 
 def test_select_dams():

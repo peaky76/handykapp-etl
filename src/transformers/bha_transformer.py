@@ -25,14 +25,30 @@ def parse_sex(sex):
     return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
 
 
-@task(tags=["BHA"], task_run_name="get_{date}_{type}_file")
-def get_file(type="ratings", date="latest"):
+def validate_rating(rating):
+    return not rating or (0 < int(rating) < 240)
+
+
+def validate_sex(sex):
+    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE"]
+
+
+def validate_year(year):
+    return 1600 <= int(year) <= 2100
+
+
+@task(tags=["BHA"], task_run_name="get_{date}_{type}_csv")
+def get_csv(type="ratings", date="latest"):
     idx = -1 if date == "latest" else 0
     search_string = "" if date == "latest" else date
-    files = [
-        file for file in get_files(SOURCE) if type in file and search_string in file
-    ]
-    return files[idx] if files else None
+    csvs = [csv for csv in get_files(SOURCE) if type in csv and search_string in csv]
+    return csvs[idx] if csvs else None
+
+
+@task(tags=["BHA"])
+def read_csv(csv):
+    source = petl.MemorySource(stream_file(csv))
+    return petl.fromcsv(source)
 
 
 @task(tags=["BHA"])
@@ -56,6 +72,44 @@ def transform_ratings_csv(csv):
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
     )
+
+
+@task(tags=["BHA"])
+def validate_ratings_input(data):
+    header = (
+        "Name",
+        "Year",
+        "Sex",
+        "Sire",
+        "Dam",
+        "Trainer",
+        "Flat rating",
+        "Diff Flat",
+        "Flat Clltrl",
+        "AWT rating",
+        "Diff AWT",
+        "AWT Clltrl",
+        "Chase rating",
+        "Diff Chase",
+        "Chase Clltrl",
+        "Hurdle rating",
+        "Diff Hurdle",
+        "Hurdle Clltrl",
+    )
+    constraints = [
+        dict(name="name_str", field="Name", test=str),
+        dict(name="year_valid", field="Year", test=validate_year),
+        dict(name="sex_valid", field="Sex", test=validate_sex),
+        dict(name="sire_str", field="Sire", test=str),
+        dict(name="dam_str", field="Dam", test=str),
+        dict(name="trainer_str", field="Trainer", test=str),
+        dict(name="flat_valid", field="Flat rating", test=validate_rating),
+        dict(name="awt_valid", field="AWT rating", test=validate_rating),
+        dict(name="chase_valid", field="Chase rating", test=validate_rating),
+        dict(name="hurdle_rating_int", field="Hurdle rating", test=validate_rating),
+    ]
+    validator = {"header": header, "constraints": constraints}
+    return petl.validate(data, **validator)
 
 
 @task(tags=["BHA"])
@@ -130,7 +184,7 @@ def select_trainers(data):
 
 @flow
 def bha_transformer():
-    source = petl.MemorySource(stream_file(get_file()))
+    source = petl.MemorySource(stream_file(get_csv()))
     data = transform_ratings_csv(source)
     problems = validate_ratings_data(data)
     print(problems.lookall())
