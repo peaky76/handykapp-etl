@@ -26,7 +26,7 @@ def parse_sex(sex):
 
 
 def validate_rating(rating):
-    return not rating or (0 < int(rating) < 240)
+    return not rating or (0 <= int(rating) <= 240)
 
 
 def validate_sex(sex):
