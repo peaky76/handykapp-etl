@@ -8,6 +8,7 @@ from src.transformers.bha_transformer import (
     SOURCE,
     validate_rating,
     validate_sex,
+    validate_year,
 )
 
 
@@ -69,6 +70,22 @@ def test_validate_sex_fails_for_none():
 
 def test_validate_sex_fails_for_invalid_string():
     assert not validate_sex("PUPPY")
+
+
+def test_validate_year_fails_for_none():
+    assert not validate_year(None)
+
+
+def test_validate_year_passes_for_str_in_range():
+    assert validate_year("2020")
+
+
+def test_validate_year_fails_for_str_below_range():
+    assert not validate_year("1599")
+
+
+def test_validate_year_fails_for_str_above_range():
+    assert not validate_year("2101")
 
 
 def test_get_csv_returns_latest_ratings_by_default(mocker):
