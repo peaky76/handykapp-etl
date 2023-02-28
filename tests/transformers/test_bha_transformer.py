@@ -8,6 +8,7 @@ from src.transformers.bha_transformer import (
     select_dams,
     select_sires,
     SOURCE,
+    validate_horse,
     validate_rating,
     validate_sex,
     validate_year,
@@ -57,8 +58,24 @@ def test_parse_sex_returns_correct_value_for_mare():
     assert "F" == parse_sex("MARE")
 
 
-def test_validate_rating_passes_for_none():
-    assert validate_rating(None)
+def test_validate_horse_fails_for_none():
+    assert not validate_horse(None)
+
+
+def test_validate_horse_fails_for_empty_string():
+    assert not validate_horse("")
+
+
+def test_validate_horse_passes_for_valid_string():
+    assert validate_horse("DOBBIN (IRE)")
+
+
+def test_validate_horse_fails_for_string_without_country():
+    assert not validate_horse("DOBBIN")
+
+
+def test_validate_horse_fails_for_string_over_30_chars():
+    assert not validate_horse("DOBBINTHEREALLYEXTREMELYGOODHORSEWITHALOVELYMANE (IRE)")
 
 
 def test_validate_rating_passes_for_empty_string():
