@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 
@@ -23,6 +24,14 @@ def parse_horse(horse):
 
 def parse_sex(sex):
     return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
+
+
+def validate_horse(horse):
+    if not horse:
+        return False
+
+    has_country = bool(re.search("\([A-Z]{2,3}\)", horse))
+    return len(horse) <= 30 and has_country
 
 
 def validate_rating(rating):
@@ -97,11 +106,11 @@ def validate_ratings_input(data):
         "Hurdle Clltrl",
     )
     constraints = [
-        dict(name="name_str", field="Name", test=str),
+        dict(name="name_str", field="Name", test=validate_horse),
         dict(name="year_valid", field="Year", test=validate_year),
         dict(name="sex_valid", field="Sex", test=validate_sex),
-        dict(name="sire_str", field="Sire", test=str),
-        dict(name="dam_str", field="Dam", test=str),
+        dict(name="sire_str", field="Sire", test=validate_horse),
+        dict(name="dam_str", field="Dam", test=validate_horse),
         dict(name="trainer_str", field="Trainer", test=str),
         dict(name="flat_valid", field="Flat rating", test=validate_rating),
         dict(name="awt_valid", field="AWT rating", test=validate_rating),
