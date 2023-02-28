@@ -1,4 +1,4 @@
-from extractors.bha_extractor import SOURCE, DESTINATION
+from src.extractors.bha_extractor import SOURCE, DESTINATION
 
 
 def test_bha_source():
