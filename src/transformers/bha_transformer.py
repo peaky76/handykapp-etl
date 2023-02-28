@@ -34,7 +34,7 @@ def validate_sex(sex):
 
 
 def validate_year(year):
-    return 1600 <= int(year) <= 2100
+    return year and 1600 <= int(year) <= 2100
 
 
 @task(tags=["BHA"], task_run_name="get_{date}_{type}_csv")
