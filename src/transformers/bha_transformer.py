@@ -67,7 +67,7 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_csv(csv):
+def transform_ratings_data(data):
     used_fields = (
         "Name",
         "Year",
@@ -81,8 +81,7 @@ def transform_ratings_csv(csv):
         "Hurdle rating",
     )
     return (
-        petl.fromcsv(csv)
-        .cut(used_fields)
+        petl.cut(data, used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
@@ -147,17 +146,13 @@ def select_trainers(data):
 
 @flow
 def bha_transformer():
-    # logger = get_run_logger()
     csv = get_csv()
     data = read_csv(csv)
     problems = validate_ratings_data(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
-    # data = transform_ratings_csv(source)
-    # print(problems.lookall())
-    # sires = select_sires(data.dicts())
-    # dams = select_dams(data.dicts())
-    # print(sires)
+    data = transform_ratings_data(data)
+    print(data)
 
 
 if __name__ == "__main__":
