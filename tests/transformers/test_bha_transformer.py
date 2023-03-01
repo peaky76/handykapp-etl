@@ -2,6 +2,7 @@ from prefect.testing.utilities import prefect_test_harness
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
+    log_validation_problem,
     parse_horse,
     parse_sex,
     read_csv,
@@ -28,6 +29,19 @@ def mock_csv_data():
 @pytest.fixture
 def mock_csv_bytearray(mock_csv_data):
     return bytearray("\n".join(mock_csv_data), "utf-8")
+
+
+def test_log_validation_problem(mocker):
+    logger = mocker.patch("src.transformers.bha_transformer.get_run_logger")
+    problem = {
+        "name": "name_str",
+        "field": "year",
+        "row": "1",
+        "value": "foobar",
+        "error": "ValueError",
+    }
+    log_validation_problem(problem)
+    assert logger().error.called
 
 
 def test_parse_horse_returns_correct_dict_when_country_supplied():
