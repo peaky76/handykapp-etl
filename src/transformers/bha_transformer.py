@@ -86,6 +86,7 @@ def transform_ratings_csv(csv):
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
+        .dicts()
     )
 
 
