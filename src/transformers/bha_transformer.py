@@ -141,12 +141,22 @@ def validate_ratings_data(data):
 
 @task(tags=["BHA"])
 def select_dams(data):
-    return sorted(list(set([x["dam"] for x in data])))
+    return [
+        {"name": dam[0], "country": dam[1]}
+        for dam in sorted(
+            list(set([(horse["dam"], horse["dam_country"]) for horse in data]))
+        )
+    ]
 
 
 @task(tags=["BHA"])
 def select_sires(data):
-    return sorted(list(set([x["sire"] for x in data])))
+    return [
+        {"name": sire[0], "country": sire[1]}
+        for sire in sorted(
+            list(set([(horse["sire"], horse["sire_country"]) for horse in data]))
+        )
+    ]
 
 
 @task(tags=["BHA"])
