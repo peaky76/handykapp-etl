@@ -112,29 +112,17 @@ def validate_ratings_data(data):
         "Hurdle Clltrl",
     )
     constraints = [
-        dict(name="name_str", field="Name", assertion=lambda x: validate_horse(x)),
-        dict(name="year_valid", field="Year", assertion=lambda x: validate_year(x)),
-        dict(name="sex_valid", field="Sex", assertion=lambda x: validate_sex(x)),
-        dict(name="sire_str", field="Sire", assertion=lambda x: validate_horse(x)),
-        dict(name="dam_str", field="Dam", assertion=lambda x: validate_horse(x)),
-        dict(name="trainer_str", field="Trainer", assertion=lambda x: str),
+        dict(name="name_str", field="Name", assertion=validate_horse),
+        dict(name="year_valid", field="Year", assertion=validate_year),
+        dict(name="sex_valid", field="Sex", assertion=validate_sex),
+        dict(name="sire_str", field="Sire", assertion=validate_horse),
+        dict(name="dam_str", field="Dam", assertion=validate_horse),
+        dict(name="trainer_str", field="Trainer", test=str),
+        dict(name="flat_valid", field="Flat rating", assertion=validate_rating),
+        dict(name="awt_valid", field="AWT rating", assertion=validate_rating),
+        dict(name="chase_valid", field="Chase rating", assertion=validate_rating),
         dict(
-            name="flat_valid",
-            field="Flat rating",
-            assertion=lambda x: validate_rating(x),
-        ),
-        dict(
-            name="awt_valid", field="AWT rating", assertion=lambda x: validate_rating(x)
-        ),
-        dict(
-            name="chase_valid",
-            field="Chase rating",
-            assertion=lambda x: validate_rating(x),
-        ),
-        dict(
-            name="hurdle_rating_int",
-            field="Hurdle rating",
-            assertion=lambda x: validate_rating(x),
+            name="hurdle_rating_int", field="Hurdle rating", assertion=validate_rating
         ),
     ]
     validator = {"header": header, "constraints": constraints}
