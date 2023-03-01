@@ -29,7 +29,7 @@ def parse_horse(horse):
 
 
 def parse_sex(sex):
-    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION"] else "F"
+    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION", "RIG"] else "F"
 
 
 def validate_horse(horse):
@@ -45,7 +45,7 @@ def validate_rating(rating):
 
 
 def validate_sex(sex):
-    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE"]
+    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE", "RIG"]
 
 
 def validate_year(year):
