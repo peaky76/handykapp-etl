@@ -7,13 +7,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from helpers import stream_file
 from transformers.bha_transformer import (
-    get_csv,
+    bha_transformer,
     select_dams,
     select_sires,
-    parse_horse,
-    parse_sex,
     select_trainers,
-    transform_ratings_csv,
 )
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
@@ -53,39 +50,39 @@ def load_people(people):
     return ret_val
 
 
-@task(tags=["BHA"], task_run_name="load_basics")
+@task(tags=["BHA"])
 def load_parents(horses, sex):
     ret_val = {}
     for horse in horses:
-        name, country = parse_horse(horse)
-        id = db.horses.insert_one({"name": name, "country": country, "sex": sex})
-        ret_val[horse] = id.inserted_id
+        id = db.horses.insert_one(
+            {"name": horse["name"], "country": horse["country"], "sex": sex}
+        )
+        ret_val[(horse["name"], horse["country"])] = id.inserted_id
     return ret_val
 
 
-@task(tags=["BHA"], task_run_name="load_details")
+@task(tags=["BHA"])
 def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
     logger = get_run_logger()
     for i, horse in enumerate(horses):
-        name, country = parse_horse(horse["name"])
-        sex = parse_sex(horse["sex"])
-        db.horses.insert_one(
-            {
-                "name": name,
-                "country": country,
-                "sex": sex,
-                "year": horse["year"],
-                "sire": sires_ids.get(horse["sire"], None),
-                "dam": dams_ids.get(horse["dam"], None),
-                "trainer": trainer_ids.get(horse["trainer"], None),
-                "ratings": {
-                    "flat": horse["flat"],
-                    "aw": horse["aw"],
-                    "chase": horse["chase"],
-                    "hurdle": horse["hurdle"],
-                },
-            }
-        )
+        data = {
+            "name": horse["name"],
+            "country": horse["country"],
+            "sex": horse["sex"],
+            "year": horse["year"],
+            "sire": sires_ids.get((horse["sire"], horse["sire_country"]), None),
+            "dam": dams_ids.get((horse["dam"], horse["dam_country"]), None),
+            "trainer": trainer_ids.get(horse["trainer"], None),
+            "ratings": {
+                "flat": horse["flat"],
+                "aw": horse["aw"],
+                "chase": horse["chase"],
+                "hurdle": horse["hurdle"],
+            },
+        }
+        if horse["is_gelded"]:
+            data["operations"] = {"type": "gelding", "date": None}
+        db.horses.insert_one(data)
         if i % 250 == 0:
             logger.info(f"Loaded {i} horses")
 
@@ -110,8 +107,7 @@ def create_sample_database():
 
 @flow
 def load_database_afresh():
-    source = petl.MemorySource(stream_file(get_csv()))
-    data = transform_ratings_csv(source)
+    data = bha_transformer()
     sires = select_sires(data)
     dams = select_dams(data)
     trainers = select_trainers(data)
