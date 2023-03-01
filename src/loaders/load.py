@@ -112,15 +112,15 @@ def create_sample_database():
 def load_database_afresh():
     source = petl.MemorySource(stream_file(get_csv()))
     data = transform_ratings_csv(source)
-    sires = select_sires(data.dicts())
-    dams = select_dams(data.dicts())
-    trainers = select_trainers(data.dicts())
+    sires = select_sires(data)
+    dams = select_dams(data)
+    trainers = select_trainers(data)
     drop_database()
     spec_database()
     sires_ids = load_parents(sires, "M")
     dams_ids = load_parents(dams, "F")
     trainer_ids = load_people(trainers)
-    load_horse_detail(data.dicts(), sires_ids, dams_ids, trainer_ids)
+    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
     # load_ratings()
 
 
