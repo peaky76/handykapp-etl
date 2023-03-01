@@ -139,24 +139,27 @@ def validate_ratings_data(data):
     return petl.validate(data, **validator)
 
 
-@task(tags=["BHA"])
-def select_dams(data):
+def select_parent(data, parent):
     return [
-        {"name": dam[0], "country": dam[1]}
-        for dam in sorted(
-            list(set([(horse["dam"], horse["dam_country"]) for horse in data]))
+        {"name": p[0], "country": p[1]}
+        for p in sorted(
+            list(
+                set(
+                    [(horse[f"{parent}"], horse[f"{parent}_country"]) for horse in data]
+                )
+            )
         )
     ]
+
+
+@task(tags=["BHA"])
+def select_dams(data):
+    return select_parent(data, "dam")
 
 
 @task(tags=["BHA"])
 def select_sires(data):
-    return [
-        {"name": sire[0], "country": sire[1]}
-        for sire in sorted(
-            list(set([(horse["sire"], horse["sire_country"]) for horse in data]))
-        )
-    ]
+    return select_parent(data, "sire")
 
 
 @task(tags=["BHA"])
