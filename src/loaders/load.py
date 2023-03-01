@@ -6,15 +6,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from helpers import stream_file
-from transformers.bha_transformer import (
-    bha_transformer,
-    select_dams,
-    select_sires,
-    select_trainers,
-)
+from transformers.bha_transformer import bha_transformer
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
-import petl
 import yaml
 
 with open("api_info.yml", "r") as f:
@@ -90,6 +84,34 @@ def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
 @task
 def load_ratings():
     pass  # TODO
+
+
+def select_parent(data, parent):
+    return [
+        {"name": p[0], "country": p[1]}
+        for p in sorted(
+            list(
+                set(
+                    [(horse[f"{parent}"], horse[f"{parent}_country"]) for horse in data]
+                )
+            )
+        )
+    ]
+
+
+@task(tags=["BHA"])
+def select_dams(data):
+    return select_parent(data, "dam")
+
+
+@task(tags=["BHA"])
+def select_sires(data):
+    return select_parent(data, "sire")
+
+
+@task(tags=["BHA"])
+def select_trainers(data):
+    return sorted(list(set([x["trainer"] for x in data])))
 
 
 @flow

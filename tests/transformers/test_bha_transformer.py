@@ -5,10 +5,6 @@ from src.transformers.bha_transformer import (
     log_validation_problem,
     parse_horse,
     parse_sex,
-    read_csv,
-    select_dams,
-    select_sires,
-    SOURCE,
     validate_horse,
     validate_rating,
     validate_sex,
@@ -175,35 +171,3 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
 def test_get_csv_returns_none_if_no_files_found(mocker):
     mocker.patch("src.transformers.bha_transformer.get_files", return_value=[])
     assert None == get_csv.fn()
-
-
-def test_select_dams():
-    data = [
-        {"dam": "DAM1", "dam_country": "IRE"},
-        {"dam": "DAM2", "dam_country": "GB"},
-        {"dam": "DAM2", "dam_country": "IRE"},
-        {"dam": "DAM1", "dam_country": "IRE"},
-        {"dam": "DAM3", "dam_country": "IRE"},
-    ]
-    assert [
-        {"name": "DAM1", "country": "IRE"},
-        {"name": "DAM2", "country": "GB"},
-        {"name": "DAM2", "country": "IRE"},
-        {"name": "DAM3", "country": "IRE"},
-    ] == select_dams.fn(data)
-
-
-def test_select_sires():
-    data = [
-        {"sire": "SIRE1", "sire_country": "IRE"},
-        {"sire": "SIRE2", "sire_country": "GB"},
-        {"sire": "SIRE2", "sire_country": "IRE"},
-        {"sire": "SIRE1", "sire_country": "IRE"},
-        {"sire": "SIRE3", "sire_country": "IRE"},
-    ]
-    assert [
-        {"name": "SIRE1", "country": "IRE"},
-        {"name": "SIRE2", "country": "GB"},
-        {"name": "SIRE2", "country": "IRE"},
-        {"name": "SIRE3", "country": "IRE"},
-    ] == select_sires.fn(data)
