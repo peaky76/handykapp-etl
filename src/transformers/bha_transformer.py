@@ -141,61 +141,6 @@ def validate_ratings_data(data):
     return petl.validate(data, **validator)
 
 
-# @task(tags=["BHA"])
-# def validate_ratings_data(data):
-#     header = (
-#         "name",
-#         "year",
-#         "sex",
-#         "sire",
-#         "dam",
-#         "trainer",
-#         "flat",
-#         "aw",
-#         "chase",
-#         "hurdle",
-#     )
-#     constraints = [
-#         dict(name="name_str", field="name", test=str),
-#         dict(name="year_int", field="year", test=int),
-#         dict(
-#             name="year_sensible",
-#             field="year",
-#             assertion=lambda x: 1600 <= int(x) <= 2100,
-#         ),
-#         dict(
-#             name="sex_valid",
-#             field="sex",
-#             test=lambda x: x in ["COLT", "FILLY", "GELDING", "STALLION", "MARE"],
-#         ),
-#         dict(name="sire_str", field="sire", test=str),
-#         dict(name="dam_str", field="dam", test=str),
-#         dict(name="trainer_str", field="trainer", test=str),
-#         dict(
-#             name="flat_int",
-#             field="flat",
-#             assertion=lambda x: x is None or isinstance(x, int),
-#         ),
-#         dict(
-#             name="aw_int",
-#             field="aw",
-#             assertion=lambda x: x is None or isinstance(x, int),
-#         ),
-#         dict(
-#             name="chase_int",
-#             field="chase",
-#             assertion=lambda x: x is None or isinstance(x, int),
-#         ),
-#         dict(
-#             name="hurdle_int",
-#             field="hurdle",
-#             assertion=lambda x: x is None or isinstance(x, int),
-#         ),
-#     ]
-#     validator = {"header": header, "constraints": constraints}
-#     return petl.validate(data, **validator)
-
-
 @task(tags=["BHA"])
 def select_dams(data):
     return sorted(list(set([x["dam"] for x in data])))
