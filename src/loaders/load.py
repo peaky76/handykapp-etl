@@ -46,21 +46,21 @@ def spec_database():
 
 @task(tags=["BHA"])
 def load_people(people):
-    return_val = {}
+    ret_val = {}
     for person in people:
         id = db.people.insert_one({"name": person})
-        return_val[person] = id.inserted_id
-    return return_val
+        ret_val[person] = id.inserted_id
+    return ret_val
 
 
 @task(tags=["BHA"], task_run_name="load_basics")
 def load_parents(horses, sex):
-    return_val = {}
+    ret_val = {}
     for horse in horses:
         name, country = parse_horse(horse)
         id = db.horses.insert_one({"name": name, "country": country, "sex": sex})
-        return_val[horse] = id.inserted_id
-    return return_val
+        ret_val[horse] = id.inserted_id
+    return ret_val
 
 
 @task(tags=["BHA"], task_run_name="load_details")
@@ -113,14 +113,14 @@ def load_database_afresh():
     source = petl.MemorySource(stream_file(get_csv()))
     data = transform_ratings_csv(source)
     sires = select_sires(data.dicts())
-    # dams = select_dams(data)
-    # trainers = select_trainers(data)
+    dams = select_dams(data.dicts())
+    trainers = select_trainers(data.dicts())
     drop_database()
     spec_database()
     sires_ids = load_parents(sires, "M")
-    # dams_ids = load_parents(dams, "F")
-    # trainer_ids = load_people(trainers)
-    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    dams_ids = load_parents(dams, "F")
+    trainer_ids = load_people(trainers)
+    load_horse_detail(data.dicts(), sires_ids, dams_ids, trainer_ids)
     # load_ratings()
 
 
