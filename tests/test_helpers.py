@@ -7,7 +7,7 @@ def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
         "2023-02-13"
     )  # A Monday
     weekday_int = 2
-    assert parse("2023-02-07") == get_last_occurrence_of(weekday_int)
+    assert parse("2023-02-07").date() == get_last_occurrence_of(weekday_int)
 
 
 def test_get_last_occurrence_of_when_day_is_today(mocker):
@@ -15,7 +15,7 @@ def test_get_last_occurrence_of_when_day_is_today(mocker):
         "2023-02-14"
     )  # A Tuesday
     weekday_int = 2
-    assert parse("2023-02-14") == get_last_occurrence_of(weekday_int)
+    assert parse("2023-02-14").date() == get_last_occurrence_of(weekday_int)
 
 
 def test_get_last_occurrence_of_when_day_is_yesterday(mocker):
@@ -23,4 +23,4 @@ def test_get_last_occurrence_of_when_day_is_yesterday(mocker):
         "2023-02-15"
     )  # A Wednesday
     weekday_int = 2
-    assert parse("2023-02-14") == get_last_occurrence_of(weekday_int)
+    assert parse("2023-02-14").date() == get_last_occurrence_of(weekday_int)
