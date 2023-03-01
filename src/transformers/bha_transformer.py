@@ -151,9 +151,9 @@ def bha_transformer():
     problems = validate_ratings_data(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
-    data = transform_ratings_data(data)
-    print(data)
+    return transform_ratings_data(data)
 
 
 if __name__ == "__main__":
-    bha_transformer()
+    data = bha_transformer()
+    print(data)
