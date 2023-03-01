@@ -43,4 +43,4 @@ def write_file(content, filename):
 
 
 def get_last_occurrence_of(weekday):
-    return pendulum.now().add(days=1).previous(weekday)
+    return pendulum.now().add(days=1).previous(weekday).date()
