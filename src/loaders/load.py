@@ -16,7 +16,7 @@ from transformers.bha_transformer import (
     transform_ratings_csv,
 )
 from prefect import flow, task, get_run_logger
-from pymongo import ASCENDING, DESCENDING
+from pymongo import ASCENDING as ASC
 import petl
 import yaml
 
@@ -36,16 +36,12 @@ def drop_database():
 @task
 def spec_database():
     db.horses.create_index(
-        [("name", ASCENDING), ("country", ASCENDING), ("year", ASCENDING)], unique=True
+        [("name", ASC), ("country", ASC), ("year", ASC)], unique=True
     )
     db.horses.create_index("name")
     db.people.create_index("name", unique=True)
-    db.racecourses.create_index(
-        [("name", ASCENDING), ("country", ASCENDING)], unique=True
-    )
-    db.races.create_index(
-        [("racecourse", ASCENDING), ("datetime", ASCENDING)], unique=True
-    )
+    db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
+    db.races.create_index([("racecourse", ASC), ("datetime", ASC)], unique=True)
 
 
 @task(tags=["BHA"])
