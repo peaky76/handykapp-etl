@@ -85,6 +85,8 @@ def transform_ratings_data(data):
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
+        .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
+        .convert({"sex": parse_sex})
         .dicts()
     )
 
