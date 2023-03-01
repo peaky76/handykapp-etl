@@ -179,19 +179,31 @@ def test_get_csv_returns_none_if_no_files_found(mocker):
 
 def test_select_dams():
     data = [
-        {"dam": "DAM1"},
-        {"dam": "DAM2"},
-        {"dam": "DAM1"},
-        {"dam": "DAM3"},
+        {"dam": "DAM1", "dam_country": "IRE"},
+        {"dam": "DAM2", "dam_country": "GB"},
+        {"dam": "DAM2", "dam_country": "IRE"},
+        {"dam": "DAM1", "dam_country": "IRE"},
+        {"dam": "DAM3", "dam_country": "IRE"},
     ]
-    assert ["DAM1", "DAM2", "DAM3"] == select_dams.fn(data)
+    assert [
+        {"name": "DAM1", "country": "IRE"},
+        {"name": "DAM2", "country": "GB"},
+        {"name": "DAM2", "country": "IRE"},
+        {"name": "DAM3", "country": "IRE"},
+    ] == select_dams.fn(data)
 
 
 def test_select_sires():
     data = [
-        {"sire": "SIRE1"},
-        {"sire": "SIRE2"},
-        {"sire": "SIRE1"},
-        {"sire": "SIRE3"},
+        {"sire": "SIRE1", "sire_country": "IRE"},
+        {"sire": "SIRE2", "sire_country": "GB"},
+        {"sire": "SIRE2", "sire_country": "IRE"},
+        {"sire": "SIRE1", "sire_country": "IRE"},
+        {"sire": "SIRE3", "sire_country": "IRE"},
     ]
-    assert ["SIRE1", "SIRE2", "SIRE3"] == select_sires.fn(data)
+    assert [
+        {"name": "SIRE1", "country": "IRE"},
+        {"name": "SIRE2", "country": "GB"},
+        {"name": "SIRE2", "country": "IRE"},
+        {"name": "SIRE3", "country": "IRE"},
+    ] == select_sires.fn(data)
