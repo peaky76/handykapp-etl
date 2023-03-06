@@ -5,6 +5,7 @@ from .helpers import (
     stream_file,
     write_file,
     get_last_occurrence_of,
+    log_validation_problem,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "stream_file",
     "write_file",
     "get_last_occurrence_of",
+    "log_validation_problem",
 ]

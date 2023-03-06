@@ -1,6 +1,7 @@
 import csv
 import json
 import pendulum
+from prefect import get_run_logger
 from clients import spaces_client as client
 from requests import get
 
@@ -44,3 +45,9 @@ def write_file(content, filename):
 
 def get_last_occurrence_of(weekday):
     return pendulum.now().add(days=1).previous(weekday).date()
+
+
+def log_validation_problem(problem):
+    msg = f"{problem['error']} in row {problem['row']} for {problem['field']}: {problem['value']}"
+    logger = get_run_logger()
+    logger.error(msg)
