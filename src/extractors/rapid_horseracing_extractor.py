@@ -10,15 +10,18 @@ from time import sleep
 from prefect import flow, task
 from helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
+import yaml
 
+with open("api_info.yml", "r") as f:
+    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 # NB: In RapidAPI, results are called race details
 
-SOURCE = "https://horse-racing.p.rapidapi.com/"
-BASE_DESTINATION = "handykapp/rapid_horseracing/"
-RACECARDS_DESTINATION = f"{BASE_DESTINATION}racecards/"
-RESULTS_DESTINATION = f"{BASE_DESTINATION}results/"
-LIMITS = {"day": 50, "minute": 10}
+SOURCE = api_info["rapid_horseracing"]["source"]["dir"]
+DESTINATION = api_info["rapid_horseracing"]["spaces"]["dir"]
+RACECARDS_DESTINATION = f"{DESTINATION}racecards/"
+RESULTS_DESTINATION = f"{DESTINATION}results/"
+LIMITS = api_info["rapid_horseracing"]["limits"]
 
 
 def get_file_date(filename):
@@ -79,7 +82,7 @@ def get_next_racecard_date():
 
 @flow
 def update_results_to_do_list():
-    filename = f"{BASE_DESTINATION}results_to_do_list.json"
+    filename = f"{DESTINATION}results_to_do_list.json"
     current_status = read_file(filename)
     last_checked = (
         pendulum.parse(current_status["last_checked"])
@@ -118,9 +121,9 @@ def rapid_horseracing_extractor():
     update_results_to_do_list()
 
     # Fetch a number of results within the limits presented
-    races_batch = read_file(f"{BASE_DESTINATION}results_to_do_list.json")[
-        "results_to_do"
-    ][: LIMITS["day"] - 2]
+    races_batch = read_file(f"{DESTINATION}results_to_do_list.json")["results_to_do"][
+        : LIMITS["day"] - 2
+    ]
     for race_id in races_batch:
         extract_result(race_id)
         sleep(90)

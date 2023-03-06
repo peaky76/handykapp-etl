@@ -7,3 +7,11 @@ bha:
       perf_figs: "performance-figures.csv"
   spaces:
     dir: "handykapp/bha/"
+rapid_horseracing:
+  source:
+    dir: "https://horse-racing.p.rapidapi.com/"
+  spaces:
+    dir: "handykapp/rapid_horseracing/"
+  limits:
+    day: 50
+    minute: 10
