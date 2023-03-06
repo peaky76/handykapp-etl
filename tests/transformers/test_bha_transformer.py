@@ -1,8 +1,6 @@
-from prefect.testing.utilities import prefect_test_harness
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
-    log_validation_problem,
     parse_horse,
     parse_sex,
     validate_horse,
