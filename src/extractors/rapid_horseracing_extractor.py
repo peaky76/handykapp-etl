@@ -14,7 +14,7 @@ from prefect.blocks.system import Secret
 
 # NB: In RapidAPI, results are called race details
 
-BASE_URL = "https://horse-racing.p.rapidapi.com/"
+SOURCE = "https://horse-racing.p.rapidapi.com/"
 BASE_DESTINATION = "handykapp/rapid_horseracing/"
 RACECARDS_DESTINATION = f"{BASE_DESTINATION}racecards/"
 RESULTS_DESTINATION = f"{BASE_DESTINATION}results/"
@@ -34,7 +34,7 @@ def get_headers(url):
 
 @task(tags=["Rapid"], task_run_name="extract_result_{race_id}")
 def extract_result(race_id):
-    source = f"{BASE_URL}race/{race_id}"
+    source = f"{SOURCE}race/{race_id}"
     headers = get_headers(source)
 
     content = fetch_content(source, headers=headers)
@@ -44,7 +44,7 @@ def extract_result(race_id):
 
 @task(tags=["Rapid"], task_run_name="extract_racecards_{date}")
 def extract_racecards(date):  # date - YYYY-MM-DD
-    source = f"{BASE_URL}racecards"
+    source = f"{SOURCE}racecards"
     params = {"date": date}
     headers = get_headers(source)
 
