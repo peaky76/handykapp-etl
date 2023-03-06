@@ -7,9 +7,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, stream_file
 from prefect import flow, task
-import petl
-import yaml
 import pendulum
+import petl
+import re
+import yaml
 
 
 with open("api_info.yml", "r") as f:
@@ -26,6 +27,11 @@ def validate_date(date):
         return False
     except TypeError:
         return False
+
+
+def validate_distance(distance):
+    pattern = r"^(([1-4]m)(\s)?([1-7]f)?|([1-7]f))$"
+    return bool(re.match(pattern, distance)) if distance else False
 
 
 @task(tags=["Rapid"])
@@ -55,7 +61,7 @@ def validate_result(data):
         dict(name="course_str", field="course", test=str),
         dict(name="date_valid", field="date", assertion=validate_date),
         dict(name="title_str", field="title", test=str),
-        dict(name="distance_valid", field="distance", assertion=lambda x: x),
+        dict(name="distance_valid", field="distance", assertion=validate_distance),
         dict(name="age_int", field="age", test=int),
         dict(name="going_valid", field="going", assertion=lambda x: x),
         dict(name="finished_bool", field="finished", test=bool),
