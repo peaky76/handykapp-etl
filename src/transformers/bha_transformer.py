@@ -4,8 +4,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from helpers import get_files, read_file, stream_file
-from prefect import flow, get_run_logger, task
+from helpers import get_files, log_validation_problem, stream_file
+from prefect import flow, task
 import petl
 import yaml
 
@@ -14,12 +14,6 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["bha"]["spaces"]["dir"]
-
-
-def log_validation_problem(problem):
-    msg = f"{problem['error']} in row {problem['row']} for {problem['field']}: {problem['value']}"
-    logger = get_run_logger()
-    logger.error(msg)
 
 
 def parse_horse(horse):
