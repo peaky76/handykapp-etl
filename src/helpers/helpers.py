@@ -1,7 +1,7 @@
 import csv
 import json
 import pendulum
-from src.clients import spaces_client as client
+from clients import spaces_client as client
 from requests import get
 
 BUCKET_NAME = "peaky76"
