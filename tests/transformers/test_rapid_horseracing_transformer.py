@@ -50,6 +50,14 @@ def test_validate_distance_fails_for_furlongs_over_eight():
     assert not validate_distance("9f")
 
 
+def test_validate_distance_fails_for_furlongs_under_four():
+    assert not validate_distance("3f")
+
+
+def test_validate_distance_fails_for_miles_over_four():
+    assert not validate_distance("6m")
+
+
 def test_validate_going_passes_for_straight_going():
     assert validate_going("good")
 
