@@ -1,5 +1,6 @@
 from transformers.rapid_horseracing_transformer import (
     parse_distance,
+    parse_going,
     validate_date,
     validate_distance,
     validate_going,
@@ -21,6 +22,21 @@ def test_parse_distance_returns_correct_value_for_furlongs():
 
 def test_parse_distance_returns_correct_value_for_none():
     assert parse_distance(None) == 0
+
+
+def test_parse_going_returns_correct_value_for_straight_going():
+    assert parse_going("GOOD") == {"main": "GOOD", "secondary": None}
+
+
+def test_parse_going_returns_correct_value_for_going_to_going():
+    assert parse_going("GOOD TO FIRM") == {"main": "GOOD TO FIRM", "secondary": None}
+
+
+def test_parse_going_returns_correct_value_for_going_with_in_places():
+    assert parse_going("GOOD (GOOD TO SOFT IN PLACES)") == {
+        "main": "GOOD",
+        "secondary": "GOOD TO SOFT",
+    }
 
 
 def test_validate_date_fails_for_none():

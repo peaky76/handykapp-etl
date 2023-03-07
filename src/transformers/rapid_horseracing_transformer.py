@@ -33,6 +33,14 @@ def parse_distance(distance):
     return round(((int(miles) * 8 + int(furlongs)) * 220 * 0.9144), 3)
 
 
+def parse_going(going):
+    if not going:
+        return None
+
+    going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
+    return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}
+
+
 def validate_date(date):
     try:
         pendulum.parse(date)
@@ -91,7 +99,15 @@ def transform_result(data):
         .convert("canceled", lambda x: bool(int(x)))
         .convert(
             "distance",
-            lambda x: {"description": x, "advertised_metres": parse_distance(x)},
+            lambda x: {"description": x, "expected_metres": int(parse_distance(x))},
+        )
+        .convert(
+            "going",
+            lambda x: {
+                "description": x,
+                "main": parse_going(x)["main"],
+                "secondary": parse_going(x)["secondary"],
+            },
         )
         .dicts()
     )
