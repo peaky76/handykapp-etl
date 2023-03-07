@@ -48,6 +48,7 @@ def validate_going(going):
         "SOFT TO HEAVY",
         "HEAVY",
         "STANDARD",
+        "STANDARD TO SLOW",
         "SLOW",
         "YIELDING",
     ]
@@ -102,7 +103,7 @@ def validate_result(data):
 
 @flow
 def rapid_horseracing_transformer():
-    data = read_file(f"{SOURCE}results/rapid_api_result_187431.json")
+    data = read_file(f"{SOURCE}results/rapid_api_result_187558.json")
     problems = validate_result(petl.fromdicts([data]))
     for problem in problems.dicts():
         log_validation_problem(problem)
