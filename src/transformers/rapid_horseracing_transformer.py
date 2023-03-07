@@ -99,7 +99,11 @@ def transform_result(data):
         .convert("canceled", lambda x: bool(int(x)))
         .convert(
             "distance",
-            lambda x: {"description": x, "expected_metres": int(parse_distance(x))},
+            lambda x: {
+                "description": x,
+                "expected_metres": int(parse_distance(x)),
+                "actual_metres": None,
+            },
         )
         .convert(
             "going",
