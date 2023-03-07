@@ -34,6 +34,27 @@ def validate_distance(distance):
     return bool(re.match(pattern, distance)) if distance else False
 
 
+def validate_going(going):
+    if not going:
+        return False
+
+    goings = [
+        "HARD",
+        "FIRM",
+        "GOOD TO FIRM",
+        "GOOD",
+        "GOOD TO SOFT",
+        "SOFT",
+        "SOFT TO HEAVY",
+        "HEAVY",
+        "STANDARD",
+        "SLOW",
+        "YIELDING",
+    ]
+    going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
+    return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
+
+
 def validate_prize(prize):
     pattern = r"^[£|\$][0-9]{1,3}(,)*[0-9]{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
@@ -68,7 +89,7 @@ def validate_result(data):
         dict(name="title_str", field="title", test=str),
         dict(name="distance_valid", field="distance", assertion=validate_distance),
         dict(name="age_int", field="age", test=int),
-        dict(name="going_valid", field="going", assertion=lambda x: x),
+        dict(name="going_valid", field="going", assertion=validate_going),
         dict(name="finished_bool", field="finished", test=bool),
         dict(name="canceled_bool", field="canceled", test=bool),
         dict(name="prize_valid", field="prize", assertion=validate_prize),

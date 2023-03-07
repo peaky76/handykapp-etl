@@ -1,6 +1,7 @@
 from transformers.rapid_horseracing_transformer import (
     validate_date,
     validate_distance,
+    validate_going,
     validate_prize,
 )
 
@@ -47,6 +48,26 @@ def test_validate_distance_fails_for_furlongs_before_miles():
 
 def test_validate_distance_fails_for_furlongs_over_eight():
     assert not validate_distance("9f")
+
+
+def test_validate_going_passes_for_straight_going():
+    assert validate_going("good")
+
+
+def test_validate_going_passes_for_going_to_going():
+    assert validate_going("good to firm")
+
+
+def test_validate_going_passes_for_going_with_in_places():
+    assert validate_going("good (good to soft in places)")
+
+
+def test_validate_going_fails_for_none():
+    assert not validate_going(None)
+
+
+def test_validate_going_fails_for_invalid_string():
+    assert not validate_going("moist to tricky")
 
 
 def test_validate_prize_passes_for_sterling():
