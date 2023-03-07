@@ -1,4 +1,8 @@
-from transformers.rapid_horseracing_transformer import validate_date, validate_distance
+from transformers.rapid_horseracing_transformer import (
+    validate_date,
+    validate_distance,
+    validate_prize,
+)
 
 
 def test_validate_date_fails_for_none():
@@ -43,3 +47,23 @@ def test_validate_distance_fails_for_furlongs_before_miles():
 
 def test_validate_distance_fails_for_furlongs_over_eight():
     assert not validate_distance("9f")
+
+
+def test_validate_prize_passes_for_sterling():
+    assert validate_prize("£1234")
+
+
+def test_validate_prize_passes_for_sterling_with_comma():
+    assert validate_prize("£1,234")
+
+
+def test_validate_prize_passes_for_dollar():
+    assert validate_prize("$1234")
+
+
+def test_validate_prize_fails_for_none():
+    assert not validate_prize(None)
+
+
+def test_validate_prize_fails_for_invalid_string():
+    assert not validate_prize("£1234$")

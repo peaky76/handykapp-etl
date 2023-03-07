@@ -34,6 +34,11 @@ def validate_distance(distance):
     return bool(re.match(pattern, distance)) if distance else False
 
 
+def validate_prize(prize):
+    pattern = r"^[£|\$][0-9]{1,3}(,)*[0-9]{1,3}$"
+    return bool(re.match(pattern, prize)) if prize else False
+
+
 @task(tags=["Rapid"])
 def read_json(json):
     source = petl.MemorySource(stream_file(json))
@@ -66,7 +71,7 @@ def validate_result(data):
         dict(name="going_valid", field="going", assertion=lambda x: x),
         dict(name="finished_bool", field="finished", test=bool),
         dict(name="canceled_bool", field="canceled", test=bool),
-        dict(name="prize_valid", field="prize", assertion=lambda x: x),
+        dict(name="prize_valid", field="prize", assertion=validate_prize),
         dict(name="class_int", field="class", test=int),
         dict(name="horses_list", field="horses", test=list),
     ]
