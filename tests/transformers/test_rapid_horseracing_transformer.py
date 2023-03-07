@@ -1,9 +1,26 @@
 from transformers.rapid_horseracing_transformer import (
+    parse_distance,
     validate_date,
     validate_distance,
     validate_going,
     validate_prize,
 )
+
+
+def test_parse_distance_returns_correct_value_for_miles_and_furlongs():
+    assert parse_distance("1m2f") == 2011.680
+
+
+def test_parse_distance_returns_correct_value_for_miles():
+    assert parse_distance("1m") == 1609.344
+
+
+def test_parse_distance_returns_correct_value_for_furlongs():
+    assert parse_distance("6f") == 1207.008
+
+
+def test_parse_distance_returns_correct_value_for_none():
+    assert parse_distance(None) == 0
 
 
 def test_validate_date_fails_for_none():
