@@ -30,7 +30,7 @@ def validate_date(date):
 
 
 def validate_distance(distance):
-    pattern = r"^(([1-4]m)(\s)?([1-7]f)?|([1-7]f))$"
+    pattern = r"^(([1-4]m)(\s)?([1-7]f)?|([4-7]f))$"
     return bool(re.match(pattern, distance)) if distance else False
 
 
@@ -103,7 +103,7 @@ def validate_result(data):
 
 @flow
 def rapid_horseracing_transformer():
-    data = read_file(f"{SOURCE}results/rapid_api_result_187558.json")
+    data = read_file(f"{SOURCE}results/rapid_api_result_187686.json")
     problems = validate_result(petl.fromdicts([data]))
     for problem in problems.dicts():
         log_validation_problem(problem)
