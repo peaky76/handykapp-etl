@@ -19,6 +19,20 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
 
 
+def parse_distance(distance):
+    if not distance:
+        return 0
+
+    if "m" in distance:
+        miles = distance.split("m")[0]
+        furlongs = distance.split("m")[1].split("f")[0] if "f" in distance else 0
+    else:
+        miles = 0
+        furlongs = distance.split("f")[0] if "f" in distance else 0
+
+    return round(((int(miles) * 8 + int(furlongs)) * 220 * 0.9144), 3)
+
+
 def validate_date(date):
     try:
         pendulum.parse(date)
@@ -67,6 +81,22 @@ def read_json(json):
     return petl.fromjson(source)
 
 
+@task(tags=["BHA"])
+def transform_result(data):
+    return (
+        petl.rename(
+            data, {"id_race": "rapid_id", "date": "datetime", "age": "age_restriction"}
+        )
+        .convert("finished", lambda x: bool(int(x)))
+        .convert("canceled", lambda x: bool(int(x)))
+        .convert(
+            "distance",
+            lambda x: {"description": x, "advertised_metres": parse_distance(x)},
+        )
+        .dicts()
+    )
+
+
 @task(tags=["Rapid"])
 def validate_result(data):
     header = (
@@ -107,7 +137,7 @@ def rapid_horseracing_transformer():
     problems = validate_result(petl.fromdicts([data]))
     for problem in problems.dicts():
         log_validation_problem(problem)
-    return data
+    return transform_result(petl.fromdicts([data]))
 
 
 if __name__ == "__main__":
