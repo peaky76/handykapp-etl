@@ -175,7 +175,7 @@ def test_transform_horse_returns_correct_output():
         "owner": "A Owner",
         "sire": "THE SIRE",
         "dam": "THE DAM(FR)",
-        "OR": "",
+        "official_rating": "",
         "sp": "8",
         "odds": [],
     }

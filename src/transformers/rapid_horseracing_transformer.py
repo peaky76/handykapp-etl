@@ -100,6 +100,7 @@ def transform_horse(data):
                 "id_horse": "rapid_id",
                 "last_ran_days_ago": "days_since_prev_run",
                 "number": "saddlecloth",
+                "OR": "official_rating",
             },
         )
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
