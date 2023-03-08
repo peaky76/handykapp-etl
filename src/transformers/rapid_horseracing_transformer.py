@@ -68,12 +68,6 @@ def validate_prize(prize):
 
 
 @task(tags=["Rapid"])
-def read_json(json):
-    source = petl.MemorySource(stream_file(json))
-    return petl.fromjson(source)
-
-
-@task(tags=["Rapid"])
 def transform_horse(horse_data, race_date=pendulum.now()):
     return (
         petl.rename(
