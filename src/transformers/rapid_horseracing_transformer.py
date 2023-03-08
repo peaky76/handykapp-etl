@@ -24,19 +24,15 @@ def parse_yards(distance_description):
         return 0
 
     if "m" in distance_description:
-        miles = distance_description.split("m")[0]
-        furlongs = (
-            distance_description.split("m")[1].split("f")[0]
-            if "f" in distance_description
-            else 0
-        )
+        parts = distance_description.split("m")
+        miles = int(parts[0])
+        furlongs = int(parts[1].split("f")[0]) if "f" in distance_description else 0
     else:
+        parts = distance_description.split("f")
         miles = 0
-        furlongs = (
-            distance_description.split("f")[0] if "f" in distance_description else 0
-        )
+        furlongs = int(parts[0]) if "f" in distance_description else 0
 
-    return (int(miles) * 8 + int(furlongs)) * 220
+    return (miles * 8 + furlongs) * 220
 
 
 def parse_going(going):
