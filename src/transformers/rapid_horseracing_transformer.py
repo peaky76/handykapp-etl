@@ -89,7 +89,7 @@ def read_json(json):
     return petl.fromjson(source)
 
 
-@task(tags=["BHA"])
+@task(tags=["Rapid"])
 def transform_result(data):
     return (
         petl.rename(
