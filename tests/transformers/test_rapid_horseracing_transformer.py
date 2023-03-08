@@ -1,3 +1,4 @@
+import pendulum
 from transformers.rapid_horseracing_transformer import (
     parse_distance,
     parse_going,
@@ -161,6 +162,7 @@ def test_transform_horse_returns_correct_output():
     expected = {
         "name": "DOBBIN",
         "country": "IRE",
+        "year": 2020,
         "rapid_id": "123456",
         "jockey": "A Jockey",
         "trainer": "A Trainer",
@@ -180,4 +182,4 @@ def test_transform_horse_returns_correct_output():
         "sp": "8",
         "odds": [],
     }
-    assert expected == transform_horse.fn(input)[0]
+    assert expected == transform_horse.fn(input, pendulum.parse("2023-03-08"))[0]

@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 
-from transformers.parsers import parse_horse, parse_weight
+from transformers.parsers import parse_horse, parse_weight, yob_from_age
 
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -92,10 +92,10 @@ def read_json(json):
 
 
 @task(tags=["Rapid"])
-def transform_horse(data):
+def transform_horse(horse_data, race_date=pendulum.now()):
     return (
         petl.rename(
-            data,
+            horse_data,
             {
                 "id_horse": "rapid_id",
                 "weight": "lbs_carried",
@@ -104,6 +104,7 @@ def transform_horse(data):
                 "OR": "official_rating",
             },
         )
+        .addfield("year", lambda rec: yob_from_age(int(rec["age"]), race_date), index=1)
         .convert("lbs_carried", lambda x: parse_weight(x))
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
