@@ -5,6 +5,10 @@ def test_parse_horse_returns_correct_tuple_when_country_not_supplied():
     assert ("DOBBIN", None) == parse_horse("DOBBIN")
 
 
+def test_parse_horse_returns_correct_tuple_when_name_lowercase():
+    assert ("DOBBIN", None) == parse_horse("Dobbin")
+
+
 def test_parse_horse_returns_correct_tuple_when_country_supplied_with_space():
     assert ("DOBBIN", "IRE") == parse_horse("DOBBIN (IRE)")
 
