@@ -2,6 +2,8 @@
 from pathlib import Path
 import sys
 
+from transformers.parsers import parse_horse
+
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -91,10 +93,16 @@ def read_json(json):
 
 @task(tags=["Rapid"])
 def transform_horse(data):
-    return petl.rename(
-        data,
-        {"id_horse": "rapid_id", "last_ran_days_ago": "days_since_prev_run"},
-    ).dicts()
+    return (
+        petl.rename(
+            data,
+            {"id_horse": "rapid_id", "last_ran_days_ago": "days_since_prev_run"},
+        )
+        .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
+        .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
+        .cutout("horse")
+        .dicts()
+    )
 
 
 @task(tags=["Rapid"])
