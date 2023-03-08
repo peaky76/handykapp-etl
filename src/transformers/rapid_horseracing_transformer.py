@@ -102,7 +102,7 @@ def transform_horse(horse_data, race_date=pendulum.now()):
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"])[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
         .cutout("horse", "age")
-        .dicts()
+        .dicts()[0]
     )
 
 
