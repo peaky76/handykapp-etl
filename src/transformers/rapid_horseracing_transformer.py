@@ -72,7 +72,6 @@ def validate_weight(weight):
     return bool(re.match(pattern, weight)) if weight else False
 
 
-@task(tags=["Rapid"])
 def transform_horse(horse_data, race_date=pendulum.now()):
     return (
         petl.rename(
@@ -130,6 +129,14 @@ def transform_result(data):
                 "official_secondary": parse_going(x)["secondary"],
             },
         )
+        .addfield(
+            "result",
+            lambda rec: [
+                transform_horse(petl.fromdicts([h]), pendulum.parse(rec["datetime"]))
+                for h in rec["horses"]
+            ],
+        )
+        .cutout("horses")
         .dicts()
     )
 
