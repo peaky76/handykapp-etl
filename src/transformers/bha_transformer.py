@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
+import transformers.parsers as parsers
 import petl
 import yaml
 
@@ -79,13 +80,13 @@ def transform_ratings_data(data):
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
-        .addfield("country", lambda rec: parse_horse(rec["name"])[1], index=1)
-        .convert("name", lambda x: parse_horse(x)[0])
-        .addfield("sire_country", lambda rec: parse_horse(rec["sire"])[1])
-        .convert("sire", lambda x: parse_horse(x)[0])
+        .addfield("country", lambda rec: parsers.parse_horse(rec["name"])[1], index=1)
+        .convert("name", lambda x: parsers.parse_horse(x)[0])
+        .addfield("sire_country", lambda rec: parsers.parse_horse(rec["sire"])[1])
+        .convert("sire", lambda x: parsers.parse_horse(x)[0])
         .movefield("sire", -1)
-        .addfield("dam_country", lambda rec: parse_horse(rec["dam"])[1])
-        .convert("dam", lambda x: parse_horse(x)[0])
+        .addfield("dam_country", lambda rec: parsers.parse_horse(rec["dam"])[1])
+        .convert("dam", lambda x: parsers.parse_horse(x)[0])
         .movefield("dam", -1)
         .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
         .convert({"sex": parse_sex})
