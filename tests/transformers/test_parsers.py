@@ -28,6 +28,10 @@ def test_parse_going_returns_correct_value_for_going_with_in_places():
     }
 
 
+def test_parse_horse_returns_correct_tuple_when_none():
+    assert (None, None) == parse_horse(None)
+
+
 def test_parse_horse_returns_correct_tuple_when_country_not_supplied():
     assert ("DOBBIN", None) == parse_horse("DOBBIN")
 

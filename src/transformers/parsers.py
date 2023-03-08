@@ -10,6 +10,9 @@ def parse_going(going):
 
 
 def parse_horse(horse):
+    if not horse:
+        return (None, None)
+
     split_string = horse.replace(")", "").split("(")
     name, country = split_string if len(split_string) == 2 else (horse, None)
     return (name.upper().strip(), country)
