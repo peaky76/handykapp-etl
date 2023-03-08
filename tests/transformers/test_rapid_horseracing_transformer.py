@@ -1,11 +1,13 @@
 from transformers.rapid_horseracing_transformer import (
     parse_distance,
     parse_going,
+    transform_horse,
     validate_date,
     validate_distance,
     validate_going,
     validate_prize,
 )
+import petl
 
 
 def test_parse_distance_returns_correct_value_for_miles_and_furlongs():
@@ -129,3 +131,51 @@ def test_validate_prize_fails_for_none():
 
 def test_validate_prize_fails_for_invalid_string():
     assert not validate_prize("£1234$")
+
+
+def test_transform_horse_returns_correct_output():
+    input = petl.fromdicts(
+        [
+            {
+                "horse": "Dobbin(IRE)",
+                "id_horse": "123456",
+                "jockey": "A Jockey",
+                "trainer": "A Trainer",
+                "age": "3",
+                "weight": "10-0",
+                "number": "1",
+                "last_ran_days_ago": "1",
+                "non_runner": "0",
+                "form": "1-2-3",
+                "position": "1",
+                "distance_beaten": "1 1/2",
+                "owner": "A Owner",
+                "sire": "THE SIRE",
+                "dam": "THE DAM(FR)",
+                "OR": "",
+                "sp": "8",
+                "odds": [],
+            }
+        ]
+    )
+    expected = {
+        "horse": "Dobbin(IRE)",
+        "rapid_id": "123456",
+        "jockey": "A Jockey",
+        "trainer": "A Trainer",
+        "age": "3",
+        "weight": "10-0",
+        "number": "1",
+        "days_since_prev_run": "1",
+        "non_runner": "0",
+        "form": "1-2-3",
+        "position": "1",
+        "distance_beaten": "1 1/2",
+        "owner": "A Owner",
+        "sire": "THE SIRE",
+        "dam": "THE DAM(FR)",
+        "OR": "",
+        "sp": "8",
+        "odds": [],
+    }
+    assert expected == transform_horse.fn(input)[0]
