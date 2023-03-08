@@ -110,10 +110,10 @@ def transform_horse(horse_data, race_date=pendulum.now()):
                 "days_since_prev_run": int,
                 "official_rating": int,
                 "non_runner": lambda x: bool(int(x)),
+                "lbs_carried": parse_weight,
             }
         )
         .addfield("year", lambda rec: yob_from_age(rec["age"], race_date), index=1)
-        .convert("lbs_carried", lambda x: parse_weight(x))
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
         .addfield("sire_country", lambda rec: parse_horse(rec["sire"])[1], index=-4)
