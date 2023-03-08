@@ -1,6 +1,6 @@
 import pendulum
 from transformers.rapid_horseracing_transformer import (
-    parse_distance,
+    parse_yards,
     parse_going,
     transform_horse,
     validate_date,
@@ -11,20 +11,20 @@ from transformers.rapid_horseracing_transformer import (
 import petl
 
 
-def test_parse_distance_returns_correct_value_for_miles_and_furlongs():
-    assert parse_distance("1m2f") == 2011.680
+def test_parse_yards_returns_correct_value_for_miles_and_furlongs():
+    assert parse_yards("1m2f") == 2200
 
 
-def test_parse_distance_returns_correct_value_for_miles():
-    assert parse_distance("1m") == 1609.344
+def test_parse_yards_returns_correct_value_for_miles():
+    assert parse_yards("1m") == 1760
 
 
-def test_parse_distance_returns_correct_value_for_furlongs():
-    assert parse_distance("6f") == 1207.008
+def test_parse_yards_returns_correct_value_for_furlongs():
+    assert parse_yards("6f") == 1320
 
 
-def test_parse_distance_returns_correct_value_for_none():
-    assert parse_distance(None) == 0
+def test_parse_yards_returns_correct_value_for_none():
+    assert parse_yards(None) == 0
 
 
 def test_parse_going_returns_correct_value_for_straight_going():
