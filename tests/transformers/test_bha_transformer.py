@@ -1,8 +1,10 @@
+import petl
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
     parse_horse,
     parse_sex,
+    transform_ratings_data,
     validate_horse,
     validate_rating,
     validate_sex,
@@ -11,18 +13,14 @@ from src.transformers.bha_transformer import (
 
 
 @pytest.fixture
-def mock_csv_data():
+def mock_data():
     return [
-        "Name,Year,Sex,Sire,Dam,Trainer,Flat rating,Diff Flat,Flat Clltrl,AWT rating,Diff AWT,AWT Clltrl,Chase rating,Diff Chase,Chase Clltrl,Hurdle rating,Diff Hurdle,Hurdle Clltrl"
-        "A BOY NAMED IVY (IRE),2018,GELDING,MARKAZ (IRE),ST ATHAN (GB),,79,,,,,,,,,,,",
-        "A DAY TO DREAM (IRE),2020,GELDING,ADAAY (IRE),TARA TOO (IRE),Ollie Pears,49,,,,,,,,,,,",
-        "A DEFINITE GETAWAY (IRE),2018,GELDING,GETAWAY (GER),DEF IT VIC (IRE),Ben Pauling,,,,,,,,,,112,,",
+        row.split(",")
+        for row in [
+            "Name,Year,Sex,Sire,Dam,Trainer,Flat rating,Diff Flat,Flat Clltrl,AWT rating,Diff AWT,AWT Clltrl,Chase rating,Diff Chase,Chase Clltrl,Hurdle rating,Diff Hurdle,Hurdle Clltrl",
+            "A DAY TO DREAM (IRE),2020,GELDING,ADAAY (IRE),TARA TOO (IRE),Ollie Pears,49,,,,,,,,,,,",
+        ]
     ]
-
-
-@pytest.fixture
-def mock_csv_bytearray(mock_csv_data):
-    return bytearray("\n".join(mock_csv_data), "utf-8")
 
 
 def test_parse_horse_returns_correct_dict_when_country_supplied():
@@ -156,3 +154,24 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
 def test_get_csv_returns_none_if_no_files_found(mocker):
     mocker.patch("src.transformers.bha_transformer.get_files", return_value=[])
     assert None == get_csv.fn()
+
+
+def test_transform_ratings_data_returns_correct_output(mock_data):
+    expected = {
+        "name": "A DAY TO DREAM",
+        "country": "IRE",
+        "year": 2020,
+        "sex": "M",
+        "trainer": "Ollie Pears",
+        "flat": 49,
+        "aw": None,
+        "chase": None,
+        "hurdle": None,
+        "sire": "ADAAY",
+        "sire_country": "IRE",
+        "dam": "TARA TOO",
+        "dam_country": "IRE",
+        "is_gelded": True,
+    }
+    actual = transform_ratings_data.fn(mock_data)[0]
+    assert expected == actual
