@@ -165,7 +165,7 @@ def test_transform_horse_returns_correct_output():
         "jockey": "A Jockey",
         "trainer": "A Trainer",
         "age": "3",
-        "weight": "10-0",
+        "lbs_carried": 140,
         "saddlecloth": "1",
         "days_since_prev_run": "1",
         "non_runner": "0",

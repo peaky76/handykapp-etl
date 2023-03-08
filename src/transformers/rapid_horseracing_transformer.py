@@ -43,6 +43,10 @@ def parse_going(going):
     return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}
 
 
+def parse_weight(weight):
+    return 140
+
+
 def validate_date(date):
     try:
         pendulum.parse(date)
@@ -98,11 +102,13 @@ def transform_horse(data):
             data,
             {
                 "id_horse": "rapid_id",
+                "weight": "lbs_carried",
                 "last_ran_days_ago": "days_since_prev_run",
                 "number": "saddlecloth",
                 "OR": "official_rating",
             },
         )
+        .convert("lbs_carried", lambda x: parse_weight(x))
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
         .cutout("horse")
