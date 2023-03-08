@@ -164,7 +164,6 @@ def test_transform_horse_returns_correct_output():
         "rapid_id": "123456",
         "jockey": "A Jockey",
         "trainer": "A Trainer",
-        "age": "3",
         "lbs_carried": 140,
         "saddlecloth": "1",
         "days_since_prev_run": "1",
