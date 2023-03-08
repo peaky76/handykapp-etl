@@ -3,7 +3,7 @@ import pendulum
 
 def parse_going(going):
     if not going:
-        return None
+        return {"main": None, "secondary": None}
 
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
     return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}

@@ -9,6 +9,10 @@ from transformers.parsers import (
 )
 
 
+def test_parse_going_returns_correct_value_for_none():
+    assert parse_going(None) == {"main": None, "secondary": None}
+
+
 def test_parse_going_returns_correct_value_for_straight_going():
     assert parse_going("GOOD") == {"main": "GOOD", "secondary": None}
 
