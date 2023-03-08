@@ -106,6 +106,10 @@ def transform_horse(data):
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
         .cutout("horse")
+        .addfield("sire_country", lambda rec: parse_horse(rec["sire"])[1], index=-4)
+        .convert("sire", lambda x: parse_horse(x)[0])
+        .addfield("dam_country", lambda rec: parse_horse(rec["dam"])[1], index=-3)
+        .convert("dam", lambda x: parse_horse(x)[0])
         .dicts()
     )
 
