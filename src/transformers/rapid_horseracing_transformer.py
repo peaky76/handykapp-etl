@@ -67,6 +67,11 @@ def validate_prize(prize):
     return bool(re.match(pattern, prize)) if prize else False
 
 
+def validate_weight(weight):
+    pattern = r"^[0-9]{1,2}-[0-1][0-9]$"
+    return bool(re.match(pattern, weight)) if weight else False
+
+
 @task(tags=["Rapid"])
 def transform_horse(horse_data, race_date=pendulum.now()):
     return (
@@ -130,6 +135,52 @@ def transform_result(data):
 
 
 @task(tags=["Rapid"])
+def validate_horse(data):
+    header = (
+        "horse",
+        "id_horse",
+        "jockey",
+        "trainer",
+        "age",
+        "weight",
+        "number",
+        "last_ran_days_ago",
+        "non_runner",
+        "form",
+        "position",
+        "distance_beaten",
+        "owner",
+        "sire",
+        "dam",
+        "OR",
+        "sp",
+        "odds",
+    )
+    constraints = [
+        dict(name="horse_str", field="horse", test=str),
+        dict(name="id_horse_int", field="id_horse", test=int),
+        dict(name="jockey_str", field="jockey", test=str),
+        dict(name="trainer_str", field="trainer", test=str),
+        dict(name="age_int", field="age", test=int),
+        dict(name="weight_valid", field="weight", assertion=validate_weight),
+        dict(name="number_int", field="number", test=int),
+        dict(name="last_ran_days_ago_int", field="last_ran_days_ago", test=int),
+        dict(name="non_runner_bool", field="non_runner", test=bool),
+        dict(name="form_str", field="form", test=str),
+        dict(name="position_int", field="position", test=int),
+        dict(name="distance_beaten_str", field="distance_beaten", test=str),
+        dict(name="owner_str", field="owner", test=str),
+        dict(name="sire_str", field="sire", test=str),
+        dict(name="dam_str", field="dam", test=str),
+        dict(name="OR_int", field="OR", test=int),
+        dict(name="sp_float", field="sp", assertion=float),
+        dict(name="odds_list", field="odds", test=list),
+    ]
+    validator = {"header": header, "constraints": constraints}
+    return petl.validate(data, **validator)
+
+
+@task(tags=["Rapid"])
 def validate_result(data):
     header = (
         "id_race",
@@ -157,7 +208,11 @@ def validate_result(data):
         dict(name="canceled_bool", field="canceled", test=bool),
         dict(name="prize_valid", field="prize", assertion=validate_prize),
         dict(name="class_int", field="class", test=int),
-        dict(name="horses_list", field="horses", test=list),
+        dict(
+            name="horses_list",
+            field="horses",
+            assertion=lambda x: [validate_horse(h) for h in x],
+        ),
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
@@ -165,11 +220,12 @@ def validate_result(data):
 
 @flow
 def rapid_horseracing_transformer():
-    data = read_file(f"{SOURCE}results/rapid_api_result_187686.json")
-    problems = validate_result(petl.fromdicts([data]))
+    json = read_file(f"{SOURCE}results/rapid_api_result_187686.json")
+    data = petl.fromdicts([json])
+    problems = validate_result(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
-    return transform_result(petl.fromdicts([data]))
+    return transform_result(data)
 
 
 if __name__ == "__main__":
