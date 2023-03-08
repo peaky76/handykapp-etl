@@ -2,7 +2,6 @@ import petl
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
-    parse_horse,
     parse_sex,
     transform_ratings_data,
     validate_horse,
@@ -21,14 +20,6 @@ def mock_data():
             "A DAY TO DREAM (IRE),2020,GELDING,ADAAY (IRE),TARA TOO (IRE),Ollie Pears,49,,,,,,,,,,,",
         ]
     ]
-
-
-def test_parse_horse_returns_correct_dict_when_country_supplied():
-    assert ("DOBBIN", "IRE") == parse_horse("DOBBIN (IRE)")
-
-
-def test_parse_horse_returns_correct_dict_when_country_not_supplied():
-    assert ("DOBBIN", None) == parse_horse("DOBBIN")
 
 
 def test_parse_sex_returns_correct_value_for_gelding():
