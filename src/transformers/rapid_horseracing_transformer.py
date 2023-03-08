@@ -90,6 +90,14 @@ def read_json(json):
 
 
 @task(tags=["Rapid"])
+def transform_horse(data):
+    return petl.rename(
+        data,
+        {"id_horse": "rapid_id", "last_ran_days_ago": "days_since_prev_run"},
+    ).dicts()
+
+
+@task(tags=["Rapid"])
 def transform_result(data):
     return (
         petl.rename(
