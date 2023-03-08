@@ -6,8 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
-from transformers.parsers import parse_horse
-from transformers.parsers import parse_sex as p_sex
+from transformers.parsers import parse_horse, parse_sex
 import petl
 import yaml
 
@@ -16,10 +15,6 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["bha"]["spaces"]["dir"]
-
-
-def parse_sex(sex):
-    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION", "RIG"] else "F"
 
 
 def validate_horse(horse):
@@ -84,7 +79,7 @@ def transform_ratings_data(data):
         .convert("dam", lambda x: parse_horse(x)[0])
         .movefield("dam", -1)
         .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
-        .convert({"sex": p_sex})
+        .convert({"sex": parse_sex})
         .dicts()
     )
 
