@@ -141,7 +141,6 @@ def transform_result(data):
     )
 
 
-@task(tags=["Rapid"])
 def validate_horse(data):
     header = (
         "horse",
