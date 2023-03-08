@@ -101,7 +101,7 @@ def transform_result(data):
             "distance",
             lambda x: {
                 "description": x,
-                "expected_metres": int(parse_distance(x)),
+                "official_metres": int(parse_distance(x)),
                 "actual_metres": None,
             },
         )
