@@ -166,7 +166,7 @@ def test_transform_horse_returns_correct_output():
         "trainer": "A Trainer",
         "age": "3",
         "weight": "10-0",
-        "number": "1",
+        "saddlecloth": "1",
         "days_since_prev_run": "1",
         "non_runner": "0",
         "form": "1-2-3",

@@ -96,7 +96,11 @@ def transform_horse(data):
     return (
         petl.rename(
             data,
-            {"id_horse": "rapid_id", "last_ran_days_ago": "days_since_prev_run"},
+            {
+                "id_horse": "rapid_id",
+                "last_ran_days_ago": "days_since_prev_run",
+                "number": "saddlecloth",
+            },
         )
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
