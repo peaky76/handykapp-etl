@@ -169,7 +169,7 @@ def test_transform_horse_returns_correct_output():
         "lbs_carried": 140,
         "saddlecloth": "1",
         "days_since_prev_run": 1,
-        "non_runner": "0",
+        "non_runner": False,
         "form": "1-2-3",
         "position": "1",
         "distance_beaten": "1 1/2",
