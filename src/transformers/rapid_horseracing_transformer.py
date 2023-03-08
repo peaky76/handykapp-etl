@@ -2,13 +2,11 @@
 from pathlib import Path
 import sys
 
-from transformers.parsers import parse_horse, parse_weight, yob_from_age
-
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, stream_file
 from prefect import flow, task
+from transformers.parsers import parse_horse, parse_weight, yob_from_age
 import pendulum
 import petl
 import re
@@ -21,18 +19,24 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
 
 
-def parse_distance(distance):
-    if not distance:
+def parse_yards(distance_description):
+    if not distance_description:
         return 0
 
-    if "m" in distance:
-        miles = distance.split("m")[0]
-        furlongs = distance.split("m")[1].split("f")[0] if "f" in distance else 0
+    if "m" in distance_description:
+        miles = distance_description.split("m")[0]
+        furlongs = (
+            distance_description.split("m")[1].split("f")[0]
+            if "f" in distance_description
+            else 0
+        )
     else:
         miles = 0
-        furlongs = distance.split("f")[0] if "f" in distance else 0
+        furlongs = (
+            distance_description.split("f")[0] if "f" in distance_description else 0
+        )
 
-    return round(((int(miles) * 8 + int(furlongs)) * 220 * 0.9144), 3)
+    return (int(miles) * 8 + int(furlongs)) * 220
 
 
 def parse_going(going):
@@ -137,8 +141,8 @@ def transform_result(data):
             "distance",
             lambda x: {
                 "description": x,
-                "official_metres": int(parse_distance(x)),
-                "actual_metres": None,
+                "official_yards": int(parse_yards(x)),
+                "actual_yards": None,
             },
         )
         .convert(
