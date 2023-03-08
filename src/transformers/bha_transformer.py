@@ -7,6 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
 from transformers.parsers import parse_horse
+from transformers.parsers import parse_sex as p_sex
 import petl
 import yaml
 
@@ -83,7 +84,7 @@ def transform_ratings_data(data):
         .convert("dam", lambda x: parse_horse(x)[0])
         .movefield("dam", -1)
         .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
-        .convert({"sex": parse_sex})
+        .convert({"sex": p_sex})
         .dicts()
     )
 
