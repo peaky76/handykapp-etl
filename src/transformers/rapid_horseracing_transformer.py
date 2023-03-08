@@ -109,8 +109,8 @@ def transform_result(data):
             "going",
             lambda x: {
                 "description": x,
-                "main": parse_going(x)["main"],
-                "secondary": parse_going(x)["secondary"],
+                "official_main": parse_going(x)["main"],
+                "official_secondary": parse_going(x)["secondary"],
             },
         )
         .dicts()
