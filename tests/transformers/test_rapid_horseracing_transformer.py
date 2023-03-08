@@ -1,7 +1,5 @@
 import pendulum
 from transformers.rapid_horseracing_transformer import (
-    parse_yards,
-    parse_going,
     transform_horse,
     validate_date,
     validate_distance,
