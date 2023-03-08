@@ -104,7 +104,8 @@ def transform_horse(horse_data, race_date=pendulum.now()):
                 "OR": "official_rating",
             },
         )
-        .addfield("year", lambda rec: yob_from_age(int(rec["age"]), race_date), index=1)
+        .convert({"age": int, "days_since_prev_run": int, "official_rating": int})
+        .addfield("year", lambda rec: yob_from_age(rec["age"], race_date), index=1)
         .convert("lbs_carried", lambda x: parse_weight(x))
         .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)

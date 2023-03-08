@@ -168,7 +168,7 @@ def test_transform_horse_returns_correct_output():
         "trainer": "A Trainer",
         "lbs_carried": 140,
         "saddlecloth": "1",
-        "days_since_prev_run": "1",
+        "days_since_prev_run": 1,
         "non_runner": "0",
         "form": "1-2-3",
         "position": "1",
@@ -178,7 +178,7 @@ def test_transform_horse_returns_correct_output():
         "sire_country": None,
         "dam": "THE DAM",
         "dam_country": "FR",
-        "official_rating": "",
+        "official_rating": None,
         "sp": "8",
         "odds": [],
     }
