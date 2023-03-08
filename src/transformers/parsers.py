@@ -1,3 +1,6 @@
+import pendulum
+
+
 def parse_horse(horse):
     split_string = horse.replace(")", "").split("(")
     name, country = split_string if len(split_string) == 2 else (horse, None)
@@ -11,3 +14,7 @@ def parse_sex(sex):
 def parse_weight(weight):
     st, lbs = weight.split("-")
     return int(st) * 14 + int(lbs)
+
+
+def yob_from_age(age, date=pendulum.now()):
+    return date.year - age
