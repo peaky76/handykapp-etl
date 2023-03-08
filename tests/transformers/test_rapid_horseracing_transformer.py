@@ -159,7 +159,7 @@ def test_transform_horse_returns_correct_output():
         ]
     )
     expected = {
-        "name": "Dobbin",
+        "name": "DOBBIN",
         "country": "IRE",
         "rapid_id": "123456",
         "jockey": "A Jockey",
