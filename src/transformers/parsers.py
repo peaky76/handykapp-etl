@@ -6,3 +6,8 @@ def parse_horse(horse):
 
 def parse_sex(sex):
     return "M" if sex.upper() in ["GELDING", "COLT", "STALLION", "RIG"] else "F"
+
+
+def parse_weight(weight):
+    st, lbs = weight.split("-")
+    return int(st) * 14 + int(lbs)

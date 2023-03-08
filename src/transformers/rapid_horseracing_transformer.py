@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 
-from transformers.parsers import parse_horse
+from transformers.parsers import parse_horse, parse_weight
 
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -41,10 +41,6 @@ def parse_going(going):
 
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
     return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}
-
-
-def parse_weight(weight):
-    return 140
 
 
 def validate_date(date):
