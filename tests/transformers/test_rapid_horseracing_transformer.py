@@ -1,6 +1,7 @@
 import pendulum
 from transformers.rapid_horseracing_transformer import (
     transform_horse,
+    transform_result,
     validate_date,
     validate_distance,
     validate_going,
@@ -172,3 +173,48 @@ def test_transform_horse_returns_correct_output():
         "finishing_time": None,
     }
     assert expected == transform_horse(horse_data, pendulum.parse("2023-03-08"))
+
+
+def test_transform_result_returns_correct_output():
+    result_data = petl.fromdicts(
+        [
+            {
+                "id_race": "123456",
+                "course": "Lucksin Downs",
+                "date": "2020-01-01 16:00:00",
+                "title": "LUCKSIN HANDICAP (5)",
+                "distance": "1m2f",
+                "age": "3",
+                "going": "Soft (Good to Soft in places)",
+                "finished": "1",
+                "canceled": "0",
+                "finish_time": "",
+                "prize": "\u00a32794",
+                "class": "5",
+                "horses": [],
+            }
+        ]
+    )
+    expected = {
+        "rapid_id": "123456",
+        "venue": "Lucksin Downs",
+        "datetime": "2020-01-01 16:00:00",
+        "title": "LUCKSIN HANDICAP (5)",
+        "distance": {
+            "description": "1m2f",
+            "official_yards": 2200,
+            "actual_yards": None,
+        },
+        "age_restriction": "3",
+        "going": {
+            "description": "Soft (Good to Soft in places)",
+            "official_main": "SOFT",
+            "official_secondary": "GOOD TO SOFT",
+        },
+        "finished": True,
+        "cancelled": False,
+        "prize": "£2794",
+        "class": "5",
+        "result": [],
+    }
+    assert expected == transform_result.fn(result_data)[0]
