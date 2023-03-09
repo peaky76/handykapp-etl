@@ -109,7 +109,14 @@ def transform_horse(horse_data, race_date=pendulum.now()):
 def transform_result(data):
     return (
         petl.rename(
-            data, {"id_race": "rapid_id", "date": "datetime", "age": "age_restriction"}
+            data,
+            {
+                "id_race": "rapid_id",
+                "date": "datetime",
+                "age": "age_restriction",
+                "course": "venue",
+                "canceled": "cancelled",
+            },
         )
         .convert("finished", lambda x: bool(int(x)))
         .convert("canceled", lambda x: bool(int(x)))
