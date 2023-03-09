@@ -142,7 +142,7 @@ def test_transform_horse_returns_correct_output():
         "distance_beaten": "1 1/2",
         "owner": "A Owner",
         "sire": "THE SIRE",
-        "sire_country": None,
+        "sire_country": "GB",
         "dam": "THE DAM",
         "dam_country": "FR",
         "official_rating": None,
