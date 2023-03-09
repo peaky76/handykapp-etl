@@ -94,11 +94,13 @@ def transform_horse(horse_data, race_date=pendulum.now(), finishing_time=None):
             }
         )
         .addfield("year", lambda rec: yob_from_age(rec["age"], race_date), index=1)
-        .addfield("country", lambda rec: parse_horse(rec["horse"])[1], index=1)
+        .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
-        .addfield("sire_country", lambda rec: parse_horse(rec["sire"])[1], index=-4)
+        .addfield(
+            "sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1], index=-4
+        )
         .convert("sire", lambda x: parse_horse(x)[0])
-        .addfield("dam_country", lambda rec: parse_horse(rec["dam"])[1], index=-3)
+        .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
         .addfield("finishing_time", finishing_time, index=-1)
         .cutout("horse", "age")
