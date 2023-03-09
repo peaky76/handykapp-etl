@@ -48,6 +48,10 @@ def test_parse_horse_returns_correct_tuple_when_country_supplied_without_space()
     assert ("DOBBIN", "IRE") == parse_horse("DOBBIN(IRE)")
 
 
+def test_parse_horse_returns_correct_tuple_when_country_supplied_as_a_default():
+    assert ("DOBBIN", "IRE") == parse_horse("DOBBIN", "IRE")
+
+
 def test_parse_sex_returns_correct_value_for_gelding():
     assert "M" == parse_sex("GELDING")
 
