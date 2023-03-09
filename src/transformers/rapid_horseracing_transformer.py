@@ -63,7 +63,7 @@ def validate_going(going):
 
 
 def validate_prize(prize):
-    pattern = r"^[£|\$][0-9]{1,3}(,)*[0-9]{1,3}$"
+    pattern = r"^[£|\$]\d{1,3}(,)*\d{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
 
 
