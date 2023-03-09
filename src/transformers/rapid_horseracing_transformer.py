@@ -68,7 +68,7 @@ def validate_prize(prize):
 
 
 def validate_weight(weight):
-    pattern = r"^\d{1,2}-[0-1]\d$"
+    pattern = r"^\d{1,2}-(0\d|1[0-3])$"
     return bool(re.match(pattern, weight)) if weight else False
 
 
