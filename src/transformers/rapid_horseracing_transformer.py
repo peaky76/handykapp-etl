@@ -72,7 +72,7 @@ def validate_weight(weight):
     return bool(re.match(pattern, weight)) if weight else False
 
 
-def transform_horse(horse_data, race_date=pendulum.now()):
+def transform_horse(horse_data, race_date=pendulum.now(), finishing_time=None):
     return (
         petl.rename(
             horse_data,
@@ -100,6 +100,7 @@ def transform_horse(horse_data, race_date=pendulum.now()):
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"])[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
+        .addfield("finishing_time", finishing_time, index=-1)
         .cutout("horse", "age")
         .dicts()[0]
     )

@@ -148,5 +148,6 @@ def test_transform_horse_returns_correct_output():
         "official_rating": None,
         "sp": "8",
         "odds": [],
+        "finishing_time": None,
     }
     assert expected == transform_horse(input, pendulum.parse("2023-03-08"))
