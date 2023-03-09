@@ -102,7 +102,7 @@ def test_validate_prize_fails_for_invalid_string():
 
 
 def test_transform_horse_returns_correct_output():
-    input = petl.fromdicts(
+    horse_data = petl.fromdicts(
         [
             {
                 "horse": "Dobbin(IRE)",
@@ -150,4 +150,4 @@ def test_transform_horse_returns_correct_output():
         "odds": [],
         "finishing_time": None,
     }
-    assert expected == transform_horse(input, pendulum.parse("2023-03-08"))
+    assert expected == transform_horse(horse_data, pendulum.parse("2023-03-08"))
