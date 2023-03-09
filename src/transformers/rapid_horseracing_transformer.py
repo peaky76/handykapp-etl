@@ -148,7 +148,7 @@ def transform_result(data):
                 for i, h in enumerate(rec["horses"])
             ],
         )
-        .cutout("horses")
+        .cutout("horses", "finish_time")
         .dicts()
     )
 
