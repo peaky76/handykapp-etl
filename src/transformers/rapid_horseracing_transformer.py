@@ -120,7 +120,7 @@ def transform_result(data):
             },
         )
         .convert("finished", lambda x: bool(int(x)))
-        .convert("canceled", lambda x: bool(int(x)))
+        .convert("cancelled", lambda x: bool(int(x)))
         .convert(
             "distance",
             lambda x: {
@@ -140,8 +140,12 @@ def transform_result(data):
         .addfield(
             "result",
             lambda rec: [
-                transform_horse(petl.fromdicts([h]), pendulum.parse(rec["datetime"]))
-                for h in rec["horses"]
+                transform_horse(
+                    petl.fromdicts([h]),
+                    race_date=pendulum.parse(rec["datetime"]),
+                    finishing_time=rec["finish_time"] if i == 0 else None,
+                )
+                for i, h in enumerate(rec["horses"])
             ],
         )
         .cutout("horses")
