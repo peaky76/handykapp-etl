@@ -5,6 +5,7 @@ from transformers.rapid_horseracing_transformer import (
     validate_distance,
     validate_going,
     validate_prize,
+    validate_weight,
 )
 import petl
 
@@ -99,6 +100,26 @@ def test_validate_prize_fails_for_none():
 
 def test_validate_prize_fails_for_invalid_string():
     assert not validate_prize("£1234$")
+
+
+def test_validate_weight_fail_for_none():
+    assert not validate_weight(None)
+
+
+def test_validate_weight_fails_for_weight_without_hyphen():
+    assert not validate_weight("10")
+
+
+def test_validate_weight_fails_for_weight_with_more_than_one_hyphen():
+    assert not validate_weight("10-0-0")
+
+
+def test_validate_weight_fails_for_weight_with_letters():
+    assert not validate_weight("10-0a")
+
+
+def test_validate_weight_fails_for_weight_with_invalid_lbs():
+    assert not validate_weight("10-15")
 
 
 def test_transform_horse_returns_correct_output():
