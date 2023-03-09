@@ -9,6 +9,8 @@ from src.transformers.bha_transformer import (
     validate_year,
 )
 
+GET_FILES_IMPORT = "src.transformers.bha_transformer.get_files"
+
 
 @pytest.fixture
 def mock_data():
@@ -87,7 +89,7 @@ def test_validate_year_fails_for_str_above_range():
 
 def test_get_csv_returns_latest_ratings_by_default(mocker):
     mocker.patch(
-        "src.transformers.bha_transformer.get_files",
+        GET_FILES_IMPORT,
         return_value=[
             "handykapp/bha/bha_ratings_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -99,7 +101,7 @@ def test_get_csv_returns_latest_ratings_by_default(mocker):
 
 def test_get_csv_returns_perf_figs_if_requested(mocker):
     mocker.patch(
-        "src.transformers.bha_transformer.get_files",
+        GET_FILES_IMPORT,
         return_value=[
             "handykapp/bha/bha_perf_figs_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -111,7 +113,7 @@ def test_get_csv_returns_perf_figs_if_requested(mocker):
 
 def test_get_csv_returns_ratings_for_date_if_requested(mocker):
     mocker.patch(
-        "src.transformers.bha_transformer.get_files",
+        GET_FILES_IMPORT,
         return_value=[
             "handykapp/bha/bha_ratings_20200101.csv",
             "handykapp/bha/bha_ratings_20200201.csv",
@@ -122,7 +124,7 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
 
 
 def test_get_csv_returns_none_if_no_files_found(mocker):
-    mocker.patch("src.transformers.bha_transformer.get_files", return_value=[])
+    mocker.patch(GET_FILES_IMPORT, return_value=[])
     assert None == get_csv.fn()
 
 
