@@ -9,12 +9,12 @@ def parse_going(going):
     return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}
 
 
-def parse_horse(horse):
+def parse_horse(horse, default_country=None):
     if not horse:
         return (None, None)
 
     split_string = horse.replace(")", "").split("(")
-    name, country = split_string if len(split_string) == 2 else (horse, None)
+    name, country = split_string if len(split_string) == 2 else (horse, default_country)
     return (name.upper().strip(), country)
 
 
