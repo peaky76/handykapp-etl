@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import yaml
 from helpers.helpers import fetch_content, write_file
-from prefect import task
+from prefect import flow, task
 from prefect.blocks.system import Secret
 
 with open("api_info.yml", "r") as f:
@@ -21,3 +21,20 @@ def get_headers():
         "x-rapidapi-host": "the-racing-api1.p.rapidapi.com",
         "x-rapidapi-key": Secret.load("rapid-api-key").get(),
     }
+
+
+@task(tags=["TheRacingApi"])
+def extract_countries():
+    source = f"{SOURCE}courses/regions"
+    headers = get_headers()
+
+    return fetch_content(source, headers=headers)
+
+
+@flow
+def theracingapi_extractor():
+    extract_countries()
+
+
+if __name__ == "__main__":
+    theracingapi_extractor()
