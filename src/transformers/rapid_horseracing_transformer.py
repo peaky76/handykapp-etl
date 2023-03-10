@@ -214,7 +214,7 @@ def validate_horse(data):
 
 
 @task(tags=["Rapid"])
-def validate_result(data):
+def validate_results(data):
     header = (
         "id_race",
         "course",
@@ -254,13 +254,13 @@ def validate_result(data):
 @flow
 def rapid_horseracing_transformer():
     race_ids = get_race_ids(pendulum.parse("2020-01-01 00:00"))
-    for id in race_ids:
-        json = read_file(f"{SOURCE}results/rapid_api_result_{id}.json")
-        data = petl.fromdicts([json])
-        problems = validate_result(data)
-        for problem in problems.dicts():
-            log_validation_problem(problem)
-        print(transform_result(data))
+    data = petl.fromdicts(
+        [read_file(f"{SOURCE}results/rapid_api_result_{id}.json") for id in race_ids]
+    )
+    problems = validate_results(data)
+    for problem in problems.dicts():
+        log_validation_problem(problem)
+    print(transform_results(data))
 
 
 if __name__ == "__main__":
