@@ -63,7 +63,7 @@ def validate_going(going):
 
 
 def validate_handicap(title):
-    return any(word in title for word in ["HANDICAP", "H'CAP"])
+    return any(word in title.upper() for word in ["HANDICAP", "H'CAP"])
 
 
 def validate_prize(prize):
@@ -143,6 +143,7 @@ def transform_result(data):
                 "official_secondary": parse_going(x)["secondary"],
             },
         )
+        .addfield("is_handicap", lambda rec: validate_handicap(rec["title"]), index=4)
         .addfield(
             "result",
             lambda rec: [
