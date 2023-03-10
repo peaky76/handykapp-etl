@@ -31,9 +31,19 @@ def extract_countries():
     return fetch_content(source, headers=headers)
 
 
+@task(tags=["TheRacingApi"])
+def extract_racecards(day="tomorrow", region_codes=["gb", "ire"]):
+    source = f"{SOURCE}racecards/basic"
+    headers = get_headers()
+    params = {"day": day, "region_codes": region_codes}
+
+    return fetch_content(source, params=params, headers=headers)
+
+
 @flow
 def theracingapi_extractor():
     extract_countries()
+    extract_racecards()
 
 
 if __name__ == "__main__":
