@@ -1,6 +1,7 @@
 # To allow running as a script
 from pathlib import Path
 import sys
+import pendulum
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -37,7 +38,10 @@ def extract_racecards(day="tomorrow", region_codes=["gb", "ire"]):
     headers = get_headers()
     params = {"day": day, "region_codes": region_codes}
 
-    return fetch_content(source, params=params, headers=headers)
+    content = fetch_content(source, params=params, headers=headers)
+    date_str = pendulum.now().add(days=1).format("YYYYMMDD")
+    filename = f"{DESTINATION}racecards/theracingapi_racecards_{date_str}.json"
+    write_file(content, filename)
 
 
 @flow
