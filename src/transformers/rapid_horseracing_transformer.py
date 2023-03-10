@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, stream_file
 from prefect import flow, task
+from extractors.rapid_horseracing_extractor import get_race_ids
 from transformers.parsers import (
     parse_going,
     parse_horse,
@@ -247,14 +248,16 @@ def validate_result(data):
 
 @flow
 def rapid_horseracing_transformer():
-    json = read_file(f"{SOURCE}results/rapid_api_result_187686.json")
-    data = petl.fromdicts([json])
-    problems = validate_result(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
-    return transform_result(data)
+    race_ids = get_race_ids(pendulum.parse("2020-01-01 00:00"))
+    for id in race_ids:
+        json = read_file(f"{SOURCE}results/rapid_api_result_{id}.json")
+        data = petl.fromdicts([json])
+        problems = validate_result(data)
+        for problem in problems.dicts():
+            log_validation_problem(problem)
+        print(transform_result(data))
 
 
 if __name__ == "__main__":
-    data = rapid_horseracing_transformer()
-    print(data)
+    rapid_horseracing_transformer()
+    # print(data)
