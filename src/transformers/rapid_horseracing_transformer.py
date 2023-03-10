@@ -62,6 +62,10 @@ def validate_going(going):
     return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
 
 
+def validate_handicap(title):
+    return any(word in title for word in ["HANDICAP", "H'CAP"])
+
+
 def validate_prize(prize):
     pattern = r"^[£|\$]\d{1,3}(,)*\d{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
