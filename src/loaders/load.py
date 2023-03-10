@@ -34,7 +34,7 @@ def spec_database():
     db.people.create_index("name", unique=True)
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
     db.races.create_index([("racecourse", ASC), ("datetime", ASC)], unique=True)
-    db.races.create_index("results.horse")
+    db.races.create_index("result.horse")
 
 
 @task(tags=["BHA"])
