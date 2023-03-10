@@ -7,6 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from helpers import stream_file
 from transformers.bha_transformer import bha_transformer
+from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
 import yaml
@@ -82,6 +83,13 @@ def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
             logger.info(f"Loaded {i} horses")
 
 
+@task(tags=["Rapid"])
+def load_races(races):
+    for race in races:
+        del race["result"]
+        db.races.insert_one(race)
+
+
 @task
 def load_ratings():
     pass  # TODO
@@ -140,6 +148,7 @@ def load_database_afresh():
     dams_ids = load_parents(dams, "F")
     trainer_ids = load_people(trainers)
     load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    load_races(rapid_horseracing_transformer())
     # load_ratings()
 
 
