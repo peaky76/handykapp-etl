@@ -45,10 +45,15 @@ def extract_racecards(day="tomorrow", region_codes=["gb", "ire"]):
 
 
 @flow
-def theracingapi_extractor():
-    extract_countries()
+def theracingapi_racecard_extractor():
     extract_racecards()
 
 
+@flow
+def theracingapi_countries_extractor():
+    extract_countries()
+
+
 if __name__ == "__main__":
-    theracingapi_extractor()
+    theracingapi_racecard_extractor()
+    theracingapi_countries_extractor()
