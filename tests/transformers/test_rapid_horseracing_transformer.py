@@ -5,6 +5,7 @@ from transformers.rapid_horseracing_transformer import (
     validate_date,
     validate_distance,
     validate_going,
+    validate_handicap,
     validate_prize,
     validate_weight,
 )
@@ -81,6 +82,18 @@ def test_validate_going_fails_for_none():
 
 def test_validate_going_fails_for_invalid_string():
     assert not validate_going("moist to tricky")
+
+
+def test_validate_handicap_passes_if_name_contains_handicap():
+    assert validate_handicap("LUCKSIN HANDICAP (5)")
+
+
+def test_validate_handicap_passes_if_name_contains_handicap_abbr():
+    assert validate_handicap("LUCKSIN H'CAP (5) ")
+
+
+def test_validate_handicap_fails_if_name_does_not_contain_handicap():
+    assert not validate_handicap("LUCKSIN STAKES (5)")
 
 
 def test_validate_prize_passes_for_sterling():
