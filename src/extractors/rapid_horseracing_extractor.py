@@ -35,6 +35,12 @@ def get_headers(url):
     }
 
 
+@task(tags=["Rapid"])
+def get_race_ids(last_checked):
+    racecard_files = get_files(RACECARDS_DESTINATION, last_checked)
+    return [race["id_race"] for file in racecard_files for race in read_file(file)]
+
+
 @task(tags=["Rapid"], task_run_name="extract_result_{race_id}")
 def extract_result(race_id):
     source = f"{SOURCE}race/{race_id}"
@@ -55,11 +61,6 @@ def extract_racecards(date):  # date - YYYY-MM-DD
     date_str = date.replace("-", "")
     filename = f"{RACECARDS_DESTINATION}rapid_api_racecards_{date_str}.json"
     write_file(content, filename)
-
-
-@task(tags=["Rapid"])
-def get_race_ids(file):
-    return [race["id_race"] for race in read_file(file)]
 
 
 @task(tags=["Rapid"])
@@ -90,12 +91,8 @@ def update_results_to_do_list():
         else None
     )
 
-    racecard_files = get_files(RACECARDS_DESTINATION, last_checked)
     result_files = get_files(RESULTS_DESTINATION)
-
-    new_race_ids = [
-        race_id for file in racecard_files for race_id in get_race_ids(file)
-    ]
+    new_race_ids = get_race_ids(last_checked)
     done_race_ids = [filename.split(".")[0].split("_")[-1] for filename in result_files]
     to_do_race_ids = current_status["results_to_do"] + new_race_ids
 
