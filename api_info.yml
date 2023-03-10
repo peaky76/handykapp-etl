@@ -20,3 +20,6 @@ theracingapi:
     dir: "https://the-racing-api1.p.rapidapi.com/v1/"
   spaces:
     dir: "handykapp/theracingapi/"
+  limits:
+    day: 50
+    second: 2
