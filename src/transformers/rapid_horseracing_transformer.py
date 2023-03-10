@@ -78,7 +78,7 @@ def validate_weight(weight):
     return bool(re.match(pattern, weight)) if weight else False
 
 
-def transform_horse(horse_data, race_date=pendulum.now(), finishing_time=None):
+def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
     return (
         petl.rename(
             horse_data,
@@ -108,14 +108,18 @@ def transform_horse(horse_data, race_date=pendulum.now(), finishing_time=None):
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
-        .addfield("finishing_time", finishing_time, index=-1)
+        .addfield(
+            "finishing_time",
+            lambda rec: finishing_time if rec["position"] == 1 else None,
+            index=-1,
+        )
         .cutout("horse", "age")
         .dicts()[0]
     )
 
 
 @task(tags=["Rapid"])
-def transform_result(data):
+def transform_results(data):
     return (
         petl.rename(
             data,
@@ -150,13 +154,14 @@ def transform_result(data):
         .addfield(
             "result",
             lambda rec: [
-                transform_horse(
-                    petl.fromdicts([h]),
+                transform_horses(
+                    petl.fromdicts(rec["horses"]),
                     race_date=pendulum.parse(rec["datetime"]),
-                    finishing_time=rec["finish_time"] if i == 0 else None,
+                    finishing_time=rec["finish_time"],
                 )
-                for i, h in enumerate(rec["horses"])
-            ],
+            ]
+            if rec["horses"]
+            else [],
         )
         .cutout("horses", "finish_time")
         .dicts()

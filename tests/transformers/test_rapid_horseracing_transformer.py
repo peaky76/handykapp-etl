@@ -1,7 +1,7 @@
 import pendulum
 from transformers.rapid_horseracing_transformer import (
-    transform_horse,
-    transform_result,
+    transform_horses,
+    transform_results,
     validate_date,
     validate_distance,
     validate_going,
@@ -148,7 +148,7 @@ def test_validate_weight_fails_for_weight_with_invalid_lbs():
     assert not validate_weight("10-15")
 
 
-def test_transform_horse_returns_correct_output():
+def test_transform_horses_returns_correct_output():
     horse_data = petl.fromdicts(
         [
             {
@@ -197,10 +197,10 @@ def test_transform_horse_returns_correct_output():
         "odds": [],
         "finishing_time": None,
     }
-    assert expected == transform_horse(horse_data, pendulum.parse("2023-03-08"))
+    assert expected == transform_horses(horse_data, pendulum.parse("2023-03-08"))
 
 
-def test_transform_result_returns_correct_output():
+def test_transform_results_returns_correct_output():
     result_data = petl.fromdicts(
         [
             {
@@ -244,4 +244,4 @@ def test_transform_result_returns_correct_output():
         "class": "5",
         "result": [],
     }
-    assert expected == transform_result.fn(result_data)[0]
+    assert expected == transform_results.fn(result_data)[0]
