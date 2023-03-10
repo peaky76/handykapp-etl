@@ -218,6 +218,7 @@ def test_transform_result_returns_correct_output():
         "datetime": "2020-01-01 16:00:00",
         "title": "LUCKSIN HANDICAP (5)",
         "is_handicap": True,
+        "obstacle": None,
         "distance": {
             "description": "1m2f",
             "official_yards": 2200,

@@ -9,6 +9,7 @@ from prefect import flow, task
 from transformers.parsers import (
     parse_going,
     parse_horse,
+    parse_obstacle,
     parse_weight,
     parse_yards,
     yob_from_age,
@@ -144,6 +145,7 @@ def transform_result(data):
             },
         )
         .addfield("is_handicap", lambda rec: validate_handicap(rec["title"]), index=4)
+        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "result",
             lambda rec: [
