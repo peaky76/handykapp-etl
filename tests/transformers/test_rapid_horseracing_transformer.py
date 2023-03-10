@@ -88,6 +88,10 @@ def test_validate_handicap_passes_if_name_contains_handicap():
     assert validate_handicap("LUCKSIN HANDICAP (5)")
 
 
+def test_validate_handicap_passes_if_name_contains_handicap_in_titlecase():
+    assert validate_handicap("Lucksin Handicap (5) ")
+
+
 def test_validate_handicap_passes_if_name_contains_handicap_abbr():
     assert validate_handicap("LUCKSIN H'CAP (5) ")
 
@@ -213,6 +217,7 @@ def test_transform_result_returns_correct_output():
         "venue": "Lucksin Downs",
         "datetime": "2020-01-01 16:00:00",
         "title": "LUCKSIN HANDICAP (5)",
+        "is_handicap": True,
         "distance": {
             "description": "1m2f",
             "official_yards": 2200,
