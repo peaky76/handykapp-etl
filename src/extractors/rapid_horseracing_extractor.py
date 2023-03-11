@@ -36,7 +36,7 @@ def get_headers(url):
 
 
 @task(tags=["Rapid"])
-def get_race_ids(last_checked):
+def get_unfetched_race_ids(last_checked):
     racecard_files = get_files(RACECARDS_DESTINATION, last_checked)
     return [race["id_race"] for file in racecard_files for race in read_file(file)]
 
@@ -92,7 +92,7 @@ def update_results_to_do_list():
     )
 
     result_files = get_files(RESULTS_DESTINATION)
-    new_race_ids = get_race_ids(last_checked)
+    new_race_ids = get_unfetched_race_ids(last_checked)
     done_race_ids = [filename.split(".")[0].split("_")[-1] for filename in result_files]
     to_do_race_ids = current_status["results_to_do"] + new_race_ids
 
