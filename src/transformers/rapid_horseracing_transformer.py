@@ -2,9 +2,10 @@
 from pathlib import Path
 import sys
 
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from helpers import log_validation_problem, read_file, stream_file
+from helpers import log_validation_problem, read_file
 from prefect import flow, task
 from extractors.rapid_horseracing_extractor import get_race_ids
 from transformers.parsers import (
@@ -15,9 +16,17 @@ from transformers.parsers import (
     parse_yards,
     yob_from_age,
 )
+from transformers.validators import (
+    validate_date,
+    validate_distance,
+    validate_going,
+    validate_handicap,
+    validate_prize,
+    validate_weight,
+)
+
 import pendulum
 import petl
-import re
 import yaml
 
 
@@ -25,57 +34,6 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
-
-
-def validate_date(date):
-    try:
-        pendulum.parse(date)
-        return True
-    except pendulum.exceptions.ParserError:
-        return False
-    except TypeError:
-        return False
-
-
-def validate_distance(distance):
-    pattern = r"^(([1-4]m)(\s)?([1-7]f)?|([4-7]f))$"
-    return bool(re.match(pattern, distance)) if distance else False
-
-
-def validate_going(going):
-    if not going:
-        return False
-
-    goings = [
-        "HARD",
-        "FIRM",
-        "GOOD TO FIRM",
-        "GOOD",
-        "GOOD TO SOFT",
-        "SOFT",
-        "SOFT TO HEAVY",
-        "HEAVY",
-        "STANDARD",
-        "STANDARD TO SLOW",
-        "SLOW",
-        "YIELDING",
-    ]
-    going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
-    return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
-
-
-def validate_handicap(title):
-    return any(word in title.upper() for word in ["HANDICAP", "H'CAP"])
-
-
-def validate_prize(prize):
-    pattern = r"^[£|\$|€|¥]\d{1,3}(,)*\d{1,3}$"
-    return bool(re.match(pattern, prize)) if prize else False
-
-
-def validate_weight(weight):
-    pattern = r"^\d{1,2}-(0\d|1[0-3])$"
-    return bool(re.match(pattern, weight)) if weight else False
 
 
 def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
