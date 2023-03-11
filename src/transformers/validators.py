@@ -34,6 +34,7 @@ def validate_going(going):
         "STANDARD TO SLOW",
         "SLOW",
         "YIELDING",
+        "GOOD TO YIELDING",
     ]
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
     return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
