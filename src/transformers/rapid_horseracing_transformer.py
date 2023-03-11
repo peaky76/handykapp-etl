@@ -7,7 +7,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file
 from prefect import flow, task
-from extractors.rapid_horseracing_extractor import get_race_ids
 from transformers.parsers import (
     parse_going,
     parse_horse,
