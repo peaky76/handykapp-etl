@@ -108,6 +108,14 @@ def test_validate_prize_passes_for_dollar():
     assert validate_prize("$1234")
 
 
+def test_validate_prize_passes_for_euro():
+    assert validate_prize("€1234")
+
+
+def test_validate_prize_passes_for_yen():
+    assert validate_prize("¥1234")
+
+
 def test_validate_prize_fails_for_none():
     assert not validate_prize(None)
 
