@@ -110,5 +110,7 @@ def test_transform_results_returns_correct_output(result_data):
     assert expected == transform_results.fn(petl.fromdicts([result_data]))[0]
 
 
-def test_validate_results_returns_true_for_correct_data(result_data):
-    assert validate_results.fn(petl.fromdicts([result_data]))
+def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):
+    result_data["horses"] = [horse_data]
+    problems = validate_results.fn(petl.fromdicts([result_data]))
+    assert 0 == len(problems.dicts())
