@@ -2,10 +2,9 @@
 from pathlib import Path
 import sys
 
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from helpers import log_validation_problem, read_file
+from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, task
 from transformers.parsers import (
     parse_going,
@@ -35,6 +34,7 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
 
 
+@task(tags=["Rapid"])
 def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
     return (
         petl.rename(
@@ -210,16 +210,13 @@ def validate_results(data):
 
 @flow
 def rapid_horseracing_transformer():
-    race_ids = get_race_ids(pendulum.parse("2020-01-01 00:00"))
-    data = petl.fromdicts(
-        [read_file(f"{SOURCE}results/rapid_api_result_{id}.json") for id in race_ids]
-    )
+    data = petl.fromdicts([read_file(f) for f in get_files(f"{SOURCE}results")])
     problems = validate_results(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
-    print(transform_results(data))
+    return transform_results(data)
 
 
 if __name__ == "__main__":
-    rapid_horseracing_transformer()
-    # print(data)
+    data = rapid_horseracing_transformer()
+    print(data)
