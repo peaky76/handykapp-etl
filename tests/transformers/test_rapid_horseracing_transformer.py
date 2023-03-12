@@ -55,7 +55,7 @@ def test_transform_horses_returns_correct_output():
         "odds": [],
         "finishing_time": None,
     }
-    assert expected == transform_horses(horse_data, pendulum.parse("2023-03-08"))
+    assert expected == transform_horses.fn(horse_data, pendulum.parse("2023-03-08"))
 
 
 def test_transform_results_returns_correct_output():
