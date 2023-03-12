@@ -14,7 +14,7 @@ def fetch_content(url, params=None, headers=None):
     return response.content
 
 
-def get_all_files(dirname):
+def get_all_files(dirname, modified_after=None):
     continuation_token = None
     while True:
         response = client.list_objects_v2(
@@ -22,7 +22,14 @@ def get_all_files(dirname):
         )
         files = response.get("Contents", [])
         continuation_token = response.get("NextContinuationToken")
-        yield from [key for file in files if "." in (key := file.get("Key"))]
+        within_date = (
+            lambda x: modified_after is None or x.get("LastModified") > modified_after
+        )
+        yield from [
+            key
+            for file in files
+            if "." in (key := file.get("Key")) and within_date(file)
+        ]
         if not response.get("IsTruncated"):
             break
         continuation_token = response.get("NextContinuationToken")
