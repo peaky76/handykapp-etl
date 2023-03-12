@@ -1,4 +1,6 @@
 import pendulum
+import pytest
+from transformers.bha_transformer import validate_horse
 from transformers.rapid_horseracing_transformer import (
     transform_horses,
     transform_results,
@@ -6,31 +8,31 @@ from transformers.rapid_horseracing_transformer import (
 import petl
 
 
-def test_transform_horses_returns_correct_output():
-    horse_data = petl.fromdicts(
-        [
-            {
-                "horse": "Dobbin(IRE)",
-                "id_horse": "123456",
-                "jockey": "A Jockey",
-                "trainer": "A Trainer",
-                "age": "3",
-                "weight": "10-0",
-                "number": "1",
-                "last_ran_days_ago": "1",
-                "non_runner": "0",
-                "form": "1-2-3",
-                "position": "1",
-                "distance_beaten": "1 1/2",
-                "owner": "A Owner",
-                "sire": "THE SIRE",
-                "dam": "THE DAM(FR)",
-                "OR": "",
-                "sp": "8",
-                "odds": [],
-            }
-        ]
-    )
+@pytest.fixture
+def horse_data():
+    return {
+        "horse": "Dobbin(IRE)",
+        "id_horse": "123456",
+        "jockey": "A Jockey",
+        "trainer": "A Trainer",
+        "age": "3",
+        "weight": "10-0",
+        "number": "1",
+        "last_ran_days_ago": "1",
+        "non_runner": "0",
+        "form": "1-2-3",
+        "position": "1",
+        "distance_beaten": "1 1/2",
+        "owner": "A Owner",
+        "sire": "THE SIRE",
+        "dam": "THE DAM(FR)",
+        "OR": "",
+        "sp": "8",
+        "odds": [],
+    }
+
+
+def test_transform_horses_returns_correct_output(horse_data):
     expected = {
         "name": "DOBBIN",
         "country": "IRE",
@@ -55,7 +57,9 @@ def test_transform_horses_returns_correct_output():
         "odds": [],
         "finishing_time": None,
     }
-    assert expected == transform_horses.fn(horse_data, pendulum.parse("2023-03-08"))
+    assert expected == transform_horses.fn(
+        petl.fromdicts([horse_data]), pendulum.parse("2023-03-08")
+    )
 
 
 def test_transform_results_returns_correct_output():
