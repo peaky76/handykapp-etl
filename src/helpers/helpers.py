@@ -14,6 +14,20 @@ def fetch_content(url, params=None, headers=None):
     return response.content
 
 
+def get_all_files(dirname):
+    continuation_token = None
+    while True:
+        response = client.list_objects_v2(
+            Bucket=BUCKET_NAME, Prefix=dirname, ContinuationToken=continuation_token
+        )
+        files = response.get("Contents", [])
+        continuation_token = response.get("NextContinuationToken")
+        yield from [key for file in files if "." in (key := file.get("Key"))]
+        if not response.get("IsTruncated"):
+            break
+        continuation_token = response.get("NextContinuationToken")
+
+
 def get_files(dirname, modified_after=None):
     response = client.list_objects(Bucket=BUCKET_NAME, Prefix=dirname)
     files = response.get("Contents", [])
