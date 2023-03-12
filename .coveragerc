@@ -3,3 +3,8 @@ omit =
         *__init__*
         */usr/local/lib*
         *Test*
+
+[report]
+exclude_also =
+        if __name__ == .__main__.:
+        @flow
