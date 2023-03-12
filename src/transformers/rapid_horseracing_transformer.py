@@ -5,7 +5,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, get_files
-from prefect import flow, task
+from prefect import flow, get_run_logger, task
 from transformers.parsers import (
     parse_going,
     parse_horse,
@@ -15,6 +15,7 @@ from transformers.parsers import (
     yob_from_age,
 )
 from transformers.validators import (
+    validate_class,
     validate_date,
     validate_distance,
     validate_going,
@@ -197,7 +198,7 @@ def validate_results(data):
         dict(name="finished_bool", field="finished", test=bool),
         dict(name="canceled_bool", field="canceled", test=bool),
         dict(name="prize_valid", field="prize", assertion=validate_prize),
-        dict(name="class_int", field="class", test=int),
+        dict(name="class_int", field="class", assertion=validate_class),
         dict(
             name="horses_list",
             field="horses",
@@ -210,10 +211,22 @@ def validate_results(data):
 
 @flow
 def rapid_horseracing_transformer():
-    data = petl.fromdicts([read_file(f) for f in get_files(f"{SOURCE}results")])
+    logger = get_run_logger()
+    results = []
+    count = 0
+
+    for file in get_files(f"{SOURCE}results"):
+        count += 1
+        result = read_file(file)
+        results.append(result)
+        if count % 100 == 0:
+            logger.info(f"Read {count} results")
+
+    data = petl.fromdicts(results)
     problems = validate_results(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
+
     return transform_results(data)
 
 

@@ -1,4 +1,5 @@
 from transformers.validators import (
+    validate_class,
     validate_date,
     validate_distance,
     validate_going,
@@ -6,6 +7,18 @@ from transformers.validators import (
     validate_prize,
     validate_weight,
 )
+
+
+def test_validate_class_passes_for_empty_string():
+    assert validate_class("")
+
+
+def test_validate_class_passes_for_value_under_7():
+    assert validate_class("6")
+
+
+def test_validate_class_fails_for_value_over_6():
+    assert not validate_class("7")
 
 
 def test_validate_date_fails_for_none():
