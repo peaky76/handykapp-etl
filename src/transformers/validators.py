@@ -2,6 +2,10 @@ import re
 import pendulum
 
 
+def validate_class(race_class):
+    return race_class == "" or 0 < int(race_class) < 7
+
+
 def validate_date(date):
     try:
         pendulum.parse(date)
