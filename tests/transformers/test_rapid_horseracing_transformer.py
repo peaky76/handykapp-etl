@@ -114,3 +114,9 @@ def test_validate_results_returns_no_problems_for_correct_data(result_data, hors
     result_data["horses"] = [horse_data]
     problems = validate_results.fn(petl.fromdicts([result_data]))
     assert 0 == len(problems.dicts())
+
+
+def test_validate_results_returns_problems_for_incorrect_data(result_data):
+    problems = validate_results.fn(petl.fromdicts([result_data]))
+    assert 1 == len(problems.dicts())
+    assert "horses" == problems.dicts()[0]["field"]
