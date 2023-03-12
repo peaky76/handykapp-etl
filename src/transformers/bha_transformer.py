@@ -41,7 +41,9 @@ def validate_year(year):
 def get_csv(type="ratings", date="latest"):
     idx = -1 if date == "latest" else 0
     search_string = "" if date == "latest" else date
-    csvs = [csv for csv in get_files(SOURCE) if type in csv and search_string in csv]
+    csvs = [
+        csv for csv in list(get_files(SOURCE)) if type in csv and search_string in csv
+    ]
     return csvs[idx] if csvs else None
 
 
