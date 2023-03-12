@@ -32,6 +32,25 @@ def horse_data():
     }
 
 
+@pytest.fixture
+def result_data():
+    return {
+        "id_race": "123456",
+        "course": "Lucksin Downs",
+        "date": "2020-01-01 16:00:00",
+        "title": "LUCKSIN HANDICAP (5)",
+        "distance": "1m2f",
+        "age": "3",
+        "going": "Soft (Good to Soft in places)",
+        "finished": "1",
+        "canceled": "0",
+        "finish_time": "",
+        "prize": "\u00a32794",
+        "class": "5",
+        "horses": [],
+    }
+
+
 def test_transform_horses_returns_correct_output(horse_data):
     expected = {
         "name": "DOBBIN",
@@ -62,26 +81,7 @@ def test_transform_horses_returns_correct_output(horse_data):
     )
 
 
-def test_transform_results_returns_correct_output():
-    result_data = petl.fromdicts(
-        [
-            {
-                "id_race": "123456",
-                "course": "Lucksin Downs",
-                "date": "2020-01-01 16:00:00",
-                "title": "LUCKSIN HANDICAP (5)",
-                "distance": "1m2f",
-                "age": "3",
-                "going": "Soft (Good to Soft in places)",
-                "finished": "1",
-                "canceled": "0",
-                "finish_time": "",
-                "prize": "\u00a32794",
-                "class": "5",
-                "horses": [],
-            }
-        ]
-    )
+def test_transform_results_returns_correct_output(result_data):
     expected = {
         "rapid_id": "123456",
         "venue": "Lucksin Downs",
@@ -106,4 +106,4 @@ def test_transform_results_returns_correct_output():
         "class": "5",
         "result": [],
     }
-    assert expected == transform_results.fn(result_data)[0]
+    assert expected == transform_results.fn(petl.fromdicts([result_data]))[0]
