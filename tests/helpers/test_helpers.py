@@ -1,4 +1,5 @@
 from pendulum import parse
+import pendulum
 import pytest
 from src.helpers.helpers import (
     fetch_content,
@@ -30,6 +31,18 @@ def test_get_all_files(mocker):
         "NextContinuationToken": None,
     }
     assert ["foo.csv", "bar.csv"] == list(get_all_files("dir"))
+
+
+def test_get_all_files_modified_after(mocker):
+    client = mocker.patch("src.helpers.helpers.client")
+    client.list_objects_v2.return_value = {
+        "Contents": [
+            {"Key": "foo.csv", "LastModified": pendulum.parse("2019-01-01 00:00")},
+            {"Key": "bar.csv", "LastModified": pendulum.parse("2020-01-01 00:00")},
+        ],
+        "NextContinuationToken": None,
+    }
+    assert ["bar.csv"] == list(get_all_files("dir", pendulum.parse("2019-07-01 00:00")))
 
 
 def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
