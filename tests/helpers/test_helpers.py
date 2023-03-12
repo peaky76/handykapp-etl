@@ -3,7 +3,7 @@ import pendulum
 import pytest
 from src.helpers.helpers import (
     fetch_content,
-    get_all_files,
+    get_files,
     get_last_occurrence_of,
     log_validation_problem,
 )
@@ -24,16 +24,16 @@ def test_fetch_content_when_unsuccessful(mocker):
         fetch_content("https://example.com")
 
 
-def test_get_all_files(mocker):
+def test_get_files(mocker):
     client = mocker.patch("src.helpers.helpers.client")
     client.list_objects_v2.return_value = {
         "Contents": [{"Key": "foo.csv"}, {"Key": "bar.csv"}],
         "NextContinuationToken": None,
     }
-    assert ["foo.csv", "bar.csv"] == list(get_all_files("dir"))
+    assert ["foo.csv", "bar.csv"] == list(get_files("dir"))
 
 
-def test_get_all_files_modified_after(mocker):
+def test_get_files_modified_after(mocker):
     client = mocker.patch("src.helpers.helpers.client")
     client.list_objects_v2.return_value = {
         "Contents": [
@@ -42,7 +42,7 @@ def test_get_all_files_modified_after(mocker):
         ],
         "NextContinuationToken": None,
     }
-    assert ["bar.csv"] == list(get_all_files("dir", pendulum.parse("2019-07-01 00:00")))
+    assert ["bar.csv"] == list(get_files("dir", pendulum.parse("2019-07-01 00:00")))
 
 
 def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
