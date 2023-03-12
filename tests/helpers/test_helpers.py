@@ -6,6 +6,7 @@ from src.helpers.helpers import (
     get_files,
     get_last_occurrence_of,
     log_validation_problem,
+    read_file,
     stream_file,
     write_file,
 )
@@ -51,6 +52,20 @@ def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
     mocker.patch(PENDULUM_IMPORT).now.return_value = parse("2023-02-13")  # A Monday
     weekday_int = 2
     assert parse("2023-02-07").date() == get_last_occurrence_of(weekday_int)
+
+
+def test_read_file_for_csv(mocker):
+    mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
+        "foo,bar,baz", "utf-8"
+    )
+    assert [["foo", "bar", "baz"]] == read_file("foo.csv")
+
+
+def test_read_file_for_json(mocker):
+    mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
+        '{"foo": "bar"}', "utf-8"
+    )
+    assert {"foo": "bar"} == read_file("foo.json")
 
 
 def test_stream_file(mocker):
