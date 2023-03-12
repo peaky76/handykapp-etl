@@ -31,7 +31,7 @@ def test_get_files(mocker):
     client = mocker.patch("src.helpers.helpers.client")
     client.list_objects_v2.return_value = {
         "Contents": [{"Key": "foo.csv"}, {"Key": "bar.csv"}],
-        "NextContinuationToken": None,
+        "NextContinuationToken": "",
     }
     assert ["foo.csv", "bar.csv"] == list(get_files("dir"))
 

@@ -15,7 +15,7 @@ def fetch_content(url, params=None, headers=None):
 
 
 def get_files(dirname, modified_after=None):
-    continuation_token = None
+    continuation_token = ""
     while True:
         response = client.list_objects_v2(
             Bucket=BUCKET_NAME, Prefix=dirname, ContinuationToken=continuation_token
