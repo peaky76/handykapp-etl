@@ -32,7 +32,6 @@ def get_files(dirname, modified_after=None):
         ]
         if not response.get("IsTruncated"):
             break
-        continuation_token = response.get("NextContinuationToken")
 
 
 def read_file(file_path):
