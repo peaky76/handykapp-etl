@@ -1,7 +1,25 @@
 from pendulum import parse
-from src.helpers.helpers import get_last_occurrence_of, log_validation_problem
+import pytest
+from src.helpers.helpers import (
+    fetch_content,
+    get_last_occurrence_of,
+    log_validation_problem,
+)
 
 PENDULUM_IMPORT = "src.helpers.helpers.pendulum"
+
+
+def test_fetch_content_when_successful(mocker):
+    resp = mocker.patch("src.helpers.helpers.get")
+    resp.return_value.content = "foobar"
+    assert "foobar" == fetch_content("https://example.com")
+
+
+def test_fetch_content_when_unsuccessful(mocker):
+    resp = mocker.patch("src.helpers.helpers.get")
+    resp.return_value.raise_for_status.side_effect = Exception
+    with pytest.raises(Exception):
+        fetch_content("https://example.com")
 
 
 def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
