@@ -55,5 +55,5 @@ def theracingapi_countries_extractor():
 
 
 if __name__ == "__main__":
-    theracingapi_racecards_extractor()
-    theracingapi_countries_extractor()
+    theracingapi_racecards_extractor()  # type: ignore
+    theracingapi_countries_extractor()  # type: ignore

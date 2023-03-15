@@ -25,7 +25,7 @@ from transformers.validators import (
 )
 
 import pendulum
-import petl
+import petl  # type: ignore
 import yaml
 
 
@@ -227,9 +227,10 @@ def rapid_horseracing_transformer():
     for problem in problems.dicts():
         log_validation_problem(problem)
 
-    return transform_results(data)
+    return "KISS MY FACE"
+    # return transform_results(data)
 
 
 if __name__ == "__main__":
-    data = rapid_horseracing_transformer()
+    data = rapid_horseracing_transformer()  # type: ignore
     print(data)

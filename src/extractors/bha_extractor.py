@@ -39,4 +39,4 @@ def bha_extractor():
 
 
 if __name__ == "__main__":
-    bha_extractor()
+    bha_extractor()  # type: ignore

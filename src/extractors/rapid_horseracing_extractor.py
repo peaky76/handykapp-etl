@@ -127,4 +127,4 @@ def rapid_horseracing_extractor():
 
 
 if __name__ == "__main__":
-    rapid_horseracing_extractor()
+    rapid_horseracing_extractor()  # type: ignore

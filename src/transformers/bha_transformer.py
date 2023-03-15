@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
 from transformers.parsers import parse_horse, parse_sex
-import petl
+import petl  # type: ignore
 import yaml
 
 
@@ -137,5 +137,5 @@ def bha_transformer():
 
 
 if __name__ == "__main__":
-    data = bha_transformer()
+    data = bha_transformer()  # type: ignore
     print(data)
