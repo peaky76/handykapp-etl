@@ -44,6 +44,9 @@ jobs:
       - name: Run black
         run: poetry run black --check --verbose .
 
+      - name: Run static type checking
+        run: poetry run mypy src
+
       - name: Prefect login
         run: poetry run prefect cloud login -k ${{ secrets.PREFECT_API_KEY }} -w ${{ secrets.PREFECT_API_WORKSPACE }}
 
