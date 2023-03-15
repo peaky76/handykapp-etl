@@ -153,4 +153,4 @@ def load_database_afresh():
 
 
 if __name__ == "__main__":
-    load_database_afresh()
+    load_database_afresh()  # type: ignore
