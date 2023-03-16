@@ -20,4 +20,5 @@ pytest-mock = "^3.10.0"
 black = "^23.1.0"
 coverage = "^7.2.1"
 mypy = "^1.1.1"
+pytest-cov = "^4.0.0"
 
