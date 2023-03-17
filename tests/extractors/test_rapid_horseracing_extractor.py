@@ -5,6 +5,7 @@ from src.extractors.rapid_horseracing_extractor import (
     SOURCE,
     get_file_date,
     get_headers,
+    get_unfetched_race_ids,
 )
 
 LIMITS = {"day": 50, "minute": 10}
@@ -44,3 +45,14 @@ def test_get_headers(mocker):
     headers = get_headers(url)
     assert "<host>" == headers["x-rapidapi-host"]
     assert "<key>" == headers["x-rapidapi-key"]
+
+
+def test_get_unfetched_race_ids(mocker):
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.get_files"
+    ).return_value = ["file1", "file2"]
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.read_file"
+    ).return_value = [{"id_race": 999}]
+    expected = [999, 999]
+    assert expected == get_unfetched_race_ids.fn("2020-01-01")
