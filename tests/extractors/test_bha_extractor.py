@@ -1,9 +1,13 @@
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
+
 from src.extractors.bha_extractor import (
     fetch,
     save,
     SOURCE,
     DESTINATION,
-    LAST_UPDATE_STR,
 )
 
 
