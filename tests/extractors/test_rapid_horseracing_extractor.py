@@ -4,6 +4,7 @@ from src.extractors.rapid_horseracing_extractor import (
     RESULTS_DESTINATION,
     SOURCE,
     get_file_date,
+    get_headers,
 )
 
 LIMITS = {"day": 50, "minute": 10}
@@ -33,3 +34,13 @@ def test_get_file_date():
     filename = "rapid_api_racecards_20200101.json"
     expected = "20200101"
     assert expected == get_file_date(filename)
+
+
+def test_get_headers(mocker):
+    url = "https://<host>/rest_of_url"
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.Secret.load"
+    ).return_value.get.return_value = "<key>"
+    headers = get_headers(url)
+    assert "<host>" == headers["x-rapidapi-host"]
+    assert "<key>" == headers["x-rapidapi-key"]
