@@ -1,4 +1,3 @@
-import petl
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
