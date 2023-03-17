@@ -3,6 +3,7 @@ from src.extractors.rapid_horseracing_extractor import (
     RACECARDS_DESTINATION,
     RESULTS_DESTINATION,
     SOURCE,
+    extract_result,
     get_file_date,
     get_headers,
     get_unfetched_race_ids,
@@ -56,3 +57,21 @@ def test_get_unfetched_race_ids(mocker):
     ).return_value = [{"id_race": 999}]
     expected = [999, 999]
     assert expected == get_unfetched_race_ids.fn("2020-01-01")
+
+
+def test_extract_result(mocker):
+    write_file = mocker.patch("src.extractors.rapid_horseracing_extractor.write_file")
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.fetch_content"
+    ).return_value = "foobar"
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.RESULTS_DESTINATION", "results/"
+    )
+
+    extract_result.fn("12345")
+
+    assert 1 == write_file.call_count
+    assert (
+        mocker.call("foobar", "results/rapid_api_result_12345.json")
+        == write_file.call_args
+    )
