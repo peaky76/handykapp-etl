@@ -3,6 +3,7 @@ from src.extractors.rapid_horseracing_extractor import (
     RACECARDS_DESTINATION,
     RESULTS_DESTINATION,
     SOURCE,
+    get_file_date,
 )
 
 LIMITS = {"day": 50, "minute": 10}
@@ -26,3 +27,9 @@ def test_rapid_horseracing_racecards_destination():
 def test_rapid_horseracing_has_limits():
     expected = ["day", "minute"]
     assert expected == list(LIMITS.keys())
+
+
+def test_get_file_date():
+    filename = "rapid_api_racecards_20200101.json"
+    expected = "20200101"
+    assert expected == get_file_date(filename)
