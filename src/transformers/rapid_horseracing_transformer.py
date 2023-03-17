@@ -227,8 +227,7 @@ def rapid_horseracing_transformer():
     for problem in problems.dicts():
         log_validation_problem(problem)
 
-    return "KISS MY FACE"
-    # return transform_results(data)
+    return transform_results(data)
 
 
 if __name__ == "__main__":
