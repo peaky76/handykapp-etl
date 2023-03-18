@@ -1,6 +1,8 @@
+import petl
 import pytest
 from src.transformers.bha_transformer import (
     get_csv,
+    read_csv,
     transform_ratings_data,
     validate_horse,
     validate_rating,
@@ -125,6 +127,14 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
 def test_get_csv_returns_none_if_no_files_found(mocker):
     mocker.patch(GET_FILES_IMPORT, return_value=[])
     assert None == get_csv.fn()
+
+
+def test_read_csv(mocker):
+    mocker.patch(
+        "src.transformers.bha_transformer.stream_file",
+        return_value=bytes("foo,bar,baz", "utf-8"),
+    )
+    assert ("foo", "bar", "baz") == petl.header(read_csv.fn("foobar.csv"))
 
 
 def test_transform_ratings_data_returns_correct_output(mock_data):
