@@ -48,11 +48,31 @@ def validate_handicap(title):
     return any(word in title.upper() for word in ["HANDICAP", "H'CAP"])
 
 
+def validate_horse(horse):
+    if not horse:
+        return False
+
+    has_country = bool(re.search("\\([A-Z]{2,3}\\)", horse))
+    return len(horse) <= 30 and has_country
+
+
 def validate_prize(prize):
     pattern = r"^[£|\$|€|¥]\d{1,3}(,)*\d{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
 
 
+def validate_rating(rating):
+    return not rating or (0 <= int(rating) <= 240)
+
+
+def validate_sex(sex):
+    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE", "RIG"]
+
+
 def validate_weight(weight):
     pattern = r"^\d{1,2}-(0\d|1[0-3])$"
     return bool(re.match(pattern, weight)) if weight else False
+
+
+def validate_year(year):
+    return year and 1600 <= int(year) <= 2100

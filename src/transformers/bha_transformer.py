@@ -2,6 +2,13 @@ import re
 import sys
 from pathlib import Path
 
+from transformers.validators import (
+    validate_horse,
+    validate_rating,
+    validate_sex,
+    validate_year,
+)
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, log_validation_problem, stream_file
@@ -15,26 +22,6 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["bha"]["spaces"]["dir"]
-
-
-def validate_horse(horse):
-    if not horse:
-        return False
-
-    has_country = bool(re.search("\\([A-Z]{2,3}\\)", horse))
-    return len(horse) <= 30 and has_country
-
-
-def validate_rating(rating):
-    return not rating or (0 <= int(rating) <= 240)
-
-
-def validate_sex(sex):
-    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE", "RIG"]
-
-
-def validate_year(year):
-    return year and 1600 <= int(year) <= 2100
 
 
 @task(tags=["BHA"], task_run_name="get_{date}_{type}_csv")
