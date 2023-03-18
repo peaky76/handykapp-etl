@@ -106,4 +106,4 @@ def test_log_validation_problem(mocker):
         "error": "ValueError",
     }
     log_validation_problem(problem)
-    assert logger().error.called
+    assert logger().warning.called
