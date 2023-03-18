@@ -6,6 +6,7 @@ from src.transformers.bha_transformer import (
     transform_ratings_data,
     validate_horse,
     validate_rating,
+    validate_ratings_data,
     validate_sex,
     validate_year,
 )
@@ -156,3 +157,15 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
     }
     actual = transform_ratings_data.fn(mock_data)[0]
     assert expected == actual
+
+
+def test_validate_ratings_data_returns_no_problems_for_correct_data(mock_data):
+    problems = validate_ratings_data.fn(mock_data)
+    assert 0 == len(problems.dicts())
+
+
+def test_validate_ratings_data_returns_problems_for_incorrect_data(mock_data):
+    mock_data[1][0] = "A DAY TO DREAM"
+    problems = validate_ratings_data.fn(mock_data)
+    assert 1 == len(problems.dicts())
+    assert "Name" == problems.dicts()[0]["field"]
