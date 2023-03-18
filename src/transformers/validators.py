@@ -3,7 +3,7 @@ import pendulum
 
 
 def validate_class(race_class):
-    return race_class == "" or 0 < int(race_class) < 7
+    return race_class == "" or 0 < int(race_class) < 8
 
 
 def validate_date(date):
