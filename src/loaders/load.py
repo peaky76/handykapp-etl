@@ -32,7 +32,7 @@ def spec_database():
     db.horses.create_index("name")
     db.people.create_index("name", unique=True)
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
-    db.races.create_index([("racecourse", ASC), ("datetime", ASC)], unique=True)
+    db.races.create_index([("venue", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
 
 
@@ -147,8 +147,9 @@ def load_database_afresh():
     dams_ids = load_parents(dams, "F")
     trainer_ids = load_people(trainers)
     load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
-    load_races(rapid_horseracing_transformer())
-    # load_ratings()
+    races = rapid_horseracing_transformer()
+    print(races)
+    load_races(races)
 
 
 if __name__ == "__main__":
