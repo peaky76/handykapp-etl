@@ -26,6 +26,9 @@ def parse_horse(horse, default_country=None):
 
 
 def parse_obstacle(race_title):
+    if not race_title:
+        return None
+
     obstacle_types = {
         r"\bCROSS(-|\s)COUNTRY\b": "CROSS-COUNTRY",
         r"\b(STEEPLE)?CHASE\b": "CHASE",
