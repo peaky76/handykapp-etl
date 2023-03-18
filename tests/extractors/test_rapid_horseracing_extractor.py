@@ -1,3 +1,4 @@
+import pendulum
 from src.extractors.rapid_horseracing_extractor import (
     LIMITS,
     RACECARDS_DESTINATION,
@@ -7,6 +8,7 @@ from src.extractors.rapid_horseracing_extractor import (
     extract_result,
     get_file_date,
     get_headers,
+    get_next_racecard_date,
     get_unfetched_race_ids,
 )
 
@@ -95,3 +97,29 @@ def test_extract_racecards(mocker):
         mocker.call("foobar", "racecards/rapid_api_racecards_20200101.json")
         == write_file.call_args
     )
+
+
+def test_get_next_racecard_date_when_date_available(mocker):
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.get_files"
+    ).return_value = [
+        "rapid_api_racecards_20200101.json",
+        "rapid_api_racecards_20200102.json",
+        "rapid_api_racecards_20200103.json",
+    ]
+    mocker.patch("pendulum.now").return_value = pendulum.parse("2020-01-05")
+
+    assert "2020-01-04" == get_next_racecard_date.fn()
+
+
+def test_get_next_racecard_date_when_no_dates_left(mocker):
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.get_files"
+    ).return_value = [
+        "rapid_api_racecards_20200101.json",
+        "rapid_api_racecards_20200102.json",
+        "rapid_api_racecards_20200103.json",
+    ]
+    mocker.patch("pendulum.now").return_value = pendulum.parse("2020-01-03")
+
+    assert None == get_next_racecard_date.fn()
