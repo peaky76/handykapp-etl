@@ -3,6 +3,7 @@ from loaders.load import (
     load_horse_detail,
     load_parents,
     load_people,
+    load_races,
     select_dams,
     select_sires,
 )
@@ -82,6 +83,15 @@ def test_load_horse_detail(mocker):
     trainer_ids = {"TRAINER1": 1, "TRAINER2": 2}
     load_horse_detail.fn(data, sires_ids, dams_ids, trainer_ids)
     assert 2 == insert_one.call_count
+
+
+def test_load_races(mocker):
+    insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
+    races = [
+        {"foo": "bar", "result": {}},
+    ]
+    load_races.fn(races)
+    assert insert_one.called_once_with({"foo": "bar"})
 
 
 def test_select_dams():
