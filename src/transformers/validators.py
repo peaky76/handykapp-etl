@@ -44,10 +44,6 @@ def validate_going(going):
     return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
 
 
-def validate_handicap(title):
-    return any(word in title.upper() for word in ["HANDICAP", "H'CAP"])
-
-
 def validate_horse(horse):
     if not horse:
         return False

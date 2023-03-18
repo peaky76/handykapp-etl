@@ -8,6 +8,7 @@ from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import (
     parse_going,
+    parse_handicap,
     parse_horse,
     parse_obstacle,
     parse_weight,
@@ -19,7 +20,6 @@ from transformers.validators import (
     validate_date,
     validate_distance,
     validate_going,
-    validate_handicap,
     validate_prize,
     validate_weight,
 )
@@ -106,7 +106,7 @@ def transform_results(data):
                 "official_secondary": parse_going(x)["secondary"],
             },
         )
-        .addfield("is_handicap", lambda rec: validate_handicap(rec["title"]), index=4)
+        .addfield("is_handicap", lambda rec: parse_handicap(rec["title"]), index=4)
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "result",
