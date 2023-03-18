@@ -7,6 +7,7 @@ from loaders.load import (
     load_ratings,
     select_dams,
     select_sires,
+    select_trainers,
 )
 from prefect.context import TaskRunContext
 
@@ -129,3 +130,13 @@ def test_select_sires():
         {"name": "SIRE2", "country": "IRE"},
         {"name": "SIRE3", "country": "IRE"},
     ] == select_sires.fn(data)
+
+
+def test_select_trainers():
+    data = [
+        {"trainer": "TRAINER1"},
+        {"trainer": "TRAINER2"},
+        {"trainer": "TRAINER1"},
+        {"trainer": "TRAINER3"},
+    ]
+    assert ["TRAINER1", "TRAINER2", "TRAINER3"] == select_trainers.fn(data)
