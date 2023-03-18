@@ -1,10 +1,18 @@
-from loaders.load import drop_database, select_dams, select_sires
+from loaders.load import drop_database, load_people, select_dams, select_sires
 
 
 def test_drop_database(mocker):
     client = mocker.patch("src.loaders.load.client")
     drop_database.fn()
-    assert client.drop_database.called_once_with("handykapp")
+    assert client.drop_database.called_once_with("racing")
+
+
+def test_load_people(mocker):
+    mocker.patch(
+        "pymongo.collection.Collection.insert_one"
+    ).return_value.inserted_id = 1
+    people = ["TRAINER1", "TRAINER2", "TRAINER1"]
+    assert {"TRAINER1": 1, "TRAINER2": 1} == load_people.fn(people)
 
 
 def test_select_dams():
