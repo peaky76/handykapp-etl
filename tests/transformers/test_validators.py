@@ -4,8 +4,12 @@ from transformers.validators import (
     validate_distance,
     validate_going,
     validate_handicap,
+    validate_horse,
     validate_prize,
+    validate_rating,
+    validate_sex,
     validate_weight,
+    validate_year,
 )
 
 
@@ -109,6 +113,26 @@ def test_validate_handicap_fails_if_name_does_not_contain_handicap():
     assert not validate_handicap("LUCKSIN STAKES (5)")
 
 
+def test_validate_horse_fails_for_none():
+    assert not validate_horse(None)
+
+
+def test_validate_horse_fails_for_empty_string():
+    assert not validate_horse("")
+
+
+def test_validate_horse_passes_for_valid_string():
+    assert validate_horse("DOBBIN (IRE)")
+
+
+def test_validate_horse_fails_for_string_without_country():
+    assert not validate_horse("DOBBIN")
+
+
+def test_validate_horse_fails_for_string_over_30_chars():
+    assert not validate_horse("DOBBINTHEREALLYEXTREMELYGOODHORSEWITHALOVELYMANE (IRE)")
+
+
 def test_validate_prize_passes_for_sterling():
     assert validate_prize("£1234")
 
@@ -137,6 +161,34 @@ def test_validate_prize_fails_for_invalid_string():
     assert not validate_prize("£1234$")
 
 
+def test_validate_rating_passes_for_empty_string():
+    assert validate_rating("")
+
+
+def test_validate_rating_passes_for_str_in_range():
+    assert validate_rating("99")
+
+
+def test_validate_rating_fails_for_str_below_range():
+    assert not validate_rating("-1")
+
+
+def test_validate_rating_fails_for_str_above_range():
+    assert not validate_rating("999")
+
+
+def test_validate_sex_passes_for_sex_in_list():
+    assert validate_sex("MARE")
+
+
+def test_validate_sex_fails_for_none():
+    assert not validate_sex(None)
+
+
+def test_validate_sex_fails_for_invalid_string():
+    assert not validate_sex("PUPPY")
+
+
 def test_validate_weight_fail_for_none():
     assert not validate_weight(None)
 
@@ -155,3 +207,19 @@ def test_validate_weight_fails_for_weight_with_letters():
 
 def test_validate_weight_fails_for_weight_with_invalid_lbs():
     assert not validate_weight("10-15")
+
+
+def test_validate_year_fails_for_none():
+    assert not validate_year(None)
+
+
+def test_validate_year_passes_for_str_in_range():
+    assert validate_year("2020")
+
+
+def test_validate_year_fails_for_str_below_range():
+    assert not validate_year("1599")
+
+
+def test_validate_year_fails_for_str_above_range():
+    assert not validate_year("2101")
