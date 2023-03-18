@@ -5,7 +5,6 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
-from helpers import stream_file
 from transformers.bha_transformer import bha_transformer
 from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
 from prefect import flow, task, get_run_logger
