@@ -1,4 +1,10 @@
-from loaders.load import drop_database, load_people, select_dams, select_sires
+from loaders.load import (
+    drop_database,
+    load_parents,
+    load_people,
+    select_dams,
+    select_sires,
+)
 
 
 def test_drop_database(mocker):
@@ -13,6 +19,22 @@ def test_load_people(mocker):
     ).return_value.inserted_id = 1
     people = ["TRAINER1", "TRAINER2", "TRAINER1"]
     assert {"TRAINER1": 1, "TRAINER2": 1} == load_people.fn(people)
+
+
+def test_load_parents(mocker):
+    mocker.patch(
+        "pymongo.collection.Collection.insert_one"
+    ).return_value.inserted_id = 1
+    horses = [
+        {"name": "HORSE1", "country": "IRE"},
+        {"name": "HORSE2", "country": "GB"},
+        {"name": "HORSE2", "country": "IRE"},
+    ]
+    assert {
+        ("HORSE1", "IRE"): 1,
+        ("HORSE2", "GB"): 1,
+        ("HORSE2", "IRE"): 1,
+    } == load_parents.fn(horses, "M")
 
 
 def test_select_dams():
