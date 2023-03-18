@@ -35,7 +35,6 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
 
 
-@task(tags=["Rapid"])
 def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
     return (
         petl.rename(
