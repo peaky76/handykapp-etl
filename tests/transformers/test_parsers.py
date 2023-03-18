@@ -90,6 +90,10 @@ def test_parse_obstacle_returns_correct_value_for_embedded_use_of_chase():
     assert None == parse_obstacle("A PURCHASE")
 
 
+def test_parse_obstacle_returns_none_if_name_is_none():
+    assert None == parse_obstacle(None)
+
+
 def test_parse_obstacle_returns_correct_value_for_hurdle():
     assert "HURDLE" == parse_obstacle("A HURDLE")
 
