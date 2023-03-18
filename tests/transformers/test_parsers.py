@@ -1,6 +1,7 @@
 import pendulum
 from transformers.parsers import (
     parse_going,
+    parse_handicap,
     parse_horse,
     parse_obstacle,
     parse_sex,
@@ -27,6 +28,26 @@ def test_parse_going_returns_correct_value_for_going_with_in_places():
         "main": "GOOD",
         "secondary": "GOOD TO SOFT",
     }
+
+
+def test_parse_handicap_returns_true_if_name_contains_handicap():
+    assert parse_handicap("LUCKSIN HANDICAP (5)")
+
+
+def test_parse_handicap_returns_true_if_name_contains_handicap_in_titlecase():
+    assert parse_handicap("Lucksin Handicap (5) ")
+
+
+def test_parse_handicap_returns_true_if_name_contains_handicap_abbr():
+    assert parse_handicap("LUCKSIN H'CAP (5) ")
+
+
+def test_parse_handicap_returns_false_if_name_does_not_contain_handicap():
+    assert not parse_handicap("LUCKSIN STAKES (5)")
+
+
+def test_parse_handicap_returns_none_if_name_is_none():
+    assert parse_handicap(None) is None
 
 
 def test_parse_horse_returns_correct_tuple_when_none():

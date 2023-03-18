@@ -10,6 +10,12 @@ def parse_going(going):
     return {"main": going[0], "secondary": going[1] if len(going) == 2 else None}
 
 
+def parse_handicap(title):
+    return (
+        any(word in title.upper() for word in ["HANDICAP", "H'CAP"]) if title else None
+    )
+
+
 def parse_horse(horse, default_country=None):
     if not horse:
         return (None, None)
