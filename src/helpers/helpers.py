@@ -60,4 +60,4 @@ def get_last_occurrence_of(weekday):
 def log_validation_problem(problem):
     msg = f"{problem['error']} in row {problem['row']} for {problem['field']}: {problem['value']}"
     logger = get_run_logger()
-    logger.error(msg)
+    logger.warning(msg)
