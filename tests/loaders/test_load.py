@@ -1,4 +1,10 @@
-from loaders.load import select_dams, select_sires
+from loaders.load import drop_database, select_dams, select_sires
+
+
+def test_drop_database(mocker):
+    client = mocker.patch("src.loaders.load.client")
+    drop_database.fn()
+    assert client.drop_database.called_once_with("handykapp")
 
 
 def test_select_dams():
