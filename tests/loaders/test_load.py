@@ -4,6 +4,7 @@ from loaders.load import (
     load_parents,
     load_people,
     load_races,
+    load_ratings,
     select_dams,
     select_sires,
 )
@@ -92,6 +93,10 @@ def test_load_races(mocker):
     ]
     load_races.fn(races)
     assert insert_one.called_once_with({"foo": "bar"})
+
+
+def test_load_ratings():
+    assert load_ratings.fn() is None
 
 
 def test_select_dams():
