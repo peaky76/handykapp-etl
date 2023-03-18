@@ -16,12 +16,12 @@ def test_validate_class_passes_for_empty_string():
     assert validate_class("")
 
 
-def test_validate_class_passes_for_value_under_7():
-    assert validate_class("6")
+def test_validate_class_passes_for_value_under_8():
+    assert validate_class("7")
 
 
-def test_validate_class_fails_for_value_over_6():
-    assert not validate_class("7")
+def test_validate_class_fails_for_value_over_7():
+    assert not validate_class("8")
 
 
 def test_validate_date_fails_for_none():
