@@ -148,7 +148,6 @@ def load_database_afresh():
     trainer_ids = load_people(trainers)
     load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
     races = rapid_horseracing_transformer()
-    print(races)
     load_races(races)
 
 
