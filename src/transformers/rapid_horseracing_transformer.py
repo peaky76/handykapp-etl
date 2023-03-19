@@ -86,26 +86,12 @@ def transform_results(data):
                 "age": "age_restriction",
                 "course": "venue",
                 "canceled": "cancelled",
+                "distance": "distance_description",
+                "going": "going_description",
             },
         )
         .convert("finished", lambda x: bool(int(x)))
         .convert("cancelled", lambda x: bool(int(x)))
-        .convert(
-            "distance",
-            lambda x: {
-                "description": x,
-                "official_yards": int(parse_yards(x)),
-                "actual_yards": None,
-            },
-        )
-        .convert(
-            "going",
-            lambda x: {
-                "description": x,
-                "official_main": parse_going(x)["main"],
-                "official_secondary": parse_going(x)["secondary"],
-            },
-        )
         .addfield("is_handicap", lambda rec: parse_handicap(rec["title"]), index=4)
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
