@@ -88,6 +88,10 @@ def test_validate_going_passes_for_going_with_in_places():
     assert validate_going("good (good to soft in places)")
 
 
+def test_validate_going_passes_for_going_with_chase_and_hurdle():
+    assert validate_going("good (good to soft in places chase course)")
+
+
 def test_validate_going_fails_for_none():
     assert not validate_going(None)
 

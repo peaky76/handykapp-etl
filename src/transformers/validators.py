@@ -42,7 +42,9 @@ def validate_going(going):
         "YIELDING TO SOFT",
     ]
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
-    return going[0] in goings and (going[1] in goings if len(going) == 2 else True)
+    return any(g in going[0] for g in goings) and (
+        any(g in going[1] for g in goings) if len(going) == 2 else True
+    )
 
 
 def validate_horse(horse):
