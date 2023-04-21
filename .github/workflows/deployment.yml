@@ -47,6 +47,9 @@ jobs:
       - name: Run static type checking
         run: poetry run mypy src
 
+      - name: Run linters
+        run: poetry run ruff .
+
       # TODO: Fix spaces_client import error during the tests run
       # - name: Run tests
       #   run: poetry run pytest --cov-fail-under=75
