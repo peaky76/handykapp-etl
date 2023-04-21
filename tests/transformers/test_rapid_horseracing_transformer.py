@@ -1,6 +1,5 @@
 import pendulum
 import pytest
-from transformers.bha_transformer import validate_horse
 from transformers.rapid_horseracing_transformer import (
     transform_horses,
     transform_results,
