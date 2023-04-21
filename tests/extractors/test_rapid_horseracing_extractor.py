@@ -23,7 +23,7 @@ def test_rapid_horseracing_racecards_destination():
     assert expected == RACECARDS_DESTINATION
 
 
-def test_rapid_horseracing_racecards_destination():
+def test_rapid_horseracing_results_destination():
     expected = "handykapp/rapid_horseracing/results/"
     assert expected == RESULTS_DESTINATION
 
