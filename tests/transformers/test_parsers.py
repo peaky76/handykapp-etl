@@ -75,7 +75,7 @@ def test_parse_horse_returns_correct_tuple_when_country_supplied_as_a_default():
 
 
 def test_parse_obstacle_returns_correct_value_for_none():
-    assert None == parse_obstacle("A RACE")
+    assert None is parse_obstacle("A RACE")
 
 
 def test_parse_obstacle_returns_correct_value_for_chase():
@@ -87,11 +87,11 @@ def test_parse_obstacle_returns_correct_value_for_steeplechase():
 
 
 def test_parse_obstacle_returns_correct_value_for_embedded_use_of_chase():
-    assert None == parse_obstacle("A PURCHASE")
+    assert None is parse_obstacle("A PURCHASE")
 
 
 def test_parse_obstacle_returns_none_if_name_is_none():
-    assert None == parse_obstacle(None)
+    assert None is parse_obstacle(None)
 
 
 def test_parse_obstacle_returns_correct_value_for_hurdle():
@@ -107,11 +107,11 @@ def test_parse_obstacle_returns_correct_value_for_cross_country_chase():
 
 
 def test_parse_obstacle_returns_correct_value_for_national_hunt_flat():
-    assert None == parse_obstacle("A NATIONAL HUNT FLAT")
+    assert None is parse_obstacle("A NATIONAL HUNT FLAT")
 
 
 def test_parse_obstacle_returns_correct_value_for_flat_race():
-    assert None == parse_obstacle("A BIG STAKES RACE")
+    assert None is parse_obstacle("A BIG STAKES RACE")
 
 
 def test_parse_obstacle_is_case_insensitive():

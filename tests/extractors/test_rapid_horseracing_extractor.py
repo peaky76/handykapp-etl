@@ -122,4 +122,4 @@ def test_get_next_racecard_date_when_no_dates_left(mocker):
     ]
     mocker.patch("pendulum.now").return_value = pendulum.parse("2020-01-03")
 
-    assert None == get_next_racecard_date.fn()
+    assert None is get_next_racecard_date.fn()

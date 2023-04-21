@@ -7,12 +7,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import (
-    parse_going,
     parse_handicap,
     parse_horse,
     parse_obstacle,
     parse_weight,
-    parse_yards,
     yob_from_age,
 )
 from transformers.validators import (

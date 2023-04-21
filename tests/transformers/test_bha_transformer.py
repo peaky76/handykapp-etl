@@ -59,7 +59,7 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
 
 def test_get_csv_returns_none_if_no_files_found(mocker):
     mocker.patch(GET_FILES_IMPORT, return_value=[])
-    assert None == get_csv.fn()
+    assert None is get_csv.fn()
 
 
 def test_read_csv(mocker):
