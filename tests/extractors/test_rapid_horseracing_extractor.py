@@ -12,8 +12,6 @@ from src.extractors.rapid_horseracing_extractor import (
     get_unfetched_race_ids,
 )
 
-LIMITS = {"day": 50, "minute": 10}
-
 
 def test_rapid_horseracing_source():
     expected = "https://horse-racing.p.rapidapi.com/"
