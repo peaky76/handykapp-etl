@@ -22,8 +22,10 @@ def get_files(dirname, modified_after=None):
         )
         files = response.get("Contents", [])
         continuation_token = response.get("NextContinuationToken")
+
         def within_date(x):
             return modified_after is None or x.get("LastModified") > modified_after
+
         yield from [
             key
             for file in files
