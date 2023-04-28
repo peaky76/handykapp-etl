@@ -56,7 +56,7 @@ def validate_horse(horse):
 
 
 def validate_prize(prize):
-    pattern = r"^[£|\$|€|¥]\d{1,3}(,)*\d{1,3}$"
+    pattern = r"^[£\$€¥]\d{1,3}(,)*\d{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
 
 
