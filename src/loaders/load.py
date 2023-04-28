@@ -40,8 +40,8 @@ def spec_database():
 def load_people(people):
     ret_val = {}
     for person in people:
-        id = db.people.insert_one({"name": person})
-        ret_val[person] = id.inserted_id
+        person_id = db.people.insert_one({"name": person})
+        ret_val[person] = person_id.inserted_id
     return ret_val
 
 
@@ -49,10 +49,10 @@ def load_people(people):
 def load_parents(horses, sex):
     ret_val = {}
     for horse in horses:
-        id = db.horses.insert_one(
+        horse_id = db.horses.insert_one(
             {"name": horse["name"], "country": horse["country"], "sex": sex}
         )
-        ret_val[(horse["name"], horse["country"])] = id.inserted_id
+        ret_val[(horse["name"], horse["country"])] = horse_id.inserted_id
     return ret_val
 
 
