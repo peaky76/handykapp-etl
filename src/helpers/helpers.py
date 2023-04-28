@@ -36,13 +36,13 @@ def get_files(dirname, modified_after=None):
 
 
 def read_file(file_path):
-    format = file_path.split(".")[-1]
+    file_type = file_path.split(".")[-1]
     output = {
         "csv": lambda x: [row for row in csv.reader(x.splitlines())],
         "json": lambda x: json.loads(x),
     }
     stream = stream_file(file_path).decode("utf-8")
-    return output[format](stream)
+    return output[file_type](stream)
 
 
 def stream_file(file_path):
