@@ -1,5 +1,6 @@
 # To allow running as a script
 from pathlib import Path
+import re
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -12,7 +13,7 @@ def fetch():
     pass
 
 
-@flow(tags=["Racing Research"])
+@flow
 def formdata_extractor():
     fetch()
 
