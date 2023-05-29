@@ -1,4 +1,23 @@
-from extractors.formdata_extractor import is_dist_going, is_race_date
+from extractors.formdata_extractor import extract_run, is_dist_going, is_race_date
+
+
+def test_extract_run():
+    input = "9-6 BMcHugh 11 6.3 65 6.1G 78 12Oct22 H 7 Not 12 8-11 CMurtagh 10 4.6 67 5D 74 22Apr23 H"
+    expected = [
+        "12Oct22",
+        "H",
+        "7",
+        "Not",
+        "12",
+        "8-11",
+        "CMurtagh",
+        "10",
+        "4.6",
+        "67",
+        "5D",
+        "74",
+    ]
+    assert expected == extract_run(input)
 
 
 def test_is_dist_going_true_for_turf_going():
