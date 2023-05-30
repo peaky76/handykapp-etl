@@ -100,6 +100,10 @@ def test_is_horse_not_true_for_trainer():
     assert not is_horse("D B O'Meara")
 
 
+def test_is_horse_not_true_for_trainer_initials():
+    assert not is_horse("D B O")
+
+
 def test_is_horse_not_true_for_date_range():
     assert not is_horse("21 MAY 22 - 21 MAY 23")
 
