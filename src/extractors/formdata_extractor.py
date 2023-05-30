@@ -1,4 +1,4 @@
-# To allow running as a script
+# To allow running as a script, need path
 from pathlib import Path
 import fitz
 import re
@@ -45,6 +45,19 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
+def process_formdata_stream(stream):
+    horse_count = 0
+    for word in stream:
+        if "FORMDATA" in word:
+            print("TITLE")
+        elif is_horse(word):
+            print(f"HORSE: {word}")
+            horse_count += 1
+        elif is_race_date(word):
+            print("RUN")
+    print(f"Total horses: {horse_count}")
+
+
 def stream_formdata_by_word():
     doc = fitz.open("src/extractors/textAf.pdf")
     for page in doc:
@@ -56,8 +69,7 @@ def stream_formdata_by_word():
 @flow
 def formdata_extractor():
     word_iterator = stream_formdata_by_word()
-    for word in word_iterator:
-        print(word)
+    process_formdata_stream(word_iterator)
 
 
 if __name__ == "__main__":
