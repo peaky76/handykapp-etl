@@ -1,4 +1,5 @@
 # To allow running as a script, need path
+from collections import namedtuple
 from pathlib import Path
 import fitz
 import re
@@ -7,6 +8,28 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, task
+
+Horse = namedtuple(
+    "Horse", ["name", "country", "age", "trainer", "trainer_form", "prize_money"]
+)
+Run = namedtuple(
+    "Run",
+    [
+        "date",
+        "type",
+        "win_prize",
+        "course",
+        "number_of_runners",
+        "weight",
+        "jockey",
+        "position",
+        "beaten_distance",
+        "time_rating",
+        "distance",
+        "going",
+        "form_rating",
+    ],
+)
 
 
 def extract_run(string: str) -> str:
