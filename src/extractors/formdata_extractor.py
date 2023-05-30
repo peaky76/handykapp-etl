@@ -33,6 +33,16 @@ Run = namedtuple(
 )
 
 
+def create_horse(words: list[str]) -> Horse:
+    print(words)
+    print("\n")
+
+
+def create_run(words: list[str]) -> Run:
+    print(words)
+    print("\n")
+
+
 def is_dist_going(string: str) -> str:
     dist_going_regex = r"\d\.?\d?[H|F|M|G|D|S|V|f|g|d|s]"
     return bool(re.match(dist_going_regex, string))
@@ -72,19 +82,17 @@ def process_formdata_stream(stream):
         if is_horse(word):
             adding_runs = False
             if len(run_args):
-                print(run_args)
-                print("\n")
-            run_args = []
+                create_run(run_args)
+                run_args = []
+
         elif is_race_date(word):
             adding_runs = True
             if len(horse_args):
-                print(horse_args)
-                print("\n")
+                create_horse(horse_args)
+                horse_args = []
             if len(run_args):
-                print(run_args)
-                print("\n")
-            horse_args = []
-            run_args = []
+                create_run(run_args)
+                run_args = []
 
         if not adding_runs:
             horse_args.append(word)
