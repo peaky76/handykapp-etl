@@ -84,6 +84,10 @@ def test_is_horse_true_with_country():
     assert is_horse("AADDEEY (IRE)")
 
 
+def test_is_horse_true_with_multiple_word_name():
+    assert is_horse("HURRICANE LANE")
+
+
 def test_is_horse_not_true_for_dist_going():
     assert not is_horse("5G")
 
