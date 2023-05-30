@@ -1,5 +1,6 @@
 # To allow running as a script
 from pathlib import Path
+import fitz
 import re
 import sys
 
@@ -28,13 +29,24 @@ def is_race_date(string: str) -> str:
 
 
 @task(tags=["Racing Research"])
-def fetch():
-    pass
+def fetch_words():
+    doc = fitz.open("src/extractors/textAf.pdf")
+    words = []
+    for page in doc:
+        text = page.get_text()
+        for word in text.split("\n"):
+            if (word.upper() != word and "-" in word) or len(word) <= 6:
+                for subword in word.split(" "):
+                    words.append(subword)
+            else:
+                words.append(word)
+
+    return words
 
 
 @flow
 def formdata_extractor():
-    fetch()
+    print(fetch_words()[:10000])
 
 
 if __name__ == "__main__":
