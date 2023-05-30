@@ -2,6 +2,7 @@ from extractors.formdata_extractor import (
     extract_run,
     extract_title,
     is_dist_going,
+    is_horse,
     is_race_date,
 )
 
@@ -73,6 +74,26 @@ def test_is_dist_going_true_for_decimal_dist():
 
 def test_is_dist_going_false_with_non_dist_going():
     assert not is_dist_going("85")
+
+
+def test_is_horse_true_without_country():
+    assert is_horse("AADDEEY")
+
+
+def test_is_horse_true_with_country():
+    assert is_horse("AADDEEY (IRE)")
+
+
+def test_is_horse_not_true_for_dist_going():
+    assert not is_horse("5G")
+
+
+def test_is_horse_not_true_for_title():
+    assert not is_horse("FORMDATA")
+
+
+def test_is_horse_not_true_for_date_range():
+    assert not is_horse("21 MAY 22 - 21 MAY 23")
 
 
 def test_is_race_date_true_when_single_digit_day():
