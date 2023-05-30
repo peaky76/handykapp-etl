@@ -10,7 +10,8 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from prefect import flow, task
 
 Horse = namedtuple(
-    "Horse", ["name", "country", "age", "trainer", "trainer_form", "prize_money"]
+    "Horse",
+    ["name", "country", "age", "trainer", "trainer_form", "prize_money"],
 )
 Run = namedtuple(
     "Run",
@@ -69,16 +70,42 @@ def is_race_date(string: str) -> str:
 
 
 def process_formdata_stream(stream):
-    horse_count = 0
+    horses = []
+    horse_args = []
+    run_args = []
+    adding_runs = False
+
     for word in stream:
+        # Skip any titles
         if "FORMDATA" in word:
-            print("TITLE")
-        elif is_horse(word):
-            print(f"HORSE: {word}")
-            horse_count += 1
+            skip_count = 3
+            continue
+        else:
+            if skip_count > 0:
+                skip_count -= 1
+                continue
+
+        if is_horse(word):
+            adding_runs = False
+            if len(run_args):
+                print(run_args)
+                print("\n")
+            run_args = []
         elif is_race_date(word):
-            print("RUN")
-    print(f"Total horses: {horse_count}")
+            adding_runs = True
+            if len(horse_args):
+                print(horse_args)
+                print("\n")
+            if len(run_args):
+                print(run_args)
+                print("\n")
+            horse_args = []
+            run_args = []
+
+        if not adding_runs:
+            horse_args.append(word)
+        else:
+            run_args.append(word)
 
 
 def stream_formdata_by_word():
