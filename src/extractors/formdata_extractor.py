@@ -35,25 +35,19 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
-@task(tags=["Racing Research"])
-def fetch_words():
+def stream_formdata_by_word():
     doc = fitz.open("src/extractors/textAf.pdf")
-    words = []
     for page in doc:
         text = page.get_text()
-        for word in text.split("\n"):
-            if (word.upper() != word and "-" in word) or len(word) <= 6:
-                for subword in word.split(" "):
-                    words.append(subword)
-            else:
-                words.append(word)
-
-    return words
+        words = text.split("\n")
+        yield from words
 
 
 @flow
 def formdata_extractor():
-    print(fetch_words()[:10000])
+    word_iterator = stream_formdata_by_word()
+    for word in word_iterator:
+        print(word)
 
 
 if __name__ == "__main__":
