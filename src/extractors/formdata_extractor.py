@@ -32,7 +32,12 @@ def is_dist_going(string: str) -> str:
 
 def is_horse(string: str) -> str:
     horse_regex = r"^(?!.*FORMDATA)[A-Z\s]{3,18}(?: \([A-Z]{1,3}\))?$"
-    return string == string.upper() and bool(re.match(horse_regex, string))
+    initial_regex = r"^[A-Z] [A-Z] [A-Z]$"
+    return (
+        string == string.upper()
+        and bool(re.match(horse_regex, string))
+        and not bool(re.match(initial_regex, string))
+    )
 
 
 def is_race_date(string: str) -> str:
