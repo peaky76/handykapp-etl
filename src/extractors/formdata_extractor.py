@@ -30,6 +30,11 @@ def is_dist_going(string: str) -> str:
     return bool(re.match(dist_going_regex, string))
 
 
+def is_horse(string: str) -> str:
+    horse_regex = r"^(?!.*FORMDATA)[A-Z]{3,18}(?: \([A-Z]{1,3}\))?$"
+    return bool(re.match(horse_regex, string))
+
+
 def is_race_date(string: str) -> str:
     date_regex = r"\d{1,2}[A-Z][a-z]{2}\d{2}"
     return bool(re.match(date_regex, string))
