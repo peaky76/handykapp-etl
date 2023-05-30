@@ -31,7 +31,7 @@ def is_dist_going(string: str) -> str:
 
 
 def is_horse(string: str) -> str:
-    horse_regex = r"^(?!.*FORMDATA)[A-Z]{3,18}(?: \([A-Z]{1,3}\))?$"
+    horse_regex = r"^(?!.*FORMDATA)[A-Z\s]{3,18}(?: \([A-Z]{1,3}\))?$"
     return bool(re.match(horse_regex, string))
 
 
