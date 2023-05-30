@@ -18,6 +18,13 @@ def extract_run(string: str) -> str:
     return elements[next_date_index : next_dist_going_index + 2]
 
 
+def extract_title(words: list[str]):
+    for i, word in enumerate(words):
+        if "FORMDATA" in word:
+            return " ".join(words[i : i + 4])
+    return None
+
+
 def is_dist_going(string: str) -> str:
     dist_going_regex = r"\d\.?\d?[H|F|M|G|D|S|V|f|g|d|s]"
     return bool(re.match(dist_going_regex, string))

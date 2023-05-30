@@ -1,4 +1,9 @@
-from extractors.formdata_extractor import extract_run, is_dist_going, is_race_date
+from extractors.formdata_extractor import (
+    extract_run,
+    extract_title,
+    is_dist_going,
+    is_race_date,
+)
 
 
 def test_extract_run():
@@ -18,6 +23,40 @@ def test_extract_run():
         "74",
     ]
     assert expected == extract_run(input)
+
+
+def test_extract_title_when_all_elements_present():
+    words = [
+        "FLAT FORMDATA",
+        "21 MAY 22 - 21 MAY 23",
+        "5",
+        "AAD",
+        "AADDEEY (IRE)",
+        "6",
+        "Archie Watson",
+    ]
+    assert "FLAT FORMDATA 21 MAY 22 - 21 MAY 23 5 AAD" == extract_title(words)
+
+
+def test_extract_title_when_not_title():
+    words = [
+        "Archie Watson",
+        "F2",
+        "£15462",
+        "4Jun22",
+        "H",
+        "39",
+        "Eps",
+        "11",
+        "9-4",
+        "t5HarryBurns",
+        "7",
+        "16.5",
+        "63",
+        "12G",
+        "87",
+    ]
+    assert None == extract_title(words)
 
 
 def test_is_dist_going_true_for_turf_going():
