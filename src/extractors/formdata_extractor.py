@@ -34,16 +34,34 @@ Run = namedtuple(
 
 
 def create_horse(words: list[str]) -> Horse:
+    words = [w for w in words if w]  # Occasional lines have empty strings at end
+
     name = words[0].split("(")[0].strip()
     country = words[0].split("(")[1].split(")")[0] if "(" in words[0] else "GB"
 
-    if len(words) == 5:
-        horse = Horse(name, country, *words[1:])
-        print(horse)
-        return horse
-    else:
-        print("Horse tbc")
-        return None
+    try:
+        if len(words) == 5:
+            # Base case
+            horse = Horse(name, country, *words[1:])
+        elif 2 <= len(words) < 5:
+            # Handle cases where horse line has been insufficiently split
+            further_split = ("".join(words[1:])).split(" ")
+            horse = Horse(
+                name,
+                country,
+                further_split[0],
+                " ".join(further_split[0:-2]),
+                *further_split[-2:],
+            )
+        else:
+            # Handle cases where trainer name has been split
+            horse = Horse(name, country, words[1], "".join(words[2:-2]), *words[-2:])
+    except:
+        print(words)
+        horse = None
+
+    print(horse)
+    return horse
 
 
 def create_run(words: list[str]) -> Run:
@@ -105,7 +123,8 @@ def process_formdata_stream(stream):
         elif is_race_date(word):
             adding_runs = True
             if len(horse_args):
-                create_horse(horse_args)
+                horse = create_horse(horse_args)
+                horses.append(horse)
                 horse_args = []
             if len(run_args):
                 create_run(run_args)
@@ -115,6 +134,8 @@ def process_formdata_stream(stream):
             horse_args.append(word)
         else:
             run_args.append(word)
+
+    print(f"Horse count {len([h for h in horses if h is not None])}")
 
 
 def stream_formdata_by_word():
