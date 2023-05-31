@@ -34,13 +34,30 @@ Run = namedtuple(
 
 
 def create_horse(words: list[str]) -> Horse:
-    print(words)
-    print("\n")
+    name = words[0].split("(")[0].strip()
+    country = words[0].split("(")[1].split(")")[0] if "(" in words[0] else "GB"
+
+    if len(words) == 5:
+        horse = Horse(name, country, *words[1:])
+        print(horse)
+        return horse
+    else:
+        print("Horse tbc")
+        return None
 
 
 def create_run(words: list[str]) -> Run:
-    print(words)
-    print("\n")
+    if len(words) == 12:
+        dist_and_going = list(words[10])
+        dist = "".join(dist_and_going[:-1])
+        going = dist_and_going[-1]
+
+        run = Run(*words[:10], dist, going, words[11])
+        print(run)
+        return run
+    else:
+        print("Run tbc")
+        return None
 
 
 def is_dist_going(string: str) -> str:
