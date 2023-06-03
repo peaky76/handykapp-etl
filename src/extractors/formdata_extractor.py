@@ -7,7 +7,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from prefect import flow, task
+from prefect import flow, get_run_logger, task
 
 Horse = namedtuple(
     "Horse",
@@ -34,6 +34,7 @@ Run = namedtuple(
 
 
 def create_horse(words: list[str]) -> Horse:
+    logger = get_run_logger()
     words = [w for w in words if w]  # Occasional lines have empty strings at end
 
     name = words[0].split("(")[0].strip()
@@ -57,7 +58,7 @@ def create_horse(words: list[str]) -> Horse:
             # Handle cases where trainer name has been split
             horse = Horse(name, country, words[1], "".join(words[2:-2]), *words[-2:])
     except:
-        print(words)
+        logger.error(f"Error creating horse from {words}")
         horse = None
 
     print(horse)
@@ -132,6 +133,8 @@ def process_formdata_stream(stream):
 
         if not adding_runs:
             horse_args.append(word)
+        elif "then moved" in word:
+            pass
         else:
             run_args.append(word)
 
