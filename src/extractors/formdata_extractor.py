@@ -66,6 +66,7 @@ def create_horse(words: list[str]) -> Horse:
 
 
 def create_run(words: list[str]) -> Run:
+    words = " ".join(words).split(" ")
     if len(words) == 12:
         dist_and_going = list(words[10])
         dist = "".join(dist_and_going[:-1])
@@ -75,7 +76,7 @@ def create_run(words: list[str]) -> Run:
         print(run)
         return run
     else:
-        print("Run tbc")
+        print(words)
         return None
 
 
