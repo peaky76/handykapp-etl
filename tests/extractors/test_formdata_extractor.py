@@ -1,11 +1,23 @@
 from extractors.formdata_extractor import (
+    extract_dist_going,
     extract_prize,
     extract_weight,
-    is_dist_going,
     is_horse,
     is_race_date,
     parse_middle_details,
 )
+
+
+def test_extract_dist_going_for_turf_going():
+    assert ("5", "G") == extract_dist_going("5G")
+
+
+def test_extract_dist_going_for_aw_going():
+    assert ("5", "d") == extract_dist_going("5d")
+
+
+def test_extract_dist_going_for_decimal_dist():
+    assert ("9.1", "G") == extract_dist_going("9.1G")
 
 
 def test_extract_prize():
@@ -14,22 +26,6 @@ def test_extract_prize():
 
 def test_extract_weight():
     assert ("9-13", "t3RyanSexton") == extract_weight("9-13t3RyanSexton")
-
-
-def test_is_dist_going_true_for_turf_going():
-    assert is_dist_going("5G")
-
-
-def test_is_dist_going_true_for_aw_going():
-    assert is_dist_going("5d")
-
-
-def test_is_dist_going_true_for_decimal_dist():
-    assert is_dist_going("9.1G")
-
-
-def test_is_dist_going_false_with_non_dist_going():
-    assert not is_dist_going("85")
 
 
 def test_is_horse_true_without_country():
