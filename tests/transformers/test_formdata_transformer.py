@@ -1,4 +1,4 @@
-from extractors.formdata_extractor import (
+from transformers.formdata_transformer import (
     extract_dist_going,
     extract_prize,
     extract_weight,

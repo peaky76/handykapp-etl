@@ -260,7 +260,7 @@ def process_formdata_stream(stream):
 
 
 def stream_formdata_by_word():
-    doc = fitz.open("src/extractors/textAf.pdf")
+    doc = fitz.open("src/transformers/textAf.pdf")
     for page in doc:
         text = page.get_text()
         # Replace non-ascii characters with apostrophes
@@ -269,10 +269,10 @@ def stream_formdata_by_word():
 
 
 @flow
-def formdata_extractor():
+def formdata_transformer():
     word_iterator = stream_formdata_by_word()
     process_formdata_stream(word_iterator)
 
 
 if __name__ == "__main__":
-    formdata_extractor()  # type: ignore
+    formdata_transformer()  # type: ignore
