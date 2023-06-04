@@ -134,3 +134,6 @@ deployments/
 
 # Dockerfile
 Dockerfile
+
+# Data
+*.pdf
