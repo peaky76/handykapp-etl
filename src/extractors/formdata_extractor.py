@@ -204,6 +204,10 @@ def process_formdata_stream(stream):
                 skip_count -= 1
                 continue
 
+        # Handle then moved to O'Callaghan weirdness
+        if "20'Callaghan" in word:
+            word = word.split("20'Callaghan")[0]
+
         if is_horse(word):
             adding_horses = True
             adding_runs = False
