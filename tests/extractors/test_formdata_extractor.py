@@ -155,3 +155,14 @@ def test_parse_middle_details_when_position_reordered():
     }
 
     assert expected == parse_middle_details("t3HDavies2p3")
+
+
+def test_parse_middle_details_when_position_is_disaster():
+    expected = {
+        "headgear": "t",
+        "allowance": "3",
+        "jockey": "HDavies",
+        "position": "p",
+    }
+
+    assert expected == parse_middle_details("t3HDaviesp")
