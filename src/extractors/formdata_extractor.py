@@ -71,8 +71,8 @@ def create_run(words: list[str]) -> Run:
     try:
         # Handle extra empty string at end of some lines
         words = words if words[-1] != "" else words[:-1]
-        # Handle cases where words are insufficiently split and apostrophe escaping
-        words = " ".join(words).replace(chr(25), "'").split(" ")
+        # Handle cases where words are insufficiently split
+        words = " ".join(words).split(" ")
         # Split overlong prize money
         if len(words[1]) > 4:
             racetype, prize = extract_prize(words[1])
@@ -233,7 +233,7 @@ def stream_formdata_by_word():
     doc = fitz.open("src/extractors/textAf.pdf")
     for page in doc:
         text = page.get_text()
-        words = text.split("\n")
+        words = text.replace(chr(25), "'").split("\n")
         yield from words
 
 
