@@ -74,18 +74,22 @@ def create_run(words: list[str]) -> Run:
     try:
         # Handle extra empty string at end of some lines
         words = words if words[-1] != "" else words[:-1]
+
         # Handle cases where words are insufficiently split
         words = " ".join(words).split(" ")
+
         # Split overlong prize money
         if len(words[1]) > 4:
             racetype, prize = extract_prize(words[1])
             words[1] = racetype
             words.insert(2, prize)
+
         # Split conjoined weight
         if len(words[5]) > 5 and words[5][0].isdigit() and "-" in words[5][:3]:
             weight, jockey = extract_weight(words[5])
             words[5] = weight
             words.insert(6, jockey)
+
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
 
