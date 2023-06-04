@@ -73,9 +73,9 @@ def test_is_race_date_false_with_non_date():
 def test_parse_jockey_details_when_jockey_and_single_digit_position():
     expected = {
         "headgear": None,
-        "allowance": 0,
+        "allowance": None,
         "jockey": "JFanning",
-        "position": 3,
+        "position": "3",
     }
 
     assert expected == parse_jockey_details("JFanning3")
@@ -84,9 +84,9 @@ def test_parse_jockey_details_when_jockey_and_single_digit_position():
 def test_parse_jockey_details_when_jockey_and_double_digit_position():
     expected = {
         "headgear": None,
-        "allowance": 0,
+        "allowance": None,
         "jockey": "JFanning",
-        "position": 12,
+        "position": "12",
     }
 
     assert expected == parse_jockey_details("JFanning12")
@@ -95,9 +95,9 @@ def test_parse_jockey_details_when_jockey_and_double_digit_position():
 def test_parse_jockey_details_when_headgear_jockey_position():
     expected = {
         "headgear": "t",
-        "allowance": 0,
+        "allowance": None,
         "jockey": "JFanning",
-        "position": 12,
+        "position": "12",
     }
 
     assert expected == parse_jockey_details("tJFanning12")
@@ -106,9 +106,9 @@ def test_parse_jockey_details_when_headgear_jockey_position():
 def test_parse_jockey_details_when_allowance_jockey_position():
     expected = {
         "headgear": None,
-        "allowance": 3,
+        "allowance": "3",
         "jockey": "HDavies",
-        "position": 12,
+        "position": "12",
     }
 
     assert expected == parse_jockey_details("3HDavies12")
@@ -117,9 +117,9 @@ def test_parse_jockey_details_when_allowance_jockey_position():
 def test_parse_jockey_details_when_headgear_allowance_jockey_position():
     expected = {
         "headgear": "t",
-        "allowance": 3,
+        "allowance": "3",
         "jockey": "HDavies",
-        "position": 12,
+        "position": "12",
     }
 
     assert expected == parse_jockey_details("t3HDavies12")
