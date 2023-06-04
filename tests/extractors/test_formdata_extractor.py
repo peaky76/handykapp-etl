@@ -128,3 +128,25 @@ def test_parse_middle_details_when_headgear_allowance_jockey_position():
     }
 
     assert expected == parse_middle_details("t3HDavies12")
+
+
+def test_parse_middle_details_when_position_equal():
+    expected = {
+        "headgear": "t",
+        "allowance": "3",
+        "jockey": "HDavies",
+        "position": "=12",
+    }
+
+    assert expected == parse_middle_details("t3HDavies=12")
+
+
+def test_parse_middle_details_when_position_reordered():
+    expected = {
+        "headgear": "t",
+        "allowance": "3",
+        "jockey": "HDavies",
+        "position": "2p3",
+    }
+
+    assert expected == parse_middle_details("t3HDavies2p3")
