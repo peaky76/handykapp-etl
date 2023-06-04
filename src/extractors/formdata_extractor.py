@@ -22,6 +22,8 @@ Run = namedtuple(
         "course",
         "number_of_runners",
         "weight",
+        "headgear",
+        "allowance",
         "jockey",
         "position",
         "beaten_distance",
@@ -61,21 +63,47 @@ def create_horse(words: list[str]) -> Horse:
         logger.error(f"Error creating horse from {words}")
         horse = None
 
-    print(horse)
+    # print(horse)
     return horse
 
 
 def create_run(words: list[str]) -> Run:
-    words = " ".join(words).split(" ")
-    if len(words) == 12:
-        dist_and_going = list(words[10])
+    try:
+        # Handle cases where words are insufficiently split
+        words = " ".join(words).split(" ")
+        # Join middle details to be processed separately
+        middle_details = "".join(words[6:-4])
+
+        pre0, pre1 = middle_details[0:2]
+        post0, post1 = middle_details[-2:]
+
+        headgear = pre0 if not pre0.isdigit() and pre0.lower() == pre0 else None
+        allowance = pre0 if pre0.isdigit() else pre1 if pre1.isdigit() else 0
+        position = "".join(x for x in [post0, post1] if x.isdigit())
+
+        jockey_end_index = -(len(position) + 1)
+        jockey_start_index = sum(bool(x) for x in [headgear, allowance])
+        jockey = middle_details[jockey_start_index:jockey_end_index]
+
+        dist_and_going = list(words[-2])
         dist = "".join(dist_and_going[:-1])
         going = dist_and_going[-1]
 
-        run = Run(*words[:10], dist, going, words[11])
-        print(run)
+        run = Run(
+            *words[:6],
+            headgear,
+            int(allowance),
+            jockey,
+            int(position),
+            *words[-4:-2],
+            dist,
+            going,
+            words[-1],
+        )
+        # print(run)
         return run
-    else:
+    except Exception as e:
+        print(e)
         print(words)
         return None
 
