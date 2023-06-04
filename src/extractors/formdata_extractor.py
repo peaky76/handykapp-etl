@@ -182,16 +182,11 @@ def parse_middle_details(details: str) -> list[str]:
 
     match = re.match(pattern, details, re.VERBOSE)
     if match:
-        headgear = match.group("headgear")
-        allowance = match.group("allowance")
-        jockey = match.group("jockey")
-        position = match.group("position")
-
         return {
-            "headgear": headgear,
-            "allowance": allowance,
-            "jockey": jockey,
-            "position": position,
+            "headgear": match.group("headgear"),
+            "allowance": match.group("allowance"),
+            "jockey": match.group("jockey"),
+            "position": match.group("position"),
         }
     else:
         return None
