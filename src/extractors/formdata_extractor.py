@@ -71,6 +71,11 @@ def create_run(words: list[str]) -> Run:
     try:
         # Handle cases where words are insufficiently split
         words = " ".join(words).split(" ")
+        # Split overlong prize money
+        if len(words[1]) > 4:
+            racetype, prize = extract_prize(words[1])
+            words[1] = racetype
+            words.insert(2, prize)
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
 
@@ -91,6 +96,22 @@ def create_run(words: list[str]) -> Run:
     except Exception as e:
         print(e)
         print(words)
+        return None
+
+
+def extract_prize(string: str) -> str:
+    pattern = r"""
+        ^                               # Start of the string
+        (?P<racetype>\d*[A-Za-z]+)?     # Race type
+        (?P<prize>\d{3,4})              # Prize money
+    """
+
+    match = re.match(pattern, string, re.VERBOSE)
+    if match:
+        racetype = match.group("racetype")
+        prize = match.group("prize")
+        return (racetype, prize)
+    else:
         return None
 
 
