@@ -96,6 +96,7 @@ def create_run(words: list[str]) -> Run:
     except Exception as e:
         print(e)
         print(words)
+        print("".join(words[6:-4]))
         return None
 
 
@@ -140,7 +141,7 @@ def parse_middle_details(details: str) -> list[str]:
         ^                        # Start of the string
         (?P<headgear>[a-z])?     # Lowercase letter as the headgear
         (?P<allowance>\d+)?      # Optional number as the allowance
-        (?P<jockey>[a-zA-Z]+)    # Remaining characters as the jockey
+        (?P<jockey>[a-zA-Z\-]+)    # Remaining characters as the jockey
         (?P<position>\d+)        # Last number as the position
         $                        # End of the string
     """
