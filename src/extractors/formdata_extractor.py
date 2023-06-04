@@ -103,7 +103,7 @@ def create_run(words: list[str]) -> Run:
     except Exception as e:
         print(e)
         print(words)
-        print("".join(words[6:-4]))
+        print(ord(words[-1][0]))
         return None
 
 
@@ -233,7 +233,8 @@ def stream_formdata_by_word():
     doc = fitz.open("src/extractors/textAf.pdf")
     for page in doc:
         text = page.get_text()
-        words = text.replace(chr(25), "'").split("\n")
+        # Replace non-ascii characters with apostrophes
+        words = text.replace(chr(25), "'").replace(chr(65533), "'").split("\n")
         yield from words
 
 
