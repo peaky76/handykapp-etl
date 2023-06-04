@@ -198,6 +198,7 @@ def parse_middle_details(details: str) -> list[str]:
 
 
 def process_formdata_stream(stream):
+    logger = get_run_logger()
     horses = []
     horse_args = []
     run_args = []
@@ -245,7 +246,9 @@ def process_formdata_stream(stream):
         elif adding_runs:
             run_args.append(word)
 
-    print(f"Horse count {len([h for h in horses if h is not None])}")
+    logger.info(
+        f"Processed {len([h for h in horses if h is not None])} horses from Formdata"
+    )
 
 
 def stream_formdata_by_word():
