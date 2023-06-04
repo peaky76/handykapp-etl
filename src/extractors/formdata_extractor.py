@@ -69,6 +69,8 @@ def create_horse(words: list[str]) -> Horse:
 
 def create_run(words: list[str]) -> Run:
     try:
+        # Handle extra empty string at end of some lines
+        words = words if words[-1] != "" else words[:-1]
         # Handle cases where words are insufficiently split and apostrophe escaping
         words = " ".join(words).replace(chr(25), "'").split(" ")
         # Split overlong prize money
