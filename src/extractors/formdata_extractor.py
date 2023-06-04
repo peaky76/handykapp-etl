@@ -220,30 +220,31 @@ def process_formdata_stream(stream):
         if "20'Callaghan" in word:
             word = word.split("20'Callaghan")[0]
 
+        # Switch on/off adding horses/runs
         if is_horse(word):
             adding_horses = True
             adding_runs = False
-            if len(run_args):
-                run = create_run(run_args)
-                horse.runs.append(run)
-                run_args = []
-
         elif is_race_date(word):
             adding_horses = False
             adding_runs = True
-            if len(horse_args):
-                horse = create_horse(horse_args)
-                horses.append(horse)
-                horse_args = []
-            if len(run_args):
-                run = create_run(run_args)
-                horse.runs.append(run)
-                run_args = []
-
         elif "then" in word:
             adding_horses = False
             adding_runs = False
 
+        # Create horses/runs
+        if is_race_date(word):
+            if len(horse_args):
+                horse = create_horse(horse_args)
+                horses.append(horse)
+                horse_args = []
+
+        if is_horse(word) or is_race_date(word):
+            if len(run_args):
+                run = create_run(run_args)
+                horse.runs.append(run)
+                run_args = []
+
+        # Add words to horses/runs
         if adding_horses:
             horse_args.append(word)
         elif adding_runs:
