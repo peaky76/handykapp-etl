@@ -1,9 +1,14 @@
 from extractors.formdata_extractor import (
+    extract_prize,
     is_dist_going,
     is_horse,
     is_race_date,
     parse_middle_details,
 )
+
+
+def test_extract_prize():
+    assert ("2CG", "1156") == extract_prize("2CG1156")
 
 
 def test_is_dist_going_true_for_turf_going():
