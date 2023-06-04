@@ -2,8 +2,8 @@ from extractors.formdata_extractor import (
     is_dist_going,
     is_horse,
     is_race_date,
+    parse_middle_details,
 )
-from src.extractors.formdata_extractor import parse_jockey_details
 
 
 def test_is_dist_going_true_for_turf_going():
@@ -70,7 +70,7 @@ def test_is_race_date_false_with_non_date():
     assert not is_race_date("JMitchell")
 
 
-def test_parse_jockey_details_when_jockey_and_single_digit_position():
+def test_parse_middle_details_when_jockey_and_single_digit_position():
     expected = {
         "headgear": None,
         "allowance": None,
@@ -78,10 +78,10 @@ def test_parse_jockey_details_when_jockey_and_single_digit_position():
         "position": "3",
     }
 
-    assert expected == parse_jockey_details("JFanning3")
+    assert expected == parse_middle_details("JFanning3")
 
 
-def test_parse_jockey_details_when_jockey_and_double_digit_position():
+def test_parse_middle_details_when_jockey_and_double_digit_position():
     expected = {
         "headgear": None,
         "allowance": None,
@@ -89,10 +89,10 @@ def test_parse_jockey_details_when_jockey_and_double_digit_position():
         "position": "12",
     }
 
-    assert expected == parse_jockey_details("JFanning12")
+    assert expected == parse_middle_details("JFanning12")
 
 
-def test_parse_jockey_details_when_headgear_jockey_position():
+def test_parse_middle_details_when_headgear_jockey_position():
     expected = {
         "headgear": "t",
         "allowance": None,
@@ -100,10 +100,10 @@ def test_parse_jockey_details_when_headgear_jockey_position():
         "position": "12",
     }
 
-    assert expected == parse_jockey_details("tJFanning12")
+    assert expected == parse_middle_details("tJFanning12")
 
 
-def test_parse_jockey_details_when_allowance_jockey_position():
+def test_parse_middle_details_when_allowance_jockey_position():
     expected = {
         "headgear": None,
         "allowance": "3",
@@ -111,10 +111,10 @@ def test_parse_jockey_details_when_allowance_jockey_position():
         "position": "12",
     }
 
-    assert expected == parse_jockey_details("3HDavies12")
+    assert expected == parse_middle_details("3HDavies12")
 
 
-def test_parse_jockey_details_when_headgear_allowance_jockey_position():
+def test_parse_middle_details_when_headgear_allowance_jockey_position():
     expected = {
         "headgear": "t",
         "allowance": "3",
@@ -122,4 +122,4 @@ def test_parse_jockey_details_when_headgear_allowance_jockey_position():
         "position": "12",
     }
 
-    assert expected == parse_jockey_details("t3HDavies12")
+    assert expected == parse_middle_details("t3HDavies12")
