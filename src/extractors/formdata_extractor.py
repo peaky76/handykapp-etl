@@ -4,6 +4,7 @@ from pathlib import Path
 import fitz
 import re
 import sys
+import pendulum
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -96,7 +97,8 @@ def create_run(words: list[str]) -> Run:
         middle_details = parse_middle_details("".join(words[6:-4]))
 
         run = Run(
-            *words[:6],
+            pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
+            *words[1:6],
             *middle_details.values(),
             *words[-4:-2],
             *extract_dist_going(words[-2]),
