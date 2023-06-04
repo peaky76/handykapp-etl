@@ -256,7 +256,7 @@ def process_formdata_stream(stream):
     logger.info(
         f"Processed {len([h for h in horses if h is not None])} horses from Formdata"
     )
-    print(horses[-1])
+    return horses
 
 
 def stream_formdata_by_word():
@@ -271,7 +271,7 @@ def stream_formdata_by_word():
 @flow
 def formdata_transformer():
     word_iterator = stream_formdata_by_word()
-    process_formdata_stream(word_iterator)
+    return process_formdata_stream(word_iterator)
 
 
 if __name__ == "__main__":
