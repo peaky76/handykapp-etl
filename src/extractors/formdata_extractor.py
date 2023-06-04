@@ -59,15 +59,15 @@ def create_horse(words: list[str]) -> Horse:
         else:
             # Handle cases where trainer name has been split
             horse = Horse(name, country, words[1], "".join(words[2:-2]), *words[-2:])
-    except:
+    except Exception as e:
         logger.error(f"Error creating horse from {words}")
         horse = None
 
-    # print(horse)
     return horse
 
 
 def create_run(words: list[str]) -> Run:
+    logger = get_run_logger()
     try:
         # Handle extra empty string at end of some lines
         words = words if words[-1] != "" else words[:-1]
@@ -96,10 +96,10 @@ def create_run(words: list[str]) -> Run:
         # print(run)
         return run
     except Exception as e:
-        print(e)
-        print(words)
-        print(ord(words[-1][0]))
-        return None
+        logger.error(f"Error creating run from {words}")
+        run = None
+
+    return run
 
 
 def extract_dist_going(string: str) -> tuple[str]:
