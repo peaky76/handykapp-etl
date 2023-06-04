@@ -72,7 +72,7 @@ def create_run(words: list[str]) -> Run:
         # Handle cases where words are insufficiently split
         words = " ".join(words).split(" ")
         # Join jockey details to be processed separately
-        details = parse_jockey_details("".join(words[6:-4]))
+        middle_details = parse_middle_details("".join(words[6:-4]))
 
         dist_and_going = list(words[-2])
         dist = "".join(dist_and_going[:-1])
@@ -80,7 +80,7 @@ def create_run(words: list[str]) -> Run:
 
         run = Run(
             *words[:6],
-            *details.values(),
+            *middle_details.values(),
             *words[-4:-2],
             dist,
             going,
@@ -114,7 +114,7 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
-def parse_jockey_details(details: str) -> list[str]:
+def parse_middle_details(details: str) -> list[str]:
     pattern = r"""
         ^                        # Start of the string
         (?P<headgear>[a-z])?     # Lowercase letter as the headgear
