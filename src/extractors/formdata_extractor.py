@@ -192,7 +192,7 @@ def parse_middle_details(details: str) -> list[str]:
     if match:
         return {
             "headgear": match.group("headgear"),
-            "allowance": match.group("allowance"),
+            "allowance": int(match.group("allowance") or 0),
             "jockey": match.group("jockey"),
             "position": match.group("position"),
         }
