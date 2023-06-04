@@ -3,6 +3,7 @@ from extractors.formdata_extractor import (
     is_horse,
     is_race_date,
 )
+from src.extractors.formdata_extractor import parse_jockey_details
 
 
 def test_is_dist_going_true_for_turf_going():
@@ -67,3 +68,58 @@ def test_is_race_date_true_when_double_digit_day():
 
 def test_is_race_date_false_with_non_date():
     assert not is_race_date("JMitchell")
+
+
+def test_parse_jockey_details_when_jockey_and_single_digit_position():
+    expected = {
+        "headgear": None,
+        "allowance": 0,
+        "jockey": "JFanning",
+        "position": 3,
+    }
+
+    assert expected == parse_jockey_details("JFanning3")
+
+
+def test_parse_jockey_details_when_jockey_and_double_digit_position():
+    expected = {
+        "headgear": None,
+        "allowance": 0,
+        "jockey": "JFanning",
+        "position": 12,
+    }
+
+    assert expected == parse_jockey_details("JFanning12")
+
+
+def test_parse_jockey_details_when_headgear_jockey_position():
+    expected = {
+        "headgear": "t",
+        "allowance": 0,
+        "jockey": "JFanning",
+        "position": 12,
+    }
+
+    assert expected == parse_jockey_details("tJFanning12")
+
+
+def test_parse_jockey_details_when_allowance_jockey_position():
+    expected = {
+        "headgear": None,
+        "allowance": 3,
+        "jockey": "HDavies",
+        "position": 12,
+    }
+
+    assert expected == parse_jockey_details("3HDavies12")
+
+
+def test_parse_jockey_details_when_headgear_allowance_jockey_position():
+    expected = {
+        "headgear": "t",
+        "allowance": 3,
+        "jockey": "HDavies",
+        "position": 12,
+    }
+
+    assert expected == parse_jockey_details("t3HDavies12")
