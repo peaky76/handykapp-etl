@@ -86,16 +86,11 @@ def create_run(words: list[str]) -> Run:
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
 
-        dist_and_going = list(words[-2])
-        dist = "".join(dist_and_going[:-1])
-        going = dist_and_going[-1]
-
         run = Run(
             *words[:6],
             *middle_details.values(),
             *words[-4:-2],
-            dist,
-            going,
+            *extract_dist_going(words[-2]),
             words[-1],
         )
         # print(run)
@@ -107,11 +102,30 @@ def create_run(words: list[str]) -> Run:
         return None
 
 
-def extract_prize(string: str) -> str:
+def extract_dist_going(string: str) -> tuple[str]:
+    pattern = r"""
+        ^                                       # Start of the string
+        (?:r)?                                  # Optional r
+        (?P<dist>\d\.?\d?)                      # Distance
+        (?P<going>[H|F|M|G|D|S|V|f|g|d|s])      # Going
+        $                                       # End of the string
+    """
+
+    match = re.match(pattern, string, re.VERBOSE)
+    if match:
+        dist = match.group("dist")
+        going = match.group("going")
+        return (dist, going)
+    else:
+        return None
+
+
+def extract_prize(string: str) -> tuple[str]:
     pattern = r"""
         ^                               # Start of the string
         (?P<racetype>\d*[A-Za-z]+)?     # Race type
         (?P<prize>\d{3,4})              # Prize money
+        $                               # End of the string
     """
 
     match = re.match(pattern, string, re.VERBOSE)
@@ -123,10 +137,10 @@ def extract_prize(string: str) -> str:
         return None
 
 
-def extract_weight(string: str) -> str:
+def extract_weight(string: str) -> tuple[str]:
     pattern = r"""
         ^                               # Start of the string
-        (?P<weight>\d{1,2}\-\d{2})               # Weight
+        (?P<weight>\d{1,2}\-\d{2})      # Weight
         (?P<jockey>.*)                  # Jockey
         $                               # End of the string
     """
@@ -138,11 +152,6 @@ def extract_weight(string: str) -> str:
         return (weight, jockey)
     else:
         return None
-
-
-def is_dist_going(string: str) -> str:
-    dist_going_regex = r"\d\.?\d?[H|F|M|G|D|S|V|f|g|d|s]"
-    return bool(re.match(dist_going_regex, string))
 
 
 def is_horse(string: str) -> str:
