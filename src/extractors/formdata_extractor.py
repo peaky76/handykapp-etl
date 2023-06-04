@@ -191,6 +191,7 @@ def process_formdata_stream(stream):
     horses = []
     horse_args = []
     run_args = []
+    adding_horses = False
     adding_runs = False
 
     for word in stream:
@@ -204,12 +205,14 @@ def process_formdata_stream(stream):
                 continue
 
         if is_horse(word):
+            adding_horses = True
             adding_runs = False
             if len(run_args):
                 create_run(run_args)
                 run_args = []
 
         elif is_race_date(word):
+            adding_horses = False
             adding_runs = True
             if len(horse_args):
                 horse = create_horse(horse_args)
@@ -219,11 +222,13 @@ def process_formdata_stream(stream):
                 create_run(run_args)
                 run_args = []
 
-        if not adding_runs:
+        elif "then" in word:
+            adding_horses = False
+            adding_runs = False
+
+        if adding_horses:
             horse_args.append(word)
-        elif "then moved" in word:
-            pass
-        else:
+        elif adding_runs:
             run_args.append(word)
 
     print(f"Horse count {len([h for h in horses if h is not None])}")
