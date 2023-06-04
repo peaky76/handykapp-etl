@@ -11,7 +11,7 @@ from prefect import flow, get_run_logger, task
 
 Horse = namedtuple(
     "Horse",
-    ["name", "country", "age", "trainer", "trainer_form", "prize_money"],
+    ["name", "country", "age", "trainer", "trainer_form", "prize_money", "runs"],
 )
 Run = namedtuple(
     "Run",
@@ -45,7 +45,7 @@ def create_horse(words: list[str]) -> Horse:
     try:
         if len(words) == 5:
             # Base case
-            horse = Horse(name, country, *words[1:])
+            horse = Horse(name, country, *words[1:], [])
         elif 2 <= len(words) < 5:
             # Handle cases where horse line has been insufficiently split
             further_split = ("".join(words[1:])).split(" ")
@@ -55,10 +55,13 @@ def create_horse(words: list[str]) -> Horse:
                 further_split[0],
                 " ".join(further_split[0:-2]),
                 *further_split[-2:],
+                [],
             )
         else:
             # Handle cases where trainer name has been split
-            horse = Horse(name, country, words[1], "".join(words[2:-2]), *words[-2:])
+            horse = Horse(
+                name, country, words[1], "".join(words[2:-2]), *words[-2:], []
+            )
     except Exception as e:
         logger.error(f"Error creating horse from {words}: {e}")
         horse = None
