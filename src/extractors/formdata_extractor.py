@@ -69,8 +69,8 @@ def create_horse(words: list[str]) -> Horse:
 
 def create_run(words: list[str]) -> Run:
     try:
-        # Handle cases where words are insufficiently split
-        words = " ".join(words).split(" ")
+        # Handle cases where words are insufficiently split and apostrophe escaping
+        words = " ".join(words).replace(chr(25), "'").split(" ")
         # Split overlong prize money
         if len(words[1]) > 4:
             racetype, prize = extract_prize(words[1])
@@ -138,12 +138,12 @@ def is_race_date(string: str) -> str:
 
 def parse_middle_details(details: str) -> list[str]:
     pattern = r"""
-        ^                        # Start of the string
-        (?P<headgear>[a-z])?     # Lowercase letter as the headgear
-        (?P<allowance>\d+)?      # Optional number as the allowance
-        (?P<jockey>[a-zA-Z\-]+)    # Remaining characters as the jockey
-        (?P<position>\d+)        # Last number as the position
-        $                        # End of the string
+        ^                           # Start of the string
+        (?P<headgear>[a-z])?        # Lowercase letter as the headgear
+        (?P<allowance>\d+)?         # Optional number as the allowance
+        (?P<jockey>[a-zA-Z\-]+)   # Remaining characters as the jockey
+        (?P<position>\d+)           # Last number as the position
+        $                           # End of the string
     """
 
     match = re.match(pattern, details, re.VERBOSE)
