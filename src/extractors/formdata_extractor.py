@@ -71,19 +71,8 @@ def create_run(words: list[str]) -> Run:
     try:
         # Handle cases where words are insufficiently split
         words = " ".join(words).split(" ")
-        # Join middle details to be processed separately
-        middle_details = "".join(words[6:-4])
-
-        pre0, pre1 = middle_details[0:2]
-        post0, post1 = middle_details[-2:]
-
-        headgear = pre0 if not pre0.isdigit() and pre0.lower() == pre0 else None
-        allowance = pre0 if pre0.isdigit() else pre1 if pre1.isdigit() else 0
-        position = "".join(x for x in [post0, post1] if x.isdigit())
-
-        jockey_end_index = -(len(position) + 1)
-        jockey_start_index = sum(bool(x) for x in [headgear, allowance])
-        jockey = middle_details[jockey_start_index:jockey_end_index]
+        # Join jockey details to be processed separately
+        details = parse_jockey_details("".join(words[6:-4]))
 
         dist_and_going = list(words[-2])
         dist = "".join(dist_and_going[:-1])
@@ -91,10 +80,7 @@ def create_run(words: list[str]) -> Run:
 
         run = Run(
             *words[:6],
-            headgear,
-            int(allowance),
-            jockey,
-            int(position),
+            *details.values(),
             *words[-4:-2],
             dist,
             going,
@@ -126,6 +112,26 @@ def is_horse(string: str) -> str:
 def is_race_date(string: str) -> str:
     date_regex = r"\d{1,2}[A-Z][a-z]{2}\d{2}"
     return bool(re.match(date_regex, string))
+
+
+def parse_jockey_details(details: str) -> list[str]:
+    pre0, pre1 = details[0:2]
+    post0, post1 = details[-2:]
+
+    headgear = pre0 if not pre0.isdigit() and pre0.lower() == pre0 else None
+    allowance = int(pre0) if pre0.isdigit() else int(pre1) if pre1.isdigit() else 0
+    position = int("".join(x for x in [post0, post1] if x.isdigit()))
+
+    jockey_end_index = -(len(str(position)))
+    jockey_start_index = sum(bool(x) for x in [headgear, allowance])
+    jockey = details[jockey_start_index:jockey_end_index]
+
+    return {
+        "headgear": headgear,
+        "allowance": allowance,
+        "jockey": jockey,
+        "position": position,
+    }
 
 
 def process_formdata_stream(stream):
