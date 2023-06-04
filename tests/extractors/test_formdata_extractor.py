@@ -79,7 +79,7 @@ def test_is_race_date_false_with_non_date():
 def test_parse_middle_details_when_jockey_and_single_digit_position():
     expected = {
         "headgear": None,
-        "allowance": None,
+        "allowance": 0,
         "jockey": "JFanning",
         "position": "3",
     }
@@ -90,7 +90,7 @@ def test_parse_middle_details_when_jockey_and_single_digit_position():
 def test_parse_middle_details_when_jockey_and_double_digit_position():
     expected = {
         "headgear": None,
-        "allowance": None,
+        "allowance": 0,
         "jockey": "JFanning",
         "position": "12",
     }
@@ -101,7 +101,7 @@ def test_parse_middle_details_when_jockey_and_double_digit_position():
 def test_parse_middle_details_when_headgear_jockey_position():
     expected = {
         "headgear": "t",
-        "allowance": None,
+        "allowance": 0,
         "jockey": "JFanning",
         "position": "12",
     }
@@ -112,7 +112,7 @@ def test_parse_middle_details_when_headgear_jockey_position():
 def test_parse_middle_details_when_allowance_jockey_position():
     expected = {
         "headgear": None,
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "12",
     }
@@ -123,7 +123,7 @@ def test_parse_middle_details_when_allowance_jockey_position():
 def test_parse_middle_details_when_headgear_allowance_jockey_position():
     expected = {
         "headgear": "t",
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "12",
     }
@@ -134,7 +134,7 @@ def test_parse_middle_details_when_headgear_allowance_jockey_position():
 def test_parse_middle_details_when_position_equal():
     expected = {
         "headgear": "t",
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "=12",
     }
@@ -145,7 +145,7 @@ def test_parse_middle_details_when_position_equal():
 def test_parse_middle_details_when_position_reordered():
     expected = {
         "headgear": "t",
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "2p3",
     }
@@ -156,7 +156,7 @@ def test_parse_middle_details_when_position_reordered():
 def test_parse_middle_details_when_position_is_disaster():
     expected = {
         "headgear": "t",
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "p",
     }
@@ -167,7 +167,7 @@ def test_parse_middle_details_when_position_is_disaster():
 def test_parse_middle_details_when_position_includes_disqulification():
     expected = {
         "headgear": "t",
-        "allowance": "3",
+        "allowance": 3,
         "jockey": "HDavies",
         "position": "3d",
     }
