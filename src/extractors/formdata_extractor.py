@@ -93,8 +93,6 @@ def create_run(words: list[str]) -> Run:
             *extract_dist_going(words[-2]),
             words[-1],
         )
-        # print(run)
-        return run
     except Exception as e:
         logger.error(f"Error creating run from {words}")
         run = None
