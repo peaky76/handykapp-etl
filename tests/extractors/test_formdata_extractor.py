@@ -166,3 +166,14 @@ def test_parse_middle_details_when_position_is_disaster():
     }
 
     assert expected == parse_middle_details("t3HDaviesp")
+
+
+def test_parse_middle_details_when_position_includes_disqulification():
+    expected = {
+        "headgear": "t",
+        "allowance": "3",
+        "jockey": "HDavies",
+        "position": "3d",
+    }
+
+    assert expected == parse_middle_details("t3HDavies3d")

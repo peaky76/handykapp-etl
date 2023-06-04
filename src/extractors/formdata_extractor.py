@@ -166,7 +166,7 @@ def parse_middle_details(details: str) -> list[str]:
         (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
         (?P<allowance>\d+)?                     # Optional number as the allowance
         (?P<jockey>[a-zA-Z\-\']+)               # Remaining characters as the jockey
-        (?P<position>(\=?\d+(?:p\d+)?|[a-z]))   # Last number or char as the position (With optional = or #p# formatting)
+        (?P<position>(\=?\d+(?:p\d+|d)?|[a-z]))   # Last number or char as the position (With optional = or #p# formatting)
         $                                       # End of the string
     """
 
