@@ -76,6 +76,11 @@ def create_run(words: list[str]) -> Run:
             racetype, prize = extract_prize(words[1])
             words[1] = racetype
             words.insert(2, prize)
+        # Split conjoined weight
+        if len(words[5]) > 5 and words[5][0].isdigit() and "-" in words[5][:3]:
+            weight, jockey = extract_weight(words[5])
+            words[5] = weight
+            words.insert(6, jockey)
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
 
@@ -112,6 +117,23 @@ def extract_prize(string: str) -> str:
         racetype = match.group("racetype")
         prize = match.group("prize")
         return (racetype, prize)
+    else:
+        return None
+
+
+def extract_weight(string: str) -> str:
+    pattern = r"""
+        ^                               # Start of the string
+        (?P<weight>\d{1,2}\-\d{2})               # Weight
+        (?P<jockey>.*)                  # Jockey
+        $                               # End of the string
+    """
+
+    match = re.match(pattern, string, re.VERBOSE)
+    if match:
+        weight = match.group("weight")
+        jockey = match.group("jockey")
+        return (weight, jockey)
     else:
         return None
 
