@@ -115,23 +115,30 @@ def is_race_date(string: str) -> str:
 
 
 def parse_jockey_details(details: str) -> list[str]:
-    pre0, pre1 = details[0:2]
-    post0, post1 = details[-2:]
+    pattern = r"""
+        ^                        # Start of the string
+        (?P<headgear>[a-z])?     # Lowercase letter as the headgear
+        (?P<allowance>\d+)?      # Optional number as the allowance
+        (?P<jockey>[a-zA-Z]+)    # Remaining characters as the jockey
+        (?P<position>\d+)        # Last number as the position
+        $                        # End of the string
+    """
 
-    headgear = pre0 if not pre0.isdigit() and pre0.lower() == pre0 else None
-    allowance = int(pre0) if pre0.isdigit() else int(pre1) if pre1.isdigit() else 0
-    position = int("".join(x for x in [post0, post1] if x.isdigit()))
+    match = re.match(pattern, details, re.VERBOSE)
+    if match:
+        headgear = match.group("headgear")
+        jockey = match.group("jockey")
+        allowance = match.group("allowance")
+        position = match.group("position")
 
-    jockey_end_index = -(len(str(position)))
-    jockey_start_index = sum(bool(x) for x in [headgear, allowance])
-    jockey = details[jockey_start_index:jockey_end_index]
-
-    return {
-        "headgear": headgear,
-        "allowance": allowance,
-        "jockey": jockey,
-        "position": position,
-    }
+        return {
+            "headgear": headgear,
+            "jockey": jockey,
+            "allowance": allowance,
+            "position": position,
+        }
+    else:
+        return None
 
 
 def process_formdata_stream(stream):
