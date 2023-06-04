@@ -60,7 +60,7 @@ def create_horse(words: list[str]) -> Horse:
             # Handle cases where trainer name has been split
             horse = Horse(name, country, words[1], "".join(words[2:-2]), *words[-2:])
     except Exception as e:
-        logger.error(f"Error creating horse from {words}")
+        logger.error(f"Error creating horse from {words}: {e}")
         horse = None
 
     return horse
@@ -94,7 +94,7 @@ def create_run(words: list[str]) -> Run:
             words[-1],
         )
     except Exception as e:
-        logger.error(f"Error creating run from {words}")
+        logger.error(f"Error creating run from {words}: {e}")
         run = None
 
     return run
