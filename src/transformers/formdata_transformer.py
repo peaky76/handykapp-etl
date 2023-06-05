@@ -252,7 +252,10 @@ def process_formdata_stream(stream):
 
         if (horse_switch or run_switch) and len(run_args):
             run = create_run(run_args)
-            horse.runs.append(run)
+            if run == None:
+                logger.error(f"Missing run for {horse.name}")
+            else:
+                horse.runs.append(run)
             run_args = []
 
         # Add words to horses/runs
