@@ -7,6 +7,9 @@ bha:
       perf_figs: "performance-figures.csv"
   spaces:
     dir: "handykapp/bha/"
+formdata:
+  spaces:
+    dir: "handykapp/formdata/"
 rapid_horseracing:
   source:
     dir: "https://horse-racing.p.rapidapi.com/"

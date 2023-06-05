@@ -8,7 +8,16 @@ import pendulum
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from helpers import get_files, stream_file
 from prefect import flow, get_run_logger, task
+import yaml
+
+
+with open("api_info.yml", "r") as f:
+    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+
+SOURCE = api_info["formdata"]["spaces"]["dir"]
+
 
 Horse = namedtuple(
     "Horse",
@@ -270,24 +279,28 @@ def process_formdata_stream(stream):
     return horses
 
 
-def stream_formdata_by_word():
-    doc = fitz.open("src/transformers/textAf.pdf")
-    for page in doc:
-        text = page.get_text()
-        # Replace non-ascii characters with apostrophes
-        words = (
-            text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
-            .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
-            .replace(chr(25), "'")  # Regular apostrophe
-            .replace(chr(65533), "'")
-            .split("\n")
-        )
-        yield from words
+def stream_formdata_by_word(files):
+    for file in files:
+        doc = fitz.open("pdf", stream_file(file))
+        for page in doc:
+            text = page.get_text()
+            # Replace non-ascii characters with apostrophes
+            words = (
+                text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
+                .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
+                .replace(chr(25), "'")  # Regular apostrophe
+                .replace(chr(65533), "'")
+                .split("\n")
+            )
+            yield from words
 
 
 @flow
 def formdata_transformer():
-    word_iterator = stream_formdata_by_word()
+    files = [file for file in list(get_files(SOURCE)) if "nh" not in file][-1:]
+    logger = get_run_logger()
+    logger.info(f"Processing {len(files)} files from {SOURCE}")
+    word_iterator = stream_formdata_by_word(files)
     return process_formdata_stream(word_iterator)
 
 
