@@ -275,7 +275,13 @@ def stream_formdata_by_word():
     for page in doc:
         text = page.get_text()
         # Replace non-ascii characters with apostrophes
-        words = text.replace(chr(25), "'").replace(chr(65533), "'").split("\n")
+        words = (
+            text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
+            .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
+            .replace(chr(25), "'")  # Regular apostrophe
+            .replace(chr(65533), "'")
+            .split("\n")
+        )
         yield from words
 
 
