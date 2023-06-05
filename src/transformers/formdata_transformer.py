@@ -235,10 +235,6 @@ def process_formdata_stream(stream):
                 skip_count -= 1
                 continue
 
-        # Handle then moved to O'Callaghan weirdness
-        if "20'Callaghan" in word:
-            word = word.split("20'Callaghan")[0]
-
         horse_switch = is_horse(word)
         run_switch = is_race_date(word)
 
