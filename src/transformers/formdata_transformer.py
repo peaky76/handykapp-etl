@@ -93,6 +93,12 @@ def create_run(words: list[str]) -> Run:
             words[5] = weight
             words.insert(6, jockey)
 
+        # Split conjoined finishing distance
+        if "*" in words[7]:
+            position, beaten_distance = words[7].split("*")
+            words[7] = position
+            words.insert(8, f"-{beaten_distance}")
+
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
 
