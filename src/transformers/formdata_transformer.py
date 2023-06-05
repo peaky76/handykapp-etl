@@ -293,7 +293,11 @@ def stream_formdata_by_word(files):
 
 @flow
 def formdata_transformer():
-    files = [file for file in list(get_files(SOURCE)) if "nh" not in file][-1:]
+    files = [
+        file
+        for file in list(get_files(SOURCE))
+        if "nh" not in file and "_19" not in file and not "_20" in file
+    ]
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
     word_iterator = stream_formdata_by_word(files)
