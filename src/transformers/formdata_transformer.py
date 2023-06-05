@@ -132,7 +132,7 @@ def extract_dist_going(string: str) -> tuple[str]:
     if match:
         dist = match.group("dist")
         going = match.group("going")
-        return (dist, going)
+        return (float(dist), going)
     else:
         return None
 
