@@ -94,10 +94,11 @@ def create_run(words: list[str]) -> Run:
             words.insert(6, jockey)
 
         # Split conjoined finishing distance
-        if "*" in words[7]:
-            position, beaten_distance = words[7].split("*")
-            words[7] = position
-            words.insert(8, f"-{beaten_distance}")
+        for i, word in enumerate(words[7:9]):
+            if "p" in word and "*" in word:
+                position, beaten_distance = word.split("*")
+                words[7 + i] = position
+                words.insert(8 + i, f"-{beaten_distance}")
 
         # Join jockey details to be processed separately
         middle_details = parse_middle_details("".join(words[6:-4]))
@@ -106,9 +107,10 @@ def create_run(words: list[str]) -> Run:
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
             *words[1:6],
             *middle_details.values(),
-            *words[-4:-2],
+            float(words[-4].replace("*", "-")) if "." in words[-4] else None,
+            int(words[-3]) if words[-3].isdigit() else None,
             *extract_dist_going(words[-2]),
-            words[-1],
+            int(words[-1]) if words[-1].isdigit() else None,
         )
     except Exception as e:
         logger.error(f"Error creating run from {words}: {e}")
