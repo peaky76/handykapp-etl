@@ -133,7 +133,7 @@ def extract_dist_going(string: str) -> tuple[str]:
         ^                                       # Start of the string
         (?:r)?                                  # Optional r
         (?P<dist>\d\.?\d?)                      # Distance
-        (?P<going>[H|F|M|G|D|S|V|f|g|d|s])      # Going
+        (?P<going>[H|F|M|G|D|S|V|f|m|g|d|s])      # Going
         $                                       # End of the string
     """
 
