@@ -89,7 +89,7 @@ def create_run(words: list[str]) -> Run:
         words = " ".join(words).split(" ")
 
         # Split overlong prize money
-        if len(words[1]) > 4:
+        if len(words[1]) > 5:
             racetype, prize = extract_prize(words[1])
             words[1] = racetype
             words.insert(2, prize)
@@ -143,6 +143,7 @@ def extract_dist_going(string: str) -> tuple[str]:
         going = match.group("going")
         return (float(dist), going)
     else:
+        print(string)
         return None
 
 
@@ -214,6 +215,7 @@ def parse_middle_details(details: str) -> list[str]:
             "position": match.group("position"),
         }
     else:
+        print(details)
         return None
 
 
@@ -327,6 +329,7 @@ def formdata_transformer():
                         if matched_run:
                             runs.remove(matched_run)
                         runs.append(new_run)
+
                     updated_horse = Horse(
                         matched_horse.name,
                         matched_horse.country,
