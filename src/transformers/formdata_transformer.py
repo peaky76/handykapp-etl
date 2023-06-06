@@ -88,6 +88,10 @@ def create_run(words: list[str]) -> Run:
         # Handle cases where words are insufficiently split
         words = " ".join(words).split(" ")
 
+        # Handle odd case of Phoenix Dawn (missing data)
+        if len(words) == 10 and words[6:] == ["b", "RHavlin", "p", "p12"]:
+            words = words[:9] + ["", "p12", "16d", "p12"]
+
         # Split overlong prize money
         if len(words[1]) > 5:
             racetype, prize = extract_prize(words[1])
