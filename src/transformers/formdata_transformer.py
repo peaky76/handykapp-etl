@@ -269,26 +269,22 @@ def process_formdata_stream(stream):
         elif adding_runs:
             run_args.append(word)
 
-    logger.info(
-        f"Processed {len([h for h in horses if h is not None])} horses from Formdata"
-    )
     return horses
 
 
-def stream_formdata_by_word(files):
-    for file in files:
-        doc = fitz.open("pdf", stream_file(file))
-        for page in doc:
-            text = page.get_text()
-            # Replace non-ascii characters with apostrophes
-            words = (
-                text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
-                .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
-                .replace(chr(25), "'")  # Regular apostrophe
-                .replace(chr(65533), "'")
-                .split("\n")
-            )
-            yield from words
+def stream_formdata_by_word(file):
+    doc = fitz.open("pdf", stream_file(file))
+    for page in doc:
+        text = page.get_text()
+        # Replace non-ascii characters with apostrophes
+        words = (
+            text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
+            .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
+            .replace(chr(25), "'")  # Regular apostrophe
+            .replace(chr(65533), "'")
+            .split("\n")
+        )
+        yield from words
 
 
 @flow
@@ -300,8 +296,52 @@ def formdata_transformer():
     ]
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
-    word_iterator = stream_formdata_by_word(files)
-    return process_formdata_stream(word_iterator)
+
+    stored_horses = []
+    for file in files:
+        word_iterator = stream_formdata_by_word(file)
+        horses = process_formdata_stream(word_iterator)
+        logger.info(
+            f"Processed {len([h for h in horses if h is not None])} horses from Formdata"
+        )
+
+        if len(stored_horses) == 0:
+            stored_horses = horses
+        else:
+            for horse in horses:
+                matched_horse = next(
+                    (
+                        h
+                        for h in stored_horses
+                        if h.name == horse.name and h.country == horse.country
+                    ),
+                    None,
+                )
+                if matched_horse:
+                    runs = matched_horse.runs
+                    for new_run in horse.runs:
+                        matched_run = next(
+                            (r for r in runs if r.date == new_run.date),
+                            None,
+                        )
+                        if matched_run:
+                            runs.remove(matched_run)
+                        runs.append(new_run)
+                    updated_horse = Horse(
+                        matched_horse.name,
+                        matched_horse.country,
+                        horse.age,
+                        horse.trainer,
+                        horse.trainer_form,
+                        horse.prize_money,
+                        runs,
+                    )
+                    stored_horses.remove(matched_horse)
+                    stored_horses.append(updated_horse)
+                else:
+                    stored_horses.append(horse)
+
+    return stored_horses
 
 
 if __name__ == "__main__":
