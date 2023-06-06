@@ -104,8 +104,10 @@ def create_run(words: list[str]) -> Run:
 
         # Split conjoined finishing distance
         for i, word in enumerate(words[7:9]):
-            if "p" in word and "*" in word:
-                position, beaten_distance = word.split("*")
+            if "p" in word and ("*" in word or "." in word):
+                position, beaten_distance = (
+                    word.split("*") if "*" in word else (word[:3], word[3:])
+                )
                 words[7 + i] = position
                 words.insert(8 + i, f"-{beaten_distance}")
 
