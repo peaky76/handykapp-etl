@@ -1442,13 +1442,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.10.15"
+version = "2.10.17"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "prefect-2.10.15-py3-none-any.whl", hash = "sha256:e6e3d3943306f5161aedeb7b7b6eb4a3e9f21baca5ca55f8d3b1818e826b7c86"},
-    {file = "prefect-2.10.15.tar.gz", hash = "sha256:e5c22a149630b10baedc791a03b3f45fc7b5704290c63919c17c75392ed945ab"},
+    {file = "prefect-2.10.17-py3-none-any.whl", hash = "sha256:632a9c149cf4d9ff917a66916d2d4939059b5f9c41372b8f082a5b87f9c5c669"},
+    {file = "prefect-2.10.17.tar.gz", hash = "sha256:490fc6ebbad72d451feb493a112a8d38d9c7eb3981d8f67a231a9770744a3d43"},
 ]
 
 [package.dependencies]
@@ -2587,4 +2587,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10.0"
-content-hash = "7705c5906df00dd49a1f5abb4267b54c65df8c4e1ca9c6cb067b9ce486f2781f"
+content-hash = "35500fea8b7cb2f4cad87b86f5f13ac13510f0a1b2104f1fdbad82c3592f1b63"
