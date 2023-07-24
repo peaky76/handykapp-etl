@@ -23,7 +23,7 @@ pytest-cov = "^4.1.0"
 pytest-mock = "^3.11.1"
 ruff = "^0.0.280"
 types-pyyaml = "^6.0.12.11"
-types-requests = "^2.31.0.1"
+types-requests = "^2.31.0.2"
 
 [tool.ruff]
 ignore = ["E402", "E501"]
