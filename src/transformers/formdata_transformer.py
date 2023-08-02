@@ -1,7 +1,7 @@
 # To allow running as a script, need path
 from collections import namedtuple
 from pathlib import Path
-import fitz
+import fitz  # type: ignore
 import re
 import sys
 import pendulum
