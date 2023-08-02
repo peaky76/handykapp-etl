@@ -286,7 +286,7 @@ def stream_formdata_by_word(file):
         text = page.get_text()
         # Replace non-ascii characters with apostrophes
         words = (
-            text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostropher
+            text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostrophe
             .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
             .replace(chr(25), "'")  # Regular apostrophe
             .replace(chr(65533), "'")
