@@ -34,7 +34,7 @@ def extract_countries():
 
 @task(tags=["TheRacingApi"])
 def extract_racecards(day="tomorrow", region_codes=["gb", "ire"]):
-    source = f"{SOURCE}racecards/basic"
+    source = f"{SOURCE}racecards/free"
     headers = get_headers()
     params = {"day": day, "region_codes": region_codes}
 
