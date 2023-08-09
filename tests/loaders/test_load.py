@@ -14,7 +14,8 @@ from pymongo import ASCENDING as ASC
 
 
 def test_drop_database(mocker):
-    client = mocker.patch("src.loaders.load.client")
+    client = mocker.patch("src.clients.mongo_client")
+    # client = mocker.patch("src.loaders.load.client")
     drop_database.fn()
     assert client.drop_database.called_once_with("racing")
 
@@ -86,7 +87,7 @@ def test_load_parents(mocker):
 def test_load_horse_detail(mocker):
     insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
     mocker.patch("prefect.context.TaskRunContext")
-    mocker.patch("src.loaders.load.get_run_logger")
+    mocker.patch("prefect.get_run_logger")
     data = [
         {
             "name": "HORSE1",
