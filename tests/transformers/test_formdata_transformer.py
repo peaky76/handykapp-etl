@@ -9,15 +9,15 @@ from transformers.formdata_transformer import (
 
 
 def test_extract_dist_going_for_turf_going():
-    assert ("5", "G") == extract_dist_going("5G")
+    assert (float("5"), "G") == extract_dist_going("5G")
 
 
 def test_extract_dist_going_for_aw_going():
-    assert ("5", "d") == extract_dist_going("5d")
+    assert (float("5"), "d") == extract_dist_going("5d")
 
 
 def test_extract_dist_going_for_decimal_dist():
-    assert ("9.1", "G") == extract_dist_going("9.1G")
+    assert (float("9.1"), "G") == extract_dist_going("9.1G")
 
 
 def test_extract_prize():
