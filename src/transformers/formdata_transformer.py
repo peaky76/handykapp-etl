@@ -134,7 +134,7 @@ def create_run(words: list[str]) -> Run:
     return run
 
 
-def extract_dist_going(string: str) -> tuple[str]:
+def extract_dist_going(string: str) -> tuple[str] | None:
     pattern = r"""
         ^                                       # Start of the string
         (?:r)?                                  # Optional r
@@ -169,7 +169,7 @@ def extract_prize(string: str) -> tuple[str]:
         return None
 
 
-def extract_weight(string: str) -> tuple[str]:
+def extract_weight(string: str) -> tuple[str] | None:
     pattern = r"""
         ^                               # Start of the string
         (?P<weight>\d{1,2}\-\d{2})      # Weight
@@ -201,7 +201,7 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
-def parse_middle_details(details: str) -> list[str]:
+def parse_middle_details(details: str) -> list[str] | None:
     pattern = r"""
         ^                                       # Start of the string
         (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
