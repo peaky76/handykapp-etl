@@ -256,7 +256,6 @@ def parse_middle_details(details: str) -> list[str] | None:
             "position": match.group("position"),
         }
     else:
-        print(details)
         return None
 
 
