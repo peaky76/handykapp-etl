@@ -190,17 +190,36 @@ def get_formdata_date(filename: str) -> pendulum.Date:
     return pendulum.from_format(filename[-10:-4], "YYMMDD").date()
 
 
-def get_formdatas(*, code: RacingCode = None, after_year: int = 0) -> list[str]:
+def get_formdatas(
+    *, code: RacingCode = None, after_year: int = 0, for_refresh: bool = False
+) -> list[str]:
     base = [file for file in get_files(SOURCE) if int(file[-10:-8]) > after_year]
     flat = [file for file in base if "nh" not in file]
     nh = [file for file in base if "nh" in file]
 
+    def select_for_refresh(files):
+        if not for_refresh:
+            return files
+
+        selected_files = []
+        next_date = get_formdata_date(files[0])
+        current_file = files[0]
+        for file in files:
+            if get_formdata_date(file) > next_date:
+                selected_files.append(current_file)
+                next_date = get_formdata_date(current_file).add(years=1)
+            current_file = file
+        if files[-1] not in selected_files:
+            selected_files.append(files[-1])
+
+        return selected_files
+
     if code == RacingCode.FLAT:
-        return flat
+        return select_for_refresh(flat)
     elif code == RacingCode.NH:
-        return nh
+        return select_for_refresh(nh)
     else:
-        return flat + nh
+        return select_for_refresh(flat) + select_for_refresh(nh)
 
 
 def is_horse(string: str) -> str:

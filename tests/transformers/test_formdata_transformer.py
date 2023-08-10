@@ -89,6 +89,21 @@ def test_get_formdatas_with_after_year(mocker):
     assert expected == get_formdatas(after_year=22)
 
 
+def test_get_formdatas_with_for_refresh(mocker):
+    mocker.patch(FORMDATA_FETCH).return_value = FORMDATA_FILENAMES
+    expected = [
+        "formdata_190630.pdf",
+        "formdata_200628.pdf",
+        "formdata_210530.pdf",
+        "formdata_220529.pdf",
+        "formdata_230528.pdf",
+        "formdata_230702.pdf",
+        "formdata_nh_230611.pdf",
+        "formdata_nh_230702.pdf",
+    ]
+    assert expected == get_formdatas(for_refresh=True)
+
+
 def test_is_horse_true_without_country():
     assert is_horse("AADDEEY")
 
