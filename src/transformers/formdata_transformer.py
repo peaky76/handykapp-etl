@@ -334,6 +334,19 @@ def stream_formdata_by_word(file):
         yield from words
 
 
+@task(tags=["Formdata"], task_run_name="{file}_horses")
+def get_horses_from_formdata(file):
+    logger = get_run_logger()
+
+    date = get_formdata_date(file)
+    word_iterator = stream_formdata_by_word(file)
+    horses = process_formdata_stream(word_iterator, date)
+    count = len([h for h in horses if h is not None])
+    logger.info(f"Processed {count} horses from {file}")
+
+    return horses
+
+
 @flow
 def formdata_transformer():
     files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
@@ -342,12 +355,7 @@ def formdata_transformer():
 
     stored_horses = []
     for file in files:
-        date = get_formdata_date(file)
-        word_iterator = stream_formdata_by_word(file)
-        horses = process_formdata_stream(word_iterator, date)
-        logger.info(
-            f"Processed {len([h for h in horses if h is not None])} horses from {file}"
-        )
+        horses = get_horses_from_formdata(file)
 
         if len(stored_horses) == 0:
             stored_horses = horses
