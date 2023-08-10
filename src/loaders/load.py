@@ -7,6 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
 from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
+from nameparser import HumanName
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
 import yaml
@@ -30,7 +31,9 @@ def spec_database():
         [("name", ASC), ("country", ASC), ("year", ASC)], unique=True
     )
     db.horses.create_index("name")
-    db.people.create_index("name", unique=True)
+    db.people.create_index(
+        [("last", ASC), ("first", ASC), ("middle", ASC)], unique=True
+    )
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
     db.races.create_index([("venue", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
@@ -40,8 +43,18 @@ def spec_database():
 def load_people(people):
     ret_val = {}
     for person in people:
-        person_id = db.people.insert_one({"name": person})
-        ret_val[person] = person_id.inserted_id
+        if person:
+            name = HumanName(person)
+            person_id = db.people.insert_one(
+                {
+                    "title": name.title,
+                    "first": name.first,
+                    "middle": name.middle,
+                    "last": name.last,
+                    "suffix": name.suffix,
+                }
+            )
+            ret_val[person] = person_id.inserted_id
     return ret_val
 
 
