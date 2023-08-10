@@ -1,7 +1,6 @@
-from unittest.mock import patch
+import pendulum
 
 from horsetalk import RacingCode
-import pendulum
 from transformers.formdata_transformer import (
     extract_dist_going,
     extract_prize,
