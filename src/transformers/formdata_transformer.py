@@ -21,7 +21,7 @@ SOURCE = api_info["formdata"]["spaces"]["dir"]
 
 Horse = namedtuple(
     "Horse",
-    ["name", "country", "age", "trainer", "trainer_form", "prize_money", "runs"],
+    ["name", "country", "yob", "trainer", "trainer_form", "prize_money", "runs"],
 )
 Run = namedtuple(
     "Run",
@@ -45,7 +45,7 @@ Run = namedtuple(
 )
 
 
-def create_horse(words: list[str]) -> Horse:
+def create_horse(words: list[str], year: int) -> Horse:
     logger = get_run_logger()
     words = [w for w in words if w]  # Occasional lines have empty strings at end
 
@@ -55,14 +55,14 @@ def create_horse(words: list[str]) -> Horse:
     try:
         if len(words) == 5:
             # Base case
-            horse = Horse(name, country, *words[1:], [])
+            horse = Horse(name, country, year - int(words[1]), *words[2:], [])
         elif 2 <= len(words) < 5:
             # Handle cases where horse line has been insufficiently split
             further_split = ("".join(words[1:])).split(" ")
             horse = Horse(
                 name,
                 country,
-                further_split[0],
+                year - int(further_split[0]),
                 " ".join(further_split[0:-2]),
                 *further_split[-2:],
                 [],
@@ -70,7 +70,12 @@ def create_horse(words: list[str]) -> Horse:
         else:
             # Handle cases where trainer name has been split
             horse = Horse(
-                name, country, words[1], "".join(words[2:-2]), *words[-2:], []
+                name,
+                country,
+                year - int(words[1]),
+                "".join(words[2:-2]),
+                *words[-2:],
+                [],
             )
     except Exception as e:
         logger.error(f"Error creating horse from {words}: {e}")
@@ -259,7 +264,7 @@ def parse_middle_details(details: str) -> list[str] | None:
         return None
 
 
-def process_formdata_stream(stream):
+def process_formdata_stream(stream, date):
     logger = get_run_logger()
     horses = []
     horse_args = []
@@ -293,7 +298,7 @@ def process_formdata_stream(stream):
 
         # Create horses/runs
         if run_switch and len(horse_args):
-            horse = create_horse(horse_args)
+            horse = create_horse(horse_args, date.year)
             horses.append(horse)
             horse_args = []
 
@@ -337,8 +342,9 @@ def formdata_transformer():
 
     stored_horses = []
     for file in files:
+        date = get_formdata_date(file)
         word_iterator = stream_formdata_by_word(file)
-        horses = process_formdata_stream(word_iterator)
+        horses = process_formdata_stream(word_iterator, date)
         logger.info(
             f"Processed {len([h for h in horses if h is not None])} horses from {file}"
         )
@@ -369,7 +375,7 @@ def formdata_transformer():
                     updated_horse = Horse(
                         matched_horse.name,
                         matched_horse.country,
-                        horse.age,
+                        horse.yob,
                         horse.trainer,
                         horse.trainer_form,
                         horse.prize_money,
