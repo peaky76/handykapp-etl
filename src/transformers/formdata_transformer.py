@@ -5,13 +5,13 @@ import fitz  # type: ignore
 import re
 import sys
 import pendulum
+import yaml
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, stream_file
+from horsetalk import RacingCode
 from prefect import flow, get_run_logger, task
-import yaml
-
 
 with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
@@ -184,6 +184,19 @@ def extract_weight(string: str) -> tuple[str] | None:
         return (weight, jockey)
     else:
         return None
+
+
+def get_formdatas(*, code: RacingCode = None, after_year: int = 0) -> list[str]:
+    base = [file for file in get_files(SOURCE) if int(file[-10:-8]) > after_year]
+    flat = [file for file in base if "nh" not in file]
+    nh = [file for file in base if "nh" in file]
+
+    if code == RacingCode.FLAT:
+        return flat
+    elif code == RacingCode.NH:
+        return nh
+    else:
+        return flat + nh
 
 
 def is_horse(string: str) -> str:

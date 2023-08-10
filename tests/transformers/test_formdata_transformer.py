@@ -1,11 +1,34 @@
+from unittest.mock import patch
+
+from horsetalk import RacingCode
 from transformers.formdata_transformer import (
     extract_dist_going,
     extract_prize,
     extract_weight,
+    get_formdatas,
     is_horse,
     is_race_date,
     parse_middle_details,
 )
+
+FORMDATA_FETCH = "transformers.formdata_transformer.get_files"
+FORMDATA_FILENAMES = [
+    "formdata_190630.pdf",
+    "formdata_200628.pdf",
+    "formdata_200705.pdf",
+    "formdata_210530.pdf",
+    "formdata_220529.pdf",
+    "formdata_230528.pdf",
+    "formdata_230604.pdf",
+    "formdata_230611.pdf",
+    "formdata_230618.pdf",
+    "formdata_230625.pdf",
+    "formdata_230702.pdf",
+    "formdata_nh_230611.pdf",
+    "formdata_nh_230618.pdf",
+    "formdata_nh_230625.pdf",
+    "formdata_nh_230702.pdf",
+]
 
 
 def test_extract_dist_going_for_turf_going():
@@ -26,6 +49,39 @@ def test_extract_prize():
 
 def test_extract_weight():
     assert ("9-13", "t3RyanSexton") == extract_weight("9-13t3RyanSexton")
+
+
+def test_get_formdatas_default(mocker):
+    mocker.patch(FORMDATA_FETCH).return_value = FORMDATA_FILENAMES
+    assert FORMDATA_FILENAMES == get_formdatas()
+
+
+def test_get_formdatas_with_code(mocker):
+    mocker.patch(FORMDATA_FETCH).return_value = FORMDATA_FILENAMES
+    expected = [
+        "formdata_nh_230611.pdf",
+        "formdata_nh_230618.pdf",
+        "formdata_nh_230625.pdf",
+        "formdata_nh_230702.pdf",
+    ]
+    assert expected == get_formdatas(code=RacingCode.NH)
+
+
+def test_get_formdatas_with_after_year(mocker):
+    mocker.patch(FORMDATA_FETCH).return_value = FORMDATA_FILENAMES
+    expected = [
+        "formdata_230528.pdf",
+        "formdata_230604.pdf",
+        "formdata_230611.pdf",
+        "formdata_230618.pdf",
+        "formdata_230625.pdf",
+        "formdata_230702.pdf",
+        "formdata_nh_230611.pdf",
+        "formdata_nh_230618.pdf",
+        "formdata_nh_230625.pdf",
+        "formdata_nh_230702.pdf",
+    ]
+    assert expected == get_formdatas(after_year=22)
 
 
 def test_is_horse_true_without_country():
