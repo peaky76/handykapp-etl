@@ -331,7 +331,7 @@ def stream_formdata_by_word(file):
 
 @flow
 def formdata_transformer():
-    files = get_formdatas(code=RacingCode.FLAT, after_year=20)
+    files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
 
@@ -340,7 +340,7 @@ def formdata_transformer():
         word_iterator = stream_formdata_by_word(file)
         horses = process_formdata_stream(word_iterator)
         logger.info(
-            f"Processed {len([h for h in horses if h is not None])} horses from Formdata"
+            f"Processed {len([h for h in horses if h is not None])} horses from {file}"
         )
 
         if len(stored_horses) == 0:
