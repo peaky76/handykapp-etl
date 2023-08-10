@@ -309,11 +309,7 @@ def stream_formdata_by_word(file):
 
 @flow
 def formdata_transformer():
-    files = [
-        file
-        for file in list(get_files(SOURCE))
-        if "nh" not in file and "_19" not in file and not "_20" in file
-    ]
+    files = get_formdatas(code=RacingCode.FLAT, after_year=20)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
 
