@@ -10,7 +10,7 @@ import yaml
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, stream_file
-from horsetalk import RacingCode
+from horsetalk import RacingCode  # type: ignore
 from prefect import flow, get_run_logger, task
 
 with open("api_info.yml", "r") as f:
@@ -45,7 +45,7 @@ Run = namedtuple(
 )
 
 
-def create_horse(words: list[str], year: int) -> Horse:
+def create_horse(words: list[str], year: int) -> Horse | None:
     logger = get_run_logger()
     words = [w for w in words if w]  # Occasional lines have empty strings at end
 
@@ -99,7 +99,7 @@ def create_run(words: list[str]) -> Run:
 
         # Split overlong prize money
         if len(words[1]) > 5:
-            racetype, prize = extract_prize(words[1])
+            racetype, prize = extract_prize(words[1]) or ("", "")
             words[1] = racetype
             words.insert(2, prize)
 
@@ -157,7 +157,7 @@ def extract_dist_going(string: str) -> tuple[str] | None:
         return None
 
 
-def extract_prize(string: str) -> tuple[str]:
+def extract_prize(string: str) -> tuple[str] | None:
     pattern = r"""
         ^                               # Start of the string
         (?P<racetype>\d*[A-Za-z]+)?     # Race type
