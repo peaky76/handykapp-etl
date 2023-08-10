@@ -1,10 +1,12 @@
 from unittest.mock import patch
 
 from horsetalk import RacingCode
+import pendulum
 from transformers.formdata_transformer import (
     extract_dist_going,
     extract_prize,
     extract_weight,
+    get_formdata_date,
     get_formdatas,
     is_horse,
     is_race_date,
@@ -49,6 +51,10 @@ def test_extract_prize():
 
 def test_extract_weight():
     assert ("9-13", "t3RyanSexton") == extract_weight("9-13t3RyanSexton")
+
+
+def test_get_formdata_date():
+    assert pendulum.date(2019, 6, 30) == get_formdata_date(FORMDATA_FILENAMES[0])
 
 
 def test_get_formdatas_default(mocker):

@@ -186,6 +186,10 @@ def extract_weight(string: str) -> tuple[str] | None:
         return None
 
 
+def get_formdata_date(filename: str) -> pendulum.Date:
+    return pendulum.from_format(filename[-10:-4], "YYMMDD").date()
+
+
 def get_formdatas(*, code: RacingCode = None, after_year: int = 0) -> list[str]:
     base = [file for file in get_files(SOURCE) if int(file[-10:-8]) > after_year]
     flat = [file for file in base if "nh" not in file]
