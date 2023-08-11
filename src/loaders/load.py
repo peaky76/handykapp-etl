@@ -40,7 +40,7 @@ def spec_database():
 
 
 @task(tags=["BHA"])
-def load_people(people):
+def load_people(people, source):
     ret_val = {}
     for person in people:
         if person:
@@ -52,6 +52,7 @@ def load_people(people):
                     "middle": name.middle,
                     "last": name.last,
                     "suffix": name.suffix,
+                    "display_name": {source: person},
                 }
             )
             ret_val[person] = person_id.inserted_id
@@ -158,7 +159,7 @@ def load_database_afresh():
     spec_database()
     sires_ids = load_parents(sires, "M")
     dams_ids = load_parents(dams, "F")
-    trainer_ids = load_people(trainers)
+    trainer_ids = load_people(trainers, "bha")
     load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
     races = rapid_horseracing_transformer()
     load_races(races)
