@@ -39,23 +39,27 @@ def spec_database():
     db.races.create_index("result.horse")
 
 
+def add_person(person, source):
+    name = HumanName(person)
+    person_id = db.people.insert_one(
+        {
+            "title": name.title,
+            "first": name.first,
+            "middle": name.middle,
+            "last": name.last,
+            "suffix": name.suffix,
+            "display_name": {source: person},
+        }
+    )
+    return person_id.inserted_id
+
+
 @task(tags=["BHA"])
 def load_people(people, source):
     ret_val = {}
     for person in people:
         if person:
-            name = HumanName(person)
-            person_id = db.people.insert_one(
-                {
-                    "title": name.title,
-                    "first": name.first,
-                    "middle": name.middle,
-                    "last": name.last,
-                    "suffix": name.suffix,
-                    "display_name": {source: person},
-                }
-            )
-            ret_val[person] = person_id.inserted_id
+            ret_val[person] = add_person(person, source)
     return ret_val
 
 
