@@ -73,8 +73,10 @@ def load_people(people, source):
 def load_parents(horses, sex):
     ret_val = {}
     for horse in horses:
-        name, country = parse_horse(horse)
-        ret_val[(name, country)] = add_horse({name: name, country: country, sex: sex})
+        name, country = parse_horse(horse, "GB")
+        ret_val[(name, country)] = add_horse(
+            {"name": name, "country": country, "sex": sex}
+        )
     return ret_val
 
 
