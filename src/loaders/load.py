@@ -81,24 +81,17 @@ def load_parents(horses, sex):
 def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
     logger = get_run_logger()
     for i, horse in enumerate(horses):
-        data = {
-            "name": horse["name"],
-            "country": horse["country"],
-            "sex": horse["sex"],
-            "year": horse["year"],
-            "sire": sires_ids.get((horse["sire"], horse["sire_country"]), None),
-            "dam": dams_ids.get((horse["dam"], horse["dam_country"]), None),
-            "trainer": trainer_ids.get(horse["trainer"], None),
-            "ratings": {
-                "flat": horse["flat"],
-                "aw": horse["aw"],
-                "chase": horse["chase"],
-                "hurdle": horse["hurdle"],
-            },
-        }
+        horse["sire"]: sires_ids.get((horse["sire"], horse["sire_country"]), None)
+        horse["dam"]: dams_ids.get((horse["dam"], horse["dam_country"]), None)
+        horse["trainer"]: trainer_ids.get(horse["trainer"], None)
         if horse["is_gelded"]:
-            data["operations"] = {"type": "gelding", "date": None}
-        db.horses.insert_one(data)
+            horse["operations"] = {"type": "gelding", "date": None}
+        del horse["sire_country"]
+        del horse["dam_country"]
+        del horse["is_gelded"]
+
+        add_horse(horse)
+
         if i % 250 == 0:
             logger.info(f"Loaded {i} horses")
 
