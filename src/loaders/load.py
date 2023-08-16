@@ -2,12 +2,11 @@
 from pathlib import Path
 import sys
 
-from transformers.parsers import parse_horse
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
+from transformers.parsers import parse_horse
 from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
 from nameparser import HumanName
 from prefect import flow, task, get_run_logger
