@@ -15,7 +15,6 @@ from pymongo import ASCENDING as ASC
 
 def test_drop_database(mocker):
     client = mocker.patch("src.clients.mongo_client")
-    # client = mocker.patch("src.loaders.load.client")
     drop_database.fn()
     assert client.drop_database.called_once_with("racing")
 
