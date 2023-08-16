@@ -39,10 +39,8 @@ def spec_database():
     db.races.create_index("result.horse")
 
 
-def add_horse(horse, sex):
-    horse_id = db.horses.insert_one(
-        {"name": horse["name"], "country": horse["country"], "sex": sex}
-    )
+def add_horse(horse):
+    horse_id = db.horses.insert_one(horse)
     return horse_id.inserted_id
 
 
@@ -74,7 +72,8 @@ def load_people(people, source):
 def load_parents(horses, sex):
     ret_val = {}
     for horse in horses:
-        ret_val[(horse["name"], horse["country"])] = add_horse(horse, sex)
+        horse["sex"] = sex
+        ret_val[(horse["name"], horse["country"])] = add_horse(horse)
     return ret_val
 
 
