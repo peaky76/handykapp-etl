@@ -111,18 +111,8 @@ def load_ratings():
 
 
 @task(tags=["BHA"])
-def select_dams(data):
-    return sorted(list(set([x["dam"] for x in data])))
-
-
-@task(tags=["BHA"])
-def select_sires(data):
-    return sorted(list(set([x["sire"] for x in data])))
-
-
-@task(tags=["BHA"])
-def select_trainers(data):
-    return sorted(list(set([x["trainer"] for x in data])))
+def select_set(data, key):
+    return sorted(list(set([x[key] for x in data])))
 
 
 @flow
@@ -141,9 +131,9 @@ def create_sample_database():
 @flow
 def load_database_afresh():
     data = bha_transformer()
-    sires = select_sires(data)
-    dams = select_dams(data)
-    trainers = select_trainers(data)
+    sires = select_set(data, "sire")
+    dams = select_set(data, "dam")
+    trainers = select_set(data, "trainer")
     drop_database()
     spec_database()
     sires_ids = load_parents(sires, "M")
