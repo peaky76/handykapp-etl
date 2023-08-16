@@ -71,12 +71,21 @@ def load_people(people, source):
 
 @task(tags=["BHA"])
 def load_parents(horses, sex):
+    logger = get_run_logger()
+    parent_type = {
+        "M": "sire",
+        "F": "dam",
+    }
     ret_val = {}
-    for horse in horses:
+    for i, horse in enumerate(horses):
         name, country = parse_horse(horse, "GB")
         ret_val[(name, country)] = add_horse(
             {"name": name, "country": country, "sex": sex}
         )
+
+        if i % 250 == 0:
+            logger.info(f"Loaded {i} {parent_type[sex]}s")
+
     return ret_val
 
 
@@ -138,9 +147,9 @@ def load_database_afresh():
     sires_ids = load_parents(sires, "M")
     dams_ids = load_parents(dams, "F")
     trainer_ids = load_people(trainers, "bha")
-    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
-    races = rapid_horseracing_transformer()
-    load_races(races)
+    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    # races = rapid_horseracing_transformer()
+    # load_races(races)
 
 
 if __name__ == "__main__":
