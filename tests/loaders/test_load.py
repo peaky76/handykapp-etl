@@ -65,7 +65,7 @@ def test_load_people(mocker):
         "pymongo.collection.Collection.insert_one"
     ).return_value.inserted_id = 1
     people = ["TRAINER1", "TRAINER2", "TRAINER1"]
-    assert {"TRAINER1": 1, "TRAINER2": 1} == load_people.fn(people)
+    assert {"TRAINER1": 1, "TRAINER2": 1} == load_people.fn(people, "a_source")
 
 
 def test_load_parents(mocker):
