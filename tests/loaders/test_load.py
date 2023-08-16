@@ -5,9 +5,7 @@ from loaders.load import (
     load_people,
     load_races,
     load_ratings,
-    select_dams,
-    select_sires,
-    select_trainers,
+    select_set,
     spec_database,
 )
 from pymongo import ASCENDING as ASC
@@ -137,40 +135,11 @@ def test_load_ratings():
     assert load_ratings.fn() is None
 
 
-def test_select_dams():
-    data = [
-        {"dam": "DAM1 (IRE)"},
-        {"dam": "DAM2 (GB)"},
-        {"dam": "DAM2 (IRE)"},
-        {"dam": "DAM1 (IRE)"},
-        {"dam": "DAM3 (IRE)"},
-    ]
-    assert ["DAM1 (IRE)", "DAM2 (GB)", "DAM2 (IRE)", "DAM3 (IRE)"] == select_dams.fn(
-        data
-    )
-
-
-def test_select_sires():
-    data = [
-        {"sire": "SIRE1 (IRE)"},
-        {"sire": "SIRE2 (GB)"},
-        {"sire": "SIRE2 (IRE)"},
-        {"sire": "SIRE1 (IRE)"},
-        {"sire": "SIRE3 (IRE)"},
-    ]
-    assert [
-        "SIRE1 (IRE)",
-        "SIRE2 (GB)",
-        "SIRE2 (IRE)",
-        "SIRE3 (IRE)",
-    ] == select_sires.fn(data)
-
-
-def test_select_trainers():
+def test_select_set():
     data = [
         {"trainer": "TRAINER1"},
         {"trainer": "TRAINER2"},
         {"trainer": "TRAINER1"},
         {"trainer": "TRAINER3"},
     ]
-    assert ["TRAINER1", "TRAINER2", "TRAINER3"] == select_trainers.fn(data)
+    assert ["TRAINER1", "TRAINER2", "TRAINER3"] == select_set.fn(data, "trainer")
