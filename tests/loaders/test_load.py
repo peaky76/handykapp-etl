@@ -71,11 +71,7 @@ def test_load_parents(mocker):
     mocker.patch(
         "pymongo.collection.Collection.insert_one"
     ).return_value.inserted_id = 1
-    horses = [
-        {"name": "HORSE1", "country": "IRE"},
-        {"name": "HORSE2", "country": "GB"},
-        {"name": "HORSE2", "country": "IRE"},
-    ]
+    horses = ["HORSE1 (IRE)", "HORSE2 (GB)", "HORSE2 (IRE)"]
     assert {
         ("HORSE1", "IRE"): 1,
         ("HORSE2", "GB"): 1,
@@ -143,33 +139,30 @@ def test_load_ratings():
 
 def test_select_dams():
     data = [
-        {"dam": "DAM1", "dam_country": "IRE"},
-        {"dam": "DAM2", "dam_country": "GB"},
-        {"dam": "DAM2", "dam_country": "IRE"},
-        {"dam": "DAM1", "dam_country": "IRE"},
-        {"dam": "DAM3", "dam_country": "IRE"},
+        {"dam": "DAM1 (IRE)"},
+        {"dam": "DAM2 (GB)"},
+        {"dam": "DAM2 (IRE)"},
+        {"dam": "DAM1 (IRE)"},
+        {"dam": "DAM3 (IRE)"},
     ]
-    assert [
-        {"name": "DAM1", "country": "IRE"},
-        {"name": "DAM2", "country": "GB"},
-        {"name": "DAM2", "country": "IRE"},
-        {"name": "DAM3", "country": "IRE"},
-    ] == select_dams.fn(data)
+    assert ["DAM1 (IRE)", "DAM2 (GB)", "DAM2 (IRE)", "DAM3 (IRE)"] == select_dams.fn(
+        data
+    )
 
 
 def test_select_sires():
     data = [
-        {"sire": "SIRE1", "sire_country": "IRE"},
-        {"sire": "SIRE2", "sire_country": "GB"},
-        {"sire": "SIRE2", "sire_country": "IRE"},
-        {"sire": "SIRE1", "sire_country": "IRE"},
-        {"sire": "SIRE3", "sire_country": "IRE"},
+        {"sire": "SIRE1 (IRE)"},
+        {"sire": "SIRE2 (GB)"},
+        {"sire": "SIRE2 (IRE)"},
+        {"sire": "SIRE1 (IRE)"},
+        {"sire": "SIRE3 (IRE)"},
     ]
     assert [
-        {"name": "SIRE1", "country": "IRE"},
-        {"name": "SIRE2", "country": "GB"},
-        {"name": "SIRE2", "country": "IRE"},
-        {"name": "SIRE3", "country": "IRE"},
+        "SIRE1 (IRE)",
+        "SIRE2 (GB)",
+        "SIRE2 (IRE)",
+        "SIRE3 (IRE)",
     ] == select_sires.fn(data)
 
 

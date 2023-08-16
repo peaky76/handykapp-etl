@@ -2,6 +2,8 @@
 from pathlib import Path
 import sys
 
+from transformers.parsers import parse_horse
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
@@ -72,8 +74,8 @@ def load_people(people, source):
 def load_parents(horses, sex):
     ret_val = {}
     for horse in horses:
-        horse["sex"] = sex
-        ret_val[(horse["name"], horse["country"])] = add_horse(horse)
+        name, country = parse_horse(horse)
+        ret_val[(name, country)] = add_horse({name: name, country: country, sex: sex})
     return ret_val
 
 
@@ -108,27 +110,14 @@ def load_ratings():
     pass  # TODO
 
 
-def select_parent(data, parent):
-    return [
-        {"name": p[0], "country": p[1]}
-        for p in sorted(
-            list(
-                set(
-                    [(horse[f"{parent}"], horse[f"{parent}_country"]) for horse in data]
-                )
-            )
-        )
-    ]
-
-
 @task(tags=["BHA"])
 def select_dams(data):
-    return select_parent(data, "dam")
+    return sorted(list(set([x["dam"] for x in data])))
 
 
 @task(tags=["BHA"])
 def select_sires(data):
-    return select_parent(data, "sire")
+    return sorted(list(set([x["sire"] for x in data])))
 
 
 @task(tags=["BHA"])
