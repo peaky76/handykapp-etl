@@ -53,6 +53,7 @@ def transform_ratings_data(data):
         "Chase rating",
         "Hurdle rating",
     )
+    rating_types = ["flat", "aw", "chase", "hurdle"]
     return (
         petl.cut(data, used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
@@ -68,6 +69,8 @@ def transform_ratings_data(data):
         .movefield("dam", -1)
         .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
         .convert({"sex": parse_sex})
+        .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
+        .cutout(*rating_types)
         .dicts()
     )
 

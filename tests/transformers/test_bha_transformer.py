@@ -77,15 +77,17 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
         "year": 2020,
         "sex": "M",
         "trainer": "Ollie Pears",
-        "flat": 49,
-        "aw": None,
-        "chase": None,
-        "hurdle": None,
         "sire": "ADAAY",
         "sire_country": "IRE",
         "dam": "TARA TOO",
         "dam_country": "IRE",
         "is_gelded": True,
+        "ratings": {
+            "flat": 49,
+            "aw": None,
+            "chase": None,
+            "hurdle": None,
+        },
     }
     actual = transform_ratings_data.fn(mock_data)[0]
     assert expected == actual
