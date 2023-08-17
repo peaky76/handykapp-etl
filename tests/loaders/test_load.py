@@ -91,7 +91,7 @@ def test_load_horses(mocker):
             "dam": "DAM2 (GB)",
             "sire": "SIRE2 (GB)",
             "trainer": "TRAINER2",
-            "operations": {"type": "gelding", "date": None},
+            "operations": [{"type": "gelding", "date": None}],
             "ratings": {
                 "flat": 0,
                 "aw": 0,
