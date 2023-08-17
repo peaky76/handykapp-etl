@@ -121,7 +121,7 @@ def create_run(words: list[str]) -> Run:
                 words.insert(8 + i, f"-{beaten_distance}")
 
         # Join jockey details to be processed separately
-        middle_details = parse_middle_details("".join(words[6:-4]))
+        middle_details = extract_middle_details("".join(words[6:-4]))
 
         run = Run(
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
@@ -153,6 +153,28 @@ def extract_dist_going(string: str) -> tuple[str] | None:
         dist = match.group("dist")
         going = match.group("going")
         return (float(dist), going)
+    else:
+        return None
+
+
+def extract_middle_details(details: str) -> list[str] | None:
+    pattern = r"""
+        ^                                       # Start of the string
+        (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
+        (?P<allowance>\d+)?                     # Optional number as the allowance
+        (?P<jockey>[a-zA-Z\-\']+)               # Remaining characters as the jockey
+        (?P<position>(\=?\d+(?:p\d+|d)?|[a-z]))   # Last number or char as the position (With optional = or #p# formatting)
+        $                                       # End of the string
+    """
+
+    match = re.match(pattern, details, re.VERBOSE)
+    if match:
+        return {
+            "headgear": match.group("headgear"),
+            "allowance": int(match.group("allowance") or 0),
+            "jockey": match.group("jockey"),
+            "position": match.group("position"),
+        }
     else:
         return None
 
@@ -240,28 +262,6 @@ def is_horse(string: str) -> str:
 def is_race_date(string: str) -> str:
     date_regex = r"\d{1,2}[A-Z][a-z]{2}\d{2}"
     return bool(re.match(date_regex, string))
-
-
-def parse_middle_details(details: str) -> list[str] | None:
-    pattern = r"""
-        ^                                       # Start of the string
-        (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
-        (?P<allowance>\d+)?                     # Optional number as the allowance
-        (?P<jockey>[a-zA-Z\-\']+)               # Remaining characters as the jockey
-        (?P<position>(\=?\d+(?:p\d+|d)?|[a-z]))   # Last number or char as the position (With optional = or #p# formatting)
-        $                                       # End of the string
-    """
-
-    match = re.match(pattern, details, re.VERBOSE)
-    if match:
-        return {
-            "headgear": match.group("headgear"),
-            "allowance": int(match.group("allowance") or 0),
-            "jockey": match.group("jockey"),
-            "position": match.group("position"),
-        }
-    else:
-        return None
 
 
 def process_formdata_stream(stream, date):
