@@ -61,6 +61,20 @@ def add_person(person, source):
 
 
 @task(tags=["BHA"])
+def load_horses(horses):
+    logger = get_run_logger()
+    ret_val = {}
+    for i, horse in enumerate(horses):
+        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
+        ret_val[(horse["name"], horse.get("country"))] = add_horse(horse)
+
+        if i % 250 == 0:
+            logger.info(f"Loaded {i} horses")
+
+    return ret_val
+
+
+@task(tags=["BHA"])
 def load_people(people, source):
     ret_val = {}
     for person in people:
@@ -69,24 +83,8 @@ def load_people(people, source):
     return ret_val
 
 
-@task(tags=["BHA"])
-def load_parents(horses, sex):
-    logger = get_run_logger()
-    parent_type = {
-        "M": "sire",
-        "F": "dam",
-    }
-    ret_val = {}
-    for i, horse in enumerate(horses):
-        name, country = parse_horse(horse, "GB")
-        ret_val[(name, country)] = add_horse(
-            {"name": name, "country": country, "sex": sex}
-        )
-
-        if i % 250 == 0:
-            logger.info(f"Loaded {i} {parent_type[sex]}s")
-
-    return ret_val
+def convert_parent(name, sex):
+    return {"name": name, "sex": sex}
 
 
 @task(tags=["BHA"])
@@ -135,22 +133,22 @@ def create_sample_database():
 
 
 @flow
-def load_horses():
+def load_bha_horses():
     data = bha_transformer()
-    sires = select_set(data, "sire")
-    dams = select_set(data, "dam")
+    sires = [convert_parent(x, "M") for x in select_set(data, "sire")]
+    dams = [convert_parent(x, "F") for x in select_set(data, "dam")]
     trainers = select_set(data, "trainer")
-    sires_ids = load_parents(sires, "M")
-    dams_ids = load_parents(dams, "F")
-    trainer_ids = load_people(trainers, "bha")
-    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    sires_ids = load_horses(sires)
+    dams_ids = load_horses(dams)
+    # trainer_ids = load_people(trainers, "bha")
+    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
 
 
 @flow
 def load_database_afresh():
     drop_database()
     spec_database()
-    load_horses()
+    load_bha_horses()
     # races = rapid_horseracing_transformer()
     # load_races(races)
 
