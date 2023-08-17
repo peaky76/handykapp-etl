@@ -79,7 +79,7 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
         "trainer": "Ollie Pears",
         "sire": "ADAAY (IRE)",
         "dam": "TARA TOO (IRE)",
-        "is_gelded": True,
+        "operations": {"type": "gelding", "date": None},
         "ratings": {
             "flat": 49,
             "aw": None,
