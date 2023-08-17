@@ -93,6 +93,7 @@ def load_parents(horses, sex):
 def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
     logger = get_run_logger()
     for i, horse in enumerate(horses):
+        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
         horse["sire"]: sires_ids.get(parse_horse(horse["sire"], None))
         horse["dam"]: dams_ids.get(parse_horse(horse["dam"], None))
         horse["trainer"]: trainer_ids.get(horse["trainer"], None)
