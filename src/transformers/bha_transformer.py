@@ -61,7 +61,7 @@ def transform_ratings_data(data):
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
         .addfield(
             "operations",
-            lambda rec: {"type": "gelding", "date": None}
+            lambda rec: [{"type": "gelding", "date": None}]
             if rec["sex"] == "GELDING"
             else None,
         )
