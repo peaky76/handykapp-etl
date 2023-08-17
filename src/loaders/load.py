@@ -137,17 +137,22 @@ def create_sample_database():
 
 
 @flow
-def load_database_afresh():
+def load_horses():
     data = bha_transformer()
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
     trainers = select_set(data, "trainer")
-    drop_database()
-    spec_database()
     sires_ids = load_parents(sires, "M")
     dams_ids = load_parents(dams, "F")
     trainer_ids = load_people(trainers, "bha")
-    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+
+
+@flow
+def load_database_afresh():
+    drop_database()
+    spec_database()
+    load_horses()
     # races = rapid_horseracing_transformer()
     # load_races(races)
 
