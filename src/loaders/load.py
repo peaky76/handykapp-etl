@@ -60,6 +60,20 @@ def add_person(person, source):
     return person_id.inserted_id
 
 
+def convert_parent(name, sex):
+    return {"name": name, "sex": sex}
+
+
+def convert_value_to_id(horse, value, lookup):
+    if value:
+        horse[value] = (
+            lookup.get(parse_horse(horse[value]), None)
+            if value in ["sire", "dam"]
+            else lookup.get(horse[value], None)
+        )
+    return horse
+
+
 @task(tags=["BHA"])
 def load_horses(horses):
     logger = get_run_logger()
@@ -81,25 +95,6 @@ def load_people(people, source):
         if person:
             ret_val[person] = add_person(person, source)
     return ret_val
-
-
-def convert_parent(name, sex):
-    return {"name": name, "sex": sex}
-
-
-@task(tags=["BHA"])
-def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
-    logger = get_run_logger()
-    for i, horse in enumerate(horses):
-        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
-        horse["sire"]: sires_ids.get(parse_horse(horse["sire"], None))
-        horse["dam"]: dams_ids.get(parse_horse(horse["dam"], None))
-        horse["trainer"]: trainer_ids.get(horse["trainer"], None)
-
-        add_horse(horse)
-
-        if i % 250 == 0:
-            logger.info(f"Loaded {i} horses")
 
 
 @task(tags=["Rapid"])
@@ -140,8 +135,11 @@ def load_bha_horses():
     trainers = select_set(data, "trainer")
     sires_ids = load_horses(sires)
     dams_ids = load_horses(dams)
-    # trainer_ids = load_people(trainers, "bha")
-    # load_horse_detail(data, sires_ids, dams_ids, trainer_ids)
+    trainer_ids = load_people(trainers, "bha")
+    data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
+    data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
+    data = [convert_value_to_id(x, "trainer", trainer_ids) for x in data]
+    load_horses(data)
 
 
 @flow
