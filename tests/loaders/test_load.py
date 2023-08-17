@@ -85,14 +85,11 @@ def test_load_horse_detail(mocker):
     insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
     data = [
         {
-            "name": "HORSE1",
-            "country": "IRE",
+            "name": "HORSE1 (IRE)",
             "sex": "M",
             "year": 2008,
-            "dam": "DAM1",
-            "dam_country": "IRE",
-            "sire": "SIRE1",
-            "sire_country": "IRE",
+            "dam": "DAM1 (IRE)",
+            "sire": "SIRE1 (IRE)",
             "trainer": "TRAINER1",
             "operations": {},
             "ratings": {
@@ -103,14 +100,11 @@ def test_load_horse_detail(mocker):
             },
         },
         {
-            "name": "HORSE2",
-            "country": "GB",
+            "name": "HORSE2 (GB)",
             "sex": "M",
             "year": 2008,
-            "dam": "DAM2",
-            "dam_country": "GB",
-            "sire": "SIRE2",
-            "sire_country": "GB",
+            "dam": "DAM2 (GB)",
+            "sire": "SIRE2 (GB)",
             "trainer": "TRAINER2",
             "operations": {"type": "gelding", "date": None},
             "ratings": {
