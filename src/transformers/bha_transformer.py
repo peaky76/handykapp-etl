@@ -63,7 +63,7 @@ def transform_ratings_data(data):
             "operations",
             lambda rec: {"type": "gelding", "date": None}
             if rec["sex"] == "GELDING"
-            else {},
+            else None,
         )
         .convert({"sex": parse_sex})
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})

@@ -1,7 +1,6 @@
 from loaders.load import (
     drop_database,
-    load_horse_detail,
-    load_parents,
+    load_horses,
     load_people,
     load_races,
     load_ratings,
@@ -65,21 +64,7 @@ def test_load_people(mocker):
     assert {"TRAINER1": 1, "TRAINER2": 1} == load_people.fn(people, "a_source")
 
 
-def test_load_parents(mocker):
-    mocker.patch("prefect.context.TaskRunContext")
-    mocker.patch("prefect.get_run_logger")
-    mocker.patch(
-        "pymongo.collection.Collection.insert_one"
-    ).return_value.inserted_id = 1
-    horses = ["HORSE1 (IRE)", "HORSE2 (GB)", "HORSE2 (IRE)"]
-    assert {
-        ("HORSE1", "IRE"): 1,
-        ("HORSE2", "GB"): 1,
-        ("HORSE2", "IRE"): 1,
-    } == load_parents.fn(horses, "M")
-
-
-def test_load_horse_detail(mocker):
+def test_load_horses(mocker):
     mocker.patch("prefect.context.TaskRunContext")
     mocker.patch("prefect.get_run_logger")
     insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
@@ -91,7 +76,7 @@ def test_load_horse_detail(mocker):
             "dam": "DAM1 (IRE)",
             "sire": "SIRE1 (IRE)",
             "trainer": "TRAINER1",
-            "operations": {},
+            "operations": None,
             "ratings": {
                 "flat": 0,
                 "aw": 0,
@@ -115,10 +100,7 @@ def test_load_horse_detail(mocker):
             },
         },
     ]
-    sires_ids = {("SIRE1", "IRE"): 1, ("SIRE2", "GB"): 2}
-    dams_ids = {("DAM1", "IRE"): 1, ("DAM2", "GB"): 2}
-    trainer_ids = {"TRAINER1": 1, "TRAINER2": 2}
-    load_horse_detail.fn(data, sires_ids, dams_ids, trainer_ids)
+    load_horses.fn(data)
     assert 2 == insert_one.call_count
 
 
