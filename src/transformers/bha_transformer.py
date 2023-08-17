@@ -61,7 +61,12 @@ def transform_ratings_data(data):
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
         .addfield("country", lambda rec: parse_horse(rec["name"])[1], index=1)
         .convert("name", lambda x: parse_horse(x)[0])
-        .addfield("is_gelded", lambda rec: rec["sex"] == "GELDING")
+        .addfield(
+            "operations",
+            lambda rec: {"type": "gelding", "date": None}
+            if rec["sex"] == "GELDING"
+            else {},
+        )
         .convert({"sex": parse_sex})
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types)

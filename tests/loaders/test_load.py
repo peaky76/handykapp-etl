@@ -66,6 +66,8 @@ def test_load_people(mocker):
 
 
 def test_load_parents(mocker):
+    mocker.patch("prefect.context.TaskRunContext")
+    mocker.patch("prefect.get_run_logger")
     mocker.patch(
         "pymongo.collection.Collection.insert_one"
     ).return_value.inserted_id = 1
@@ -78,9 +80,9 @@ def test_load_parents(mocker):
 
 
 def test_load_horse_detail(mocker):
-    insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
     mocker.patch("prefect.context.TaskRunContext")
     mocker.patch("prefect.get_run_logger")
+    insert_one = mocker.patch("pymongo.collection.Collection.insert_one")
     data = [
         {
             "name": "HORSE1",
@@ -92,11 +94,13 @@ def test_load_horse_detail(mocker):
             "sire": "SIRE1",
             "sire_country": "IRE",
             "trainer": "TRAINER1",
-            "flat": 0,
-            "aw": 0,
-            "chase": 0,
-            "hurdle": 0,
-            "is_gelded": False,
+            "operations": {},
+            "ratings": {
+                "flat": 0,
+                "aw": 0,
+                "chase": 0,
+                "hurdle": 0,
+            },
         },
         {
             "name": "HORSE2",
@@ -108,11 +112,13 @@ def test_load_horse_detail(mocker):
             "sire": "SIRE2",
             "sire_country": "GB",
             "trainer": "TRAINER2",
-            "flat": 0,
-            "aw": 0,
-            "chase": 0,
-            "hurdle": 0,
-            "is_gelded": True,
+            "operations": {"type": "gelding", "date": None},
+            "ratings": {
+                "flat": 0,
+                "aw": 0,
+                "chase": 0,
+                "hurdle": 0,
+            },
         },
     ]
     sires_ids = {("SIRE1", "IRE"): 1, ("SIRE2", "GB"): 2}

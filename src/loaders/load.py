@@ -96,9 +96,6 @@ def load_horse_detail(horses, sires_ids, dams_ids, trainer_ids):
         horse["sire"]: sires_ids.get(parse_horse(horse["sire"], None))
         horse["dam"]: dams_ids.get(parse_horse(horse["dam"], None))
         horse["trainer"]: trainer_ids.get(horse["trainer"], None)
-        if horse["is_gelded"]:
-            horse["operations"] = {"type": "gelding", "date": None}
-        del horse["is_gelded"]
 
         add_horse(horse)
 
