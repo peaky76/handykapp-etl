@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from models.mongo_horse import MongoHorse
 
 from transformers.validators import (
     validate_horse,
@@ -40,7 +41,7 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_data(data):
+def transform_ratings_data(data) -> list[MongoHorse]:
     used_fields = (
         "Name",
         "Year",
@@ -73,7 +74,7 @@ def transform_ratings_data(data):
 
 
 @task(tags=["BHA"])
-def validate_ratings_data(data):
+def validate_ratings_data(data) -> petl.ValidationResult:
     header = (
         "Name",
         "Year",

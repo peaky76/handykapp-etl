@@ -8,7 +8,7 @@ from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
 from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
-from nameparser import HumanName
+from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
 import yaml
