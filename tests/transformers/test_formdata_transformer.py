@@ -10,6 +10,7 @@ from transformers.formdata_transformer import (
     is_horse,
     is_race_date,
     extract_middle_details,
+    transform_horse_data,
 )
 
 FORMDATA_FETCH = "transformers.formdata_transformer.get_files"
@@ -249,3 +250,43 @@ def test_is_race_date_true_when_double_digit_day():
 
 def test_is_race_date_false_with_non_date():
     assert not is_race_date("JMitchell")
+
+
+def test_transform_horse_data():
+    data = [
+        {
+            "name": "AADDEEY",
+            "country": "GB",
+            "yob": 2018,
+            "trainer": "D B O'Meara",
+            "trainer_form": "F2",
+            "prize_money": "£2000",
+            "runs": [
+                {
+                    "date": "2020-06-04",
+                    "type": "3G3",
+                    "win_prize": "21",
+                    "course": "Ncl",
+                    "number_of_runners": "13",
+                    "weight": "9-5",
+                    "headgear": None,
+                    "allowance": 0,
+                    "jockey": "SDeSousa",
+                    "position": "8",
+                    "beaten_distance": 6.5,
+                    "time_rating": 76,
+                    "distance": 6,
+                    "going": "g",
+                    "form_rating": 99,
+                }
+            ],
+        }
+    ]
+    expected = {
+        "name": "AADDEEY (GB)",
+        "prize_money": "£2000",
+        "trainer": "D B O'Meara",
+        "year": 2018,
+    }
+
+    assert expected == list(transform_horse_data.fn(data))[0]
