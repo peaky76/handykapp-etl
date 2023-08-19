@@ -1,4 +1,5 @@
 from loaders.load import (
+    convert_person,
     drop_database,
     load_horses,
     load_people,
@@ -54,6 +55,19 @@ def test_spec_database_adds_races_result_horse_index(mocker):
     create_index = mocker.patch("pymongo.collection.Collection.create_index")
     spec_database.fn()
     assert create_index.called_once_with("result.horse")
+
+
+def test_convert_person():
+    expected = {
+        "title": "Mr.",
+        "first": "John",
+        "middle": "",
+        "last": "Smith",
+        "suffix": "",
+        "nickname": "",
+        "display_name": {"BHA": "Mr. John Smith"},
+    }
+    assert expected == convert_person("Mr. John Smith", "BHA")
 
 
 def test_load_people(mocker):
