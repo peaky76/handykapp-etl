@@ -2,9 +2,10 @@
 from collections import namedtuple
 from pathlib import Path
 import fitz  # type: ignore
+import pendulum
+import petl  # type: ignore
 import re
 import sys
-import pendulum
 import yaml
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -345,6 +346,19 @@ def get_horses_from_formdata(file):
     logger.info(f"Processed {count} horses from {file}")
 
     return horses
+
+
+@task(tags=["Racing Research"])
+def transform_horse_data(data: dict):
+    used_fields = ("name", "country", "yob", "trainer", "prize_money")
+    return (
+        petl.fromdicts(data)
+        .cut(used_fields)
+        .convert("name", lambda x, row: f"{x} ({row.country})", pass_row=True)
+        .cutout("country")
+        .rename({"yob": "year"})
+        .dicts()
+    )
 
 
 @flow
