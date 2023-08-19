@@ -74,7 +74,7 @@ def transform_ratings_data(data) -> list[MongoHorse]:
 
 
 @task(tags=["BHA"])
-def validate_ratings_data(data) -> petl.ValidationResult:
+def validate_ratings_data(data) -> bool:
     header = (
         "Name",
         "Year",

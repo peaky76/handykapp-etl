@@ -337,7 +337,7 @@ def stream_formdata_by_word(file):
         yield from words
 
 
-@task(tags=["Formdata"], task_run_name="{file}_horses")
+@task(tags=["Racing Research"], task_run_name="{file}_horses")
 def get_horses_from_formdata(file):
     logger = get_run_logger()
 
