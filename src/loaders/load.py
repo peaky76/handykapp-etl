@@ -45,18 +45,8 @@ def add_horse(horse):
     return horse_id.inserted_id
 
 
-def add_person(person, source):
-    name = HumanName(person)
-    person_id = db.people.insert_one(
-        {
-            "title": name.title,
-            "first": name.first,
-            "middle": name.middle,
-            "last": name.last,
-            "suffix": name.suffix,
-            "display_name": {source: person},
-        }
-    )
+def add_person(person):
+    person_id = db.people.insert_one(person)
     return person_id.inserted_id
 
 
@@ -99,7 +89,7 @@ def load_people(people, source):
     ret_val = {}
     for person in people:
         if person:
-            ret_val[person] = add_person(person, source)
+            ret_val[person] = add_person(convert_person(person, source))
     return ret_val
 
 
