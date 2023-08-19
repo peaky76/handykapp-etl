@@ -64,6 +64,12 @@ def convert_parent(name, sex):
     return {"name": name, "sex": sex}
 
 
+def convert_person(name, source):
+    parsed_name = HumanName(name).as_dict()
+    parsed_name["display_name"] = {source: name}
+    return parsed_name
+
+
 def convert_value_to_id(horse, value, lookup):
     if value:
         horse[value] = (
