@@ -8,6 +8,8 @@ import re
 import sys
 import yaml
 
+from models.mongo_horse import MongoHorse
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import get_files, stream_file
@@ -349,7 +351,7 @@ def get_horses_from_formdata(file):
 
 
 @task(tags=["Racing Research"])
-def transform_horse_data(data: dict):
+def transform_horse_data(data: dict) -> list[MongoHorse]:
     used_fields = ("name", "country", "yob", "trainer", "prize_money")
     return (
         petl.fromdicts(data)
