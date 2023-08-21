@@ -35,6 +35,7 @@ def spec_database():
     db.people.create_index(
         [("last", ASC), ("first", ASC), ("middle", ASC)], unique=True
     )
+    db.people.create_index("display_name.bha", unique=True)
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
     db.races.create_index([("venue", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
@@ -68,6 +69,13 @@ def convert_value_to_id(horse, value, lookup):
             else lookup.get(horse[value], None)
         )
     return horse
+
+
+def find_person(name, source):
+    if direct_find := db.people.find_one({"display_name": {source: name}}):
+        return direct_find["_id"]
+    elif len(list(db.people.find({"last": HumanName(name).last}))):
+        raise RuntimeWarning("Sure, you found a surname but is it the right dude?")
 
 
 @task(tags=["BHA"])
@@ -148,4 +156,14 @@ def load_database_afresh():
 
 
 if __name__ == "__main__":
-    load_database_afresh()  # type: ignore
+    person = "Dave Barsteward"
+    source = "bha"
+    try:
+        if person_id := find_person(person, source):
+            print(person_id)
+        else:
+            print(add_person(convert_person(person, source)))
+    except RuntimeWarning:
+        print("Found a surname but is it the right dude?")
+
+    # load_database_afresh()  # type: ignore
