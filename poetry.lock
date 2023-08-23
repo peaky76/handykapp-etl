@@ -1453,12 +1453,12 @@ pytzdata = ">=2020.1"
 
 [[package]]
 name = "petl"
-version = "1.7.13"
+version = "1.7.14"
 description = "A Python package for extracting, transforming and loading tables of data."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
-    {file = "petl-1.7.13.tar.gz", hash = "sha256:964136f10582a511807929fae9854af229a67a972f64cfc7c636a65efca157d7"},
+    {file = "petl-1.7.14.tar.gz", hash = "sha256:d4802e3c4804bf85f2267a0102fcad35c61e6a37c90d9e1a1674331f35a90a7f"},
 ]
 
 [package.extras]
@@ -2805,4 +2805,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.0"
-content-hash = "ba3d18b3e5029ff216030a951afe33429d83f95f209aab569efb42df6f1fb25a"
+content-hash = "61f7fe45a7f79fbb27ab81cbb386e2f32cebd829556705e5e4716f69d7fe8e1a"
