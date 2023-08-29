@@ -5,7 +5,7 @@ description = "ETL pipeline to feed the handykapp horse racing analysis app"
 authors = ["Robert Peacock <robertjamespeacock@gmail.com>"]
 
 [tool.poetry.dependencies]
-boto3 = "^1.28.35"
+boto3 = "^1.28.36"
 horsetalk = "^0.10.1"
 pendulum = "^2.1.2"
 petl = "^1.7.14"
