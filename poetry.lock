@@ -864,13 +864,13 @@ hyperframe = ">=6.0,<7"
 
 [[package]]
 name = "horsetalk"
-version = "0.10.1"
+version = "0.10.2"
 description = "A library of enums and parsers for common horseracing terminology"
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "horsetalk-0.10.1-py3-none-any.whl", hash = "sha256:c481a4e1738872f6646b8675be4db2d3fc7db60959c35aa2977a70e274491ff7"},
-    {file = "horsetalk-0.10.1.tar.gz", hash = "sha256:bdcd6cfb6a8610fd1fb4f148023206e0d5f863a6983b112b682219fb4410e691"},
+    {file = "horsetalk-0.10.2-py3-none-any.whl", hash = "sha256:fc5e95ea3c0ad0ffebb0cc877bb928da12bce87d9c24e1a8926377be3cf695d6"},
+    {file = "horsetalk-0.10.2.tar.gz", hash = "sha256:ae19c620b847eada600c2933f53304548fa372018ca91e5d6110fbb209df5085"},
 ]
 
 [package.dependencies]
@@ -2828,4 +2828,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.0"
-content-hash = "6284854153076be143844a65e833d9dcf5c9cee92f75237071c01a4fcdb6f9de"
+content-hash = "07b80fb7c4741a023d000abfa430cc3bbb9cf7d9ba132fc9edc42db94d84b94f"
