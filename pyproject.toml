@@ -24,7 +24,7 @@ mypy = "^1.5.1"
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 pytest-mock = "^3.11.1"
-ruff = "^0.0.286"
+ruff = "^0.0.287"
 types-pyyaml = "^6.0.12.11"
 types-requests = "^2.31.0.2"
 
