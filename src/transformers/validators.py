@@ -55,6 +55,10 @@ def validate_horse(horse):
     return len(horse) <= 30 and has_country
 
 
+def validate_in_enum(value, enum):
+    return value.lower() in [e.name.lower() for e in enum]
+
+
 def validate_prize(prize):
     pattern = r"^[£\$€¥]\d{1,3}(,)*\d{1,3}$"
     return bool(re.match(pattern, prize)) if prize else False
