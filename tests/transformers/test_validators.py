@@ -110,14 +110,6 @@ def test_validate_horse_fails_for_empty_string():
     assert not validate_horse("")
 
 
-def test_validate_in_enum_passes_for_valid_string():
-    assert validate_in_enum("Jockey", Enum("Job", "JOCKEY TRAINER OWNER"))
-
-
-def test_validate_in_enum_fails_for_invalid_string():
-    assert not validate_in_enum("Valet", Enum("Job", "JOCKEY TRAINER OWNER"))
-
-
 def test_validate_horse_passes_for_valid_string():
     assert validate_horse("DOBBIN (IRE)")
 
@@ -128,6 +120,18 @@ def test_validate_horse_fails_for_string_without_country():
 
 def test_validate_horse_fails_for_string_over_30_chars():
     assert not validate_horse("DOBBINTHEREALLYEXTREMELYGOODHORSEWITHALOVELYMANE (IRE)")
+
+
+def test_validate_in_enum_passes_for_valid_string():
+    assert validate_in_enum("Jockey", Enum("Job", "JOCKEY TRAINER OWNER"))
+
+
+def test_validate_in_enum_fails_for_none():
+    assert not validate_in_enum(None, Enum("Job", "JOCKEY TRAINER OWNER"))
+
+
+def test_validate_in_enum_fails_for_invalid_string():
+    assert not validate_in_enum("Valet", Enum("Job", "JOCKEY TRAINER OWNER"))
 
 
 def test_validate_prize_passes_for_sterling():
