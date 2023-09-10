@@ -1,6 +1,6 @@
 import pendulum
 import re
-from horsetalk import AWGoingDescription, TurfGoingDescription
+from horsetalk import AWGoingDescription, Gender, TurfGoingDescription
 
 
 def validate_class(race_class):
@@ -55,7 +55,7 @@ def validate_rating(rating):
 
 
 def validate_sex(sex):
-    return sex in ["COLT", "FILLY", "GELDING", "STALLION", "MARE", "RIG"]
+    return validate_in_enum(sex, Gender)
 
 
 def validate_weight(weight):
