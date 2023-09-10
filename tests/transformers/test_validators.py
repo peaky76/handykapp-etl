@@ -1,9 +1,11 @@
+from enum import Enum
 from transformers.validators import (
     validate_class,
     validate_date,
     validate_distance,
     validate_going,
     validate_horse,
+    validate_in_enum,
     validate_prize,
     validate_rating,
     validate_sex,
@@ -106,6 +108,14 @@ def test_validate_horse_fails_for_none():
 
 def test_validate_horse_fails_for_empty_string():
     assert not validate_horse("")
+
+
+def test_validate_in_enum_passes_for_valid_string():
+    assert validate_in_enum("Jockey", Enum("Job", "JOCKEY TRAINER OWNER"))
+
+
+def test_validate_in_enum_fails_for_invalid_string():
+    assert not validate_in_enum("Valet", Enum("Job", "JOCKEY TRAINER OWNER"))
 
 
 def test_validate_horse_passes_for_valid_string():
