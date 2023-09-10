@@ -42,7 +42,7 @@ def validate_horse(horse):
 
 
 def validate_in_enum(value, enum):
-    return value.lower() in [e.name.lower() for e in enum]
+    return value and value.lower() in [e.name.lower() for e in enum]
 
 
 def validate_prize(prize):
