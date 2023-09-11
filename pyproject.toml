@@ -18,7 +18,7 @@ pymupdf = "^1.23.3"
 nameparser = "^1.1.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
+black = "^23.9.1"
 coverage = "^7.3.0"
 mypy = "^1.5.1"
 pytest = "^7.4.1"
