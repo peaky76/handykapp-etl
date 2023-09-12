@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
-from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
+from transformers.core_transformer import core_transformer
 from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
@@ -48,6 +48,11 @@ def add_horse(horse):
 def add_person(person):
     person_id = db.people.insert_one(person)
     return person_id.inserted_id
+
+
+def add_racecourse(racecourse):
+    racecourse_id = db.racecourses.insert_one(racecourse)
+    return racecourse_id.inserted_id
 
 
 def convert_parent(name, sex):
@@ -100,6 +105,12 @@ def load_races(races):
         db.races.insert_one(race)
 
 
+@task(tags=["Core"])
+def load_racecourses(racecourses):
+    for racecourse in racecourses:
+        add_racecourse(racecourse)
+
+
 @task
 def load_ratings():
     pass  # TODO
@@ -140,11 +151,13 @@ def load_bha_horses():
 
 @flow
 def load_database_afresh():
-    drop_database()
-    spec_database()
-    load_bha_horses()
+    # drop_database()
+    # spec_database()
+    # load_bha_horses()
     # races = rapid_horseracing_transformer()
     # load_races(races)
+    racecourses = core_transformer()
+    load_racecourses(racecourses)
 
 
 if __name__ == "__main__":
