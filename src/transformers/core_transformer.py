@@ -53,6 +53,9 @@ def transform_racecourses_data(data) -> list:
         .rename({x: x.lower() for x in used_fields})
         .rename({"venue": "name", "speed": "style", "direction": "handedness"})
         .addfield("references", lambda rec: {"racing_research": rec["rrabbr"]})
+        .convert(
+            ("surface", "shape", "style", "handedness", "contour"), lambda x: x.lower()
+        )
         .cutout("rrabbr")
         .dicts()
     )
