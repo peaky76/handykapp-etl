@@ -2,6 +2,10 @@
 from pathlib import Path
 import sys
 
+from bson import ObjectId
+
+from transformers import core_transformer
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
@@ -48,6 +52,22 @@ def add_horse(horse):
 def add_person(person):
     person_id = db.people.insert_one(person)
     return person_id.inserted_id
+
+
+def add_racecourse(racecourse):
+    racecourse_id = db.racecourses.insert_one(racecourse)
+    return racecourse_id.inserted_id
+
+
+def associate_person(person_id, display_name, source):
+    result = db.people.update_one(
+        {"_id": person_id},
+        {"$set": {f"display_name.{source}": display_name}},
+    )
+    print(result.acknowledged)
+    print(result.matched_count)
+    print(result.modified_count)
+    print(result.upserted_id)
 
 
 def convert_parent(name, sex):
@@ -100,6 +120,13 @@ def load_races(races):
         db.races.insert_one(race)
 
 
+@task(tags=["Core"])
+def load_racecourses():
+    data = core_transformer()
+    for racecourse in data:
+        add_racecourse(racecourse)
+
+
 @task
 def load_ratings():
     pass  # TODO
@@ -140,12 +167,17 @@ def load_bha_horses():
 
 @flow
 def load_database_afresh():
-    drop_database()
-    spec_database()
-    load_bha_horses()
+    pass
+    # drop_database()
+    # spec_database()
+    # load_bha_horses()
     # races = rapid_horseracing_transformer()
     # load_races(races)
+    load_racecourses()
 
 
 if __name__ == "__main__":
+    # associate_person(
+    #     ObjectId("64e3a2d08221a239f72d273f"), "Geoffrey Bastard", "sportinglife"
+    # )
     load_database_afresh()  # type: ignore
