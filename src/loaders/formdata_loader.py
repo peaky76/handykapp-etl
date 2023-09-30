@@ -11,7 +11,17 @@ from prefect import flow, task
 db = client.handykapp
 
 
-@task(tags=["RacingResearch"])
+def create_code_to_course_dict():
+    source = db.racecourses.find(
+        projection={"_id": 2, "references": {"racing_research": 1}}
+    )
+    return {
+        racecourse["references"]["racing_research"]: racecourse["_id"]
+        for racecourse in source
+    }
+
+
+@task
 def load_horses(horses):
     ret_val = {}
     for horse in horses:
