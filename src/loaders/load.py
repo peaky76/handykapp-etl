@@ -8,6 +8,7 @@ from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
 from transformers.core_transformer import core_transformer
+from loaders.adders import add_horse, add_person, add_racecourse
 from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
 from pymongo import ASCENDING as ASC
@@ -38,21 +39,6 @@ def spec_database():
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
     db.races.create_index([("venue", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
-
-
-def add_horse(horse):
-    horse_id = db.horses.insert_one(horse)
-    return horse_id.inserted_id
-
-
-def add_person(person):
-    person_id = db.people.insert_one(person)
-    return person_id.inserted_id
-
-
-def add_racecourse(racecourse):
-    racecourse_id = db.racecourses.insert_one(racecourse)
-    return racecourse_id.inserted_id
 
 
 def convert_parent(name, sex):
