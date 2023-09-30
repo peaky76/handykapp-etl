@@ -7,19 +7,8 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, task
-from pymongo import ASCENDING as ASC
 
 db = client.handykapp
-
-
-@task
-def drop_collection():
-    db.formdata.drop()
-
-
-@task
-def spec_collection():
-    pass
 
 
 @task(tags=["RacingResearch"])
@@ -38,11 +27,11 @@ def load_horses(horses):
 
 
 @flow
-def load_database_afresh():
-    drop_collection()
+def load_formdata_afresh():
+    db.formdata.drop()
     horses = formdata_transformer()
     load_horses(horses)
 
 
 if __name__ == "__main__":
-    load_database_afresh()  # type: ignore
+    load_formdata_afresh()  # type: ignore
