@@ -22,25 +22,25 @@ def create_code_to_course_dict():
 
 
 @task
-def load_horses(horses):
+def load_formdata(formdata):
     ret_val = {}
-    for horse in horses:
+    for entry in formdata:
         run_dict = []
-        for run in horse.runs:
+        for run in entry.runs:
             run_dict.append(run._asdict())
-        horse = horse._asdict()
-        horse["runs"] = run_dict
+        entry = entry._asdict()
+        entry["runs"] = run_dict
 
-        horse_id = db.formdata.insert_one(horse)
-        ret_val[f"{horse['name']} ({horse['country']})"] = horse_id.inserted_id
+        entry_id = db.formdata.insert_one(entry)
+        ret_val[f"{entry['name']} ({entry['country']})"] = entry_id.inserted_id
     return ret_val
 
 
 @flow
 def load_formdata_afresh():
     db.formdata.drop()
-    horses = formdata_transformer()
-    load_horses(horses)
+    formdata = formdata_transformer()
+    load_formdata(formdata)
 
 
 if __name__ == "__main__":
