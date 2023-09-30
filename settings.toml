@@ -1,0 +1,24 @@
+[bha]
+source_dir = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
+spaces_dir = "handykapp/bha/"
+
+[bha.files]
+ratings = "ratings.csv"
+rating_changes = "ratings.csv?diff"
+perf_figs = "performance-figures.csv"
+
+[core]
+spaces_dir = "handykapp/core/"
+
+[formdata]
+spaces_dir = "handykapp/formdata/"
+
+[rapid_horseracing]
+source_dir = "https://horse-racing.p.rapidapi.com/"
+spaces_dir = "handykapp/rapid_horseracing/"
+limits = { day = 50, minute = 10 }
+
+[theracingapi]
+source_dir = "https://the-racing-api1.p.rapidapi.com/v1/"
+spaces_dir = "handykapp/theracingapi/"
+limits = { day = 50, second = 2 }
