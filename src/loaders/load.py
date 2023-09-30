@@ -91,12 +91,6 @@ def load_races(races):
         db.races.insert_one(race)
 
 
-@task(tags=["Core"])
-def load_racecourses(racecourses):
-    for racecourse in racecourses:
-        add_racecourse(racecourse)
-
-
 @task
 def load_ratings():
     pass  # TODO
@@ -137,13 +131,12 @@ def load_bha_horses():
 
 @flow
 def load_database_afresh():
+    pass
     # drop_database()
     # spec_database()
     # load_bha_horses()
     # races = rapid_horseracing_transformer()
     # load_races(races)
-    racecourses = core_transformer()
-    load_racecourses(racecourses)
 
 
 if __name__ == "__main__":
