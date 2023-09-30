@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from transformers.formdata_transformer import formdata_transformer
-from prefect import flow, task, get_run_logger
+from prefect import flow, task
 from pymongo import ASCENDING as ASC
 
 db = client.handykapp
