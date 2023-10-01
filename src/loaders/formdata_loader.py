@@ -5,6 +5,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
+from loaders.shared import select_set
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
@@ -108,6 +109,8 @@ def load_formdata_horses(formdata=None):
         formdata = formdata_transformer()
 
     ret_val = {}
+    upsert_count = 0
+    added_count = 0
     for entry in formdata:
         entry = entry._asdict()
         del entry["runs"]
@@ -121,14 +124,13 @@ def load_formdata_horses(formdata=None):
             {"$set": {"prize_money": entry["prize_money"]}},
             upsert=True,
         )
-        is_upsert = entry_id.matched_count > 0
-
-        if is_upsert:
-            logger.debug(f"Added prize money to {entry['name']}")
-        else:
-            logger.info(f"Created new database entry for {entry['name']}")
+        upsert_count += int(bool(entry_id.matched_count > 0))
+        added_count += int(bool(entry_id.matched_count == 0))
 
         ret_val[(entry["name"], entry["country"])] = entry_id.upserted_id
+
+    logger.info(f"Upserted {upsert_count} horses from Formdata")
+    logger.info(f"Added {added_count} horses from Formdata")
 
     return ret_val
 
