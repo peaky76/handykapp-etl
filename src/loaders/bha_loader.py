@@ -123,9 +123,32 @@ def load_bha_people(data=None):
     return load_people(trainers, "bha")
 
 
+@flow
+def enrich_with_bha_ratings(data=None, lookup={}):
+    logger = get_run_logger()
+
+    if data is None:
+        data = bha_transformer()
+
+    count = 0
+    for horse in data:
+        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
+        db.horses.update_one(
+            {"_id": lookup[(horse["name"], horse["country"])]},
+            {"$set": {"ratings": horse["ratings"]}},
+            upsert=False,
+        )
+
+        if count and count % 250 == 0:
+            logger.info(f"Enriched {count} horses with ratings")
+
+    logger.info(f"Enriched {count} horses with ratings")
+
+
 if __name__ == "__main__":
     data = bha_transformer()
     db.horses.drop()
     db.people.drop()
-    load_bha_horses(data)  # type: ignore
+    horse_lookup = load_bha_horses(data)
     load_bha_people(data)
+    enrich_with_bha_ratings(data, horse_lookup)
