@@ -60,7 +60,7 @@ def load_formdata(formdata):
 
 
 @task
-def load_horses(formdata):
+def load_formdata_horses(formdata=formdata_transformer()):
     ret_val = {}
     for entry in formdata:
         entry = entry._asdict()
@@ -129,7 +129,7 @@ def load_formdata_afresh():
     )
     formdata = formdata_transformer()
     load_formdata(formdata)
-    horse_ids = load_horses(formdata)
+    horse_ids = load_formdata_horses(formdata)
     load_races(formdata)
     load_runs(formdata, horse_ids)
 
