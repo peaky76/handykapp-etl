@@ -111,7 +111,7 @@ def load_bha_horses(data=None):
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
     # data = [convert_value_to_id(x, "trainer", trainer_ids) for x in data]
-    load_horses(data)
+    return load_horses(data)
 
 
 @flow
@@ -120,7 +120,7 @@ def load_bha_people(data=None):
         data = bha_transformer()
 
     trainers = select_set(data, "trainer")
-    load_people(trainers, "bha")
+    return load_people(trainers, "bha")
 
 
 if __name__ == "__main__":
