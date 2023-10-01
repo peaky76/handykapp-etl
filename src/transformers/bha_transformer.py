@@ -25,11 +25,13 @@ SOURCE = api_info["bha"]["spaces"]["dir"]
 
 
 @task(tags=["BHA"], task_run_name="get_{date}_{type}_csv")
-def get_csv(type="ratings", date="latest"):
+def get_csv(csv_type="ratings", date="latest"):
     idx = -1 if date == "latest" else 0
     search_string = "" if date == "latest" else date
     csvs = [
-        csv for csv in list(get_files(SOURCE)) if type in csv and search_string in csv
+        csv
+        for csv in list(get_files(SOURCE))
+        if csv_type in csv and search_string in csv
     ]
     return csvs[idx] if csvs else None
 
