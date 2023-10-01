@@ -1,3 +1,4 @@
+import re
 from nameparser import HumanName  # type: ignore
 
 
@@ -9,3 +10,7 @@ def convert_person(name, source):
 
 def select_set(data, key):
     return sorted(list(set([x[key] for x in data])))
+
+
+def decondensed_title(str):
+    return re.sub(r"(?<=[A-Z])(?=[A-Z])", " ", str)
