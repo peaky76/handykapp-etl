@@ -40,6 +40,10 @@ def test_decondensed_title_with_four_capitals():
     assert decondensed_title("JFTSmith") == "J F T Smith"
 
 
+def test_decondensed_title_with_two_words():
+    assert decondensed_title("JohnSmith") == "John Smith"
+
+
 def test_decondensed_title_with_apostrophe():
     assert decondensed_title("JO'Smith") == "J O'Smith"
 
