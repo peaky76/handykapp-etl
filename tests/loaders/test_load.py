@@ -1,4 +1,4 @@
-from loaders.load import (
+from loaders.bha_loader import (
     convert_person,
     drop_database,
     load_horses,
