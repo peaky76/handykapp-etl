@@ -112,12 +112,12 @@ def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
         horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
         horse_id = horse_lookup.get((horse["name"], horse["country"]))
         if not horse_id:
-            logger.warning(f"{horse['name']} ({horse['country']}) not in database")
+            logger.warning(f"{horse['name']} ({horse['country']}) not in lookup table")
             continue
 
         trainer_id = person_lookup.get(horse["trainer"])
         if not trainer_id:
-            logger.warning(f"{horse['trainer']} not in database")
+            logger.warning(f"{horse['trainer']} not in lookup table")
             continue
 
         db.horses.update_one(
@@ -163,13 +163,10 @@ def load_bha_horses(data=None):
 
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
-    # trainers = select_set(data, "trainer")
     sires_ids = load_horses([{"name": name, "sex": "M"} for name in sires], "sires")
     dams_ids = load_horses([{"name": name, "sex": "F"} for name in dams], "dams")
-    # trainer_ids = load_people(trainers, "bha")
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
-    # data = [convert_value_to_id(x, "trainer", trainer_ids) for x in data]
     return load_horses(data)
 
 
