@@ -43,6 +43,11 @@ def load_horses(horses):
     logger = get_run_logger()
     ret_val = {}
     for i, horse in enumerate(horses):
+        if horse.get("trainer") or horse.get("trainer") == "":
+            del horse["trainer"]
+        if horse.get("ratings"):
+            del horse["ratings"]
+
         horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
         ret_val[(horse["name"], horse.get("country"))] = add_horse(horse)
 
@@ -78,13 +83,13 @@ def load_bha_horses():
     data = bha_transformer()
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
-    trainers = select_set(data, "trainer")
+    # trainers = select_set(data, "trainer")
     sires_ids = load_horses([convert_parent(x, "M") for x in sires])
     dams_ids = load_horses([convert_parent(x, "F") for x in dams])
-    trainer_ids = load_people(trainers, "bha")
+    # trainer_ids = load_people(trainers, "bha")
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
-    data = [convert_value_to_id(x, "trainer", trainer_ids) for x in data]
+    # data = [convert_value_to_id(x, "trainer", trainer_ids) for x in data]
     load_horses(data)
 
 
@@ -99,4 +104,4 @@ def load_bha_afresh():
 
 
 if __name__ == "__main__":
-    load_database_afresh()  # type: ignore
+    load_bha_horses()  # type: ignore
