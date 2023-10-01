@@ -42,8 +42,8 @@ def select_set(data, key):
     return sorted(list(set([x[key] for x in data])))
 
 
-@task(tags=["BHA"])
-def load_horses(horses):
+@task(tags=["BHA"], task_run_name="load_{descriptor}")
+def load_horses(horses, descriptor="horses"):
     logger = get_run_logger()
     ret_val = {}
     count = 0
@@ -63,9 +63,9 @@ def load_horses(horses):
             logger.warning(f"{horse['name']} ({horse['country']}) already in database")
 
         if count and count % 250 == 0:
-            logger.info(f"Loaded {count} horses")
+            logger.info(f"Loaded {count} {descriptor}")
 
-    logger.info(f"Loaded {count} horses")
+    logger.info(f"Loaded {count} {descriptor}")
     return ret_val
 
 
@@ -102,13 +102,11 @@ def load_bha_horses(data=None):
     if data is None:
         data = bha_transformer()
 
-    logger = get_run_logger()
-    logger.info(data)
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
     # trainers = select_set(data, "trainer")
-    sires_ids = load_horses([{"name": name, "sex": "M"} for name in sires])
-    dams_ids = load_horses([{"name": name, "sex": "F"} for name in dams])
+    sires_ids = load_horses([{"name": name, "sex": "M"} for name in sires], "sires")
+    dams_ids = load_horses([{"name": name, "sex": "F"} for name in dams], "dams")
     # trainer_ids = load_people(trainers, "bha")
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
