@@ -18,10 +18,6 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["spaces"]["dir"]
 
 
-def convert_parent(name, sex):
-    return {"name": name, "sex": sex}
-
-
 def convert_person(name, source):
     parsed_name = HumanName(name).as_dict()
     parsed_name["display_name"] = {source: name}
@@ -84,8 +80,8 @@ def load_bha_horses():
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
     # trainers = select_set(data, "trainer")
-    sires_ids = load_horses([convert_parent(x, "M") for x in sires])
-    dams_ids = load_horses([convert_parent(x, "F") for x in dams])
+    sires_ids = load_horses([{"name": name, "sex": "M"} for name in sires])
+    dams_ids = load_horses([{"name": name, "sex": "F"} for name in dams])
     # trainer_ids = load_people(trainers, "bha")
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
