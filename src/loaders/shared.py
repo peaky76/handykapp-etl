@@ -13,4 +13,4 @@ def select_set(data, key):
 
 
 def decondensed_title(str):
-    return re.sub(r"(?<=[A-Z])(?=[A-Z])", " ", str)
+    return re.sub(r"(?<=[A-Za-z])(?=[A-Z])", " ", str)
