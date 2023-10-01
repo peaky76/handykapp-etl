@@ -4,6 +4,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from clients import mongo_client as client
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
 from loaders.adders import add_horse, add_person
@@ -17,6 +18,8 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["bha"]["spaces"]["dir"]
+
+db = client.handykapp
 
 
 def convert_person(name, source):
@@ -95,8 +98,12 @@ def load_people(people, source):
 
 
 @flow
-def load_bha_horses():
-    data = bha_transformer()
+def load_bha_horses(data=None):
+    if data is None:
+        data = bha_transformer()
+
+    logger = get_run_logger()
+    logger.info(data)
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
     # trainers = select_set(data, "trainer")
@@ -110,12 +117,17 @@ def load_bha_horses():
 
 
 @flow
-def load_bha_people():
-    data = bha_transformer()
+def load_bha_people(data=None):
+    if data is None:
+        data = bha_transformer()
+
     trainers = select_set(data, "trainer")
     load_people(trainers, "bha")
 
 
 if __name__ == "__main__":
-    # load_bha_horses()  # type: ignore
-    load_bha_people()
+    data = bha_transformer()
+    db.horses.drop()
+    db.people.drop()
+    load_bha_horses(data)  # type: ignore
+    load_bha_people(data)
