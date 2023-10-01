@@ -1,22 +1,7 @@
 from loaders.bha_loader import (
-    convert_person,
     load_horses,
     load_people,
 )
-from pymongo import ASCENDING as ASC
-
-
-def test_convert_person():
-    expected = {
-        "title": "Mr.",
-        "first": "John",
-        "middle": "",
-        "last": "Smith",
-        "suffix": "",
-        "nickname": "",
-        "display_name": {"BHA": "Mr. John Smith"},
-    }
-    assert expected == convert_person("Mr. John Smith", "BHA")
 
 
 def test_load_people(mocker):

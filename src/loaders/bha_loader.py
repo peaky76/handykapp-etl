@@ -2,11 +2,10 @@
 from pathlib import Path
 import sys
 
-from loaders.shared import select_set
+from loaders.shared import convert_person, select_set
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
 from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
@@ -22,12 +21,6 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["spaces"]["dir"]
 
 db = client.handykapp
-
-
-def convert_person(name, source):
-    parsed_name = HumanName(name).as_dict()
-    parsed_name["display_name"] = {source: name}
-    return parsed_name
 
 
 def convert_value_to_id(horse, value, lookup):
