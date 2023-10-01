@@ -44,6 +44,7 @@ def load_horses(horses):
     logger = get_run_logger()
     ret_val = {}
     count = 0
+
     for horse in horses:
         if horse.get("trainer") or horse.get("trainer") == "":
             del horse["trainer"]
@@ -67,10 +68,22 @@ def load_horses(horses):
 
 @task(tags=["BHA"])
 def load_people(people, source):
+    logger = get_run_logger()
     ret_val = {}
+    count = 0
+
     for person in people:
         if person:
-            ret_val[person] = add_person(convert_person(person, source))
+            try:
+                ret_val[person] = add_person(convert_person(person, source))
+                count += 1
+            except DuplicateKeyError:
+                logger.warning(f"{person} already in database")
+
+        if count and count % 100 == 0:
+            logger.info(f"Loaded {count} people")
+
+    logger.info(f"Loaded {count} people")
     return ret_val
 
 
@@ -97,14 +110,12 @@ def load_bha_horses():
 
 
 @flow
-def load_bha_afresh():
-    pass
-    # drop_database()
-    # spec_database()
-    # load_bha_horses()
-    # races = rapid_horseracing_transformer()
-    # load_races(races)
+def load_bha_people():
+    data = bha_transformer()
+    trainers = select_set(data, "trainer")
+    load_people(trainers, "bha")
 
 
 if __name__ == "__main__":
-    load_bha_horses()  # type: ignore
+    # load_bha_horses()  # type: ignore
+    load_bha_people()
