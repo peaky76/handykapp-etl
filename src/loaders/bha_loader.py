@@ -9,6 +9,7 @@ from transformers.parsers import parse_horse
 from loaders.adders import add_horse, add_person
 from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
+from pymongo.errors import DuplicateKeyError
 
 import yaml
 
@@ -42,18 +43,25 @@ def select_set(data, key):
 def load_horses(horses):
     logger = get_run_logger()
     ret_val = {}
-    for i, horse in enumerate(horses):
+    count = 0
+    for horse in horses:
         if horse.get("trainer") or horse.get("trainer") == "":
             del horse["trainer"]
         if horse.get("ratings"):
             del horse["ratings"]
 
         horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
-        ret_val[(horse["name"], horse.get("country"))] = add_horse(horse)
 
-        if i % 250 == 0:
-            logger.info(f"Loaded {i} horses")
+        try:
+            ret_val[(horse["name"], horse.get("country"))] = add_horse(horse)
+            count += 1
+        except DuplicateKeyError:
+            logger.warning(f"{horse['name']} ({horse['country']}) already in database")
 
+        if count and count % 250 == 0:
+            logger.info(f"Loaded {count} horses")
+
+    logger.info(f"Loaded {count} horses")
     return ret_val
 
 
