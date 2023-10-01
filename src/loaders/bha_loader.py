@@ -4,13 +4,13 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from clients import mongo_client as client
-from transformers.bha_transformer import bha_transformer
-from transformers.parsers import parse_horse
-from loaders.adders import add_horse, add_person
 from nameparser import HumanName  # type: ignore
 from prefect import flow, task, get_run_logger
 from pymongo.errors import DuplicateKeyError
+from clients import mongo_client as client
+from loaders.adders import add_horse, add_person
+from transformers.bha_transformer import bha_transformer
+from transformers.parsers import parse_horse
 
 import yaml
 
@@ -90,13 +90,6 @@ def load_people(people, source):
     return ret_val
 
 
-# @task(tags=["Rapid"])
-# def load_races(races):
-#     for race in races:
-#         del race["result"]
-#         db.races.insert_one(race)
-
-
 @flow
 def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
     logger = get_run_logger()
@@ -115,14 +108,11 @@ def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
             logger.warning(f"{horse['name']} ({horse['country']}) not in lookup table")
             continue
 
-        trainer_id = person_lookup.get(horse["trainer"])
-        if not trainer_id:
-            logger.warning(f"{horse['trainer']} not in lookup table")
-            continue
+        convert_value_to_id(horse, "trainer", person_lookup)
 
         db.horses.update_one(
             {"_id": horse_id},
-            {"$set": {"current_trainer": trainer_id}},
+            {"$set": {"current_trainer": horse["trainer"]}},
             upsert=False,
         )
         count += 1
