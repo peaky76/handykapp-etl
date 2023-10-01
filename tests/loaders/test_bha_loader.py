@@ -2,7 +2,6 @@ from loaders.bha_loader import (
     convert_person,
     load_horses,
     load_people,
-    select_set,
 )
 from pymongo import ASCENDING as ASC
 
@@ -68,13 +67,3 @@ def test_load_horses(mocker):
     ]
     load_horses.fn(data)
     assert 2 == insert_one.call_count
-
-
-def test_select_set():
-    data = [
-        {"trainer": "TRAINER1"},
-        {"trainer": "TRAINER2"},
-        {"trainer": "TRAINER1"},
-        {"trainer": "TRAINER3"},
-    ]
-    assert ["TRAINER1", "TRAINER2", "TRAINER3"] == select_set(data, "trainer")
