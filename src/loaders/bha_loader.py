@@ -2,6 +2,8 @@
 from pathlib import Path
 import sys
 
+from loaders.selectors import select_set
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from nameparser import HumanName  # type: ignore
@@ -36,10 +38,6 @@ def convert_value_to_id(horse, value, lookup):
             else lookup.get(horse[value], None)
         )
     return horse
-
-
-def select_set(data, key):
-    return sorted(list(set([x[key] for x in data])))
 
 
 @task(tags=["BHA"], task_run_name="load_{descriptor}")
