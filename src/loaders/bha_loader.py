@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 
-from loaders.selectors import select_set
+from loaders.shared import select_set
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -167,11 +167,18 @@ def load_bha_people(data=None):
     return load_people(trainers, "bha")
 
 
-if __name__ == "__main__":
-    data = bha_transformer()
+@flow
+def load_bha_afresh(data=None):
+    if data is None:
+        data = bha_transformer()
+
     db.horses.drop()
     db.people.drop()
     horse_lookup = load_bha_horses(data)
     person_lookup = load_bha_people(data)
     enrich_with_bha_ratings(data, horse_lookup)
     associate_horse_with_trainer(data, horse_lookup, person_lookup)
+
+
+if __name__ == "__main__":
+    load_bha_afresh()
