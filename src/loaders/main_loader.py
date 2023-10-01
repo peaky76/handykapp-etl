@@ -1,6 +1,15 @@
+# To allow running as a script
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from clients import mongo_client as client
-from prefect import task
+from prefect import flow, task
 from pymongo import ASCENDING as ASC
+from loaders.bha_loader import load_bha_horses
+from loaders.formdata_loader import load_formdata_horses
+
 
 db = client.handykapp
 
@@ -22,3 +31,15 @@ def spec_database():
     db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
     db.races.create_index([("course", ASC), ("date", ASC), ("time", ASC)], unique=True)
     db.races.create_index("result.horse")
+
+
+@flow
+def load_database_afresh():
+    drop_database()
+    spec_database()
+    # load_bha_horses()
+    load_formdata_horses()
+
+
+if __name__ == "__main__":
+    load_database_afresh()  # type: ignore
