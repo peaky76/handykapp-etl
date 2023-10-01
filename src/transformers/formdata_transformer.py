@@ -24,7 +24,7 @@ SOURCE = api_info["formdata"]["spaces"]["dir"]
 
 Horse = namedtuple(
     "Horse",
-    ["name", "country", "yob", "trainer", "trainer_form", "prize_money", "runs"],
+    ["name", "country", "year", "trainer", "trainer_form", "prize_money", "runs"],
 )
 Run = namedtuple(
     "Run",
@@ -352,13 +352,12 @@ def get_horses_from_formdata(file):
 
 @task(tags=["Racing Research"])
 def transform_horse_data(data: dict) -> list[MongoHorse]:
-    used_fields = ("name", "country", "yob", "trainer", "prize_money")
+    used_fields = ("name", "country", "year", "trainer", "prize_money")
     return (
         petl.fromdicts(data)
         .cut(used_fields)
         .convert("name", lambda x, row: f"{x} ({row.country})", pass_row=True)
         .cutout("country")
-        .rename({"yob": "year"})
         .dicts()
     )
 
@@ -399,7 +398,7 @@ def formdata_transformer():
                     updated_horse = Horse(
                         matched_horse.name,
                         matched_horse.country,
-                        horse.yob,
+                        horse.year,
                         horse.trainer,
                         horse.trainer_form,
                         horse.prize_money,

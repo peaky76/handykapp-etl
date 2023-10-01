@@ -257,7 +257,7 @@ def test_transform_horse_data():
         {
             "name": "AADDEEY",
             "country": "GB",
-            "yob": 2018,
+            "year": 2018,
             "trainer": "D B O'Meara",
             "trainer_form": "F2",
             "prize_money": "£2000",
