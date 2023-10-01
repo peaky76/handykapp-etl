@@ -24,7 +24,7 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["spaces"]["dir"]
 
 
-@task(tags=["BHA"], task_run_name="get_{date}_{type}_csv")
+@task(tags=["BHA"], task_run_name="get_{date}_{csv_type}_csv")
 def get_csv(csv_type="ratings", date="latest"):
     idx = -1 if date == "latest" else 0
     search_string = "" if date == "latest" else date
