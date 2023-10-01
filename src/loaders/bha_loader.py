@@ -34,6 +34,10 @@ def convert_value_to_id(horse, value, lookup):
     return horse
 
 
+def select_set(data, key):
+    return sorted(list(set([x[key] for x in data])))
+
+
 @task(tags=["BHA"])
 def load_horses(horses):
     logger = get_run_logger()
@@ -67,11 +71,6 @@ def load_people(people, source):
 #     for race in races:
 #         del race["result"]
 #         db.races.insert_one(race)
-
-
-@task(tags=["BHA"])
-def select_set(data, key):
-    return sorted(list(set([x[key] for x in data])))
 
 
 @flow
