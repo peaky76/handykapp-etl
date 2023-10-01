@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from transformers.formdata_transformer import formdata_transformer
-from prefect import flow, task
+from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
 from pymongo.errors import DuplicateKeyError
 
@@ -60,19 +60,6 @@ def load_formdata(formdata):
 
 
 @task
-def load_formdata_horses(formdata=formdata_transformer()):
-    ret_val = {}
-    for entry in formdata:
-        entry = entry._asdict()
-        del entry["runs"]
-        del entry["prize_money"]
-        del entry["trainer_form"]
-        entry_id = db.horses.insert_one(entry)
-        ret_val[f"{entry['name']} ({entry['country']})"] = entry_id.inserted_id
-    return ret_val
-
-
-@task
 def load_races(formdata):
     codes_to_courses = create_code_to_course_dict()
     for entry in formdata:
@@ -111,6 +98,39 @@ def load_runs(formdata, horse_ids):
                     }
                 },
             )
+
+
+@flow
+def load_formdata_horses(formdata=None):
+    logger = get_run_logger()
+
+    if formdata is None:
+        formdata = formdata_transformer()
+
+    ret_val = {}
+    for entry in formdata:
+        entry = entry._asdict()
+        del entry["runs"]
+        del entry["trainer_form"]
+        entry_id = db.horses.update_one(
+            {
+                "name": entry["name"],
+                "country": entry["country"],
+                "year": entry["year"],
+            },
+            {"$set": {"prize_money": entry["prize_money"]}},
+            upsert=True,
+        )
+        is_upsert = entry_id.matched_count > 0
+
+        if is_upsert:
+            logger.debug(f"Added prize money to {entry['name']}")
+        else:
+            logger.info(f"Created new database entry for {entry['name']}")
+
+        ret_val[(entry["name"], entry["country"])] = entry_id.upserted_id
+
+    return ret_val
 
 
 @flow

@@ -37,7 +37,7 @@ def spec_database():
 def load_database_afresh():
     drop_database()
     spec_database()
-    # load_bha_horses()
+    load_bha_horses()
     load_formdata_horses()
 
 
