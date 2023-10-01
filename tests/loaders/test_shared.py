@@ -1,4 +1,4 @@
-from loaders.selectors import select_set
+from loaders.shared import select_set
 
 
 def test_select_set():
