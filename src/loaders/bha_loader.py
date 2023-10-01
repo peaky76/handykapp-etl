@@ -98,6 +98,65 @@ def load_people(people, source):
 
 
 @flow
+def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
+    logger = get_run_logger()
+
+    if data is None:
+        data = bha_transformer()
+
+    count = 0
+    for horse in data:
+        if not horse.get("trainer"):
+            continue
+
+        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
+        horse_id = horse_lookup.get((horse["name"], horse["country"]))
+        if not horse_id:
+            logger.warning(f"{horse['name']} ({horse['country']}) not in database")
+            continue
+
+        trainer_id = person_lookup.get(horse["trainer"])
+        if not trainer_id:
+            logger.warning(f"{horse['trainer']} not in database")
+            continue
+
+        db.horses.update_one(
+            {"_id": horse_id},
+            {"$set": {"current_trainer": trainer_id}},
+            upsert=False,
+        )
+        count += 1
+
+        if count and count % 250 == 0:
+            logger.info(f"Added {count} trainers to horses")
+
+    logger.info(f"Added {count} trainers to horses")
+
+
+@flow
+def enrich_with_bha_ratings(data=None, lookup={}):
+    logger = get_run_logger()
+
+    if data is None:
+        data = bha_transformer()
+
+    count = 0
+    for horse in data:
+        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
+        db.horses.update_one(
+            {"_id": lookup[(horse["name"], horse["country"])]},
+            {"$set": {"ratings": horse["ratings"]}},
+            upsert=False,
+        )
+        count += 1
+
+        if count and count % 250 == 0:
+            logger.info(f"Enriched {count} horses with ratings")
+
+    logger.info(f"Enriched {count} horses with ratings")
+
+
+@flow
 def load_bha_horses(data=None):
     if data is None:
         data = bha_transformer()
@@ -123,32 +182,11 @@ def load_bha_people(data=None):
     return load_people(trainers, "bha")
 
 
-@flow
-def enrich_with_bha_ratings(data=None, lookup={}):
-    logger = get_run_logger()
-
-    if data is None:
-        data = bha_transformer()
-
-    count = 0
-    for horse in data:
-        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
-        db.horses.update_one(
-            {"_id": lookup[(horse["name"], horse["country"])]},
-            {"$set": {"ratings": horse["ratings"]}},
-            upsert=False,
-        )
-
-        if count and count % 250 == 0:
-            logger.info(f"Enriched {count} horses with ratings")
-
-    logger.info(f"Enriched {count} horses with ratings")
-
-
 if __name__ == "__main__":
     data = bha_transformer()
     db.horses.drop()
     db.people.drop()
     horse_lookup = load_bha_horses(data)
-    load_bha_people(data)
+    person_lookup = load_bha_people(data)
     enrich_with_bha_ratings(data, horse_lookup)
+    associate_horse_with_trainer(data, horse_lookup, person_lookup)
