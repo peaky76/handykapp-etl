@@ -5,7 +5,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
-from loaders.shared import select_set
+from loaders.shared import decondensed_title
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
@@ -35,6 +35,18 @@ RUN_KEYS = [
 ]
 
 
+def adjust_rr_name(name):
+    country = name.split("(")[-1].replace(")", "") if "(" in name else None
+    name = name.replace(" (" + country + ")", "") if country else name
+    name = (
+        decondensed_title(name)
+        .replace("Mc ", "Mc")
+        .replace("Mac ", "Mac")
+        .replace("O' ", "O'")
+    )
+    return f"{name} ({country})" if country else name
+
+
 def create_code_to_course_dict():
     source = db.racecourses.find(
         projection={"_id": 2, "references": {"racing_research": 1}}
@@ -45,7 +57,7 @@ def create_code_to_course_dict():
     }
 
 
-@task
+@task(tags=["Racing Research"])
 def load_formdata(formdata):
     ret_val = {}
     for entry in formdata:
@@ -136,6 +148,33 @@ def load_formdata_horses(formdata=None):
 
 
 @flow
+def load_formdata_people(formdata=None):
+    logger = get_run_logger()
+
+    if formdata is None:
+        formdata = formdata_transformer()
+
+    # ret_val = {}
+
+    all_jockeys = []
+    all_trainers = []
+
+    for entry in formdata:
+        entry = entry._asdict()
+        all_trainers.append(entry["trainer"])
+        jockeys = list(set([run._asdict()["jockey"] for run in entry["runs"]]))
+        all_jockeys.extend(jockeys)
+
+    all_jockeys = [x for x in list(set(all_jockeys))]
+    all_trainers = [x for x in list(set(all_trainers))]
+
+    logger.info(f"Found {len(all_jockeys)} jockeys")
+    logger.info(f"Found {len(all_trainers)} trainers")
+
+    return {"jockeys": all_jockeys, "trainers": all_trainers}
+
+
+@flow
 def load_formdata_afresh():
     db.formdata.drop()
     db.horses.drop()
@@ -157,4 +196,9 @@ def load_formdata_afresh():
 
 
 if __name__ == "__main__":
-    load_formdata_afresh()  # type: ignore
+    data = load_formdata_people()  # type: ignore
+    print(data["jockeys"])
+    print(data["trainers"])
+
+    print([adjust_rr_name(x) for x in data["jockeys"]])
+    print([adjust_rr_name(x) for x in data["trainers"]])
