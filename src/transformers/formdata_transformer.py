@@ -124,7 +124,11 @@ def create_run(words: list[str]) -> Run:
                 words.insert(8 + i, f"-{beaten_distance}")
 
         # Join jockey details to be processed separately
-        middle_details = extract_middle_details("".join(words[6:-4]))
+        flat_non_finisher = any(
+            letter in words[-4] for letter in ["b", "f", "n", "p", "u"]
+        )
+        joined_middle = "".join(words[6:-3] if flat_non_finisher else words[6:-4])
+        middle_details = extract_middle_details(joined_middle)
 
         run = Run(
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
@@ -364,7 +368,8 @@ def transform_horse_data(data: dict) -> list[MongoHorse]:
 
 @flow
 def formdata_transformer():
-    files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
+    files = get_formdatas(code=RacingCode.FLAT, after_year=22, for_refresh=True)
+    # files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
 
