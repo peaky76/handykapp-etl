@@ -1,11 +1,12 @@
 # To allow running as a script
 from pathlib import Path
+import re
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
-from loaders.shared import decondensed_title
+from peak_utility.text.case import normal
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
@@ -38,12 +39,22 @@ RUN_KEYS = [
 def adjust_rr_name(name):
     country = name.split("(")[-1].replace(")", "") if "(" in name else None
     name = name.replace(" (" + country + ")", "") if country else name
-    name = (
-        decondensed_title(name)
-        .replace("Mc ", "Mc")
+
+    # TODO : Will be in next v0.5 of peak_utility
+    scottishise = (
+        lambda x: re.sub(r"(m(?:a*)c)(\s*)", r"\1 ", x, flags=re.IGNORECASE)
+        .title()
         .replace("Mac ", "Mac")
-        .replace("O' ", "O'")
+        .replace("Mc ", "Mc")
     )
+
+    name = scottishise(normal(name))
+    name = re.sub(
+        r"([a-z])'([A-Z])",
+        lambda match: match.group(1) + "'" + match.group(2).lower(),
+        name,
+    )
+
     return f"{name} ({country})" if country else name
 
 
@@ -197,8 +208,8 @@ def load_formdata_afresh():
 
 if __name__ == "__main__":
     data = load_formdata_people()  # type: ignore
-    print(data["jockeys"])
-    print(data["trainers"])
+    # print(data["jockeys"])
+    # print(data["trainers"])
 
     print([adjust_rr_name(x) for x in data["jockeys"]])
     print([adjust_rr_name(x) for x in data["trainers"]])
