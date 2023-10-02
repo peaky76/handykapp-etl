@@ -151,7 +151,7 @@ def extract_dist_going(string: str) -> tuple[str] | None:
         ^                                       # Start of the string
         (?:r)?                                  # Optional r
         (?P<dist>\d\.?\d?)                      # Distance
-        (?P<going>[H|F|M|G|D|S|V|f|m|g|d|s])      # Going
+        (?P<going>[H|F|M|G|D|S|V|f|m|g|d|s])    # Going
         $                                       # End of the string
     """
 
@@ -170,7 +170,7 @@ def extract_middle_details(details: str) -> list[str] | None:
         (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
         (?P<allowance>\d+)?                     # Optional number as the allowance
         (?P<jockey>[a-zA-Z\-\']+)               # Remaining characters as the jockey
-        (?P<position>(\=?\d+(?:p\d+|d)?|[a-z]))   # Last number or char as the position (With optional = or #p# formatting)
+        (?P<position>(\=?\d+(?:p\d+|d)?|[a-z])) # Last number or char as the position (With optional = or #p# formatting)
         $                                       # End of the string
     """
 
