@@ -58,6 +58,11 @@ def validate_sex(sex):
     return validate_in_enum(sex, Gender)
 
 
+def validate_time(time):
+    pattern = r"^\d{1,2}(?::|.)\d{2}$"
+    return bool(re.match(pattern, time)) if time else False
+
+
 def validate_weight(weight):
     pattern = r"^\d{1,2}-(0\d|1[0-3])$"
     return bool(re.match(pattern, weight)) if weight else False
