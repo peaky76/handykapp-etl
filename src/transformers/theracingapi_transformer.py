@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import yaml
-from horsetalk import CoatColour, Gender
+from horsetalk import CoatColour, Gender, RaceClass, RaceDistance, RaceGrade
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import (
@@ -33,11 +33,10 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["theracingapi"]["spaces"]["dir"]
 
 
-@task(tags=["TheRacingAPI"])
-def transform_horse(horse_data, race_date=pendulum.now()):
+def transform_horse(data, race_date=pendulum.now()):
     return (
         petl.rename(
-            horse_data,
+            data,
             {
                 "horse": "name",
                 "region": "country",
@@ -75,40 +74,42 @@ def transform_horse(horse_data, race_date=pendulum.now()):
     )
 
 
-# @task(tags=["Rapid"])
-# def transform_results(data):
-#     return (
-#         petl.rename(
-#             data,
-#             {
-#                 "id_race": "rapid_id",
-#                 "date": "datetime",
-#                 "age": "age_restriction",
-#                 "course": "venue",
-#                 "canceled": "cancelled",
-#                 "distance": "distance_description",
-#                 "going": "going_description",
-#             },
-#         )
-#         .convert("finished", lambda x: bool(int(x)))
-#         .convert("cancelled", lambda x: bool(int(x)))
-#         .addfield("is_handicap", lambda rec: parse_handicap(rec["title"]), index=4)
-#         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
-#         .addfield(
-#             "result",
-#             lambda rec: [
-#                 transform_horses(
-#                     petl.fromdicts(rec["horses"]),
-#                     race_date=pendulum.parse(rec["datetime"]),
-#                     finishing_time=rec["finish_time"],
-#                 )
-#             ]
-#             if rec["horses"]
-#             else [],
-#         )
-#         .cutout("horses", "finish_time")
-#         .dicts()
-#     )
+@task(tags=["TheRacingAPI"])
+def transform_racecard(data):
+    return (
+        petl.rename(
+            data,
+            {
+                "off_time": "time",
+                "race_name": "title",
+                "age_band": "age_restriction",
+                "rating_band": "rating_restriction",
+                "going": "going_description",
+                "pattern": "grade",
+                "distance_f": "distance_description",
+                "race_class": "class",
+            },
+        )
+        .addfield("is_handicap", lambda rec: parse_handicap(rec["title"]), index=4)
+        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
+        .convert(
+            {
+                "time": lambda x: pendulum.parse(
+                    f"{str(int(x.split(':')[0])+12)}:{x.split(':')[1]}",
+                    tz="Europe/London",
+                ).to_time_string(),
+                "prize": lambda x: x.replace(",", ""),
+                "grade": lambda x: str(RaceGrade(x)) if x else None,
+                "class": lambda x: int(RaceClass(x)),
+                "distance_description": lambda x: str(
+                    RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
+                ),
+                "runners": lambda x: [transform_horse(petl.fromdicts([h])) for h in x],
+            }
+        )
+        .cutout("field_size", "region", "type")
+        .dicts()[0]
+    )
 
 
 # def validate_horse(data):

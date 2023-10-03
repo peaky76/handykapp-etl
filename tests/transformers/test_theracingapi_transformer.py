@@ -1,7 +1,7 @@
 import pendulum
 import petl
 import pytest
-from transformers.theracingapi_transformer import transform_horse
+from transformers.theracingapi_transformer import transform_horse, transform_racecard
 
 
 @pytest.fixture
@@ -73,8 +73,8 @@ def racecard_data(horse_1_data, horse_2_data):
         "going": "Soft",
         "surface": "Turf",
         "runners": [
-            horse_1_data(),
-            horse_2_data(),
+            horse_1_data,
+            horse_2_data,
         ],
     }
 
@@ -102,9 +102,10 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
         "lbs_carried": 141,
         "official_rating": 76,
     }
-    assert expected == transform_horse.fn(
+    actual = transform_horse(
         petl.fromdicts([horse_1_data]), pendulum.parse("2023-10-03")
     )
+    assert actual == expected
 
 
 def test_transform_horse_returns_correct_output_when_apprentice_jockey(
@@ -130,29 +131,36 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
         "lbs_carried": 141,
         "official_rating": 76,
     }
-    assert expected == transform_horse.fn(
+    actual = transform_horse(
         petl.fromdicts([horse_2_data]), pendulum.parse("2023-10-03")
     )
+    assert actual == expected
 
 
-# def test_transform_race_returns_correct_output(racecard_data):
-#     expected = {
-#         "course": "Ayr",
-#         "surface": "Turf",
-#         "date": "2023-10-03",
-#         "time": "13:42:00",
-#         "title": "VIRGIN BET APPRENTICE HANDICAP",
-#         "is_handicap": True,
-#         "obstacle": None,
-#         "distance_description": "1m",
-#         "grade": None,
-#         "class": 5,
-#         "age_restriction": "3+",
-#         "rating_restriction": "0-75",
-#         "going_description": "Soft",
-#         "prize": "£4187",
-#     }
-#     assert expected == transform_result.fn(petl.fromdicts([racecard_data]))
+def test_transform_racecard_returns_correct_output(racecard_data):
+    expected = {
+        "course": "Ayr",
+        "surface": "Turf",
+        "date": "2023-10-03",
+        "time": "13:42:00",
+        "title": "Virgin Bet Apprentice Handicap",
+        "is_handicap": True,
+        "obstacle": None,
+        "distance_description": "1m",
+        "grade": None,
+        "class": 5,
+        "age_restriction": "3yo+",
+        "rating_restriction": "0-75",
+        "going_description": "Soft",
+        "prize": "£4187",
+    }
+
+    actual = transform_racecard.fn(petl.fromdicts([racecard_data]))
+
+    assert len(actual["runners"]) == 2
+    actual.pop("runners")
+
+    assert actual == expected
 
 
 # def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):
