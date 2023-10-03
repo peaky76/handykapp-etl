@@ -9,6 +9,7 @@ from transformers.validators import (
     validate_prize,
     validate_rating,
     validate_sex,
+    validate_time,
     validate_weight,
     validate_year,
 )
@@ -188,6 +189,30 @@ def test_validate_sex_fails_for_none():
 
 def test_validate_sex_fails_for_invalid_string():
     assert not validate_sex("PUPPY")
+
+
+def test_validate_time_passes_for_valid_12hr_time_with_dot():
+    assert validate_time("1.00")
+
+
+def test_validate_time_passes_for_valid_12hr_time_with_colon():
+    assert validate_time("1:00")
+
+
+def test_validate_time_passes_for_valid_24hr_time_with_dot():
+    assert validate_time("13.00")
+
+
+def test_validate_time_passes_for_valid_24hr_time_with_colon():
+    assert validate_time("13:00")
+
+
+def test_validate_time_fails_for_all_digits():
+    assert not validate_time("100")
+
+
+def test_validate_time_fails_for_all_letters():
+    assert not validate_time("time")
 
 
 def test_validate_weight_fail_for_none():
