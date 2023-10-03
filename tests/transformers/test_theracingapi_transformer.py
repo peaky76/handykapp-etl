@@ -1,7 +1,11 @@
 import pendulum
 import petl
 import pytest
-from transformers.theracingapi_transformer import transform_horse, transform_racecard
+from transformers.theracingapi_transformer import (
+    transform_horse,
+    transform_racecard,
+    validate_racecard,
+)
 
 
 @pytest.fixture
@@ -163,13 +167,13 @@ def test_transform_racecard_returns_correct_output(racecard_data):
     assert actual == expected
 
 
-# def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):
-#     result_data["horses"] = [horse_data]
-#     problems = validate_results.fn(petl.fromdicts([result_data]))
+# def test_validate_racecard_returns_no_problems_for_correct_data(racecard_data):
+#     problems = validate_racecard.fn(petl.fromdicts([racecard_data]))
 #     assert 0 == len(problems.dicts())
 
 
-# def test_validate_results_returns_problems_for_incorrect_data(result_data):
-#     problems = validate_results.fn(petl.fromdicts([result_data]))
+# def test_validate_racecard_returns_problems_for_incorrect_data(racecard_data):
+#     racecard_data["course"] = 365
+#     problems = validate_racecard.fn(petl.fromdicts([racecard_data]))
 #     assert 1 == len(problems.dicts())
 #     assert "horses" == problems.dicts()[0]["field"]

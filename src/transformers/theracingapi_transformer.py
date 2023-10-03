@@ -18,11 +18,8 @@ from transformers.parsers import (
     yob_from_age,
 )
 from transformers.validators import (
-    validate_class,
     validate_date,
-    validate_distance,
-    validate_going,
-    validate_prize,
+    validate_time,
     validate_weight,
 )
 
@@ -75,7 +72,7 @@ def transform_horse(data, race_date=pendulum.now()):
 
 
 @task(tags=["TheRacingAPI"])
-def transform_racecard(data):
+def transform_racecards(data):
     return (
         petl.rename(
             data,
@@ -112,110 +109,131 @@ def transform_racecard(data):
     )
 
 
-# def validate_horse(data):
-#     header = (
-#         "horse",
-#         "id_horse",
-#         "jockey",
-#         "trainer",
-#         "age",
-#         "weight",
-#         "number",
-#         "last_ran_days_ago",
-#         "non_runner",
-#         "form",
-#         "position",
-#         "distance_beaten",
-#         "owner",
-#         "sire",
-#         "dam",
-#         "OR",
-#         "sp",
-#         "odds",
-#     )
-#     constraints = [
-#         dict(name="horse_str", field="horse", test=str),
-#         dict(name="id_horse_int", field="id_horse", test=int),
-#         dict(name="jockey_str", field="jockey", test=str),
-#         dict(name="trainer_str", field="trainer", test=str),
-#         dict(name="age_int", field="age", test=int),
-#         dict(name="weight_valid", field="weight", assertion=validate_weight),
-#         dict(name="number_int", field="number", test=int),
-#         dict(name="last_ran_days_ago_int", field="last_ran_days_ago", test=int),
-#         dict(name="non_runner_bool", field="non_runner", test=bool),
-#         dict(name="form_str", field="form", test=str),
-#         dict(name="position_int", field="position", test=int),
-#         dict(name="distance_beaten_str", field="distance_beaten", test=str),
-#         dict(name="owner_str", field="owner", test=str),
-#         dict(name="sire_str", field="sire", test=str),
-#         dict(name="dam_str", field="dam", test=str),
-#         dict(name="OR_int", field="OR", test=int),
-#         dict(name="sp_float", field="sp", assertion=float),
-#         dict(name="odds_list", field="odds", test=list),
-#     ]
-#     validator = {"header": header, "constraints": constraints}
-#     return petl.validate(data, **validator)
+def validate_horse(data):
+    header = (
+        "horse",
+        "age",
+        "sex",
+        "sex_code",
+        "colour",
+        "region",
+        "dam",
+        "sire",
+        "damsire",
+        "trainer",
+        "owner",
+        "number",
+        "draw",
+        "headgear",
+        "lbs",
+        "ofr",
+        "jockey",
+        "last_run",
+        "form",
+    )
+
+    constraints = [
+        dict(name="horse_str", field="horse", test=str),
+        dict(name="age_int", field="age", test=int),
+        dict(name="sex_str", field="sex", test=str),
+        dict(name="colour_str", field="colour", test=str),
+        dict(name="region_str", field="region", test=str),
+        dict(name="dam_str", field="dam", test=str),
+        dict(name="sire_str", field="sire", test=str),
+        dict(name="damsire_str", field="damsire", test=str),
+        dict(name="trainer_str", field="trainer", test=str),
+        dict(name="owner_str", field="owner", test=str),
+        dict(name="jockey_str", field="jockey", test=str),
+        dict(name="number_digit", field="number", test=lambda x: x.isdigit()),
+        dict(name="draw_digit", field="draw", test=lambda x: x.isdigit()),
+        dict(name="headgear_str", field="headgear", test=str),
+        dict(name="lbs_valid", field="lbs", assertion=validate_weight),
+        dict(name="ofr_digit", field="ofr", test=lambda x: x.isdigit()),
+    ]
+    validator = {"header": header, "constraints": constraints}
+    return petl.validate(data, **validator)
 
 
-# @task(tags=["Rapid"])
-# def validate_results(data):
-#     header = (
-#         "id_race",
-#         "course",
-#         "date",
-#         "title",
-#         "distance",
-#         "age",
-#         "going",
-#         "finished",
-#         "canceled",
-#         "finish_time",
-#         "prize",
-#         "class",
-#         "horses",
-#     )
-#     constraints = [
-#         dict(name="course_str", field="course", test=str),
-#         dict(name="date_valid", field="date", assertion=validate_date),
-#         dict(name="title_str", field="title", test=str),
-#         dict(name="distance_valid", field="distance", assertion=validate_distance),
-#         dict(name="age_int", field="age", test=int),
-#         dict(name="going_valid", field="going", assertion=validate_going),
-#         dict(name="finished_bool", field="finished", test=bool),
-#         dict(name="canceled_bool", field="canceled", test=bool),
-#         dict(name="prize_valid", field="prize", assertion=validate_prize),
-#         dict(name="class_int", field="class", assertion=validate_class),
-#         dict(
-#             name="horses_list",
-#             field="horses",
-#             assertion=lambda x: [validate_horse(h) for h in x],
-#         ),
-#     ]
-#     validator = {"header": header, "constraints": constraints}
-#     return petl.validate(data, **validator)
+@task(tags=["TheRacingAPI"])
+def validate_racecards(data):
+    header = (
+        "course",
+        "date",
+        "off_time",
+        "race_name",
+        "distance_f",
+        "region",
+        "pattern",
+        "race_class",
+        "type",
+        "age_band",
+        "rating_band",
+        "prize",
+        "field_size",
+        "going",
+        "surface",
+        "runners",
+    )
+
+    constraints = [
+        dict(name="course_str", field="course", test=str),
+        dict(name="date_valid", field="date", assertion=validate_date),
+        dict(name="off_time_valid", field="off_time", assertion=validate_time),
+        dict(name="distance_float", field="distance_f", test=float),
+        dict(name="region_str", field="region", test=str),
+        dict(name="pattern_valid", field="pattern", test=RaceGrade),
+        dict(
+            name="race_class_valid",
+            field="race_class",
+            assertion=lambda x: not x or x.replace("Class ", "").isdigit(),
+        ),
+        dict(
+            name="age_band_valid", field="age_band", assertion=lambda x: x[0].isdigit()
+        ),
+        dict(
+            name="rating_band_valid",
+            field="rating_band",
+            assertion=lambda x: not x
+            or (x[0].isdigit() and x[-1].isdigit() and "-" in x),
+        ),
+        dict(
+            name="prize_valid",
+            field="prize",
+            assertion=lambda x: (x[0] == "£" or x[0] == "€") and x[1].isdigit(),
+        ),
+        dict(
+            name="runners_list",
+            field="runners",
+            assertion=lambda x: [validate_horse(h) for h in x],
+        ),
+    ]
+    validator = {"header": header, "constraints": constraints}
+    return petl.validate(data, **validator)
 
 
-# @flow
-# def rapid_horseracing_transformer():
-#     logger = get_run_logger()
-#     results = []
-#     count = 0
+@flow
+def theracingapi_transformer():
+    logger = get_run_logger()
+    racecards = []
+    count = 0
 
-#     for file in get_files(f"{SOURCE}results"):
-#         count += 1
-#         result = read_file(file)
-#         results.append(result)
-#         if count % 100 == 0:
-#             logger.info(f"Read {count} results")
+    for file in get_files(f"{SOURCE}racecards"):
+        count += 1
+        day = read_file(file)
+        racecards.extend(day["racecards"])
+        if count % 50 == 0:
+            logger.info(f"Read {count} days of racecards")
 
-#     data = petl.fromdicts(results)
-#     problems = validate_results(data)
-#     for problem in problems.dicts():
-#         log_validation_problem(problem)
+    logger.info(f"Read {count} days of racecards")
 
-#     return transform_results(data)
+    data = petl.fromdicts(racecards)
+    problems = validate_racecards(data)
+    for problem in problems.dicts():
+        log_validation_problem(problem)
+
+    return transform_racecards(data)
 
 
-# if __name__ == "__main__":
-#     data = rapid_horseracing_transformer()  # type: ignore
-#     print(data)
+if __name__ == "__main__":
+    data = theracingapi_transformer()  # type: ignore
+    print(data)
