@@ -16,6 +16,7 @@ from horsetalk import (
     RacecourseStyle,
     Surface,
 )
+from peak_utility.text.case import snake
 from prefect import flow, task
 from transformers.validators import validate_in_enum
 
@@ -40,23 +41,24 @@ def read_csv():
 @task(tags=["Core"])
 def transform_racecourses_data(data) -> list:
     used_fields = (
-        "Venue",
+        "Name",
+        "Formal Name",
         "Surface",
         "Shape",
         "Direction",
         "Speed",
         "Contour",
-        "RRAbbr",
+        "RR Abbr",
     )
     return (
         petl.cut(data, used_fields)
-        .rename({x: x.lower() for x in used_fields})
-        .rename({"venue": "name", "speed": "style", "direction": "handedness"})
-        .addfield("references", lambda rec: {"racing_research": rec["rrabbr"]})
+        .rename({x: snake(x.lower()) for x in used_fields})
+        .rename({"speed": "style", "direction": "handedness"})
+        .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
         .convert(
             ("surface", "shape", "style", "handedness", "contour"), lambda x: x.lower()
         )
-        .cutout("rrabbr")
+        .cutout("rr_abbr")
         .dicts()
     )
 
@@ -64,7 +66,8 @@ def transform_racecourses_data(data) -> list:
 @task(tags=["Core"])
 def validate_racecourses_data(data) -> bool:
     header = (
-        "Venue",
+        "Name",
+        "Formal Name",
         "Surface",
         "Grade",
         "Straight",
@@ -73,10 +76,15 @@ def validate_racecourses_data(data) -> bool:
         "Speed",
         "Contour",
         "Location",
-        "RRAbbr",
+        "RR Abbr",
     )
     constraints = [
-        dict(name="venue_str", field="Venue", assertion=lambda x: isinstance(x, str)),
+        dict(name="name_str", field="Name", assertion=lambda x: isinstance(x, str)),
+        dict(
+            name="formal_name_str",
+            field="Formal Name",
+            assertion=lambda x: isinstance(x, str),
+        ),
         dict(
             name="surface_valid",
             field="Surface",
@@ -86,7 +94,7 @@ def validate_racecourses_data(data) -> bool:
         dict(
             name="straight_valid",
             field="Straight",
-            assertion=lambda x: x is None or re.search(RaceDistance.REGEX, x),
+            assertion=lambda x: not x or re.search(RaceDistance.REGEX, x),
         ),
         dict(
             name="shape_valid",
@@ -110,7 +118,7 @@ def validate_racecourses_data(data) -> bool:
         ),
         dict(
             name="rr_abbr_valid",
-            field="RRAbbr",
+            field="RR Abbr",
             assertion=lambda x: isinstance(x, str) and len(x) == 3,
         ),
     ]
