@@ -7,6 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from peak_utility.text.case import normal
+from loaders.shared import convert_person
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
@@ -159,30 +160,71 @@ def load_formdata_horses(formdata=None):
 
 
 @flow
-def load_formdata_people(formdata=None):
+def load_formdata_jockeys(formdata=None):
     logger = get_run_logger()
 
     if formdata is None:
         formdata = formdata_transformer()
 
-    # ret_val = {}
-
     all_jockeys = []
+    for entry in formdata:
+        entry = entry._asdict()
+        jockeys = list(set([run._asdict()["jockey"] for run in entry["runs"]]))
+        all_jockeys.extend(jockeys)
+
+    all_jockeys = [adjust_rr_name(x) for x in list(set(all_jockeys))]
+
+    ret_val = {}
+    upsert_count = 0
+    added_count = 0
+    for jockey in all_jockeys:
+        person = convert_person(jockey, "racing_research")
+
+        search_criteria = {
+            "first": person["first"]
+            if len(person["first"]) > 1
+            else {"$regex": f"^{person['first']}", "$options": "i"},
+            "last": person["last"],
+        }
+
+        possibilities = db.people.find(search_criteria)
+        logger.info(f"{jockey} could be {list(possibilities)}")
+
+    logger.info(f"Upserted {upsert_count} jockeys from Formdata")
+    logger.info(f"Added {added_count} jockeys from Formdata")
+
+    return all_jockeys
+
+
+@flow
+def load_formdata_trainers(formdata=None):
+    logger = get_run_logger()
+
+    if formdata is None:
+        formdata = formdata_transformer()
+
+    ret_val = {}
+
     all_trainers = []
 
     for entry in formdata:
         entry = entry._asdict()
         all_trainers.append(entry["trainer"])
-        jockeys = list(set([run._asdict()["jockey"] for run in entry["runs"]]))
-        all_jockeys.extend(jockeys)
 
-    all_jockeys = [x for x in list(set(all_jockeys))]
-    all_trainers = [x for x in list(set(all_trainers))]
+    all_trainers = [adjust_rr_name(x) for x in list(set(all_trainers))]
 
-    logger.info(f"Found {len(all_jockeys)} jockeys")
     logger.info(f"Found {len(all_trainers)} trainers")
 
-    return {"jockeys": all_jockeys, "trainers": all_trainers}
+    return all_trainers
+
+
+@flow
+def load_formdata_people(formdata=None):
+    if formdata is None:
+        formdata = formdata_transformer()
+
+    load_formdata_jockeys(formdata)
+    # load_formdata_trainers(formdata)
 
 
 @flow
@@ -207,9 +249,6 @@ def load_formdata_afresh():
 
 
 if __name__ == "__main__":
-    data = load_formdata_people()  # type: ignore
-    # print(data["jockeys"])
-    # print(data["trainers"])
-
-    print([adjust_rr_name(x) for x in data["jockeys"]])
-    print([adjust_rr_name(x) for x in data["trainers"]])
+    load_formdata_jockeys()
+    # data = load_formdata_people()  # type: ignore
+    # print(data)
