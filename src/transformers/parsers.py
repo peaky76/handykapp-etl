@@ -38,21 +38,5 @@ def parse_weight(weight):
     return int(st) * 14 + int(lbs)
 
 
-def parse_yards(distance_description):
-    if not distance_description:
-        return 0
-
-    if "m" in distance_description:
-        parts = distance_description.split("m")
-        miles = int(parts[0])
-        furlongs = int(parts[1].split("f")[0]) if "f" in distance_description else 0
-    else:
-        parts = distance_description.split("f")
-        miles = 0
-        furlongs = int(parts[0]) if "f" in distance_description else 0
-
-    return (miles * 8 + furlongs) * 220
-
-
 def yob_from_age(age, date=pendulum.now()):
     return date.year - age
