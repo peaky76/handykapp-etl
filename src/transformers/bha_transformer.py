@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from models.mongo_horse import MongoHorse
-from horsetalk import Gender
+from horsetalk import Gender  # type: ignore
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
 from transformers.validators import (

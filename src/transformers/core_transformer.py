@@ -4,11 +4,11 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import petl
+import petl  # type: ignore
 import re
 import yaml
 from helpers import get_files, log_validation_problem, stream_file
-from horsetalk import (
+from horsetalk import (  # type: ignore
     Handedness,
     RaceDistance,
     RacecourseContour,
@@ -16,7 +16,7 @@ from horsetalk import (
     RacecourseStyle,
     Surface,
 )
-from peak_utility.text.case import snake
+from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
 from transformers.validators import validate_in_enum
 

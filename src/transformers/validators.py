@@ -1,6 +1,6 @@
 import pendulum
 import re
-from horsetalk import AWGoingDescription, Gender, TurfGoingDescription
+from horsetalk import AWGoingDescription, Gender, TurfGoingDescription  # type: ignore
 
 
 def validate_class(race_class):
