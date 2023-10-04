@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import yaml
-from horsetalk import CoatColour, Gender, RaceClass, RaceDistance, RaceGrade
+from horsetalk import CoatColour, Gender, Headgear, RaceClass, RaceDistance, RaceGrade
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import (
@@ -54,7 +54,7 @@ def transform_horse(data, race_date=pendulum.now()):
                 "saddlecloth": int,
                 "draw": int,
                 "lbs_carried": int,
-                "headgear": lambda x: x or None,
+                "headgear": lambda x: Headgear[x].name.title() if x else None,
                 "official_rating": int,
             }
         )
