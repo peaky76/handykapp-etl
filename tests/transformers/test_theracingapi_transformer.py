@@ -49,7 +49,7 @@ def horse_2_data():
         "owner": "John Kenny",
         "number": "2",
         "draw": "7",
-        "headgear": "",
+        "headgear": "bl",
         "lbs": "141",
         "ofr": "76",
         "jockey": "Brandon Wilkie(5)",
@@ -131,7 +131,7 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
         "allowance": 5,
         "saddlecloth": 2,
         "draw": 7,
-        "headgear": None,
+        "headgear": "Blinkers",
         "lbs_carried": 141,
         "official_rating": 76,
     }
