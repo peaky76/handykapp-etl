@@ -1,6 +1,5 @@
 import pendulum
 from transformers.parsers import (
-    parse_going,
     parse_handicap,
     parse_horse,
     parse_obstacle,
@@ -8,25 +7,6 @@ from transformers.parsers import (
     parse_yards,
     yob_from_age,
 )
-
-
-def test_parse_going_returns_correct_value_for_none():
-    assert parse_going(None) == {"main": None, "secondary": None}
-
-
-def test_parse_going_returns_correct_value_for_straight_going():
-    assert parse_going("GOOD") == {"main": "GOOD", "secondary": None}
-
-
-def test_parse_going_returns_correct_value_for_going_to_going():
-    assert parse_going("GOOD TO FIRM") == {"main": "GOOD TO FIRM", "secondary": None}
-
-
-def test_parse_going_returns_correct_value_for_going_with_in_places():
-    assert parse_going("GOOD (GOOD TO SOFT IN PLACES)") == {
-        "main": "GOOD",
-        "secondary": "GOOD TO SOFT",
-    }
 
 
 def test_parse_handicap_returns_true_if_name_contains_handicap():
