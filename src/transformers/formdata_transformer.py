@@ -1,20 +1,23 @@
 # To allow running as a script, need path
-from collections import namedtuple
 from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import fitz  # type: ignore
 import pendulum
 import petl  # type: ignore
 import re
-import sys
 import yaml
 
-from models.mongo_horse import MongoHorse
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
+from collections import namedtuple
+from datetime import timedelta
 from helpers import get_files, stream_file
 from horsetalk import RacingCode  # type: ignore
 from prefect import flow, get_run_logger, task
+from prefect.tasks import task_input_hash
+from models.mongo_horse import MongoHorse
+
 
 with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
@@ -349,7 +352,12 @@ def stream_formdata_by_word(file):
         yield from words
 
 
-@task(tags=["Racing Research"], task_run_name="{file}_horses")
+@task(
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(days=1),
+    tags=["Racing Research"],
+    task_run_name="{file}_horses",
+)
 def get_horses_from_formdata(file):
     logger = get_run_logger()
 
@@ -376,7 +384,7 @@ def transform_horse_data(data: dict) -> list[MongoHorse]:
 
 @flow
 def formdata_transformer():
-    files = get_formdatas(code=RacingCode.FLAT, after_year=22, for_refresh=True)
+    files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
     # files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
