@@ -1,5 +1,6 @@
 import re
 import pendulum
+from horsetalk import Gender
 
 
 def parse_going(going):
@@ -39,10 +40,6 @@ def parse_obstacle(race_title):
         if re.compile(regex).search(race_title.upper()):
             return obstacle
     return None
-
-
-def parse_sex(sex):
-    return "M" if sex.upper() in ["GELDING", "COLT", "STALLION", "RIG"] else "F"
 
 
 def parse_weight(weight):
