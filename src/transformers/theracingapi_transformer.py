@@ -211,8 +211,8 @@ def validate_racecards(data):
     return petl.validate(data, **validator)
 
 
-@flow
-def theracingapi_transformer():
+@task(tags=["TheRacingAPI"])
+def read_racecards():
     logger = get_run_logger()
     racecards = []
     count = 0
@@ -225,7 +225,12 @@ def theracingapi_transformer():
             logger.info(f"Read {count} days of racecards")
 
     logger.info(f"Read {count} days of racecards")
+    return racecards
 
+
+@flow
+def theracingapi_transformer():
+    racecards = read_racecards()
     data = petl.fromdicts(racecards)
     problems = validate_racecards(data)
     for problem in problems.dicts():
