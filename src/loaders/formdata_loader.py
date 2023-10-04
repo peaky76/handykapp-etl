@@ -6,7 +6,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
-from peak_utility.text.case import normal
+from peak_utility.text.case import normal  # type: ignore
 from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
