@@ -3,8 +3,8 @@ import petl
 import pytest
 from transformers.theracingapi_transformer import (
     transform_horse,
-    transform_racecards,
-    validate_racecards,
+    transform_races,
+    validate_races,
 )
 
 
@@ -141,7 +141,7 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
     assert actual == expected
 
 
-def test_transform_racecards_returns_correct_output(racecard_data):
+def test_transform_races_returns_correct_output(racecard_data):
     expected = {
         "course": "Ayr",
         "surface": "Turf",
@@ -159,7 +159,7 @@ def test_transform_racecards_returns_correct_output(racecard_data):
         "prize": "£4187",
     }
 
-    actual = transform_racecards.fn(petl.fromdicts([racecard_data]))
+    actual = transform_races.fn(petl.fromdicts([racecard_data]))
 
     assert len(actual["runners"]) == 2
     actual.pop("runners")
@@ -168,12 +168,12 @@ def test_transform_racecards_returns_correct_output(racecard_data):
 
 
 # def test_validate_racecard_returns_no_problems_for_correct_data(racecard_data):
-#     problems = validate_racecards.fn(petl.fromdicts([racecard_data]))
+#     problems = validate_races.fn(petl.fromdicts([racecard_data]))
 #     assert 0 == len(problems.dicts())
 
 
 # def test_validate_racecard_returns_problems_for_incorrect_data(racecard_data):
 #     racecard_data["course"] = 365
-#     problems = validate_racecards.fn(petl.fromdicts([racecard_data]))
+#     problems = validate_races.fn(petl.fromdicts([racecard_data]))
 #     assert 1 == len(problems.dicts())
 #     assert "horses" == problems.dicts()[0]["field"]
