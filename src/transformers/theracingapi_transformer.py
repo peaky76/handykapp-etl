@@ -67,12 +67,12 @@ def transform_horse(data, race_date=pendulum.now()):
         )
         .convert("jockey", lambda x: x.split("(")[0].strip())
         .cutout("sex_code", "last_run", "form", "age")
-        .dicts()
+        .dicts()[0]
     )
 
 
 @task(tags=["TheRacingAPI"])
-def transform_racecards(data):
+def transform_races(data):
     return (
         petl.rename(
             data,
@@ -105,7 +105,7 @@ def transform_racecards(data):
             }
         )
         .cutout("field_size", "region", "type")
-        .dicts()[0]
+        .dicts()
     )
 
 
@@ -155,7 +155,7 @@ def validate_horse(data):
 
 
 @task(tags=["TheRacingAPI"])
-def validate_racecards(data):
+def validate_races(data):
     header = (
         "course",
         "date",
@@ -230,13 +230,14 @@ def read_racecards():
 
 @flow
 def theracingapi_transformer():
-    racecards = read_racecards()
-    data = petl.fromdicts(racecards)
-    problems = validate_racecards(data)
+    races = read_racecards()
+    data = petl.fromdicts(races)
+    problems = validate_races(data)
     for problem in problems.dicts():
         log_validation_problem(problem)
 
-    return transform_racecards(data)
+    output = transform_races(data)
+    return output
 
 
 if __name__ == "__main__":
