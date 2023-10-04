@@ -4,7 +4,6 @@ from transformers.parsers import (
     parse_handicap,
     parse_horse,
     parse_obstacle,
-    parse_sex,
     parse_weight,
     parse_yards,
     yob_from_age,
@@ -116,30 +115,6 @@ def test_parse_obstacle_returns_correct_value_for_flat_race():
 
 def test_parse_obstacle_is_case_insensitive():
     assert "CHASE" == parse_obstacle("a chase")
-
-
-def test_parse_sex_returns_correct_value_for_gelding():
-    assert "M" == parse_sex("GELDING")
-
-
-def test_parse_sex_returns_correct_value_for_colt():
-    assert "M" == parse_sex("COLT")
-
-
-def test_parse_sex_returns_correct_value_for_stallion():
-    assert "M" == parse_sex("STALLION")
-
-
-def test_parse_sex_returns_correct_value_for_rig():
-    assert "M" == parse_sex("RIG")
-
-
-def test_parse_sex_returns_correct_value_for_filly():
-    assert "F" == parse_sex("FILLY")
-
-
-def test_parse_sex_returns_correct_value_for_mare():
-    assert "F" == parse_sex("MARE")
 
 
 def test_parse_yards_returns_correct_value_for_miles_and_furlongs():

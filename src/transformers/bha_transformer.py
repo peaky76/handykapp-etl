@@ -7,7 +7,6 @@ from models.mongo_horse import MongoHorse
 from horsetalk import Gender
 from helpers import get_files, log_validation_problem, stream_file
 from prefect import flow, task
-from transformers.parsers import parse_horse, parse_sex
 from transformers.validators import (
     validate_horse,
     validate_rating,
