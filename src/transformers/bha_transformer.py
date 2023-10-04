@@ -1,19 +1,19 @@
 import sys
 from pathlib import Path
-from models.mongo_horse import MongoHorse
 
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from models.mongo_horse import MongoHorse
+from horsetalk import Gender
+from helpers import get_files, log_validation_problem, stream_file
+from prefect import flow, task
+from transformers.parsers import parse_horse, parse_sex
 from transformers.validators import (
     validate_horse,
     validate_rating,
     validate_sex,
     validate_year,
 )
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from helpers import get_files, log_validation_problem, stream_file
-from prefect import flow, task
-from transformers.parsers import parse_horse, parse_sex
 import petl  # type: ignore
 import yaml
 
@@ -68,7 +68,7 @@ def transform_ratings_data(data) -> list[MongoHorse]:
             if rec["sex"] == "GELDING"
             else None,
         )
-        .convert({"sex": parse_sex})
+        .convert({"sex": lambda x: Gender[x].sex.name[0]})
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types)
         .dicts()
