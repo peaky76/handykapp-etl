@@ -89,7 +89,9 @@ def transform_races(data):
         )
         .addfield(
             "is_handicap",
-            lambda rec: RaceTitle.parse(rec["title"])["race_designation"].name
+            lambda rec: getattr(
+                RaceTitle.parse(rec["title"])["race_designation"], "name", None
+            )
             == "HANDICAP",
             index=4,
         )
