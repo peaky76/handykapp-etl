@@ -7,11 +7,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
-from horsetalk import HorseAge, RaceTitle
+from horsetalk import HorseAge, RaceTitle, RaceWeight
 from transformers.parsers import (
     parse_horse,
     parse_obstacle,
-    parse_weight,
 )
 from transformers.validators import (
     validate_class,
@@ -51,7 +50,7 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
                 "days_since_prev_run": int,
                 "official_rating": int,
                 "non_runner": lambda x: bool(int(x)),
-                "lbs_carried": parse_weight,
+                "lbs_carried": lambda x: RaceWeight(x).lb,
             }
         )
         .addfield(
