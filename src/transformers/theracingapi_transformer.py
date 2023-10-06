@@ -9,13 +9,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import yaml
-from horsetalk import CoatColour, Gender, Headgear, RaceClass, RaceDistance, RaceGrade, RaceTitle  # type: ignore
+from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade, RaceTitle  # type: ignore
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
-from transformers.parsers import (
-    parse_obstacle,
-    yob_from_age,
-)
+from transformers.parsers import parse_obstacle
 from transformers.validators import (
     validate_date,
     validate_time,
@@ -57,7 +54,11 @@ def transform_horse(data, race_date=pendulum.now()):
                 "official_rating": int,
             }
         )
-        .addfield("year", lambda rec: yob_from_age(rec["age"], race_date), index=3)
+        .addfield(
+            "year",
+            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
+            index=3,
+        )
         .addfield(
             "allowance",
             lambda rec: int(rec["jockey"].split("(")[1].split(")")[0])

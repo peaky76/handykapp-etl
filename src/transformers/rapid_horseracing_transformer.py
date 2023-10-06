@@ -7,12 +7,11 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
-from horsetalk import RaceTitle
+from horsetalk import HorseAge, RaceTitle
 from transformers.parsers import (
     parse_horse,
     parse_obstacle,
     parse_weight,
-    yob_from_age,
 )
 from transformers.validators import (
     validate_class,
@@ -55,7 +54,11 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
                 "lbs_carried": parse_weight,
             }
         )
-        .addfield("year", lambda rec: yob_from_age(rec["age"], race_date), index=1)
+        .addfield(
+            "year",
+            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
+            index=1,
+        )
         .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1], index=1)
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
         .addfield(
