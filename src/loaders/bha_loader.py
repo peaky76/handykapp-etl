@@ -109,9 +109,9 @@ def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
         count += 1
 
         if count and count % 250 == 0:
-            logger.info(f"Added {count} trainers to horses")
+            logger.info(f"Added trainers to {count} horses")
 
-    logger.info(f"Added {count} trainers to horses")
+    logger.info(f"Added trainers to {count} horses")
 
 
 @flow
