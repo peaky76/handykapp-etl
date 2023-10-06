@@ -2,7 +2,6 @@ import pendulum
 from transformers.parsers import (
     parse_horse,
     parse_obstacle,
-    parse_weight,
 )
 
 
@@ -72,7 +71,3 @@ def test_parse_obstacle_returns_correct_value_for_flat_race():
 
 def test_parse_obstacle_is_case_insensitive():
     assert "CHASE" == parse_obstacle("a chase")
-
-
-def test_parse_weight_returns_correct_value_for_st_lbs_with_hyphen():
-    assert 145 == parse_weight("10-5")

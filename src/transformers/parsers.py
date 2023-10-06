@@ -1,5 +1,4 @@
 import re
-import pendulum
 
 
 def parse_horse(horse, default_country=None):
@@ -25,8 +24,3 @@ def parse_obstacle(race_title):
         if re.compile(regex).search(race_title.upper()):
             return obstacle
     return None
-
-
-def parse_weight(weight):
-    st, lbs = weight.split("-")
-    return int(st) * 14 + int(lbs)
