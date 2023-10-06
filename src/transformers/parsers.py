@@ -30,7 +30,3 @@ def parse_obstacle(race_title):
 def parse_weight(weight):
     st, lbs = weight.split("-")
     return int(st) * 14 + int(lbs)
-
-
-def yob_from_age(age, date=pendulum.now()):
-    return date.year - age
