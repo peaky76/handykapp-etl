@@ -9,11 +9,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import yaml
-from horsetalk import CoatColour, Gender, Headgear, RaceClass, RaceDistance, RaceGrade  # type: ignore
+from horsetalk import CoatColour, Gender, Headgear, RaceClass, RaceDistance, RaceGrade, RaceTitle  # type: ignore
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import (
-    parse_handicap,
     parse_obstacle,
     yob_from_age,
 )
@@ -87,7 +86,12 @@ def transform_races(data):
                 "race_class": "class",
             },
         )
-        .addfield("is_handicap", lambda rec: parse_handicap(rec["title"]), index=4)
+        .addfield(
+            "is_handicap",
+            lambda rec: RaceTitle.parse(rec["title"])["race_designation"].name
+            == "HANDICAP",
+            index=4,
+        )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .convert(
             {
