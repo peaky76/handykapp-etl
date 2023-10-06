@@ -2,12 +2,6 @@ import re
 import pendulum
 
 
-def parse_handicap(title):
-    return (
-        any(word in title.upper() for word in ["HANDICAP", "H'CAP"]) if title else None
-    )
-
-
 def parse_horse(horse, default_country=None):
     if not horse:
         return (None, None)
