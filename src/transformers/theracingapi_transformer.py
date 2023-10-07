@@ -81,9 +81,8 @@ def transform_races(data):
                 "age_band": "age_restriction",
                 "rating_band": "rating_restriction",
                 "going": "going_description",
-                "pattern": "grade",
+                "pattern": "race_grade",
                 "distance_f": "distance_description",
-                "race_class": "class",
             },
         )
         .addfield(
@@ -107,8 +106,8 @@ def transform_races(data):
         .convert(
             {
                 "prize": lambda x: x.replace(",", ""),
-                "grade": lambda x: str(RaceGrade(x)) if x else None,
-                "class": lambda x: int(RaceClass(x)),
+                "race_grade": lambda x: str(RaceGrade(x)) if x else None,
+                "race_class": lambda x: int(RaceClass(x)),
                 "distance_description": lambda x: str(
                     RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
                 ),
