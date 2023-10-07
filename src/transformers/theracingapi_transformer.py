@@ -100,9 +100,7 @@ def transform_races(data):
         .addfield(
             "datetime",
             lambda rec: pendulum.parse(
-                rec["date"]
-                + " "
-                + f"{str(int(rec['off_time'].split(':')[0])+12)}:{rec['off_time'].split(':')[1]}"
+                f"{rec['date']} {str(int(rec['off_time'].split(':')[0])+12)}:{rec['off_time'].split(':')[1]}"
             ).to_iso8601_string(),
             index=1,
         )
