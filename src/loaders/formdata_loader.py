@@ -124,7 +124,7 @@ def load_runs(formdata, horse_ids):
             )
 
 
-@flow(tags=["Racing Research"])
+@flow
 def load_formdata_horses(formdata=None):
     logger = get_run_logger()
 
@@ -158,7 +158,7 @@ def load_formdata_horses(formdata=None):
     return ret_val
 
 
-@flow(tags=["Racing Research"])
+@flow
 def load_formdata_people(formdata=None):
     logger = get_run_logger()
 
@@ -185,7 +185,7 @@ def load_formdata_people(formdata=None):
     return {"jockeys": all_jockeys, "trainers": all_trainers}
 
 
-@flow(tags=["Racing Research"])
+@flow
 def load_formdata_afresh():
     db.formdata.drop()
     db.horses.drop()
