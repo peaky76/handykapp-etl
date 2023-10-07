@@ -33,9 +33,7 @@ def spec_database():
         unique=True,
     )
     db.racecourses.create_index("name")
-    db.races.create_index(
-        [("racecourse", ASC), ("date", ASC), ("time", ASC)], unique=True
-    )
+    db.races.create_index([("racecourse", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
 
 
