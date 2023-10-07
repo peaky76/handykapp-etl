@@ -32,6 +32,60 @@ def make_update_dictionary(horse, lookup):
     return update_dictionary
 
 
+def declaration_processor():
+    logger = get_run_logger()
+    logger.info("Starting declaration processor")
+    racecourse_ids = {}
+    racecourse_adds_count = 0
+    declaration_adds_count = 0
+
+    try:
+        while True:
+            dec = yield
+            racecourse_id = racecourse_ids.get(
+                (dec["course"], dec["surface"], dec["obstacle"])
+            )
+
+            if not racecourse_id:
+                racecourse = db.racecourses.find_one(
+                    {
+                        "name": dec["course"].title(),
+                        "surface": dec["surface"].lower(),
+                        "obstacle": dec["obstacle"],
+                    },
+                    {"_id": 1},
+                )
+
+                if racecourse:
+                    racecourse_id = racecourse["_id"]
+                    racecourse_ids[
+                        (dec["course"], dec["surface"], dec["obstacle"])
+                    ] = racecourse_id
+
+            if racecourse_id:
+                db.races.insert_one(
+                    {
+                        "racecourse": racecourse_id,
+                        "date": dec["date"],
+                        "time": dec["time"],
+                        "title": dec["title"],
+                        "is_handicap": dec["is_handicap"],
+                        "distance_description": dec["distance_description"],
+                        "grade": dec["grade"],
+                        "class": dec["class"],
+                        "age_restriction": dec["age_restriction"],
+                        "rating_restriction": dec["rating_restriction"],
+                        "prize": dec["prize"],
+                    }
+                )
+                declaration_adds_count += 1
+
+    except GeneratorExit:
+        logger.info(
+            f"Finished processing declarations. Added {racecourse_adds_count} courses, {declaration_adds_count} declarations"
+        )
+
+
 def horse_processor():
     logger = get_run_logger()
     logger.info("Starting horse processor")
@@ -76,8 +130,11 @@ def race_processor():
     logger.info("Starting race processor")
     race_count = 0
 
-    h = horse_processor()
-    next(h)
+    d = declaration_processor()
+    next(d)
+
+    # h = horse_processor()
+    # next(h)
 
     try:
         while True:
@@ -86,11 +143,14 @@ def race_processor():
                 logger.debug(
                     f"Processing {race['time']} from {race['course']} on {race['date']}"
                 )
-                for horse in race["runners"]:
-                    h.send({"name": horse["sire"], "sex": "M"})
-                    h.send({"name": horse["damsire"], "sex": "M"})
-                    h.send({"name": horse["dam"], "sex": "F", "sire": horse["damsire"]})
-                    h.send(horse)
+
+                d.send(race)
+
+                # for horse in race["runners"]:
+                #     h.send({"name": horse["sire"], "sex": "M"})
+                #     h.send({"name": horse["damsire"], "sex": "M"})
+                #     h.send({"name": horse["dam"], "sex": "F", "sire": horse["damsire"]})
+                #     h.send(horse)
 
                 race_count += 1
 
@@ -99,7 +159,7 @@ def race_processor():
 
     except GeneratorExit:
         logger.info(f"Processed {race_count} races")
-        h.close()
+        d.close()
 
 
 @flow
@@ -116,4 +176,6 @@ def load_theracingapi_data(data=None):
 
 
 if __name__ == "__main__":
+    db.horses.drop()
+    db.races.drop()
     load_theracingapi_data()
