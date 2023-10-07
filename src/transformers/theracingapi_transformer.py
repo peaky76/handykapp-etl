@@ -77,7 +77,6 @@ def transform_races(data):
         petl.rename(
             data,
             {
-                "off_time": "time",
                 "race_name": "title",
                 "age_band": "age_restriction",
                 "rating_band": "rating_restriction",
@@ -96,12 +95,16 @@ def transform_races(data):
             index=4,
         )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
+        .addfield(
+            "datetime",
+            lambda rec: pendulum.parse(
+                rec["date"]
+                + " "
+                + f"{str(int(rec['off_time'].split(':')[0])+12)}:{rec['off_time'].split(':')[1]}"
+            ).to_iso8601_string(),
+        )
         .convert(
             {
-                "time": lambda x: pendulum.parse(
-                    f"{str(int(x.split(':')[0])+12)}:{x.split(':')[1]}",
-                    tz="Europe/London",
-                ).to_time_string(),
                 "prize": lambda x: x.replace(",", ""),
                 "grade": lambda x: str(RaceGrade(x)) if x else None,
                 "class": lambda x: int(RaceClass(x)),
@@ -111,7 +114,7 @@ def transform_races(data):
                 "runners": lambda x: [transform_horse(petl.fromdicts([h])) for h in x],
             }
         )
-        .cutout("field_size", "region", "type")
+        .cutout("field_size", "region", "type", "date", "off_time")
         .dicts()
     )
 
