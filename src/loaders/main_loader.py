@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from prefect import flow, task
 from pymongo import ASCENDING as ASC
-from loaders.bha_loader import load_bha_afresh
+from loaders.bha_loader import load_bha
 from loaders.racecourse_loader import load_racecourses
 from loaders.formdata_loader import load_formdata_horses
 
@@ -42,7 +42,7 @@ def load_database_afresh():
     drop_database()
     spec_database()
     load_racecourses()
-    load_bha_afresh()
+    load_bha()
     load_formdata_horses()
 
 
