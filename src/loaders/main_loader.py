@@ -32,6 +32,7 @@ def spec_database():
         [("name", ASC), ("country", ASC), ("obstacle", ASC), ("surface", ASC)],
         unique=True,
     )
+    db.racecourses.create_index("name")
     db.races.create_index(
         [("racecourse", ASC), ("date", ASC), ("time", ASC)], unique=True
     )
