@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys
 
-from loaders.shared import convert_person, select_set
+from loaders.shared import convert_person, convert_value_to_id, select_set
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -21,16 +21,6 @@ with open("api_info.yml", "r") as f:
 SOURCE = api_info["bha"]["spaces"]["dir"]
 
 db = client.handykapp
-
-
-def convert_value_to_id(horse, value, lookup):
-    if value:
-        horse[value] = (
-            lookup.get(parse_horse(horse[value]), None)
-            if value in ["sire", "dam"]
-            else lookup.get(horse[value], None)
-        )
-    return horse
 
 
 @task(tags=["BHA"], task_run_name="load_{descriptor}")
