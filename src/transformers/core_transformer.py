@@ -10,6 +10,7 @@ import yaml
 from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import (  # type: ignore
     Handedness,
+    JumpCategory,
     RaceDistance,
     RacecourseContour,
     RacecourseShape,
@@ -44,6 +45,7 @@ def transform_racecourses_data(data) -> list:
         "Name",
         "Formal Name",
         "Surface",
+        "Obstacle",
         "Shape",
         "Direction",
         "Speed",
@@ -58,6 +60,7 @@ def transform_racecourses_data(data) -> list:
         .convert(
             ("surface", "shape", "style", "handedness", "contour"), lambda x: x.lower()
         )
+        .convert("obstacle", lambda x: x or None)
         .cutout("rr_abbr")
         .dicts()
     )
@@ -69,6 +72,7 @@ def validate_racecourses_data(data) -> bool:
         "Name",
         "Formal Name",
         "Surface",
+        "Obstacle",
         "Grade",
         "Straight",
         "Shape",
@@ -89,6 +93,11 @@ def validate_racecourses_data(data) -> bool:
             name="surface_valid",
             field="Surface",
             assertion=lambda x: validate_in_enum(x, Surface),
+        ),
+        dict(
+            name="obstacle_valid",
+            field="Obstacle",
+            assertion=lambda x: validate_in_enum(x, JumpCategory) or not x,
         ),
         dict(name="grade_int", field="Grade", assertion=int),
         dict(
