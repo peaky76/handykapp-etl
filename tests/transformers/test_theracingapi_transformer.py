@@ -145,8 +145,7 @@ def test_transform_races_returns_correct_output(racecard_data):
     expected = {
         "course": "Ayr",
         "surface": "Turf",
-        "date": "2023-10-03",
-        "time": "13:42:00",
+        "datetime": "2023-10-03T13:42:00Z",
         "title": "Virgin Bet Apprentice Handicap",
         "is_handicap": True,
         "obstacle": None,
@@ -159,7 +158,7 @@ def test_transform_races_returns_correct_output(racecard_data):
         "prize": "£4187",
     }
 
-    actual = transform_races.fn(petl.fromdicts([racecard_data]))
+    actual = transform_races.fn(petl.fromdicts([racecard_data]))[0]
 
     assert len(actual["runners"]) == 2
     actual.pop("runners")
