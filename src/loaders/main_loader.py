@@ -8,8 +8,8 @@ from clients import mongo_client as client
 from prefect import flow, task
 from pymongo import ASCENDING as ASC
 from loaders.bha_loader import load_bha_afresh
+from loaders.racecourse_loader import load_racecourses
 from loaders.formdata_loader import load_formdata_horses
-
 
 db = client.handykapp
 
@@ -28,8 +28,13 @@ def spec_database():
     db.people.create_index(
         [("last", ASC), ("first", ASC), ("middle", ASC)], unique=True
     )
-    db.racecourses.create_index([("name", ASC), ("country", ASC)], unique=True)
-    db.races.create_index([("course", ASC), ("date", ASC), ("time", ASC)], unique=True)
+    db.racecourses.create_index(
+        [("name", ASC), ("country", ASC), ("obstacle", ASC), ("surface", ASC)],
+        unique=True,
+    )
+    db.races.create_index(
+        [("racecourse", ASC), ("date", ASC), ("time", ASC)], unique=True
+    )
     db.races.create_index("result.horse")
 
 
@@ -38,6 +43,7 @@ def load_database_afresh():
     drop_database()
     spec_database()
     load_bha_afresh()
+    load_racecourses()
     load_formdata_horses()
 
 
