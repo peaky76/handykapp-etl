@@ -83,7 +83,7 @@ def load_formdata(formdata):
     return ret_val
 
 
-@task
+@task(tags=["Racing Research"])
 def load_races(formdata):
     codes_to_courses = create_code_to_course_dict()
     for entry in formdata:
@@ -98,7 +98,7 @@ def load_races(formdata):
                 pass
 
 
-@task
+@task(tags=["Racing Research"])
 def load_runs(formdata, horse_ids):
     codes_to_courses = create_code_to_course_dict()
     for entry in formdata:
@@ -124,7 +124,7 @@ def load_runs(formdata, horse_ids):
             )
 
 
-@flow
+@flow(tags=["Racing Research"])
 def load_formdata_horses(formdata=None):
     logger = get_run_logger()
 
@@ -158,7 +158,7 @@ def load_formdata_horses(formdata=None):
     return ret_val
 
 
-@flow
+@flow(tags=["Racing Research"])
 def load_formdata_people(formdata=None):
     logger = get_run_logger()
 
@@ -185,7 +185,7 @@ def load_formdata_people(formdata=None):
     return {"jockeys": all_jockeys, "trainers": all_trainers}
 
 
-@flow
+@flow(tags=["Racing Research"])
 def load_formdata_afresh():
     db.formdata.drop()
     db.horses.drop()
