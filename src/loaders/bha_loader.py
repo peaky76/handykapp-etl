@@ -161,16 +161,21 @@ def load_bha_people(data=None):
 
 
 @flow
-def load_bha_afresh(data=None):
+def load_bha(data=None):
     if data is None:
         data = bha_transformer()
 
-    db.horses.drop()
-    db.people.drop()
     horse_lookup = load_bha_horses(data)
     person_lookup = load_bha_people(data)
     enrich_with_bha_ratings(data, horse_lookup)
     associate_horse_with_trainer(data, horse_lookup, person_lookup)
+
+
+@flow
+def load_bha_afresh(data=None):
+    db.horses.drop()
+    db.people.drop()
+    load_bha(data)
 
 
 if __name__ == "__main__":
