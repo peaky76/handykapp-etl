@@ -56,6 +56,7 @@ def transform_racecourses_data(data) -> list:
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
         .rename({"speed": "style", "direction": "handedness"})
+        .addfield("country", "GB", index=2)
         .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
         .convert(
             ("surface", "shape", "style", "handedness", "contour"), lambda x: x.lower()
