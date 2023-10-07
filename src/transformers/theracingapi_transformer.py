@@ -88,10 +88,12 @@ def transform_races(data):
         )
         .addfield(
             "is_handicap",
-            lambda rec: getattr(
-                RaceTitle.parse(rec["title"])["race_designation"], "name", None
-            )
-            == "HANDICAP",
+            lambda rec: "HANDICAP" in rec["title"].upper()
+            or "H'CAP" in rec["title"].upper(),
+            # getattr(
+            #     RaceTitle.parse(rec["title"])["race_designation"], "name", None
+            # )
+            # == "HANDICAP",
             index=4,
         )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
@@ -102,6 +104,7 @@ def transform_races(data):
                 + " "
                 + f"{str(int(rec['off_time'].split(':')[0])+12)}:{rec['off_time'].split(':')[1]}"
             ).to_iso8601_string(),
+            index=1,
         )
         .convert(
             {
