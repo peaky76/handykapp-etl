@@ -118,6 +118,7 @@ def transform_races(data):
         )
         .convert(
             {
+                "course": lambda x: x.replace(" (AW)", ""),
                 "prize": lambda x: x.replace(",", ""),
                 "race_grade": lambda x: str(RaceGrade(x)) if x else None,
                 "race_class": lambda x: int(RaceClass(x)),
