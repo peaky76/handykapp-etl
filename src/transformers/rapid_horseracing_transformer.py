@@ -12,6 +12,7 @@ from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from horsetalk import Going, HorseAge, RaceTitle, RaceWeight, TurfGoingDescription
 from transformers.parsers import (
+    parse_code,
     parse_horse,
     parse_obstacle,
 )
@@ -110,13 +111,7 @@ def transform_results(data):
             index=6,
         )
         .addfield(
-            "code",
-            lambda rec: "National Hunt"
-            if rec["obstacle"]
-            or "National Hunt" in rec["title"]
-            or "NH" in rec["title"]
-            else "Flat",
-            index=6,
+            "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
         .addfield(
             "result",
