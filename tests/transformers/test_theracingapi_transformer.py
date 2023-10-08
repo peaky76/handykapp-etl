@@ -162,6 +162,7 @@ def test_transform_races_returns_correct_output(racecard_data):
     expected = {
         "course": "Ayr",
         "surface": "Turf",
+        "code": "Flat",
         "datetime": "2023-10-03T13:42:00Z",
         "title": "Virgin Bet Apprentice Handicap",
         "is_handicap": True,
