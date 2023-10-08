@@ -288,41 +288,25 @@ def person_processor():
         )
 
 
-def race_processor():
+@flow
+def load_theracingapi_data(data=None):
     logger = get_run_logger()
-    logger.info("Starting race processor")
+    if data is None:
+        data = theracingapi_transformer()
     race_count = 0
 
     d = declaration_processor()
     next(d)
-
-    try:
-        while True:
-            race = yield
-            if race:
-                logger.debug(f"Processing {race['datetime']} from {race['course']}")
-                d.send(race)
-                race_count += 1
-
-            if race_count and race_count % 100 == 0:
-                logger.info(f"Processed {race_count} races")
-
-    except GeneratorExit:
-        logger.info(f"Processed {race_count} races")
-        d.close()
-
-
-@flow
-def load_theracingapi_data(data=None):
-    if data is None:
-        data = theracingapi_transformer()
-
-    r = race_processor()
-    next(r)
     for race in data:
-        r.send(race)
+        logger.debug(f"Processing {race['datetime']} from {race['course']}")
+        d.send(race)
+        race_count += 1
 
-    r.close()
+        if race_count and race_count % 100 == 0:
+            logger.info(f"Processed {race_count} races")
+
+    logger.info(f"Processed {race_count} races")
+    d.close()
 
 
 if __name__ == "__main__":
