@@ -5,9 +5,10 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, get_run_logger
-from loaders.adders import add_horse
+from loaders.adders import add_horse, add_person
 from transformers.theracingapi_transformer import theracingapi_transformer
 from clients import mongo_client as client
+from nameparser import HumanName
 from pymongo.errors import DuplicateKeyError
 
 db = client.handykapp
@@ -123,6 +124,9 @@ def horse_processor():
     adds_count = 0
     skips_count = 0
 
+    p = person_processor()
+    next(p)
+
     try:
         while True:
             horse = yield
@@ -189,10 +193,98 @@ def horse_processor():
                         }
                     },
                 )
+                p.send(
+                    {
+                        "name": horse["trainer"],
+                        "role": "trainer",
+                        "race_id": race_id,
+                        "runner_id": horse_ids[name],
+                    }
+                )
+                p.send(
+                    {
+                        "name": horse["jockey"],
+                        "role": "jockey",
+                        "race_id": race_id,
+                        "runner_id": horse_ids[name],
+                    }
+                )
 
     except GeneratorExit:
         logger.info(
             f"Finished processing horses. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
+        )
+        p.close()
+
+
+def person_processor():
+    logger = get_run_logger()
+    logger.info("Starting person processor")
+    person_ids = {}
+    updated_count = 0
+    adds_count = 0
+    skips_count = 0
+
+    try:
+        while True:
+            person = yield
+            found_id = None
+            name = person["name"]
+            race_id = person["race_id"]
+            runner_id = person["runner_id"]
+            role = person["role"]
+
+            # Add person to db if not there
+            if name in person_ids.keys():
+                logger.debug(f"{person} skipped")
+                skips_count += 1
+            else:
+                name_parts = HumanName(name)
+                result = db.people.find({"last": name_parts.last})
+                for possibility in result:
+                    if name_parts.first == possibility["first"]:
+                        found_id = possibility["_id"]
+                        break
+                    elif (
+                        name_parts.first
+                        and possibility["first"]
+                        and name_parts.first[0] == possibility["first"][0]
+                        and name_parts.title == possibility["title"]
+                    ):
+                        found_id = possibility["_id"]
+                        break
+
+                if found_id:
+                    db.people.update_one(
+                        {"_id": found_id},
+                        {"$set": {"references.theracingapi": name}},
+                    )
+                    logger.debug(f"{person} updated")
+                    updated_count += 1
+                    person_ids[name] = found_id
+                else:
+                    added_id = add_person(
+                        name_parts.as_dict() | {"references.theracingapi": name}
+                    )
+                    logger.info(f"{person} added to db")
+                    adds_count += 1
+                    person_ids[name] = added_id
+
+            # Add person to horse in race
+            if race_id:
+                if role == "trainer":
+                    update_dictionary = {"runners.$.trainer": person_ids[name]}
+                elif role == "jockey":
+                    update_dictionary = {"runners.$.jockey": person_ids[name]}
+
+                db.races.update_one(
+                    {"_id": race_id, "runners._id": runner_id},
+                    {"$set": update_dictionary},
+                )
+
+    except GeneratorExit:
+        logger.info(
+            f"Finished processing people. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
         )
 
 
@@ -234,6 +326,6 @@ def load_theracingapi_data(data=None):
 
 
 if __name__ == "__main__":
-    db.horses.drop()
+    # db.horses.drop()
     db.races.drop()
     load_theracingapi_data()
