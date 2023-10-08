@@ -44,14 +44,15 @@ def declaration_processor():
         while True:
             dec = yield
             racecourse_id = racecourse_ids.get(
-                (dec["course"], dec["surface"], dec["obstacle"])
+                (dec["course"], dec["surface"], dec["code"], dec["obstacle"])
             )
 
             if not racecourse_id:
                 racecourse = db.racecourses.find_one(
                     {
                         "name": dec["course"].title(),
-                        "surface": dec["surface"].lower(),
+                        "surface": dec["surface"],
+                        "code": dec["code"],
                         "obstacle": dec["obstacle"],
                     },
                     {"_id": 1},
@@ -60,7 +61,7 @@ def declaration_processor():
                 if racecourse:
                     racecourse_id = racecourse["_id"]
                     racecourse_ids[
-                        (dec["course"], dec["surface"], dec["obstacle"])
+                        (dec["course"], dec["surface"], dec["code"], dec["obstacle"])
                     ] = racecourse_id
 
             if racecourse_id:
