@@ -6,22 +6,22 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import json
 import pendulum
+import tomllib
 from time import sleep
 from prefect import flow, task
 from helpers import fetch_content, get_files, read_file, write_file
 from prefect.blocks.system import Secret
-import yaml
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
 # NB: In RapidAPI, results are called race details
 
-SOURCE = api_info["rapid_horseracing"]["source"]["dir"]
-DESTINATION = api_info["rapid_horseracing"]["spaces"]["dir"]
+SOURCE = settings["rapid_horseracing"]["source_dir"]
+DESTINATION = settings["rapid_horseracing"]["spaces_dir"]
 RACECARDS_DESTINATION = f"{DESTINATION}racecards/"
 RESULTS_DESTINATION = f"{DESTINATION}results/"
-LIMITS = api_info["rapid_horseracing"]["limits"]
+LIMITS = settings["rapid_horseracing"]["limits"]
 
 
 def get_file_date(filename):

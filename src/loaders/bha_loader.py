@@ -2,23 +2,15 @@
 from pathlib import Path
 import sys
 
-from loaders.shared import convert_person, convert_value_to_id, select_set
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, task, get_run_logger
 from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
 from loaders.adders import add_horse, add_person
+from loaders.shared import convert_person, convert_value_to_id, select_set
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
-
-import yaml
-
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
-
-SOURCE = api_info["bha"]["spaces"]["dir"]
 
 db = client.handykapp
 

@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import petl  # type: ignore
 import re
-import yaml
+import tomllib
 from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import (  # type: ignore
     Handedness,
@@ -22,10 +22,10 @@ from prefect import flow, task
 from transformers.validators import validate_in_enum
 
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-SOURCE = api_info["core"]["spaces"]["dir"]
+SOURCE = settings["core"]["spaces_dir"]
 
 
 @task(tags=["Core"], name="get_racecourses_csv")
