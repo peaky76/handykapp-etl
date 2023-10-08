@@ -180,9 +180,7 @@ def horse_processor():
                         "$push": {
                             "runners": {
                                 "horse": horse_ids[name],
-                                # "trainer": "K R Burke",
-                                # "owner": "John Kenny",
-                                # "jockey": "Brandon Wilkie",
+                                "owner": horse["owner"],
                                 "allowance": horse["allowance"],
                                 "saddlecloth": horse["saddlecloth"],
                                 "draw": horse["draw"],
