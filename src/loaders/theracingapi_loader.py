@@ -48,10 +48,13 @@ def declaration_processor():
             )
 
             if not racecourse_id:
+                surface_options = (
+                    ["Tapeta", "Polytrack"] if dec["surface"] == "AW" else ["Turf"]
+                )
                 racecourse = db.racecourses.find_one(
                     {
                         "name": dec["course"].title(),
-                        "surface": dec["surface"],
+                        "surface": {"$in": surface_options},
                         "code": dec["code"],
                         "obstacle": dec["obstacle"],
                     },
