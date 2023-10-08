@@ -12,7 +12,7 @@ import tomllib
 from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade  # type: ignore
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
-from transformers.parsers import parse_obstacle
+from transformers.parsers import parse_code, parse_obstacle
 from transformers.validators import (
     validate_date,
     validate_time,
@@ -108,13 +108,7 @@ def transform_races(data):
         )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
-            "code",
-            lambda rec: "National Hunt"
-            if rec["obstacle"]
-            or "National Hunt" in rec["title"]
-            or "NH" in rec["title"]
-            else "Flat",
-            index=6,
+            "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
         .convert(
             {
