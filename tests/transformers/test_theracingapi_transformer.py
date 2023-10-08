@@ -96,6 +96,10 @@ def test_build_datetime_with_evening_race():
     assert build_datetime("2023-10-03", "9:15") == "2023-10-03T21:15:00Z"
 
 
+def test_build_datetime_with_minutes_below_ten():
+    assert build_datetime("2023-10-03", "3:05") == "2023-10-03T15:05:00Z"
+
+
 def test_transform_horse_returns_correct_output_when_professional_jockey(
     horse_1_data, mocker
 ):
