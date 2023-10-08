@@ -122,6 +122,8 @@ def transform_races(data):
                 "prize": lambda x: x.replace(",", ""),
                 "race_grade": lambda x: str(RaceGrade(x)) if x else None,
                 "race_class": lambda x: int(RaceClass(x)),
+                "age_restriction": lambda x: x or None,
+                "rating_restriction": lambda x: x or None,
                 "distance_description": lambda x: str(
                     RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
                 ),
