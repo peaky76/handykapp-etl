@@ -101,11 +101,20 @@ def transform_races(data):
             # == "HANDICAP",
             index=4,
         )
-        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "datetime",
             lambda rec: build_datetime(rec["date"], rec["off_time"]),
             index=1,
+        )
+        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
+        .addfield(
+            "code",
+            lambda rec: "National Hunt"
+            if rec["obstacle"]
+            or "National Hunt" in rec["title"]
+            or "NH" in rec["title"]
+            else "Flat",
+            index=6,
         )
         .convert(
             {
