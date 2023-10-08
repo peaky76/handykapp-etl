@@ -8,7 +8,7 @@ class MongoRaceRestriction(TypedDict):
     maximum: int | None
 
 
-class MongoRace(TypedDict, total=False):
+class MongoDeclaration(TypedDict, total=False):
     racecourse: ObjectId
     datetime: DateTime
     title: str
@@ -19,5 +19,8 @@ class MongoRace(TypedDict, total=False):
     race_class: int
     age_restriction: MongoRaceRestriction
     rating_restriction: MongoRaceRestriction
-    going_description: str
     prize: str
+
+
+class MongoRace(MongoDeclaration, total=False):
+    going_description: str
