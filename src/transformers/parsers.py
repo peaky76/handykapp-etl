@@ -1,6 +1,15 @@
 import re
 
 
+def parse_code(obstacle, title):
+    if obstacle:
+        return "National Hunt"
+    elif "National Hunt" in title or "NH" in title:
+        return "National Hunt"
+    else:
+        return "Flat"
+
+
 def parse_horse(horse, default_country=None):
     if not horse:
         return (None, None)
