@@ -1,8 +1,24 @@
-import pendulum
 from transformers.parsers import (
+    parse_code,
     parse_horse,
     parse_obstacle,
 )
+
+
+def test_parse_code_returns_correct_value_for_obstacle():
+    assert "National Hunt" == parse_code(True, None)
+
+
+def test_parse_code_returns_correct_value_for_national_hunt_in_title():
+    assert "National Hunt" == parse_code(False, "Big National Hunt Flat Race")
+
+
+def test_parse_code_returns_correct_value_for_nh_in_title():
+    assert "National Hunt" == parse_code(False, "Big NHF Race")
+
+
+def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
+    assert "Flat" == parse_code(False, "Big Handicap")
 
 
 def test_parse_horse_returns_correct_tuple_when_none():
