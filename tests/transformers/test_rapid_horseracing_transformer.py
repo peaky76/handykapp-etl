@@ -84,7 +84,7 @@ def test_transform_horses_returns_correct_output(horse_data):
 def test_transform_results_returns_correct_output(result_data):
     expected = {
         "rapid_id": "123456",
-        "venue": "Lucksin Downs",
+        "course": "Lucksin Downs",
         "datetime": "2020-01-01T16:00:00+00:00",
         "title": "LUCKSIN HANDICAP (5)",
         "is_handicap": True,
