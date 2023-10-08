@@ -95,8 +95,8 @@ def transform_results(data):
         .convert("cancelled", lambda x: bool(int(x)))
         .addfield(
             "is_handicap",
-            lambda rec: RaceTitle.parse(rec["title"])["race_designation"].name
-            == "HANDICAP",
+            lambda rec: "HANDICAP" in rec["title"].upper()
+            or "H'CAP" in rec["title"].upper(),
             index=4,
         )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
