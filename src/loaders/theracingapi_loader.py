@@ -272,15 +272,11 @@ def person_processor():
 
             # Add person to horse in race
             if race_id:
-                if role == "trainer":
-                    update_dictionary = {"runners.$.trainer": person_ids[name]}
-                elif role == "jockey":
-                    update_dictionary = {"runners.$.jockey": person_ids[name]}
-
                 db.races.update_one(
-                    {"_id": race_id, "runners._id": runner_id},
-                    {"$set": update_dictionary},
+                    {"_id": race_id, "runners.horse": runner_id},
+                    {"$set": {f"runners.$.{role}": person_ids[name]}},
                 )
+                updated_count += 1
 
     except GeneratorExit:
         logger.info(
