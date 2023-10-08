@@ -259,14 +259,14 @@ def person_processor():
                     )
                     logger.debug(f"{person} updated")
                     updated_count += 1
-                    person_ids[name] = found_id
                 else:
-                    added_id = add_person(
+                    found_id = add_person(
                         name_parts.as_dict() | {"references.theracingapi": name}
                     )
                     logger.info(f"{person} added to db")
                     adds_count += 1
-                    person_ids[name] = added_id
+
+                person_ids[name] = found_id
 
             # Add person to horse in race
             if race_id:
