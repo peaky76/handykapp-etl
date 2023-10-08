@@ -62,7 +62,7 @@ def horse_2_data():
 @pytest.fixture
 def racecard_data(horse_1_data, horse_2_data):
     return {
-        "course": "Ayr",
+        "course": "Wolverhampton (AW)",
         "date": "2023-10-03",
         "off_time": "1:42",
         "race_name": "Virgin Bet Apprentice Handicap",
@@ -76,7 +76,7 @@ def racecard_data(horse_1_data, horse_2_data):
         "prize": "£4,187",
         "field_size": "7",
         "going": "Soft",
-        "surface": "Turf",
+        "surface": "AW",
         "runners": [
             horse_1_data,
             horse_2_data,
@@ -160,8 +160,8 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
 
 def test_transform_races_returns_correct_output(racecard_data):
     expected = {
-        "course": "Ayr",
-        "surface": "Turf",
+        "course": "Wolverhampton",
+        "surface": "AW",
         "code": "Flat",
         "datetime": "2023-10-03T13:42:00Z",
         "title": "Virgin Bet Apprentice Handicap",
