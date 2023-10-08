@@ -4,7 +4,7 @@ from transformers.parsers import parse_horse  # type: ignore
 
 def convert_person(name, source):
     parsed_name = HumanName(name).as_dict()
-    parsed_name["display_name"] = {source: name}
+    parsed_name["references"] = {source: name}
     return parsed_name
 
 

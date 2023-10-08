@@ -9,9 +9,9 @@ def test_convert_person_with_bha():
         "last": "Smith",
         "suffix": "",
         "nickname": "",
-        "display_name": {"BHA": "Mr. John Smith"},
+        "references": {"bha": "Mr. John Smith"},
     }
-    assert expected == convert_person("Mr. John Smith", "BHA")
+    assert expected == convert_person("Mr. John Smith", "bha")
 
 
 def test_select_set():
