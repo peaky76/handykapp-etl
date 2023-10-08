@@ -10,7 +10,7 @@ import petl  # type: ignore
 import tomllib
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
-from horsetalk import HorseAge, RaceTitle, RaceWeight
+from horsetalk import Going, HorseAge, RaceTitle, RaceWeight, TurfGoingDescription
 from transformers.parsers import (
     parse_horse,
     parse_obstacle,
@@ -99,6 +99,16 @@ def transform_results(data):
             index=4,
         )
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
+        .addfield(
+            "surface",
+            lambda rec: "Turf"
+            if Going(
+                rec["going_description"].replace(" (", ", ").replace(")", "")
+            ).primary
+            in TurfGoingDescription
+            else "AW",
+            index=6,
+        )
         .addfield(
             "result",
             lambda rec: [
