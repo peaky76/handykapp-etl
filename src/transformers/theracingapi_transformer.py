@@ -9,7 +9,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import yaml
-from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade, RaceTitle  # type: ignore
+from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade  # type: ignore
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from transformers.parsers import parse_obstacle
@@ -24,6 +24,12 @@ with open("api_info.yml", "r") as f:
     api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 SOURCE = api_info["theracingapi"]["spaces"]["dir"]
+
+
+def build_datetime(date_str: str, time_str: str) -> str:
+    hour, minute = [int(x) for x in time_str.split(":")]
+    hour = hour + 12 if hour < 11 else hour
+    return pendulum.parse(f"{date_str} {str(hour)}:{str(minute)}").to_iso8601_string()
 
 
 def transform_horse(data, race_date=pendulum.now()):
@@ -98,9 +104,7 @@ def transform_races(data):
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "datetime",
-            lambda rec: pendulum.parse(
-                f"{rec['date']} {str(int(rec['off_time'].split(':')[0])+12)}:{rec['off_time'].split(':')[1]}"
-            ).to_iso8601_string(),
+            lambda rec: build_datetime(rec["date"], rec["off_time"]),
             index=1,
         )
         .convert(
