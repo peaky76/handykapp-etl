@@ -60,7 +60,7 @@ def transform_racecourses_data(data) -> list:
         .addfield("code", "Flat", index=3)
         .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
         .convert(
-            ("surface", "shape", "style", "handedness", "contour"), lambda x: x.lower()
+            ("surface", "shape", "style", "handedness", "contour"), lambda x: x.title()
         )
         .convert("obstacle", lambda x: x or None)
         .cutout("rr_abbr")
