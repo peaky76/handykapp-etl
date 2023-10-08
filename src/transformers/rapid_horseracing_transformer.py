@@ -85,7 +85,6 @@ def transform_results(data):
                 "id_race": "rapid_id",
                 "date": "datetime",
                 "age": "age_restriction",
-                "course": "venue",
                 "canceled": "cancelled",
                 "distance": "distance_description",
                 "going": "going_description",
