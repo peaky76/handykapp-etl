@@ -303,7 +303,16 @@ def load_theracingapi_data(data=None):
     d.close()
 
 
-if __name__ == "__main__":
-    # db.horses.drop()
+@flow
+def load_theracingapi_data_afresh(data=None):
+    if data is None:
+        data = theracingapi_transformer()
+
+    db.horses.drop()
     db.races.drop()
-    load_theracingapi_data()
+    db.people.drop()
+    load_theracingapi_data(data)
+
+
+if __name__ == "__main__":
+    load_theracingapi_data_afresh()
