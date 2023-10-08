@@ -36,8 +36,9 @@ def declaration_processor():
     logger = get_run_logger()
     logger.info("Starting declaration processor")
     racecourse_ids = {}
-    racecourse_adds_count = 0
+    # racecourse_adds_count = 0
     declaration_adds_count = 0
+    declaration_skips_count = 0
 
     try:
         while True:
@@ -66,23 +67,24 @@ def declaration_processor():
                 db.races.insert_one(
                     {
                         "racecourse": racecourse_id,
-                        "date": dec["date"],
-                        "time": dec["time"],
+                        "datetime": dec["datetime"],
                         "title": dec["title"],
                         "is_handicap": dec["is_handicap"],
                         "distance_description": dec["distance_description"],
-                        "grade": dec["grade"],
-                        "class": dec["class"],
+                        "race_grade": dec["race_grade"],
+                        "race_class": dec["race_class"],
                         "age_restriction": dec["age_restriction"],
                         "rating_restriction": dec["rating_restriction"],
                         "prize": dec["prize"],
                     }
                 )
                 declaration_adds_count += 1
+            else:
+                declaration_skips_count += 1
 
     except GeneratorExit:
         logger.info(
-            f"Finished processing declarations. Added {racecourse_adds_count} courses, {declaration_adds_count} declarations"
+            f"Finished processing declarations. Added {declaration_adds_count} declarations, skipped {declaration_skips_count}"
         )
 
 
@@ -140,9 +142,7 @@ def race_processor():
         while True:
             race = yield
             if race:
-                logger.debug(
-                    f"Processing {race['time']} from {race['course']} on {race['date']}"
-                )
+                logger.debug(f"Processing {race['datetime']} from {race['course']}")
 
                 d.send(race)
 
