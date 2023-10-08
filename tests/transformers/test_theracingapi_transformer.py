@@ -2,6 +2,7 @@ import pendulum
 import petl
 import pytest
 from transformers.theracingapi_transformer import (
+    build_datetime,
     transform_horse,
     transform_races,
     validate_races,
@@ -81,6 +82,18 @@ def racecard_data(horse_1_data, horse_2_data):
             horse_2_data,
         ],
     }
+
+
+def test_build_datetime_with_morning_race():
+    assert build_datetime("2023-10-03", "11:15") == "2023-10-03T11:15:00Z"
+
+
+def test_build_datetime_with_afternoon_race():
+    assert build_datetime("2023-10-03", "3:15") == "2023-10-03T15:15:00Z"
+
+
+def test_build_datetime_with_evening_race():
+    assert build_datetime("2023-10-03", "9:15") == "2023-10-03T21:15:00Z"
 
 
 def test_transform_horse_returns_correct_output_when_professional_jockey(
