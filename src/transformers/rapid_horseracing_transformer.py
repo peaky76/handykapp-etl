@@ -91,6 +91,7 @@ def transform_results(data):
                 "going": "going_description",
             },
         )
+        .convert("datetime", lambda x: pendulum.parse(x).isoformat())
         .convert("finished", lambda x: bool(int(x)))
         .convert("cancelled", lambda x: bool(int(x)))
         .addfield(
