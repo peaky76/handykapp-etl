@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
-import yaml
+import tomllib
 from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade  # type: ignore
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
@@ -20,10 +20,10 @@ from transformers.validators import (
 )
 
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-SOURCE = api_info["theracingapi"]["spaces"]["dir"]
+SOURCE = settings["theracingapi"]["spaces_dir"]
 
 
 def build_datetime(date_str: str, time_str: str) -> str:

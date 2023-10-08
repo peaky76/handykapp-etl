@@ -3,6 +3,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import petl  # type: ignore
+import tomllib
 from models.mongo_horse import MongoHorse
 from horsetalk import Gender  # type: ignore
 from helpers import get_files, log_validation_problem, stream_file
@@ -13,14 +15,12 @@ from transformers.validators import (
     validate_sex,
     validate_year,
 )
-import petl  # type: ignore
-import yaml
 
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-SOURCE = api_info["bha"]["spaces"]["dir"]
+SOURCE = settings["bha"]["spaces_dir"]
 
 
 @task(tags=["BHA"], task_run_name="get_{date}_{csv_type}_csv")

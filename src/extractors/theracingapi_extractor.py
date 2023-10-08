@@ -5,16 +5,16 @@ import pendulum
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import yaml
+import tomllib
 from helpers.helpers import fetch_content, write_file
 from prefect import flow, task
 from prefect.blocks.system import Secret
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-SOURCE = api_info["theracingapi"]["source"]["dir"]
-DESTINATION = api_info["theracingapi"]["spaces"]["dir"]
+SOURCE = settings["theracingapi"]["source_dir"]
+DESTINATION = settings["theracingapi"]["spaces_dir"]
 
 
 def get_headers():

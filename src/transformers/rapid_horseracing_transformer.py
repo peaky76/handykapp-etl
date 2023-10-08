@@ -5,6 +5,9 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import pendulum
+import petl  # type: ignore
+import tomllib
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from horsetalk import HorseAge, RaceTitle, RaceWeight
@@ -21,15 +24,11 @@ from transformers.validators import (
     validate_weight,
 )
 
-import pendulum
-import petl  # type: ignore
-import yaml
 
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
-
-SOURCE = api_info["rapid_horseracing"]["spaces"]["dir"]
+SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
 def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):

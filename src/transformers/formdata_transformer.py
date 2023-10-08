@@ -8,7 +8,7 @@ import fitz  # type: ignore
 import pendulum
 import petl  # type: ignore
 import re
-import yaml
+import tomllib
 
 from collections import namedtuple
 from datetime import timedelta
@@ -19,10 +19,10 @@ from prefect.tasks import task_input_hash
 from models.mongo_horse import MongoHorse
 
 
-with open("api_info.yml", "r") as f:
-    api_info = yaml.load(f, Loader=yaml.loader.SafeLoader)
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-SOURCE = api_info["formdata"]["spaces"]["dir"]
+SOURCE = settings["formdata"]["spaces_dir"]
 
 
 Horse = namedtuple(
