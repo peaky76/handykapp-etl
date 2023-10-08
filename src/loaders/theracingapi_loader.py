@@ -40,6 +40,9 @@ def declaration_processor():
     declaration_adds_count = 0
     declaration_skips_count = 0
 
+    h = horse_processor()
+    next(h)
+
     try:
         while True:
             dec = yield
@@ -68,7 +71,7 @@ def declaration_processor():
                     ] = racecourse_id
 
             if racecourse_id:
-                db.races.insert_one(
+                declaration = db.races.insert_one(
                     {
                         "racecourse": racecourse_id,
                         "datetime": dec["datetime"],
@@ -83,6 +86,19 @@ def declaration_processor():
                     }
                 )
                 declaration_adds_count += 1
+
+                for horse in dec["runners"]:
+                    h.send({"name": horse["sire"], "sex": "M", "race_id": None})
+                    h.send({"name": horse["damsire"], "sex": "M", "race_id": None})
+                    h.send(
+                        {
+                            "name": horse["dam"],
+                            "sex": "F",
+                            "sire": horse["damsire"],
+                            "race_id": None,
+                        }
+                    )
+                    h.send(horse | {"race_id": declaration.inserted_id})
             else:
                 declaration_skips_count += 1
 
@@ -90,6 +106,7 @@ def declaration_processor():
         logger.info(
             f"Finished processing declarations. Added {declaration_adds_count} declarations, skipped {declaration_skips_count}"
         )
+        h.close()
 
 
 def horse_processor():
@@ -103,8 +120,10 @@ def horse_processor():
     try:
         while True:
             horse = yield
+            race_id = horse["race_id"]
             name = horse["name"]
 
+            # Add horse to db if not already there
             if name in horse_ids.keys():
                 logger.debug(f"{name} skipped")
                 skips_count += 1
@@ -125,6 +144,28 @@ def horse_processor():
                     adds_count += 1
                     horse_ids[name] = added_id
 
+            # Add horse to race
+            if race_id:
+                db.races.update_one(
+                    {"_id": race_id},
+                    {
+                        "$push": {
+                            "runners": {
+                                "horse": horse_ids[name],
+                                # "trainer": "K R Burke",
+                                # "owner": "John Kenny",
+                                # "jockey": "Brandon Wilkie",
+                                "allowance": horse["allowance"],
+                                "saddlecloth": horse["saddlecloth"],
+                                "draw": horse["draw"],
+                                "headgear": horse["headgear"],
+                                "lbs_carried": horse["lbs_carried"],
+                                "official_rating": horse["official_rating"],
+                            }
+                        }
+                    },
+                )
+
     except GeneratorExit:
         logger.info(
             f"Finished processing horses. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
@@ -139,9 +180,6 @@ def race_processor():
     d = declaration_processor()
     next(d)
 
-    # h = horse_processor()
-    # next(h)
-
     try:
         while True:
             race = yield
@@ -149,12 +187,6 @@ def race_processor():
                 logger.debug(f"Processing {race['datetime']} from {race['course']}")
 
                 d.send(race)
-
-                # for horse in race["runners"]:
-                #     h.send({"name": horse["sire"], "sex": "M"})
-                #     h.send({"name": horse["damsire"], "sex": "M"})
-                #     h.send({"name": horse["dam"], "sex": "F", "sire": horse["damsire"]})
-                #     h.send(horse)
 
                 race_count += 1
 
