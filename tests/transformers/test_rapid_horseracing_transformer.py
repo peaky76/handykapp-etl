@@ -90,6 +90,7 @@ def test_transform_results_returns_correct_output(result_data):
         "is_handicap": True,
         "obstacle": None,
         "surface": "Turf",
+        "code": "Flat",
         "distance_description": "1m2f",
         "age_restriction": "3",
         "going_description": "Soft (Good to Soft in places)",
