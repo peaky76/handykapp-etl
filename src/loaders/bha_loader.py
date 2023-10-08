@@ -155,6 +155,9 @@ def load_bha(data=None):
 
 @flow
 def load_bha_afresh(data=None):
+    if data is None:
+        data = bha_transformer()
+
     db.horses.drop()
     db.people.drop()
     load_bha(data)
