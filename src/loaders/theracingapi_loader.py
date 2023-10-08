@@ -8,6 +8,7 @@ from prefect import flow, get_run_logger
 from loaders.adders import add_horse
 from transformers.theracingapi_transformer import theracingapi_transformer
 from clients import mongo_client as client
+from pymongo.errors import DuplicateKeyError
 
 db = client.handykapp
 
@@ -71,34 +72,39 @@ def declaration_processor():
                     ] = racecourse_id
 
             if racecourse_id:
-                declaration = db.races.insert_one(
-                    {
-                        "racecourse": racecourse_id,
-                        "datetime": dec["datetime"],
-                        "title": dec["title"],
-                        "is_handicap": dec["is_handicap"],
-                        "distance_description": dec["distance_description"],
-                        "race_grade": dec["race_grade"],
-                        "race_class": dec["race_class"],
-                        "age_restriction": dec["age_restriction"],
-                        "rating_restriction": dec["rating_restriction"],
-                        "prize": dec["prize"],
-                    }
-                )
-                declaration_adds_count += 1
-
-                for horse in dec["runners"]:
-                    h.send({"name": horse["sire"], "sex": "M", "race_id": None})
-                    h.send({"name": horse["damsire"], "sex": "M", "race_id": None})
-                    h.send(
+                try:
+                    declaration = db.races.insert_one(
                         {
-                            "name": horse["dam"],
-                            "sex": "F",
-                            "sire": horse["damsire"],
-                            "race_id": None,
+                            "racecourse": racecourse_id,
+                            "datetime": dec["datetime"],
+                            "title": dec["title"],
+                            "is_handicap": dec["is_handicap"],
+                            "distance_description": dec["distance_description"],
+                            "race_grade": dec["race_grade"],
+                            "race_class": dec["race_class"],
+                            "age_restriction": dec["age_restriction"],
+                            "rating_restriction": dec["rating_restriction"],
+                            "prize": dec["prize"],
                         }
                     )
-                    h.send(horse | {"race_id": declaration.inserted_id})
+                    declaration_adds_count += 1
+
+                    for horse in dec["runners"]:
+                        h.send({"name": horse["sire"], "sex": "M", "race_id": None})
+                        h.send({"name": horse["damsire"], "sex": "M", "race_id": None})
+                        h.send(
+                            {
+                                "name": horse["dam"],
+                                "sex": "F",
+                                "sire": horse["damsire"],
+                                "race_id": None,
+                            }
+                        )
+                        h.send(horse | {"race_id": declaration.inserted_id})
+                except DuplicateKeyError:
+                    logger.warning(
+                        f"Duplicate declaration for {dec['datetime']} at {dec['course']}"
+                    )
             else:
                 declaration_skips_count += 1
 
@@ -139,7 +145,25 @@ def horse_processor():
                     updated_count += 1
                     horse_ids[name] = result["_id"]
                 else:
-                    added_id = add_horse(horse)
+                    added_id = add_horse(
+                        {
+                            k: v
+                            for k, v in {
+                                "name": name,
+                                "sex": horse["sex"],
+                                "year": horse.get("year"),
+                                "country": horse.get("country"),
+                                "colour": horse.get("colour"),
+                                "sire": horse_ids.get(horse["sire"])
+                                if horse.get("sire")
+                                else None,
+                                "dam": horse_ids.get(horse["dam"])
+                                if horse.get("dam")
+                                else None,
+                            }.items()
+                            if v
+                        }
+                    )
                     logger.debug(f"{name} added to db")
                     adds_count += 1
                     horse_ids[name] = added_id
@@ -185,9 +209,7 @@ def race_processor():
             race = yield
             if race:
                 logger.debug(f"Processing {race['datetime']} from {race['course']}")
-
                 d.send(race)
-
                 race_count += 1
 
             if race_count and race_count % 100 == 0:
