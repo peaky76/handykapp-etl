@@ -10,6 +10,7 @@ from pymongo import ASCENDING as ASC
 from loaders.bha_loader import load_bha
 from loaders.racecourse_loader import load_racecourses
 from loaders.formdata_loader import load_formdata, load_formdata_horses
+from loaders.theracingapi_loader import load_theracingapi_data
 
 db = client.handykapp
 
@@ -43,8 +44,9 @@ def load_database_afresh():
     spec_database()
     load_racecourses()
     load_bha()
-    load_formdata()
-    load_formdata_horses()
+    load_theracingapi_data()
+    # load_formdata()
+    # load_formdata_horses()
 
 
 if __name__ == "__main__":
