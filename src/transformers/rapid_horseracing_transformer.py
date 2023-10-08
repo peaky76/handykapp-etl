@@ -110,6 +110,15 @@ def transform_results(data):
             index=6,
         )
         .addfield(
+            "code",
+            lambda rec: "National Hunt"
+            if rec["obstacle"]
+            or "National Hunt" in rec["title"]
+            or "NH" in rec["title"]
+            else "Flat",
+            index=6,
+        )
+        .addfield(
             "result",
             lambda rec: [
                 transform_horses(
