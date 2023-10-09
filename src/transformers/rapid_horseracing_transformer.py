@@ -11,7 +11,7 @@ import tomllib
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
 from prefect.tasks import task_input_hash
-from horsetalk import Going, HorseAge, RaceTitle, RaceWeight, TurfGoingDescription
+from horsetalk import AWGoingDescription, Going, HorseAge, RaceWeight  # type: ignore
 from transformers.parsers import (
     parse_code,
     parse_horse,
@@ -107,12 +107,15 @@ def transform_results(data):
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "surface",
-            lambda rec: "Turf"
-            if Going(
+            # TODO: Fix in horsetalk as will incorrectly categorise some turf races as AW
+            # but otherwise whole pipeline fails
+            lambda rec: "AW"
+            if "AW" in rec["going_description"]
+            or Going(
                 rec["going_description"].replace(" (", ", ").replace(")", "")
             ).primary
-            in TurfGoingDescription
-            else "AW",
+            in AWGoingDescription
+            else "Turf",
             index=6,
         )
         .addfield(
