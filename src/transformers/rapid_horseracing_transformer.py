@@ -10,6 +10,7 @@ import petl  # type: ignore
 import tomllib
 from helpers import log_validation_problem, read_file, get_files
 from prefect import flow, get_run_logger, task
+from prefect.tasks import task_input_hash
 from horsetalk import Going, HorseAge, RaceTitle, RaceWeight, TurfGoingDescription
 from transformers.parsers import (
     parse_code,
@@ -76,7 +77,11 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
     )
 
 
-@task(tags=["Rapid"])
+@task(
+    tags=["Rapid"],
+    cache_key_fn=task_input_hash,
+    cache_expiration=pendulum.timedelta(days=7),
+)
 def transform_results(data):
     return (
         petl.rename(
