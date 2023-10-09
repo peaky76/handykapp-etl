@@ -1,4 +1,5 @@
 # To allow running as a script
+from datetime import timedelta
 from pathlib import Path
 import sys
 
@@ -80,7 +81,7 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
 @task(
     tags=["Rapid"],
     cache_key_fn=task_input_hash,
-    cache_expiration=pendulum.timedelta(days=7),
+    cache_expiration=timedelta(days=7),
 )
 def transform_results(data):
     return (
