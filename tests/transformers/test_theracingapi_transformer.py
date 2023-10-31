@@ -5,7 +5,6 @@ from transformers.theracingapi_transformer import (
     build_datetime,
     transform_horse,
     transform_races,
-    validate_races,
 )
 
 
