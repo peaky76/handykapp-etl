@@ -52,11 +52,11 @@ select = [
 ignore = [
     "E402",
     "E501",
+    "E731",
     "PT011",
     # Temporary overrides
     "FBT003",
     "C901",
-    "E731",
     "RUF015",
     "PTH123",
     "PYI024",
