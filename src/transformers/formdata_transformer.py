@@ -170,8 +170,8 @@ def extract_dist_going(string: str) -> tuple[str] | None:
         dist = match.group("dist")
         going = match.group("going")
         return (float(dist), going)
-    else:
-        return None
+
+    return None
 
 
 def extract_middle_details(details: str) -> list[str] | None:
@@ -192,8 +192,8 @@ def extract_middle_details(details: str) -> list[str] | None:
             "jockey": match.group("jockey"),
             "position": match.group("position"),
         }
-    else:
-        return None
+
+    return None
 
 
 def extract_prize(string: str) -> tuple[str] | None:
@@ -209,8 +209,8 @@ def extract_prize(string: str) -> tuple[str] | None:
         racetype = match.group("racetype")
         prize = match.group("prize")
         return (racetype, prize)
-    else:
-        return None
+
+    return None
 
 
 def extract_weight(string: str) -> tuple[str] | None:
@@ -226,8 +226,8 @@ def extract_weight(string: str) -> tuple[str] | None:
         weight = match.group("weight")
         jockey = match.group("jockey")
         return (weight, jockey)
-    else:
-        return None
+
+    return None
 
 
 def get_formdata_date(filename: str) -> pendulum.Date:
@@ -260,10 +260,10 @@ def get_formdatas(
 
     if code == RacingCode.FLAT:
         return select_for_refresh(flat)
-    elif code == RacingCode.NH:
+    if code == RacingCode.NH:
         return select_for_refresh(nh)
-    else:
-        return select_for_refresh(flat) + select_for_refresh(nh)
+
+    return select_for_refresh(flat) + select_for_refresh(nh)
 
 
 def is_horse(string: str) -> str:
@@ -294,10 +294,10 @@ def process_formdata_stream(stream, date):
         if "FORMDATA" in word:
             skip_count = 3
             continue
-        else:
-            if skip_count > 0:
-                skip_count -= 1
-                continue
+
+        if skip_count > 0:
+            skip_count -= 1
+            continue
 
         horse_switch = is_horse(word)
         run_switch = is_race_date(word)

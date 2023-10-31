@@ -215,7 +215,9 @@ def validate_races(data):
             "assertion": lambda x: not x or x.replace("Class ", "").isdigit(),
         },
         {
-            "name": "age_band_valid", "field": "age_band", "assertion": lambda x: x[0].isdigit()
+            "name": "age_band_valid",
+            "field": "age_band",
+            "assertion": lambda x: x[0].isdigit(),
         },
         {
             "name": "rating_band_valid",
@@ -263,8 +265,7 @@ def theracingapi_transformer():
     for problem in problems.dicts():
         log_validation_problem(problem)
 
-    output = transform_races(data)
-    return output
+    return transform_races(data)
 
 
 if __name__ == "__main__":
