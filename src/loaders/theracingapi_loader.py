@@ -16,10 +16,7 @@ db = client.handykapp
 
 
 def make_search_dictionary(horse):
-    if horse.get("country"):
-        keys = ["name", "country", "year"]
-    else:
-        keys = ["name", "sex"]
+    keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
 
     return {k: horse[k] for k in keys}
 
