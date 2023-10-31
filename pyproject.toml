@@ -56,7 +56,6 @@ ignore = [
     # Temporary overrides
     "FBT003",
     "C901",
-    "E711",
     "E731",
     "RUF015",
     "PTH123",
