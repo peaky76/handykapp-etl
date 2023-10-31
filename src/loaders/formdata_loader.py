@@ -173,8 +173,8 @@ def load_formdata_people(formdata=None):
         jockeys = list({run._asdict()["jockey"] for run in entry["runs"]})
         all_jockeys.extend(jockeys)
 
-    all_jockeys = [x for x in list(set(all_jockeys))]
-    all_trainers = [x for x in list(set(all_trainers))]
+    all_jockeys = list(set(all_jockeys))
+    all_trainers = list(set(all_trainers))
 
     logger.info(f"Found {len(all_jockeys)} jockeys")
     logger.info(f"Found {len(all_trainers)} trainers")
