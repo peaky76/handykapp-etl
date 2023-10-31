@@ -97,18 +97,20 @@ def validate_ratings_data(data) -> bool:
         "Hurdle Clltrl",
     )
     constraints = [
-        dict(name="name_str", field="Name", assertion=validate_horse),
-        dict(name="year_valid", field="Year", assertion=validate_year),
-        dict(name="sex_valid", field="Sex", assertion=validate_sex),
-        dict(name="sire_str", field="Sire", assertion=validate_horse),
-        dict(name="dam_str", field="Dam", assertion=validate_horse),
-        dict(name="trainer_str", field="Trainer", test=str),
-        dict(name="flat_valid", field="Flat rating", assertion=validate_rating),
-        dict(name="awt_valid", field="AWT rating", assertion=validate_rating),
-        dict(name="chase_valid", field="Chase rating", assertion=validate_rating),
-        dict(
-            name="hurdle_rating_int", field="Hurdle rating", assertion=validate_rating
-        ),
+        {"name": "name_str", "field": "Name", "assertion": validate_horse},
+        {"name": "year_valid", "field": "Year", "assertion": validate_year},
+        {"name": "sex_valid", "field": "Sex", "assertion": validate_sex},
+        {"name": "sire_str", "field": "Sire", "assertion": validate_horse},
+        {"name": "dam_str", "field": "Dam", "assertion": validate_horse},
+        {"name": "trainer_str", "field": "Trainer", "test": str},
+        {"name": "flat_valid", "field": "Flat rating", "assertion": validate_rating},
+        {"name": "awt_valid", "field": "AWT rating", "assertion": validate_rating},
+        {"name": "chase_valid", "field": "Chase rating", "assertion": validate_rating},
+        {
+            "name": "hurdle_rating_int",
+            "field": "Hurdle rating",
+            "assertion": validate_rating,
+        },
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
