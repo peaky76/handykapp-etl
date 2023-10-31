@@ -24,7 +24,7 @@ def test_bha_destination():
 def test_fetch(mocker):
     mocker.patch("src.extractors.bha_extractor.fetch_content").return_value = "foobar"
     mocker.patch("src.extractors.bha_extractor.FILES").return_value = {"foo": "bar"}
-    assert "foobar" == fetch.fn("foo")
+    assert fetch.fn("foo") == "foobar"
 
 
 def test_save(mocker):
@@ -34,5 +34,5 @@ def test_save(mocker):
 
     save.fn("foo", "foobar")
 
-    assert 1 == write_file.call_count
+    assert write_file.call_count == 1
     assert mocker.call("foobar", "example/bha_foo_20210101.csv") == write_file.call_args

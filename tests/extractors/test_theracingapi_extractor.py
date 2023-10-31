@@ -24,8 +24,8 @@ def test_get_headers(mocker):
         "src.extractors.theracingapi_extractor.Secret.load"
     ).return_value.get.return_value = "<key>"
     headers = get_headers()
-    assert "the-racing-api1.p.rapidapi.com" == headers["x-rapidapi-host"]
-    assert "<key>" == headers["x-rapidapi-key"]
+    assert headers["x-rapidapi-host"] == "the-racing-api1.p.rapidapi.com"
+    assert headers["x-rapidapi-key"] == "<key>"
 
 
 def test_extract_countries(mocker):
@@ -46,5 +46,5 @@ def test_extract_racecards_for_tomorrow_as_default(mocker):
     extract_racecards.fn()
 
     expected_destination = "dir/racecards/theracingapi_racecards_20200102.json"
-    assert 1 == write_file.call_count
+    assert write_file.call_count == 1
     assert mocker.call([{}], expected_destination) == write_file.call_args

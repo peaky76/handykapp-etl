@@ -6,43 +6,43 @@ from transformers.parsers import (
 
 
 def test_parse_code_returns_correct_value_for_obstacle():
-    assert "National Hunt" == parse_code(True, None)
+    assert parse_code(True, None) == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_for_national_hunt_in_title():
-    assert "National Hunt" == parse_code(False, "Big National Hunt Flat Race")
+    assert parse_code(False, "Big National Hunt Flat Race") == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_for_nh_in_title():
-    assert "National Hunt" == parse_code(False, "Big NHF Race")
+    assert parse_code(False, "Big NHF Race") == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
-    assert "Flat" == parse_code(False, "Big Handicap")
+    assert parse_code(False, "Big Handicap") == "Flat"
 
 
 def test_parse_horse_returns_correct_tuple_when_none():
-    assert (None, None) == parse_horse(None)
+    assert parse_horse(None) == (None, None)
 
 
 def test_parse_horse_returns_correct_tuple_when_country_not_supplied():
-    assert ("DOBBIN", None) == parse_horse("DOBBIN")
+    assert parse_horse("DOBBIN") == ("DOBBIN", None)
 
 
 def test_parse_horse_returns_correct_tuple_when_name_lowercase():
-    assert ("DOBBIN", None) == parse_horse("Dobbin")
+    assert parse_horse("Dobbin") == ("DOBBIN", None)
 
 
 def test_parse_horse_returns_correct_tuple_when_country_supplied_with_space():
-    assert ("DOBBIN", "IRE") == parse_horse("DOBBIN (IRE)")
+    assert parse_horse("DOBBIN (IRE)") == ("DOBBIN", "IRE")
 
 
 def test_parse_horse_returns_correct_tuple_when_country_supplied_without_space():
-    assert ("DOBBIN", "IRE") == parse_horse("DOBBIN(IRE)")
+    assert parse_horse("DOBBIN(IRE)") == ("DOBBIN", "IRE")
 
 
 def test_parse_horse_returns_correct_tuple_when_country_supplied_as_a_default():
-    assert ("DOBBIN", "IRE") == parse_horse("DOBBIN", "IRE")
+    assert parse_horse("DOBBIN", "IRE") == ("DOBBIN", "IRE")
 
 
 def test_parse_obstacle_returns_correct_value_for_none():
@@ -50,11 +50,11 @@ def test_parse_obstacle_returns_correct_value_for_none():
 
 
 def test_parse_obstacle_returns_correct_value_for_chase():
-    assert "CHASE" == parse_obstacle("A CHASE")
+    assert parse_obstacle("A CHASE") == "CHASE"
 
 
 def test_parse_obstacle_returns_correct_value_for_steeplechase():
-    assert "CHASE" == parse_obstacle("A STEEPLECHASE")
+    assert parse_obstacle("A STEEPLECHASE") == "CHASE"
 
 
 def test_parse_obstacle_returns_correct_value_for_embedded_use_of_chase():
@@ -66,15 +66,15 @@ def test_parse_obstacle_returns_none_if_name_is_none():
 
 
 def test_parse_obstacle_returns_correct_value_for_hurdle():
-    assert "HURDLE" == parse_obstacle("A HURDLE")
+    assert parse_obstacle("A HURDLE") == "HURDLE"
 
 
 def test_parse_obstacle_returns_correct_value_for_cross_country():
-    assert "CROSS-COUNTRY" == parse_obstacle("A CROSS COUNTRY")
+    assert parse_obstacle("A CROSS COUNTRY") == "CROSS-COUNTRY"
 
 
 def test_parse_obstacle_returns_correct_value_for_cross_country_chase():
-    assert "CROSS-COUNTRY" == parse_obstacle("A CROSS COUNTRY CHASE")
+    assert parse_obstacle("A CROSS COUNTRY CHASE") == "CROSS-COUNTRY"
 
 
 def test_parse_obstacle_returns_correct_value_for_national_hunt_flat():
@@ -86,4 +86,4 @@ def test_parse_obstacle_returns_correct_value_for_flat_race():
 
 
 def test_parse_obstacle_is_case_insensitive():
-    assert "CHASE" == parse_obstacle("a chase")
+    assert parse_obstacle("a chase") == "CHASE"

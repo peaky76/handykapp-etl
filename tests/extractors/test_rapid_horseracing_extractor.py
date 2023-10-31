@@ -46,8 +46,8 @@ def test_get_headers(mocker):
         "src.extractors.rapid_horseracing_extractor.Secret.load"
     ).return_value.get.return_value = "<key>"
     headers = get_headers(url)
-    assert "<host>" == headers["x-rapidapi-host"]
-    assert "<key>" == headers["x-rapidapi-key"]
+    assert headers["x-rapidapi-host"] == "<host>"
+    assert headers["x-rapidapi-key"] == "<key>"
 
 
 def test_get_unfetched_race_ids(mocker):
@@ -72,7 +72,7 @@ def test_extract_result(mocker):
 
     extract_result.fn("12345")
 
-    assert 1 == write_file.call_count
+    assert write_file.call_count == 1
     assert (
         mocker.call("foobar", "results/rapid_api_result_12345.json")
         == write_file.call_args
@@ -91,7 +91,7 @@ def test_extract_racecards(mocker):
 
     extract_racecards.fn("2020-01-01")
 
-    assert 1 == write_file.call_count
+    assert write_file.call_count == 1
     assert (
         mocker.call("foobar", "racecards/rapid_api_racecards_20200101.json")
         == write_file.call_args
@@ -108,7 +108,7 @@ def test_get_next_racecard_date_when_date_available(mocker):
     ]
     mocker.patch("pendulum.now").return_value = pendulum.parse("2020-01-05")
 
-    assert "2020-01-04" == get_next_racecard_date.fn()
+    assert get_next_racecard_date.fn() == "2020-01-04"
 
 
 def test_get_next_racecard_date_when_no_dates_left(mocker):

@@ -31,7 +31,7 @@ def test_get_csv_returns_latest_ratings_by_default(mocker):
             "handykapp/bha/bha_rating_changes_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_ratings_20200201.csv" == get_csv.fn()
+    assert get_csv.fn() == "handykapp/bha/bha_ratings_20200201.csv"
 
 
 def test_get_csv_returns_perf_figs_if_requested(mocker):
@@ -43,9 +43,9 @@ def test_get_csv_returns_perf_figs_if_requested(mocker):
             "handykapp/bha/bha_ratings_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_perf_figs_20200101.csv" == get_csv.fn(
+    assert get_csv.fn(
         csv_type="perf_figs"
-    )
+    ) == "handykapp/bha/bha_perf_figs_20200101.csv"
 
 
 def test_get_csv_returns_ratings_for_date_if_requested(mocker):
@@ -57,7 +57,7 @@ def test_get_csv_returns_ratings_for_date_if_requested(mocker):
             "handykapp/bha/bha_ratings_20200301.csv",
         ],
     )
-    assert "handykapp/bha/bha_ratings_20200201.csv" == get_csv.fn(date="20200201")
+    assert get_csv.fn(date="20200201") == "handykapp/bha/bha_ratings_20200201.csv"
 
 
 def test_get_csv_returns_none_if_no_files_found(mocker):
@@ -70,7 +70,7 @@ def test_read_csv(mocker):
         "src.transformers.bha_transformer.stream_file",
         return_value=bytes("foo,bar,baz", "utf-8"),
     )
-    assert ("foo", "bar", "baz") == petl.header(read_csv.fn("foobar.csv"))
+    assert petl.header(read_csv.fn("foobar.csv")) == ("foo", "bar", "baz")
 
 
 def test_transform_ratings_data_returns_correct_output(mock_data):
@@ -95,11 +95,11 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
 
 def test_validate_ratings_data_returns_no_problems_for_correct_data(mock_data):
     problems = validate_ratings_data.fn(mock_data)
-    assert 0 == len(problems.dicts())
+    assert len(problems.dicts()) == 0
 
 
 def test_validate_ratings_data_returns_problems_for_incorrect_data(mock_data):
     mock_data[1][0] = "A DAY TO DREAM"
     problems = validate_ratings_data.fn(mock_data)
-    assert 1 == len(problems.dicts())
-    assert "Name" == problems.dicts()[0]["field"]
+    assert len(problems.dicts()) == 1
+    assert problems.dicts()[0]["field"] == "Name"

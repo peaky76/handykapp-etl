@@ -144,11 +144,11 @@ def test_extract_middle_details_when_position_includes_disqulification():
 
 
 def test_extract_prize():
-    assert ("2CG", "1156") == extract_prize("2CG1156")
+    assert extract_prize("2CG1156") == ("2CG", "1156")
 
 
 def test_extract_weight():
-    assert ("9-13", "t3RyanSexton") == extract_weight("9-13t3RyanSexton")
+    assert extract_weight("9-13t3RyanSexton") == ("9-13", "t3RyanSexton")
 
 
 def test_get_formdata_date():
@@ -157,7 +157,7 @@ def test_get_formdata_date():
 
 def test_get_formdatas_default(mocker):
     mocker.patch(FORMDATA_FETCH).return_value = FORMDATA_FILENAMES
-    assert FORMDATA_FILENAMES == get_formdatas()
+    assert get_formdatas() == FORMDATA_FILENAMES
 
 
 def test_get_formdatas_with_code(mocker):
