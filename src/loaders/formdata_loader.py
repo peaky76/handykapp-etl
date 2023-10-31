@@ -72,11 +72,8 @@ def create_code_to_course_dict():
 def load_formdata(formdata):
     ret_val = {}
     for entry in formdata:
-        run_dict = []
-        for run in entry.runs:
-            run_dict.append(run._asdict())
         entry = entry._asdict()
-        entry["runs"] = run_dict
+        entry["runs"] = [run._asdict() for run in entry.runs]
 
         entry_id = db.formdata.insert_one(entry)
         ret_val[f"{entry['name']} ({entry['country']})"] = entry_id.inserted_id
