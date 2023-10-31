@@ -1,6 +1,7 @@
-from bson import ObjectId
 from datetime import date
 from typing import TypedDict
+
+from bson import ObjectId
 
 
 class MongoOperation(TypedDict):

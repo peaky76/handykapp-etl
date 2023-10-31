@@ -1,26 +1,27 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import petl  # type: ignore
 import re
+
+import petl  # type: ignore
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import (  # type: ignore
     Handedness,
     JumpCategory,
-    RaceDistance,
     RacecourseContour,
     RacecourseShape,
     RacecourseStyle,
+    RaceDistance,
     Surface,
 )
 from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
-from transformers.validators import validate_in_enum
 
+from transformers.validators import validate_in_enum
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

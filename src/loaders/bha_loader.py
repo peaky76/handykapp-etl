@@ -1,16 +1,17 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from prefect import flow, task, get_run_logger
-from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
-from loaders.adders import add_horse, add_person
-from loaders.shared import convert_person, convert_value_to_id, select_set
+from prefect import flow, get_run_logger, task
+from pymongo.errors import DuplicateKeyError
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
+
+from loaders.adders import add_horse, add_person
+from loaders.shared import convert_person, convert_value_to_id, select_set
 
 db = client.handykapp
 

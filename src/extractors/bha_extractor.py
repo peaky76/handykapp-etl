@@ -1,12 +1,12 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import tomllib
-from helpers import fetch_content, write_file, get_last_occurrence_of
+from helpers import fetch_content, get_last_occurrence_of, write_file
 from prefect import flow, task
 
 with open("settings.toml", "rb") as f:

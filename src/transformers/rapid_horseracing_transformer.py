@@ -1,18 +1,18 @@
 # To allow running as a script
+import sys
 from datetime import timedelta
 from pathlib import Path
-import sys
-
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
 import tomllib
-from helpers import log_validation_problem, read_file, get_files
+from helpers import get_files, log_validation_problem, read_file
+from horsetalk import AWGoingDescription, Going, HorseAge, RaceWeight  # type: ignore
 from prefect import flow, get_run_logger, task
 from prefect.tasks import task_input_hash
-from horsetalk import AWGoingDescription, Going, HorseAge, RaceWeight  # type: ignore
+
 from transformers.parsers import (
     parse_code,
     parse_horse,
@@ -26,7 +26,6 @@ from transformers.validators import (
     validate_prize,
     validate_weight,
 )
-
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

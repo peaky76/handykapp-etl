@@ -1,6 +1,7 @@
+from typing import TypedDict
+
 from bson import ObjectId
 from pendulum import DateTime
-from typing import TypedDict
 
 
 class MongoRaceRestriction(TypedDict):

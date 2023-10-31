@@ -1,6 +1,7 @@
-from pendulum import parse
 import pendulum
 import pytest
+from pendulum import parse
+
 from src.helpers.helpers import (
     fetch_content,
     get_files,
