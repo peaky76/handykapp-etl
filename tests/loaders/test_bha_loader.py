@@ -51,4 +51,4 @@ def test_load_horses(mocker):
         },
     ]
     load_horses.fn(data)
-    assert 2 == insert_one.call_count
+    assert insert_one.call_count == 2

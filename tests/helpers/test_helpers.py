@@ -18,7 +18,7 @@ PENDULUM_IMPORT = "src.helpers.helpers.pendulum"
 def test_fetch_content_when_successful(mocker):
     resp = mocker.patch("src.helpers.helpers.get")
     resp.return_value.content = "foobar"
-    assert "foobar" == fetch_content("https://example.com")
+    assert fetch_content("https://example.com") == "foobar"
 
 
 def test_fetch_content_when_unsuccessful(mocker):
@@ -76,7 +76,7 @@ def test_stream_file(mocker):
 
     actual = stream_file("foo.csv")
     assert isinstance(actual, bytes)
-    assert "foobar" == actual.decode("utf-8")
+    assert actual.decode("utf-8") == "foobar"
 
 
 def test_write_file(mocker):
