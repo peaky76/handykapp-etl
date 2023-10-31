@@ -89,7 +89,7 @@ def load_races(formdata):
             race = {k: v for k, v in run.items() if k in RACE_KEYS}
             race["course"] = codes_to_courses[race["course"]]
             race["runs"] = []
-            try:
+            try:  # noqa: SIM105
                 db.races.insert_one(race)
             except DuplicateKeyError:
                 pass
