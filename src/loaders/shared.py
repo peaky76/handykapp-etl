@@ -19,4 +19,4 @@ def convert_value_to_id(horse, value, lookup):
 
 
 def select_set(data, key):
-    return sorted(list({x[key] for x in data}))
+    return sorted({x[key] for x in data})
