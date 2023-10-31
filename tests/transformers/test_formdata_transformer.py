@@ -284,4 +284,4 @@ def test_transform_horse_data():
         "year": 2018,
     }
 
-    assert expected == list(transform_horse_data.fn(data))[0]
+    assert expected == next(iter(transform_horse_data.fn(data)))
