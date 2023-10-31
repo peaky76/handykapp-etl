@@ -170,7 +170,7 @@ def load_formdata_people(formdata=None):
     for entry in formdata:
         entry = entry._asdict()
         all_trainers.append(entry["trainer"])
-        jockeys = list(set([run._asdict()["jockey"] for run in entry["runs"]]))
+        jockeys = list({run._asdict()["jockey"] for run in entry["runs"]})
         all_jockeys.extend(jockeys)
 
     all_jockeys = [x for x in list(set(all_jockeys))]
