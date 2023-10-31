@@ -241,10 +241,7 @@ def person_processor():
                 name_parts = HumanName(name)
                 result = db.people.find({"last": name_parts.last})
                 for possibility in result:
-                    if name_parts.first == possibility["first"]:
-                        found_id = possibility["_id"]
-                        break
-                    elif (
+                    if name_parts.first == possibility["first"] or (
                         name_parts.first
                         and possibility["first"]
                         and name_parts.first[0] == possibility["first"][0]
