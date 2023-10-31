@@ -86,7 +86,11 @@ def validate_racecourses_data(data) -> bool:
         "RR Abbr",
     )
     constraints = [
-        {"name": "name_str", "field": "Name", "assertion": lambda x: isinstance(x, str)},
+        {
+            "name": "name_str",
+            "field": "Name",
+            "assertion": lambda x: isinstance(x, str),
+        },
         {
             "name": "formal_name_str",
             "field": "Formal Name",

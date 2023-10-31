@@ -43,9 +43,9 @@ def test_get_csv_returns_perf_figs_if_requested(mocker):
             "handykapp/bha/bha_ratings_20200301.csv",
         ],
     )
-    assert get_csv.fn(
-        csv_type="perf_figs"
-    ) == "handykapp/bha/bha_perf_figs_20200101.csv"
+    assert (
+        get_csv.fn(csv_type="perf_figs") == "handykapp/bha/bha_perf_figs_20200101.csv"
+    )
 
 
 def test_get_csv_returns_ratings_for_date_if_requested(mocker):
