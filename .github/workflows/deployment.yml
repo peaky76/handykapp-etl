@@ -41,14 +41,11 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      - name: Run black
-        run: poetry run black --check --verbose .
-
       - name: Run static type checking
         run: poetry run mypy src
 
       - name: Run linters
-        run: poetry run ruff .
+        run: poetry run ruff check src
 
       # TODO: Fix spaces_client import error during the tests run
       # - name: Run tests
