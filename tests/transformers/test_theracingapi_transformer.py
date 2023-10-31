@@ -9,7 +9,7 @@ from transformers.theracingapi_transformer import (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def horse_1_data():
     return {
         "horse": "Hortzadar",
@@ -34,7 +34,7 @@ def horse_1_data():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def horse_2_data():
     return {
         "horse": "Tele Red",
@@ -59,7 +59,7 @@ def horse_2_data():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def racecard_data(horse_1_data, horse_2_data):
     return {
         "course": "Wolverhampton (AW)",
