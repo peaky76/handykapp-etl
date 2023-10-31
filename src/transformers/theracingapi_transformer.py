@@ -160,22 +160,22 @@ def validate_horse(data):
     )
 
     constraints = [
-        dict(name="horse_str", field="horse", test=str),
-        dict(name="age_int", field="age", test=int),
-        dict(name="sex_str", field="sex", test=str),
-        dict(name="colour_str", field="colour", test=str),
-        dict(name="region_str", field="region", test=str),
-        dict(name="dam_str", field="dam", test=str),
-        dict(name="sire_str", field="sire", test=str),
-        dict(name="damsire_str", field="damsire", test=str),
-        dict(name="trainer_str", field="trainer", test=str),
-        dict(name="owner_str", field="owner", test=str),
-        dict(name="jockey_str", field="jockey", test=str),
-        dict(name="number_digit", field="number", test=lambda x: x.isdigit()),
-        dict(name="draw_digit", field="draw", test=lambda x: x.isdigit()),
-        dict(name="headgear_str", field="headgear", test=str),
-        dict(name="lbs_valid", field="lbs", assertion=validate_weight),
-        dict(name="ofr_digit", field="ofr", test=lambda x: x.isdigit()),
+        {"name": "horse_str", "field": "horse", "test": str},
+        {"name": "age_int", "field": "age", "test": int},
+        {"name": "sex_str", "field": "sex", "test": str},
+        {"name": "colour_str", "field": "colour", "test": str},
+        {"name": "region_str", "field": "region", "test": str},
+        {"name": "dam_str", "field": "dam", "test": str},
+        {"name": "sire_str", "field": "sire", "test": str},
+        {"name": "damsire_str", "field": "damsire", "test": str},
+        {"name": "trainer_str", "field": "trainer", "test": str},
+        {"name": "owner_str", "field": "owner", "test": str},
+        {"name": "jockey_str", "field": "jockey", "test": str},
+        {"name": "number_digit", "field": "number", "test": lambda x: x.isdigit()},
+        {"name": "draw_digit", "field": "draw", "test": lambda x: x.isdigit()},
+        {"name": "headgear_str", "field": "headgear", "test": str},
+        {"name": "lbs_valid", "field": "lbs", "assertion": validate_weight},
+        {"name": "ofr_digit", "field": "ofr", "test": lambda x: x.isdigit()},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
@@ -203,36 +203,36 @@ def validate_races(data):
     )
 
     constraints = [
-        dict(name="course_str", field="course", test=str),
-        dict(name="date_valid", field="date", assertion=validate_date),
-        dict(name="off_time_valid", field="off_time", assertion=validate_time),
-        dict(name="distance_float", field="distance_f", test=float),
-        dict(name="region_str", field="region", test=str),
-        dict(name="pattern_valid", field="pattern", test=RaceGrade),
-        dict(
-            name="race_class_valid",
-            field="race_class",
-            assertion=lambda x: not x or x.replace("Class ", "").isdigit(),
-        ),
-        dict(
-            name="age_band_valid", field="age_band", assertion=lambda x: x[0].isdigit()
-        ),
-        dict(
-            name="rating_band_valid",
-            field="rating_band",
-            assertion=lambda x: not x
+        {"name": "course_str", "field": "course", "test": str},
+        {"name": "date_valid", "field": "date", "assertion": validate_date},
+        {"name": "off_time_valid", "field": "off_time", "assertion": validate_time},
+        {"name": "distance_float", "field": "distance_f", "test": float},
+        {"name": "region_str", "field": "region", "test": str},
+        {"name": "pattern_valid", "field": "pattern", "test": RaceGrade},
+        {
+            "name": "race_class_valid",
+            "field": "race_class",
+            "assertion": lambda x: not x or x.replace("Class ", "").isdigit(),
+        },
+        {
+            "name": "age_band_valid", "field": "age_band", "assertion": lambda x: x[0].isdigit()
+        },
+        {
+            "name": "rating_band_valid",
+            "field": "rating_band",
+            "assertion": lambda x: not x
             or (x[0].isdigit() and x[-1].isdigit() and "-" in x),
-        ),
-        dict(
-            name="prize_valid",
-            field="prize",
-            assertion=lambda x: (x[0] == "£" or x[0] == "€") and x[1].isdigit(),
-        ),
-        dict(
-            name="runners_list",
-            field="runners",
-            assertion=lambda x: [validate_horse(h) for h in x],
-        ),
+        },
+        {
+            "name": "prize_valid",
+            "field": "prize",
+            "assertion": lambda x: (x[0] == "£" or x[0] == "€") and x[1].isdigit(),
+        },
+        {
+            "name": "runners_list",
+            "field": "runners",
+            "assertion": lambda x: [validate_horse(h) for h in x],
+        },
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
