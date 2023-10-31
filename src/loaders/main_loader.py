@@ -9,7 +9,6 @@ from prefect import flow, task
 from pymongo import ASCENDING as ASC
 
 from loaders.bha_loader import load_bha
-from loaders.formdata_loader import load_formdata, load_formdata_horses
 from loaders.racecourse_loader import load_racecourses
 from loaders.theracingapi_loader import load_theracingapi_data
 
