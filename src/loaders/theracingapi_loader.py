@@ -135,7 +135,7 @@ def horse_processor():
             name = horse["name"]
 
             # Add horse to db if not already there
-            if name in horse_ids.keys():
+            if name in horse_ids:
                 logger.debug(f"{name} skipped")
                 skips_count += 1
             else:
@@ -234,7 +234,7 @@ def person_processor():
             role = person["role"]
 
             # Add person to db if not there
-            if name in person_ids.keys():
+            if name in person_ids:
                 logger.debug(f"{person} skipped")
                 skips_count += 1
             else:
