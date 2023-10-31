@@ -39,7 +39,7 @@ def get_files(dirname, modified_after=None):
 def read_file(file_path):
     file_type = file_path.split(".")[-1]
     output = {
-        "csv": lambda x: [row for row in csv.reader(x.splitlines())],
+        "csv": lambda x: list(csv.reader(x.splitlines())),
         "json": lambda x: json.loads(x),
     }
     stream = stream_file(file_path).decode("utf-8")
