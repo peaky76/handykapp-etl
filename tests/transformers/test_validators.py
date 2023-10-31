@@ -1,4 +1,5 @@
 from enum import Enum
+
 from transformers.validators import (
     validate_class,
     validate_date,

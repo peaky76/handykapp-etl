@@ -1,15 +1,16 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import json
+from time import sleep
+
 import pendulum
 import tomllib
-from time import sleep
-from prefect import flow, task
 from helpers import fetch_content, get_files, read_file, write_file
+from prefect import flow, task
 from prefect.blocks.system import Secret
 
 with open("settings.toml", "rb") as f:

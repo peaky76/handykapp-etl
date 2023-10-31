@@ -1,7 +1,8 @@
 import pendulum
+
 from src.extractors.theracingapi_extractor import (
-    SOURCE,
     DESTINATION,
+    SOURCE,
     extract_countries,
     extract_racecards,
     get_headers,

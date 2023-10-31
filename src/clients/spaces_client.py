@@ -1,7 +1,6 @@
 import boto3  # type: ignore
 from prefect.blocks.system import Secret
 
-
 session = boto3.session.Session()
 spaces_client = session.client(
     "s3",

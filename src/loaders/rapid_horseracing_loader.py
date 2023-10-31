@@ -1,13 +1,12 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from prefect import flow, get_run_logger
-
 # from loaders.adders import add_horse, add_person
 from clients import mongo_client as client
+from prefect import flow, get_run_logger
 from transformers.rapid_horseracing_transformer import rapid_horseracing_transformer
 
 # from nameparser import HumanName

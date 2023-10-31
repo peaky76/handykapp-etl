@@ -1,5 +1,6 @@
-import pendulum
 import re
+
+import pendulum
 from horsetalk import AWGoingDescription, Gender, TurfGoingDescription  # type: ignore
 
 

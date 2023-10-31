@@ -1,15 +1,16 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from prefect import flow, task
 from pymongo import ASCENDING as ASC
+
 from loaders.bha_loader import load_bha
-from loaders.racecourse_loader import load_racecourses
 from loaders.formdata_loader import load_formdata, load_formdata_horses
+from loaders.racecourse_loader import load_racecourses
 from loaders.theracingapi_loader import load_theracingapi_data
 
 db = client.handykapp

@@ -1,7 +1,6 @@
 # To allow running as a script
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -9,16 +8,24 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import CoatColour, Gender, Headgear, HorseAge, RaceClass, RaceDistance, RaceGrade  # type: ignore
-from helpers import log_validation_problem, read_file, get_files
+from helpers import get_files, log_validation_problem, read_file
+from horsetalk import (  # type: ignore
+    CoatColour,
+    Gender,
+    Headgear,
+    HorseAge,
+    RaceClass,
+    RaceDistance,
+    RaceGrade,
+)
 from prefect import flow, get_run_logger, task
+
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.validators import (
     validate_date,
     validate_time,
     validate_weight,
 )
-
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

@@ -1,16 +1,16 @@
 # To allow running as a script
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from peak_utility.text.case import normal  # type: ignore
-from transformers.formdata_transformer import formdata_transformer
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
 from pymongo.errors import DuplicateKeyError
+from transformers.formdata_transformer import formdata_transformer
 
 db = client.handykapp
 

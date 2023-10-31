@@ -1,6 +1,7 @@
 # To allow running as a script
-from pathlib import Path
 import sys
+from pathlib import Path
+
 import pendulum
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))

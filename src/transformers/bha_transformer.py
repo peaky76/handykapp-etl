@@ -5,17 +5,17 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import petl  # type: ignore
 import tomllib
-from models.mongo_horse import MongoHorse
-from horsetalk import Gender  # type: ignore
 from helpers import get_files, log_validation_problem, stream_file
+from horsetalk import Gender  # type: ignore
+from models.mongo_horse import MongoHorse
 from prefect import flow, task
+
 from transformers.validators import (
     validate_horse,
     validate_rating,
     validate_sex,
     validate_year,
 )
-
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

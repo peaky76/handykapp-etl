@@ -1,15 +1,14 @@
 import pendulum
-
 from horsetalk import RacingCode
 from transformers.formdata_transformer import (
     extract_dist_going,
+    extract_middle_details,
     extract_prize,
     extract_weight,
     get_formdata_date,
     get_formdatas,
     is_horse,
     is_race_date,
-    extract_middle_details,
     transform_horse_data,
 )
 

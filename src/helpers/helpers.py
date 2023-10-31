@@ -1,8 +1,9 @@
 import csv
 import json
+
 import pendulum
-from prefect import get_run_logger
 from clients import spaces_client as client
+from prefect import get_run_logger
 from requests import get
 
 BUCKET_NAME = "peaky76"

@@ -1,4 +1,5 @@
 import pendulum
+
 from src.extractors.rapid_horseracing_extractor import (
     LIMITS,
     RACECARDS_DESTINATION,

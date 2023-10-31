@@ -1,11 +1,11 @@
 import pendulum
+import petl
 import pytest
 from transformers.rapid_horseracing_transformer import (
     transform_horses,
     transform_results,
     validate_results,
 )
-import petl
 
 
 @pytest.fixture
