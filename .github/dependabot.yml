@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # Fetch and update latest pypi packages
   - package-ecosystem: pip
     directory: "/"
     schedule:
@@ -15,3 +14,9 @@ updates:
       prefix: fix
       prefix-development: chore
       include: scope
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+    open-pull-requests-limit: 10
