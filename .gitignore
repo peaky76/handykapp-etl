@@ -132,8 +132,5 @@ dmypy.json
 files/
 deployments/
 
-# Dockerfile
-Dockerfile
-
 # Data
 *.pdf
