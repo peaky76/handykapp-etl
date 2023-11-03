@@ -1,0 +1,15 @@
+FROM prefecthq/prefect:2.14-python3.11
+
+# Install poetry
+RUN pip install --upgrade pip
+RUN pip install poetry
+
+# Copy the project to image
+COPY /src /opt/handykapp-etl/src
+COPY README.md pyproject.toml poetry.lock /opt/handykapp-etl/
+WORKDIR /opt/handykapp-etl
+
+# Install packages in the system Python
+RUN poetry config virtualenvs.create false
+RUN poetry config virtualenvs.prefer-active-python true
+RUN poetry install --only main
