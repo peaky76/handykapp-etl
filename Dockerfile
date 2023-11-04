@@ -6,7 +6,7 @@ RUN pip install poetry
 
 # Copy the project to image
 COPY /src /opt/handykapp-etl/src
-COPY README.md pyproject.toml poetry.lock /opt/handykapp-etl/
+COPY pyproject.toml poetry.lock settings.toml /opt/handykapp-etl/
 WORKDIR /opt/handykapp-etl
 
 # Install packages in the system Python
