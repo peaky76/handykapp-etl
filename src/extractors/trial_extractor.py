@@ -1,6 +1,5 @@
 import tomllib
-from prefect import flow, get_run_logger, task
-
+from prefect import flow, get_run_logger
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
