@@ -1,5 +1,8 @@
 FROM prefecthq/prefect:2.14-python3.11
 
+RUN groupadd -r nonroot
+RUN useradd -r -g nonroot nonroot
+
 # Install poetry
 RUN pip install --upgrade pip
 RUN pip install poetry
@@ -13,3 +16,5 @@ WORKDIR /opt/handykapp-etl
 RUN poetry config virtualenvs.create false
 RUN poetry config virtualenvs.prefer-active-python true
 RUN poetry install --only main
+
+USER nonroot
