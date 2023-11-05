@@ -73,7 +73,7 @@ def load_formdata(formdata):
     ret_val = {}
     for entry in formdata:
         entry = entry._asdict()
-        entry["runs"] = [run._asdict() for run in entry.runs]
+        entry["runs"] = [run._asdict() for run in entry["runs"]]
 
         entry_id = db.formdata.insert_one(entry)
         ret_val[f"{entry['name']} ({entry['country']})"] = entry_id.inserted_id
