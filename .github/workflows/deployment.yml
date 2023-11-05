@@ -45,7 +45,7 @@ jobs:
       #   run: poetry run mypy src
 
       - name: Run linters
-        run: poetry run ruff check src
+        run: poetry run ruff check src --preview
 
       # TODO: Fix spaces_client import error during the tests run
       # - name: Run tests
