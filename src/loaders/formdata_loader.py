@@ -183,6 +183,13 @@ def load_formdata_people(formdata=None):
 
 
 @flow
+def load_formdata_only():
+    db.formdata.drop()
+    formdata = formdata_transformer()
+    load_formdata(formdata)
+
+
+@flow
 def load_formdata_afresh():
     db.formdata.drop()
     db.horses.drop()
@@ -204,9 +211,10 @@ def load_formdata_afresh():
 
 
 if __name__ == "__main__":
-    data = load_formdata_people()  # type: ignore
+    # data = load_formdata_people()  # type: ignore
     # print(data["jockeys"])
     # print(data["trainers"])
 
-    print([adjust_rr_name(x) for x in data["jockeys"]])
-    print([adjust_rr_name(x) for x in data["trainers"]])
+    # print([adjust_rr_name(x) for x in data["jockeys"]])
+    # print([adjust_rr_name(x) for x in data["trainers"]])
+    load_formdata_afresh()  # type: ignore
