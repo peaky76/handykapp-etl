@@ -1,0 +1,6 @@
+{
+  "bha-extractor": "src\\extractors\\bha_extractor.py:bha_extractor",
+  "rapid-horseracing-extractor": "src\\extractors\\rapid_horseracing_extractor.py:rapid_horseracing_extractor",
+  "theracingapi-racecards-extractor": "src\\extractors\\theracingapi_extractor.py:theracingapi_racecards_extractor",
+  "trial-extractor": "src\\extractors\\trial_extractor.py:trial_extractor"
+}
