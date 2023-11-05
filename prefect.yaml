@@ -1,0 +1,51 @@
+# Welcome to your prefect.yaml file! You can use this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: handykapp-etl
+prefect-version: 2.14.3
+
+# build section allows you to manage and build docker images
+build:
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push:
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+    repository: https://github.com/peaky76/handykapp-etl.git
+    branch: master
+    credentials: '{{ prefect.blocks.github-credentials.peaky76 }}'
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name: trial
+  version:
+  tags: []
+  description:
+  entrypoint: src\extractors\trial_extractor.py:trial_extractor
+  parameters: {}
+  work_pool:
+    name: paddling
+    work_queue_name:
+    job_variables: {}
+  schedule:
+    cron: '*/2 * * * *'
+    timezone: UTC
+    day_or: true
+- name: streamlined
+  version:
+  tags: []
+  description:
+  entrypoint: src\extractors\theracingapi_extractor.py:theracingapi_racecards_extractor
+  parameters: {}
+  work_pool:
+    name: municipal
+    work_queue_name:
+    job_variables: {}
+  schedule:
+    cron: 30 9 * * *
+    timezone: UTC
+    day_or: true
