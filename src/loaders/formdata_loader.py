@@ -185,8 +185,10 @@ def load_formdata_people(formdata=None):
 @flow
 def load_formdata_only():
     db.formdata.drop()
-    formdata = formdata_transformer()
-    load_formdata(formdata)
+    logger = get_run_logger()
+    logger.info("Dropped formdata collection")
+    # formdata = formdata_transformer()
+    # load_formdata(formdata)
 
 
 @flow
