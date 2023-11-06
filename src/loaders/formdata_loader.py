@@ -190,6 +190,12 @@ def load_formdata_only():
 
 
 @flow
+def just_doing_summat():
+    logger = get_run_logger()
+    logger.info("Hello world")
+
+
+@flow
 def load_formdata_afresh():
     db.formdata.drop()
     db.horses.drop()
