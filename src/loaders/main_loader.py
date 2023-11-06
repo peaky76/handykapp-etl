@@ -42,9 +42,9 @@ def spec_database():
 def load_database_afresh():
     drop_database()
     spec_database()
-    load_racecourses()
-    load_bha()
-    load_theracingapi_data()
+    # load_racecourses()
+    # load_bha()
+    # load_theracingapi_data()
     # load_formdata()
     # load_formdata_horses()
 
