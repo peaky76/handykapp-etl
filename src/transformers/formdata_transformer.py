@@ -384,7 +384,6 @@ def transform_horse_data(data: dict) -> list[MongoHorse]:
 @flow
 def formdata_transformer():
     files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
-    # files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
 
