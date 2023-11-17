@@ -1514,13 +1514,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.14.4"
+version = "2.14.5"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prefect-2.14.4-py3-none-any.whl", hash = "sha256:2f070ed677e957b44889a92c8fa7aa4ddcc5f1f9590ee43b0eb5af0e327bcde0"},
-    {file = "prefect-2.14.4.tar.gz", hash = "sha256:29c3b5d11a167317b61ff6ac8e75970464f4fc2046dfb1b7d4bf9fcfdeaa563e"},
+    {file = "prefect-2.14.5-py3-none-any.whl", hash = "sha256:47e862ac496f6f7dd514fe3ff5ad613913451593660a3a07194f90a9ce7a9f40"},
+    {file = "prefect-2.14.5.tar.gz", hash = "sha256:065aa0a346c02fdeab4b7937cf121d5c92877ce6df9c8b26e3ba6373b0e8d71a"},
 ]
 
 [package.dependencies]
@@ -1569,7 +1569,7 @@ uvicorn = ">=0.14.0"
 websockets = ">=10.4,<13.0"
 
 [package.extras]
-dev = ["cairosvg", "flaky", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2,!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
+dev = ["cairosvg", "codespell", "flaky", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2,!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
 
 [[package]]
 name = "pyasn1"
@@ -3020,4 +3020,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.6"
-content-hash = "1bb727bc3a75d2051cf2fc34e523f3edb1bc2e4cf6c25455f1ae2fc905dc722f"
+content-hash = "fbe0405de0cf9c2fb8bb1c28b236b54c294ca89c77d051f5563a931e01d946ef"
