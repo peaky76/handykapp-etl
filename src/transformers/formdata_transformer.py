@@ -4,10 +4,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import asyncio
+
 import re
 from collections import namedtuple
-from datetime import timedelta
 
 import fitz  # type: ignore
 import pendulum
@@ -17,7 +16,6 @@ from helpers import get_files, stream_file
 from horsetalk import RacingCode  # type: ignore
 from models.mongo_horse import MongoHorse
 from prefect import flow, get_run_logger, task
-from prefect.tasks import task_input_hash
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
