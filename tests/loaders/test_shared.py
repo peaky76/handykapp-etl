@@ -21,4 +21,4 @@ def test_select_set():
         {"trainer": "TRAINER1"},
         {"trainer": "TRAINER3"},
     ]
-    assert ["TRAINER1", "TRAINER2", "TRAINER3"] == select_set(data, "trainer")
+    assert select_set(data, "trainer") == ["TRAINER1", "TRAINER2", "TRAINER3"]

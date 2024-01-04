@@ -32,7 +32,7 @@ def test_extract_countries(mocker):
     mocker.patch("src.extractors.theracingapi_extractor.fetch_content").return_value = {
         "name": "foobaristan"
     }
-    assert {"name": "foobaristan"} == extract_countries.fn()
+    assert extract_countries.fn() == {"name": "foobaristan"}
 
 
 def test_extract_racecards_for_tomorrow_as_default(mocker):
