@@ -281,7 +281,77 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
-def process_formdata_stream(stream, date):
+def formdata_horse_processor():
+    try: 
+        while True:
+            horse, date = yield
+            logger = get_run_logger()
+            logger.info(f"Processing {horse.name}")
+
+            # try:
+            #     db.horses.insert_one(horse.dict())
+            # except DuplicateKeyError:
+            #     logger.info(f"Duplicate key for {horse.name}")
+
+    except GeneratorExit:
+        logger.info("Finished processing")
+        
+
+# def process_formdata_stream(stream, date):
+#     logger = get_run_logger()
+#     horses = []
+#     horse_args = []
+#     run_args = []
+#     adding_horses = False
+#     adding_runs = False
+
+#     for word in stream:
+#         # Skip any titles
+#         if "FORMDATA" in word:
+#             skip_count = 3
+#             continue
+
+#         if skip_count > 0:
+#             skip_count -= 1
+#             continue
+
+#         horse_switch = is_horse(word)
+#         run_switch = is_race_date(word)
+
+#         # Switch on/off adding horses/runs
+#         if horse_switch:
+#             adding_horses = True
+#             adding_runs = False
+#         elif run_switch:
+#             adding_horses = False
+#             adding_runs = True
+#         elif "then" in word:
+#             adding_horses = False
+#             adding_runs = False
+
+#         # Create horses/runs
+#         if run_switch and len(horse_args):
+#             horse = create_horse(horse_args, date.year)
+#             horses.append(horse)
+#             horse_args = []
+
+#         if (horse_switch or run_switch) and len(run_args):
+#             run = create_run(run_args)
+#             if run is None:
+#                 logger.error(f"Missing run for {horse.name}")
+#             else:
+#                 horse.runs.append(run)
+#             run_args = []
+
+#         # Add words to horses/runs
+#         if adding_horses:
+#             horse_args.append(word)
+#         elif adding_runs:
+#             run_args.append(word)
+
+#     return horses
+
+def formdata_stream_processor():
     logger = get_run_logger()
     horses = []
     horse_args = []
