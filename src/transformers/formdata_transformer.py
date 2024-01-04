@@ -287,10 +287,10 @@ def formdata_horse_processor():
             logger = get_run_logger()
             logger.info(f"Processing {horse.name}")
 
-            try:
-                db.horses.insert_one(horse.dict())
-            except DuplicateKeyError:
-                logger.info(f"Duplicate key for {horse.name}")
+            # try:
+            #     db.horses.insert_one(horse.dict())
+            # except DuplicateKeyError:
+            #     logger.info(f"Duplicate key for {horse.name}")
 
     except GeneratorExit:
         logger.info("Finished processing")
