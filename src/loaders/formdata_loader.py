@@ -227,4 +227,4 @@ if __name__ == "__main__":
 
     # print([adjust_rr_name(x) for x in data["jockeys"]])
     # print([adjust_rr_name(x) for x in data["trainers"]])
-    load_formdata_afresh()  # type: ignore
+    load_formdata_only()  # type: ignore

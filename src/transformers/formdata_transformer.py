@@ -4,6 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import asyncio
 import re
 from collections import namedtuple
 from datetime import timedelta
@@ -281,59 +282,141 @@ def is_race_date(string: str) -> str:
     return bool(re.match(date_regex, string))
 
 
-def process_formdata_stream(stream, date):
+def formdata_horse_processor():
+    try: 
+        while True:
+            horse, date = yield
+            logger = get_run_logger()
+            logger.info(f"Processing {horse.name}")
+
+            try:
+                db.horses.insert_one(horse.dict())
+            except DuplicateKeyError:
+                logger.info(f"Duplicate key for {horse.name}")
+
+    except GeneratorExit:
+        logger.info("Finished processing")
+        
+
+# def process_formdata_stream(stream, date):
+#     logger = get_run_logger()
+#     horses = []
+#     horse_args = []
+#     run_args = []
+#     adding_horses = False
+#     adding_runs = False
+
+#     for word in stream:
+#         # Skip any titles
+#         if "FORMDATA" in word:
+#             skip_count = 3
+#             continue
+
+#         if skip_count > 0:
+#             skip_count -= 1
+#             continue
+
+#         horse_switch = is_horse(word)
+#         run_switch = is_race_date(word)
+
+#         # Switch on/off adding horses/runs
+#         if horse_switch:
+#             adding_horses = True
+#             adding_runs = False
+#         elif run_switch:
+#             adding_horses = False
+#             adding_runs = True
+#         elif "then" in word:
+#             adding_horses = False
+#             adding_runs = False
+
+#         # Create horses/runs
+#         if run_switch and len(horse_args):
+#             horse = create_horse(horse_args, date.year)
+#             horses.append(horse)
+#             horse_args = []
+
+#         if (horse_switch or run_switch) and len(run_args):
+#             run = create_run(run_args)
+#             if run is None:
+#                 logger.error(f"Missing run for {horse.name}")
+#             else:
+#                 horse.runs.append(run)
+#             run_args = []
+
+#         # Add words to horses/runs
+#         if adding_horses:
+#             horse_args.append(word)
+#         elif adding_runs:
+#             run_args.append(word)
+
+#     return horses
+
+def formdata_stream_processor():
     logger = get_run_logger()
-    horses = []
     horse_args = []
     run_args = []
+    horse = None
     adding_horses = False
     adding_runs = False
 
-    for word in stream:
-        # Skip any titles
-        if "FORMDATA" in word:
-            skip_count = 3
-            continue
+    h = formdata_horse_processor()
+    next(h)
 
-        if skip_count > 0:
-            skip_count -= 1
-            continue
+    try: 
+        while True:
+            word, date = yield
 
-        horse_switch = is_horse(word)
-        run_switch = is_race_date(word)
+            logger.info(f"Processing {word}")
 
-        # Switch on/off adding horses/runs
-        if horse_switch:
-            adding_horses = True
-            adding_runs = False
-        elif run_switch:
-            adding_horses = False
-            adding_runs = True
-        elif "then" in word:
-            adding_horses = False
-            adding_runs = False
+            if "FORMDATA" in word:
+                skip_count = 3
+                continue
 
-        # Create horses/runs
-        if run_switch and len(horse_args):
-            horse = create_horse(horse_args, date.year)
-            horses.append(horse)
-            horse_args = []
+            if skip_count > 0:
+                skip_count -= 1
+                continue
 
-        if (horse_switch or run_switch) and len(run_args):
-            run = create_run(run_args)
-            if run is None:
-                logger.error(f"Missing run for {horse.name}")
-            else:
-                horse.runs.append(run)
-            run_args = []
+            logger.info(f"HORSE ARGS {horse_args}")
 
-        # Add words to horses/runs
-        if adding_horses:
-            horse_args.append(word)
-        elif adding_runs:
-            run_args.append(word)
+            horse_switch = is_horse(word)
+            run_switch = is_race_date(word)
 
-    return horses
+            # Switch on/off adding horses/runs
+            if horse_switch:
+                adding_horses = True
+                adding_runs = False
+                if horse:
+                    h.send((horse, date))
+            elif run_switch:
+                adding_horses = False
+                adding_runs = True
+            elif "then" in word:
+                adding_horses = False
+                adding_runs = False
+
+            # Create horses/runs
+            if run_switch and len(horse_args):
+                horse = create_horse(horse_args, date.year)
+                horse_args = []
+
+            if (horse_switch or run_switch) and len(run_args):
+                run = create_run(run_args)
+                if run is None:
+                    logger.error(f"Missing run for {horse.name}")
+                else:
+                    horse.runs.append(run)
+                run_args = []
+
+            # Add words to horses/runs
+            if adding_horses:
+                horse_args.append(word)
+            elif adding_runs:
+                run_args.append(word)    
+
+    except GeneratorExit:
+        logger.info("Finished processing")
+        h.close()
 
 
 def stream_formdata_by_word(file):
@@ -352,21 +435,28 @@ def stream_formdata_by_word(file):
 
 
 @task(
-    cache_key_fn=task_input_hash,
-    cache_expiration=timedelta(days=1),
+    # cache_key_fn=task_input_hash,
+    # cache_expiration=timedelta(days=1),
     tags=["Racing Research"],
     task_run_name="{file}_horses",
 )
 def get_horses_from_formdata(file):
     logger = get_run_logger()
-
     date = get_formdata_date(file)
-    word_iterator = stream_formdata_by_word(file)
-    horses = process_formdata_stream(word_iterator, date)
-    count = len([h for h in horses if h is not None])
-    logger.info(f"Processed {count} horses from {file}")
+    horses = []
+ 
+    p = formdata_stream_processor()
+    next(p)
 
-    return horses
+    for word in stream_formdata_by_word(file):
+        p.send((word, date))
+        
+    p.close()
+ 
+    # count = len([h for h in horses if h is not None])
+    # logger.info(f"Processed {count} horses from {file}")
+
+    # return horses
 
 
 @task(tags=["Racing Research"])
@@ -383,7 +473,7 @@ def transform_horse_data(data: dict) -> list[MongoHorse]:
 
 @flow
 def formdata_transformer():
-    files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
+    files = get_formdatas(code=RacingCode.FLAT, after_year=22, for_refresh=True)
     logger = get_run_logger()
     logger.info(f"Processing {len(files)} files from {SOURCE}")
 
