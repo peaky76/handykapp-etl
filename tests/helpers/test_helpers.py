@@ -34,7 +34,7 @@ def test_get_files(mocker):
         "Contents": [{"Key": "foo.csv"}, {"Key": "bar.csv"}],
         "NextContinuationToken": "",
     }
-    assert ["foo.csv", "bar.csv"] == list(get_files("dir"))
+    assert list(get_files("dir")) == ["foo.csv", "bar.csv"]
 
 
 def test_get_files_modified_after(mocker):
@@ -46,7 +46,7 @@ def test_get_files_modified_after(mocker):
         ],
         "NextContinuationToken": None,
     }
-    assert ["bar.csv"] == list(get_files("dir", pendulum.parse("2019-07-01 00:00")))
+    assert list(get_files("dir", pendulum.parse("2019-07-01 00:00"))) == ["bar.csv"]
 
 
 def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):
@@ -59,14 +59,14 @@ def test_read_file_for_csv(mocker):
     mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
         "foo,bar,baz", "utf-8"
     )
-    assert [["foo", "bar", "baz"]] == read_file("foo.csv")
+    assert read_file("foo.csv") == [["foo", "bar", "baz"]]
 
 
 def test_read_file_for_json(mocker):
     mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
         '{"foo": "bar"}', "utf-8"
     )
-    assert {"foo": "bar"} == read_file("foo.json")
+    assert read_file("foo.json") == {"foo": "bar"}
 
 
 def test_stream_file(mocker):
