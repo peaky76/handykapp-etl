@@ -91,3 +91,13 @@ deployments:
       cron: 30 9 * * *
       timezone: UTC
       day_or: true
+  - name: streamlined-test
+    version:
+    tags: []
+    description:
+    entrypoint: src\loaders\test_loader.py:test_load
+    parameters: {}
+    work_pool:
+      name: paddling
+      work_queue_name:
+      job_variables: {}

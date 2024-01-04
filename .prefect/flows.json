@@ -3,6 +3,7 @@
   "load-database-afresh": "src\\loaders\\main_loader.py:load_database_afresh",
   "load-formdata-only": "src\\loaders\\formdata_loader.py:load_formdata_only",
   "rapid-horseracing-extractor": "src\\extractors\\rapid_horseracing_extractor.py:rapid_horseracing_extractor",
+  "test-load": "src\\loaders\\test_loader.py:test_load",
   "theracingapi-racecards-extractor": "src\\extractors\\theracingapi_extractor.py:theracingapi_racecards_extractor",
   "trial-extractor": "src\\extractors\\trial_extractor.py:trial_extractor"
 }
