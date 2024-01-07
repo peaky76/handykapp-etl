@@ -192,13 +192,6 @@ def load_formdata_only():
     load_formdata(formdata)
     logger.info("Loaded formdata collection")
 
-
-@flow
-def just_doing_summat():
-    logger = get_run_logger()
-    logger.info("Hello world")
-
-
 @flow
 def load_formdata_afresh():
     db.formdata.drop()
