@@ -33,15 +33,15 @@ FORMDATA_FILENAMES = [
 
 
 def test_extract_dist_going_for_turf_going():
-    assert (float("5"), "G") == extract_dist_going("5G")
+    assert extract_dist_going("5G") == (float("5"), "G")
 
 
 def test_extract_dist_going_for_aw_going():
-    assert (float("5"), "d") == extract_dist_going("5d")
+    assert extract_dist_going("5d") == (float("5"), "d")
 
 
 def test_extract_dist_going_for_decimal_dist():
-    assert (float("9.1"), "G") == extract_dist_going("9.1G")
+    assert extract_dist_going("9.1G") == (float("9.1"), "G")
 
 
 def test_extract_middle_details_when_jockey_and_single_digit_position():
@@ -52,7 +52,7 @@ def test_extract_middle_details_when_jockey_and_single_digit_position():
         "position": "3",
     }
 
-    assert expected == extract_middle_details("JFanning3")
+    assert extract_middle_details("JFanning3") == expected 
 
 
 def test_extract_middle_details_when_jockey_and_double_digit_position():
@@ -63,7 +63,7 @@ def test_extract_middle_details_when_jockey_and_double_digit_position():
         "position": "12",
     }
 
-    assert expected == extract_middle_details("JFanning12")
+    assert extract_middle_details("JFanning12") == expected
 
 
 def test_extract_middle_details_when_headgear_jockey_position():
@@ -74,7 +74,7 @@ def test_extract_middle_details_when_headgear_jockey_position():
         "position": "12",
     }
 
-    assert expected == extract_middle_details("tJFanning12")
+    assert extract_middle_details("tJFanning12") == expected
 
 
 def test_extract_middle_details_when_allowance_jockey_position():
@@ -85,8 +85,7 @@ def test_extract_middle_details_when_allowance_jockey_position():
         "position": "12",
     }
 
-    assert expected == extract_middle_details("3HDavies12")
-
+    assert extract_middle_details("3HDavies12") == expected 
 
 def test_extract_middle_details_when_headgear_allowance_jockey_position():
     expected = {
@@ -96,7 +95,7 @@ def test_extract_middle_details_when_headgear_allowance_jockey_position():
         "position": "12",
     }
 
-    assert expected == extract_middle_details("t3HDavies12")
+    assert extract_middle_details("t3HDavies12") == expected
 
 
 def test_extract_middle_details_when_position_equal():
@@ -107,7 +106,7 @@ def test_extract_middle_details_when_position_equal():
         "position": "=12",
     }
 
-    assert expected == extract_middle_details("t3HDavies=12")
+    assert extract_middle_details("t3HDavies=12") == expected
 
 
 def test_extract_middle_details_when_position_reordered():
@@ -118,7 +117,7 @@ def test_extract_middle_details_when_position_reordered():
         "position": "2p3",
     }
 
-    assert expected == extract_middle_details("t3HDavies2p3")
+    assert extract_middle_details("t3HDavies2p3") == expected 
 
 
 def test_extract_middle_details_when_position_is_disaster():
@@ -129,7 +128,7 @@ def test_extract_middle_details_when_position_is_disaster():
         "position": "p",
     }
 
-    assert expected == extract_middle_details("t3HDaviesp")
+    assert extract_middle_details("t3HDaviesp") == expected
 
 
 def test_extract_middle_details_when_position_includes_disqulification():
@@ -140,7 +139,7 @@ def test_extract_middle_details_when_position_includes_disqulification():
         "position": "3d",
     }
 
-    assert expected == extract_middle_details("t3HDavies3d")
+    assert extract_middle_details("t3HDavies3d") == expected
 
 
 def test_extract_prize():
@@ -152,7 +151,7 @@ def test_extract_weight():
 
 
 def test_get_formdata_date():
-    assert pendulum.date(2019, 6, 30) == get_formdata_date(FORMDATA_FILENAMES[0])
+    assert get_formdata_date(FORMDATA_FILENAMES[0]) == pendulum.date(2019, 6, 30)
 
 
 def test_get_formdatas_default(mocker):
@@ -168,7 +167,7 @@ def test_get_formdatas_with_code(mocker):
         "formdata_nh_230625.pdf",
         "formdata_nh_230702.pdf",
     ]
-    assert expected == get_formdatas(code=RacingCode.NH)
+    assert get_formdatas(code=RacingCode.NH) == expected
 
 
 def test_get_formdatas_with_after_year(mocker):
@@ -185,7 +184,7 @@ def test_get_formdatas_with_after_year(mocker):
         "formdata_nh_230625.pdf",
         "formdata_nh_230702.pdf",
     ]
-    assert expected == get_formdatas(after_year=22)
+    assert get_formdatas(after_year=22) == expected
 
 
 def test_get_formdatas_with_for_refresh(mocker):
@@ -200,7 +199,7 @@ def test_get_formdatas_with_for_refresh(mocker):
         "formdata_nh_230611.pdf",
         "formdata_nh_230702.pdf",
     ]
-    assert expected == get_formdatas(for_refresh=True)
+    assert get_formdatas(for_refresh=True) == expected
 
 
 def test_is_horse_true_without_country():
@@ -284,4 +283,4 @@ def test_transform_horse_data():
         "year": 2018,
     }
 
-    assert expected == next(iter(transform_horse_data.fn(data)))
+    assert next(iter(transform_horse_data.fn(data))) == expected
