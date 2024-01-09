@@ -4,13 +4,20 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import tomllib
 from clients import mongo_client as client
+from helpers import get_files
 from nameparser import HumanName
 from prefect import flow, get_run_logger
 from pymongo.errors import DuplicateKeyError
 from transformers.theracingapi_transformer import theracingapi_transformer
 
 from loaders.adders import add_horse, add_person
+
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
+
+SOURCE = settings["theracingapi"]["spaces_dir"]
 
 db = client.handykapp
 
@@ -278,7 +285,20 @@ def person_processor():
 
 
 @flow
-def load_theracingapi_data(data=None):
+def load_theracingapi_data():
+    logger = get_run_logger()
+    logger.info("Starting theracingapi loader")
+
+    t = theracingapi_transformer()
+    next(t)
+    for file in get_files(f"{SOURCE}racecards"): 
+        t.send(file)
+
+    t.close()
+
+
+@flow
+def load_theracingapi_data_old(data=None):
     logger = get_run_logger()
     if data is None:
         data = theracingapi_transformer()
@@ -310,4 +330,4 @@ def load_theracingapi_data_afresh(data=None):
 
 
 if __name__ == "__main__":
-    load_theracingapi_data_afresh()
+    load_theracingapi_data()

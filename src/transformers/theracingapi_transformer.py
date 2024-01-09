@@ -257,8 +257,25 @@ def read_racecards():
     return racecards
 
 
-@flow
 def theracingapi_transformer():
+    logger = get_run_logger()
+    logger.info("Starting theracingapi transformer")
+    transform_count = 0
+
+    try:
+        while True:
+            file = yield
+            day = read_file(file)
+            data = petl.fromdicts(day["racecards"])
+            transform_count += 1
+            if transform_count % 50 == 0:
+                logger.info(f"Read {transform_count} days of racecards")
+                
+    except GeneratorExit:
+        logger.info(f"Finished transforming {transform_count} days of racecards")    
+
+@flow
+def theracingapi_transformer_old():
     races = read_racecards()
     data = petl.fromdicts(races)
     problems = validate_races(data)
@@ -269,5 +286,5 @@ def theracingapi_transformer():
 
 
 if __name__ == "__main__":
-    data = theracingapi_transformer()  # type: ignore
+    data = theracingapi_transformer_old()  # type: ignore
     print(data)
