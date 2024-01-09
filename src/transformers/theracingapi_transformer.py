@@ -8,7 +8,8 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from helpers import get_files, log_validation_problem, read_file
+
+# from helpers import get_files, log_validation_problem, read_file
 from horsetalk import (  # type: ignore
     CoatColour,
     Gender,
@@ -18,8 +19,9 @@ from horsetalk import (  # type: ignore
     RaceDistance,
     RaceGrade,
 )
-from prefect import flow, get_run_logger, task
 
+# from loaders.theracingapi_loader import declaration_processor
+# from prefect import flow, get_run_logger, task
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.validators import (
     validate_date,
@@ -83,8 +85,6 @@ def transform_horse(data, race_date=pendulum.now()):
         .dicts()[0]
     )
 
-
-@task(tags=["TheRacingAPI"])
 def transform_races(data):
     return (
         petl.rename(
@@ -180,8 +180,6 @@ def validate_horse(data):
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
-
-@task(tags=["TheRacingAPI"])
 def validate_races(data):
     header = (
         "course",
@@ -239,52 +237,5 @@ def validate_races(data):
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
-
-@task(tags=["TheRacingAPI"])
-def read_racecards():
-    logger = get_run_logger()
-    racecards = []
-    count = 0
-
-    for file in get_files(f"{SOURCE}racecards"):
-        count += 1
-        day = read_file(file)
-        racecards.extend(day["racecards"])
-        if count % 50 == 0:
-            logger.info(f"Read {count} days of racecards")
-
-    logger.info(f"Read {count} days of racecards")
-    return racecards
-
-
-def theracingapi_transformer():
-    logger = get_run_logger()
-    logger.info("Starting theracingapi transformer")
-    transform_count = 0
-
-    try:
-        while True:
-            file = yield
-            day = read_file(file)
-            data = petl.fromdicts(day["racecards"])
-            transform_count += 1
-            if transform_count % 50 == 0:
-                logger.info(f"Read {transform_count} days of racecards")
-                
-    except GeneratorExit:
-        logger.info(f"Finished transforming {transform_count} days of racecards")    
-
-@flow
-def theracingapi_transformer_old():
-    races = read_racecards()
-    data = petl.fromdicts(races)
-    problems = validate_races(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
-
-    return transform_races(data)
-
-
 if __name__ == "__main__":
-    data = theracingapi_transformer_old()  # type: ignore
-    print(data)
+    print("Cannot run theracingapi_transformer.py as a script.")
