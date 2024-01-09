@@ -4,13 +4,14 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import petl  # type: ignore
 import tomllib
 from clients import mongo_client as client
-from helpers import get_files
+from helpers import get_files, log_validation_problem, read_file
 from nameparser import HumanName
 from prefect import flow, get_run_logger
 from pymongo.errors import DuplicateKeyError
-from transformers.theracingapi_transformer import theracingapi_transformer
+from transformers.theracingapi_transformer import transform_races, validate_races
 
 from loaders.adders import add_horse, add_person
 
@@ -283,7 +284,44 @@ def person_processor():
             f"Finished processing people. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
         )
 
+def theracingapi_transformer():
+    logger = get_run_logger()
+    logger.info("Starting theracingapi transformer")
+    reject_count = 0
+    transform_count = 0
 
+    d = declaration_processor()
+    next(d)
+
+    try:
+        while True:
+            file = yield
+            day = read_file(file)
+            racecards = petl.fromdicts(day["racecards"])
+
+            problems = validate_races(racecards)
+            if len(problems.dicts()) > 0:
+                logger.warning(f"Validation problems in {file}")
+                if len(problems.dicts()) > 10:
+                    logger.warning("Too many problems to log")
+                else:
+                    for problem in problems.dicts():
+                        log_validation_problem(problem)
+                reject_count += 1
+            else:
+                races = transform_races(racecards)                
+                for race in races:
+                    d.send(race)
+
+                transform_count += 1
+                if transform_count % 50 == 0:
+                    logger.info(f"Read {transform_count} days of racecards")
+                    
+    except GeneratorExit:
+        logger.info(f"Finished transforming {transform_count} days of racecards, rejected {reject_count}")    
+        d.close()
+
+    
 @flow
 def load_theracingapi_data():
     logger = get_run_logger()
@@ -295,39 +333,6 @@ def load_theracingapi_data():
         t.send(file)
 
     t.close()
-
-
-@flow
-def load_theracingapi_data_old(data=None):
-    logger = get_run_logger()
-    if data is None:
-        data = theracingapi_transformer()
-    race_count = 0
-
-    d = declaration_processor()
-    next(d)
-    for race in data:
-        logger.debug(f"Processing {race['datetime']} from {race['course']}")
-        d.send(race)
-        race_count += 1
-
-        if race_count and race_count % 100 == 0:
-            logger.info(f"Processed {race_count} races")
-
-    logger.info(f"Processed {race_count} races")
-    d.close()
-
-
-@flow
-def load_theracingapi_data_afresh(data=None):
-    if data is None:
-        data = theracingapi_transformer()
-
-    db.horses.drop()
-    db.races.drop()
-    db.people.drop()
-    load_theracingapi_data(data)
-
 
 if __name__ == "__main__":
     load_theracingapi_data()
