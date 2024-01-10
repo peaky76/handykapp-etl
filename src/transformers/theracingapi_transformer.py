@@ -227,7 +227,7 @@ def validate_races(data):
         {
             "name": "prize_valid",
             "field": "prize",
-            "assertion": lambda x: (x[0] == "£" or x[0] == "€") and x[1].isdigit(),
+            "assertion": lambda x: not x or ((x[0] == "£" or x[0] == "€") and x[1].isdigit()),
         },
         {
             "name": "runners_list",
