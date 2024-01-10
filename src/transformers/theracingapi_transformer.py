@@ -25,6 +25,7 @@ from horsetalk import (  # type: ignore
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.validators import (
     validate_date,
+    validate_pattern,
     validate_time,
     validate_weight,
 )
@@ -206,7 +207,7 @@ def validate_races(data):
         {"name": "off_time_valid", "field": "off_time", "assertion": validate_time},
         {"name": "distance_float", "field": "distance_f", "test": float},
         {"name": "region_str", "field": "region", "test": str},
-        {"name": "pattern_valid", "field": "pattern", "test": RaceGrade},
+        {"name": "pattern_valid", "field": "pattern", "assertion": validate_pattern},
         {
             "name": "race_class_valid",
             "field": "race_class",
