@@ -232,7 +232,7 @@ def validate_races(data):
         {
             "name": "runners_list",
             "field": "runners",
-            "assertion": lambda x: [validate_horse(h) for h in x],
+            "assertion": lambda x: all(validate_horse(h) for h in x),
         },
     ]
     validator = {"header": header, "constraints": constraints}
