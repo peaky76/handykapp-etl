@@ -1,7 +1,12 @@
 import re
 
 import pendulum
-from horsetalk import AWGoingDescription, Gender, TurfGoingDescription  # type: ignore
+from horsetalk import (  # type: ignore
+    AWGoingDescription,
+    Gender,
+    RaceGrade,
+    TurfGoingDescription,
+)
 
 
 def validate_class(race_class):
@@ -44,6 +49,14 @@ def validate_horse(horse):
 
 def validate_in_enum(value, enum):
     return value and value.lower() in [e.name.lower() for e in enum]
+
+
+def validate_pattern(pattern):
+    try:
+        RaceGrade(pattern)
+        return True
+    except ValueError:
+        return pattern in ["Grade A", "Grade B"]
 
 
 def validate_prize(prize):

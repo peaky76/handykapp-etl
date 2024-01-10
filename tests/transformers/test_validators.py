@@ -7,6 +7,7 @@ from transformers.validators import (
     validate_going,
     validate_horse,
     validate_in_enum,
+    validate_pattern,
     validate_prize,
     validate_rating,
     validate_sex,
@@ -134,6 +135,30 @@ def test_validate_in_enum_fails_for_none():
 
 def test_validate_in_enum_fails_for_invalid_string():
     assert not validate_in_enum("Valet", Enum("Job", "JOCKEY TRAINER OWNER"))
+
+
+def test_validate_pattern_passes_for_group_race():
+    assert validate_pattern("Group 1")
+
+
+def test_validate_pattern_passes_for_grade_race():
+    assert validate_pattern("Grade 1")
+
+
+def test_validate_pattern_passes_for_listed_race():
+    assert validate_pattern("Listed")
+
+
+def test_validate_pattern_passes_for_irish_handicap_grade():
+    assert validate_pattern("Grade A")
+
+
+def test_validate_pattern_passes_for_none():
+    assert validate_pattern(None)
+
+
+def test_validate_pattern_fails_for_invalid_pattern():
+    assert not validate_pattern("Grade C")
 
 
 def test_validate_prize_passes_for_sterling():
