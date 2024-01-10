@@ -175,7 +175,7 @@ def test_transform_races_returns_correct_output(racecard_data):
         "prize": "£4187",
     }
 
-    actual = transform_races.fn(petl.fromdicts([racecard_data]))[0]
+    actual = transform_races(petl.fromdicts([racecard_data]))[0]
 
     assert len(actual["runners"]) == 2
     actual.pop("runners")
