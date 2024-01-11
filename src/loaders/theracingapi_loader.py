@@ -297,8 +297,7 @@ def theracingapi_transformer():
         while True:
             file = yield
             day = read_file(file)
-            racecards = petl.fromdicts(day["racecards"])
-
+            racecards = petl.fromdicts({k: v for k, v in dec.items() if k != "off_dt"} for dec in day["racecards"])
             problems = validate_races(racecards)
             if len(problems.dicts()) > 0:
                 logger.warning(f"Validation problems in {file}")
@@ -314,7 +313,7 @@ def theracingapi_transformer():
                     d.send(race)
 
                 transform_count += 1
-                if transform_count % 50 == 0:
+                if transform_count % 10 == 0:
                     logger.info(f"Read {transform_count} days of racecards")
                     
     except GeneratorExit:
