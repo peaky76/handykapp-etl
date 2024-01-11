@@ -134,3 +134,4 @@ deployments/
 
 # Data
 *.pdf
+*.sqlite3
