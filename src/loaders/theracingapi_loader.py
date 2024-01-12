@@ -284,7 +284,7 @@ def person_processor():
             f"Finished processing people. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
         )
 
-def theracingapi_transformer():
+def file_processor():
     logger = get_run_logger()
     logger.info("Starting theracingapi transformer")
     reject_count = 0
@@ -326,12 +326,12 @@ def load_theracingapi_data():
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
-    t = theracingapi_transformer()
-    next(t)
+    f = file_processor()
+    next(f)
     for file in get_files(f"{SOURCE}racecards"): 
-        t.send(file)
+        f.send(file)
 
-    t.close()
+    f.close()
 
 if __name__ == "__main__":
     load_theracingapi_data()
