@@ -17,7 +17,6 @@ from pymongo.errors import DuplicateKeyError
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
-    formdata_transformer,
     get_formdata_date,
     get_formdatas,
     is_horse,
