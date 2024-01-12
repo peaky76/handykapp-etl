@@ -5,12 +5,29 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import fitz  # type: ignore
+import tomllib
 from clients import mongo_client as client
+from helpers import get_files, stream_file
+from horsetalk import RacingCode
 from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger, task
 from pymongo import ASCENDING as ASC
 from pymongo.errors import DuplicateKeyError
-from transformers.formdata_transformer import formdata_transformer
+from transformers.formdata_transformer import (
+    create_horse,
+    create_run,
+    formdata_transformer,
+    get_formdata_date,
+    get_formdatas,
+    is_horse,
+    is_race_date,
+)
+
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
+
+SOURCE = settings["formdata"]["spaces_dir"]
 
 db = client.handykapp
 
@@ -66,19 +83,6 @@ def create_code_to_course_dict():
         racecourse["references"]["racing_research"]: racecourse["_id"]
         for racecourse in source
     }
-
-
-@task(tags=["Racing Research"])
-def load_formdata(formdata):
-    ret_val = {}
-    for entry in formdata:
-        entry = entry._asdict()
-        entry["runs"] = [run._asdict() for run in entry["runs"]]
-
-        entry_id = db.formdata.insert_one(entry)
-        ret_val[f"{entry['name']} ({entry['country']})"] = entry_id.inserted_id
-    return ret_val
-
 
 @task(tags=["Racing Research"])
 def load_races(formdata):
@@ -181,36 +185,213 @@ def load_formdata_people(formdata=None):
 
     return {"jockeys": all_jockeys, "trainers": all_trainers}
 
+###############################################
+
+def formdata_loader():
+    logger = get_run_logger()
+    logger.info("Starting formdata loader")
+
+    try:
+        while True:
+            item = yield
+            horse, date = item
+
+            entry = horse._asdict()
+            entry["runs"] = [run._asdict() for run in entry["runs"]]
+
+            existing_entry = db.formdata.find_one(
+                {"name": entry["name"], "country": entry["country"], "year": entry["year"]}
+            )
+
+            if existing_entry:
+                runs = existing_entry["runs"]
+
+                for new_run in entry["runs"]:
+                    matched_run = next(
+                        (r for r in runs if r["date"] == new_run["date"]),
+                        None,
+                    )
+                    if matched_run:
+                        runs.remove(matched_run)
+                    runs.append(new_run)
+
+                db.formdata.find_one_and_update(
+                    {"name": entry["name"], "country": entry["country"], "year": entry["year"]},
+                    {"$set": {"runs": runs}},
+                )
+            else:
+                db.formdata.insert_one(entry)
+            
+    except GeneratorExit:
+        pass
+
+def horse_loader():
+
+    try: 
+        while True:
+            item = yield
+            horse, date = item
+    
+    except GeneratorExit:
+        pass
+
+def word_processor():
+    logger = get_run_logger()
+    logger.info("Starting word processor")
+    horse = None
+    horse_args = []
+    run_args = []
+    adding_horses = False
+    adding_runs = False
+
+    fl = formdata_loader()
+    next(fl)
+    hl = horse_loader()
+    next(hl)
+
+    try:
+        while True:
+            item = yield
+            word, date = item
+            if "FORMDATA" in word:
+                skip_count = 3
+                continue
+
+            if skip_count > 0:
+                skip_count -= 1
+                continue
+
+            horse_switch = is_horse(word)
+            run_switch = is_race_date(word)
+
+            # Switch on/off adding horses/runs
+            if horse_switch:
+                adding_horses = True
+                adding_runs = False
+            elif run_switch:
+                adding_horses = False
+                adding_runs = True
+            elif "then" in word:
+                adding_horses = False
+                adding_runs = False
+
+            # Create horses/runs
+            if run_switch and len(horse_args):
+                horse = create_horse(horse_args, date.year)
+                horse_args = []
+
+            if (horse_switch or run_switch) and len(run_args):
+                run = create_run(run_args)
+                if run is None:
+                    logger.error(f"Missing run for {horse.name}")
+                else:
+                    horse.runs.append(run)
+                run_args = []
+
+            # Add horses/runs to db
+            if horse_switch and horse:
+                fl.send((horse, date))
+                hl.send((horse, date))
+                horse = None
+
+            # Add words to horses/runs
+            if adding_horses:
+                horse_args.append(word)
+            elif adding_runs:
+                run_args.append(word)
+
+    except GeneratorExit:
+        hl.close()
+
+def page_processor():
+    logger = get_run_logger()
+    logger.info("Starting page processor")
+
+    w = word_processor()
+    next(w)
+
+    try:
+        while True:
+            item = yield
+            page, date = item
+            text = page.get_text()
+            # Replace non-ascii characters with apostrophes
+            words = (
+                text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostrophe
+                .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
+                .replace(chr(25), "'")  # Regular apostrophe
+                .replace(chr(65533), "'") # Replacement character
+                .split("\n")
+            )
+            for word in words:
+                w.send((word, date))
+
+    except GeneratorExit:
+        w.close()
+
+
+def file_processor():
+    logger = get_run_logger()
+    logger.info("Starting file processor")
+    page_count = 0
+
+    p = page_processor()
+    next(p)
+
+    try:
+        while True:
+            file = yield
+            logger.info(f"Processing {file}")
+
+            date = get_formdata_date(file)
+            doc = fitz.open("pdf", stream_file(file))
+            for page in doc:
+                p.send((page, date))
+                page_count += 1
+
+    except GeneratorExit:
+        logger.info(f"Processed {page_count} pages")
+        p.close()
+
+###############################################
 
 @flow
 def load_formdata_only():
     logger = get_run_logger()
+    logger.info("Starting formdata loader")
+
     db.formdata.drop()
     logger.info("Dropped formdata collection")
-    formdata = formdata_transformer()
-    logger.info("Transformed formdata")
-    load_formdata(formdata)
+
+    f = file_processor()
+    next(f)
+
+    files = get_formdatas(code=RacingCode.FLAT, after_year=20, for_refresh=True)
+    for file in files:
+        f.send(file)
+
+    f.close()
     logger.info("Loaded formdata collection")
 
-@flow
-def load_formdata_afresh():
-    db.formdata.drop()
-    db.horses.drop()
-    db.races.create_index(
-        [
-            ("date", ASC),
-            ("course", ASC),
-            ("type", ASC),
-            ("number_of_runners", ASC),
-            ("win_prize", ASC),
-        ],
-        unique=True,
-    )
-    formdata = formdata_transformer()
-    load_formdata(formdata)
-    horse_ids = load_formdata_horses(formdata)
-    load_races(formdata)
-    load_runs(formdata, horse_ids)
+# @flow
+# def load_formdata_afresh():
+#     db.formdata.drop()
+#     db.horses.drop()
+#     db.races.create_index(
+#         [
+#             ("date", ASC),
+#             ("course", ASC),
+#             ("type", ASC),
+#             ("number_of_runners", ASC),
+#             ("win_prize", ASC),
+#         ],
+#         unique=True,
+#     )
+#     formdata = formdata_transformer()
+#     load_formdata(formdata)
+#     horse_ids = load_formdata_horses(formdata)
+#     load_races(formdata)
+#     load_runs(formdata, horse_ids)
 
 
 if __name__ == "__main__":
@@ -220,4 +401,4 @@ if __name__ == "__main__":
 
     # print([adjust_rr_name(x) for x in data["jockeys"]])
     # print([adjust_rr_name(x) for x in data["trainers"]])
-    load_formdata_afresh()  # type: ignore
+    load_formdata_only()  # type: ignore
