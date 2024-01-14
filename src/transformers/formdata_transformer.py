@@ -7,7 +7,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import re
 from collections import namedtuple
 
-# from datetime import timedelta
 import pendulum
 import petl  # type: ignore
 import tomllib
@@ -15,8 +14,6 @@ from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
 from models.mongo_horse import MongoHorse
 from prefect import get_run_logger, task
-
-# from prefect.tasks import task_input_hash
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
