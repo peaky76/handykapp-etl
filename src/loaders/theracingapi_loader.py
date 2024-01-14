@@ -14,7 +14,7 @@ from pymongo.errors import DuplicateKeyError
 from transformers.theracingapi_transformer import transform_races, validate_races
 
 from loaders.adders import add_horse, add_person
-from loaders.getters import get_racecourse_id
+from loaders.getters import lookup_racecourse_id
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -55,9 +55,7 @@ def declaration_processor():
     try:
         while True:
             dec = yield
-            (racecourse_id, racecourse_ids) = get_racecourse_id(
-                db,
-                racecourse_ids,
+            racecourse_id = lookup_racecourse_id(
                 dec["course"],
                 dec["surface"],
                 dec["code"],
@@ -283,8 +281,10 @@ def file_processor():
         while True:
             file = yield
             day = read_file(file)
+
             racecards = petl.fromdicts({k: v for k, v in dec.items() if k != "off_dt"} for dec in day["racecards"])
             problems = validate_races(racecards)
+            
             if len(problems.dicts()) > 0:
                 logger.warning(f"Validation problems in {file}")
                 if len(problems.dicts()) > 10:
@@ -303,7 +303,7 @@ def file_processor():
                     logger.info(f"Read {transform_count} days of racecards")
                     
     except GeneratorExit:
-        logger.info(f"Finished transforming {transform_count} days of racecards, rejected {reject_count}")    
+        logger.info(f"Finished processing {transform_count} days of racecards, rejected {reject_count}")    
         d.close()
 
     
