@@ -76,12 +76,6 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
         .dicts()[0]
     )
 
-
-@task(
-    tags=["Rapid"],
-    cache_key_fn=task_input_hash,
-    cache_expiration=timedelta(days=7),
-)
 def transform_results(data):
     return (
         petl.rename(
@@ -183,7 +177,6 @@ def validate_horse(data):
     return petl.validate(data, **validator)
 
 
-@task(tags=["Rapid"])
 def validate_results(data):
     header = (
         "id_race",
@@ -221,27 +214,5 @@ def validate_results(data):
     return petl.validate(data, **validator)
 
 
-@flow
-def rapid_horseracing_transformer():
-    logger = get_run_logger()
-    results = []
-    count = 0
-
-    for file in get_files(f"{SOURCE}results"):
-        count += 1
-        result = read_file(file)
-        results.append(result)
-        if count % 100 == 0:
-            logger.info(f"Read {count} results")
-
-    data = petl.fromdicts(results)
-    problems = validate_results(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
-
-    return transform_results(data)
-
-
 if __name__ == "__main__":
-    data = rapid_horseracing_transformer()  # type: ignore
-    print(data)
+    print("Cannot run rapid_horseracing_transformer.py as a script.")
