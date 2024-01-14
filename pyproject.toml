@@ -29,6 +29,9 @@ ruff = "^0.1.12"
 types-requests = "^2.31.0.20240106"
 mongomock = "^4.1.2"
 
+[tool.pytest.ini_options]
+testpaths = "tests"
+
 [tool.ruff]
 select = [
     "E", # pycodestyle Error
