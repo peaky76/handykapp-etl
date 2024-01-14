@@ -14,6 +14,7 @@ from pymongo.errors import DuplicateKeyError
 from transformers.theracingapi_transformer import transform_races, validate_races
 
 from loaders.adders import add_horse, add_person
+from loaders.getters import get_racecourse_id
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -54,29 +55,14 @@ def declaration_processor():
     try:
         while True:
             dec = yield
-            racecourse_id = racecourse_ids.get(
-                (dec["course"], dec["surface"], dec["code"], dec["obstacle"])
+            (racecourse_id, racecourse_ids) = get_racecourse_id(
+                db,
+                racecourse_ids,
+                dec["course"],
+                dec["surface"],
+                dec["code"],
+                dec["obstacle"],
             )
-
-            if not racecourse_id:
-                surface_options = (
-                    ["Tapeta", "Polytrack"] if dec["surface"] == "AW" else ["Turf"]
-                )
-                racecourse = db.racecourses.find_one(
-                    {
-                        "name": dec["course"].title(),
-                        "surface": {"$in": surface_options},
-                        "code": dec["code"],
-                        "obstacle": dec["obstacle"],
-                    },
-                    {"_id": 1},
-                )
-
-                if racecourse:
-                    racecourse_id = racecourse["_id"]
-                    racecourse_ids[
-                        (dec["course"], dec["surface"], dec["code"], dec["obstacle"])
-                    ] = racecourse_id
 
             if racecourse_id:
                 try:
