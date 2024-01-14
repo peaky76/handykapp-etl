@@ -1,42 +1,24 @@
-from loaders.getters import get_racecourse_id
-from mongomock import MongoClient
+import pytest
+from bson.objectid import ObjectId
+from loaders.getters import lookup_racecourse_id
 
-# Create a MongoDB mock client
-db = MongoClient().db
 
-def test_get_racecourse_id_returns_cached_racecourse_id():
-    lookup = {("Robertsbridge", "Turf", "National Hunt", "Hurdle"): "987654321"}
-    course = "Robertsbridge"
-    surface = "Turf"
-    code = "National Hunt"
-    obstacle = "Hurdle"
+@pytest.fixture()
+def mock_find_one(mocker):
+    return mocker.patch("pymongo.collection.Collection.find_one")
 
-    racecourse_id, updated_lookup = get_racecourse_id(db, lookup, course, surface, code, obstacle)
+def test_lookup_racecourse_id(mock_find_one):
+    mock_find_one.return_value = {"_id": ObjectId("abcdef123456abcdef123456")}
 
-    assert racecourse_id == "987654321"
-    assert updated_lookup == lookup
+    result = lookup_racecourse_id("Course", "Turf", "123", "No")
 
-def test_get_racecourse_id_returns_stored_racecourse_id():
-    db.racecourses.insert_one({"name": "Robertsbridge", "surface": "Turf", "code": "National Hunt", "obstacle": "Hurdle", "_id": "987654321"})
-    lookup = {}
-    course = "Robertsbridge"
-    surface = "Turf"
-    code = "National Hunt"
-    obstacle = "Hurdle"
-
-    racecourse_id, updated_lookup = get_racecourse_id(db, lookup, course, surface, code, obstacle)
-
-    assert racecourse_id == "987654321"
-    assert updated_lookup == {("Robertsbridge", "Turf", "National Hunt", "Hurdle"): "987654321"}
-
-def test_get_racecourse_id_returns_none_when_racecourse_not_found():
-    lookup = {}
-    course = "Jamesville"
-    surface = "Turf"
-    code = "Flat"
-    obstacle = None
-
-    racecourse_id, updated_lookup = get_racecourse_id(db, lookup, course, surface, code, obstacle)
-
-    assert racecourse_id is None
-    assert updated_lookup == {}
+    mock_find_one.assert_called_once_with(
+        {
+            "name": "Course",
+            "surface": {"$in": ["Turf"]},
+            "code": "123",
+            "obstacle": "No",
+        },
+        {"_id": 1},
+    )
+    assert result == ObjectId("abcdef123456abcdef123456")

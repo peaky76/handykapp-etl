@@ -1,13 +1,13 @@
-from pymongo.database import Database
+from functools import cache
 
+from clients import mongo_client as client
 
-def get_racecourse_id(db: Database, lookup: dict, course: str, surface: str, code: str, obstacle: str) -> (str, dict):
+db = client.handykapp
 
-    racecourse_id = lookup.get((course, surface, code, obstacle))
-
-    if not racecourse_id:
-        surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
-        racecourse = db.racecourses.find_one(
+@cache
+def lookup_racecourse_id(course: str, surface: str, code: str, obstacle: str) -> str:
+    surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
+    racecourse = db.racecourses.find_one(
             {
                 "name": course.title(),
                 "surface": {"$in": surface_options},
@@ -16,9 +16,5 @@ def get_racecourse_id(db: Database, lookup: dict, course: str, surface: str, cod
             },
             {"_id": 1},
         )
-
-        if racecourse:
-            racecourse_id = racecourse["_id"]
-            lookup[(course, surface, code, obstacle)] = racecourse_id
-
-    return (racecourse_id, lookup)
+    return racecourse["_id"] if racecourse else None
+    
