@@ -24,7 +24,7 @@ def validate_date(date):
 
 
 def validate_distance(distance):
-    pattern = r"^(([1-4]m)(\s)?([1-7]f)?|([4-7]f))$"
+    pattern = r"^(([1-4]\s?(?:[13579(?:11)(?:13)(?:15)]\/16|[1358]\/8|[13]\/4|1\/2)?\s?m(?:iles?)?)\s?([1-7]\s?(1\/2)?\s?f(?:urlongs?)?)?|([4-7]\s?(1\/2)?\s?f(?:urlongs?)?))$"
     return bool(re.match(pattern, distance)) if distance else False
 
 
