@@ -247,7 +247,7 @@ def person_processor():
                     logger.debug(f"{person} updated")
                     updated_count += 1
                 else:
-                    found_id = add_person(
+                    found_id = db.people.insert_one(
                         name_parts.as_dict() | {"references.theracingapi": name}
                     )
                     logger.info(f"{person} added to db")
