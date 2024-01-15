@@ -45,15 +45,13 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
                 "OR": "official_rating",
             },
         )
-        .convert(
-            {
-                "age": int,
-                "days_since_prev_run": int,
-                "official_rating": int,
-                "non_runner": lambda x: bool(int(x)),
-                "lbs_carried": lambda x: RaceWeight(x).lb,
-            }
-        )
+        .convert({
+            "age": int,
+            "days_since_prev_run": int,
+            "official_rating": int,
+            "non_runner": lambda x: bool(int(x)),
+            "lbs_carried": lambda x: RaceWeight(x).lb,
+        })
         .addfield(
             "year",
             lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
@@ -75,6 +73,7 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
         .cutout("horse", "age")
         .dicts()[0]
     )
+
 
 def transform_results(data):
     return (

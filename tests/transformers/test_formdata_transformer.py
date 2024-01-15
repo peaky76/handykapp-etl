@@ -52,7 +52,7 @@ def test_extract_middle_details_when_jockey_and_single_digit_position():
         "position": "3",
     }
 
-    assert extract_middle_details("JFanning3") == expected 
+    assert extract_middle_details("JFanning3") == expected
 
 
 def test_extract_middle_details_when_jockey_and_double_digit_position():
@@ -85,7 +85,8 @@ def test_extract_middle_details_when_allowance_jockey_position():
         "position": "12",
     }
 
-    assert extract_middle_details("3HDavies12") == expected 
+    assert extract_middle_details("3HDavies12") == expected
+
 
 def test_extract_middle_details_when_headgear_allowance_jockey_position():
     expected = {
@@ -117,7 +118,7 @@ def test_extract_middle_details_when_position_reordered():
         "position": "2p3",
     }
 
-    assert extract_middle_details("t3HDavies2p3") == expected 
+    assert extract_middle_details("t3HDavies2p3") == expected
 
 
 def test_extract_middle_details_when_position_is_disaster():

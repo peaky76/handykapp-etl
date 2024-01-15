@@ -83,6 +83,7 @@ def create_code_to_course_dict():
         for racecourse in source
     }
 
+
 @task(tags=["Racing Research"])
 def load_races(formdata):
     codes_to_courses = create_code_to_course_dict()
@@ -184,7 +185,9 @@ def load_formdata_people(formdata=None):
 
     return {"jockeys": all_jockeys, "trainers": all_trainers}
 
+
 ###############################################
+
 
 def formdata_loader():
     logger = get_run_logger()
@@ -198,9 +201,11 @@ def formdata_loader():
             entry = horse._asdict()
             entry["runs"] = [run._asdict() for run in entry["runs"]]
 
-            existing_entry = db.formdata.find_one(
-                {"name": entry["name"], "country": entry["country"], "year": entry["year"]}
-            )
+            existing_entry = db.formdata.find_one({
+                "name": entry["name"],
+                "country": entry["country"],
+                "year": entry["year"],
+            })
 
             if existing_entry:
                 runs = existing_entry["runs"]
@@ -215,24 +220,29 @@ def formdata_loader():
                     runs.append(new_run)
 
                 db.formdata.find_one_and_update(
-                    {"name": entry["name"], "country": entry["country"], "year": entry["year"]},
+                    {
+                        "name": entry["name"],
+                        "country": entry["country"],
+                        "year": entry["year"],
+                    },
                     {"$set": {"runs": runs}},
                 )
             else:
                 db.formdata.insert_one(entry)
-            
+
     except GeneratorExit:
         pass
 
-def horse_loader():
 
-    try: 
+def horse_loader():
+    try:
         while True:
             item = yield
             horse, date = item
-    
+
     except GeneratorExit:
         pass
+
 
 def word_processor():
     logger = get_run_logger()
@@ -302,6 +312,7 @@ def word_processor():
     except GeneratorExit:
         hl.close()
 
+
 def page_processor():
     logger = get_run_logger()
     logger.info("Starting page processor")
@@ -319,7 +330,7 @@ def page_processor():
                 text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostrophe
                 .replace(f"{chr(32)}{chr(25)}", "'")  # Space + apostrophe
                 .replace(chr(25), "'")  # Regular apostrophe
-                .replace(chr(65533), "'") # Replacement character
+                .replace(chr(65533), "'")  # Replacement character
                 .split("\n")
             )
             for word in words:
@@ -352,7 +363,9 @@ def file_processor():
         logger.info(f"Processed {page_count} pages")
         p.close()
 
+
 ###############################################
+
 
 @flow
 def load_formdata_only():
@@ -371,6 +384,7 @@ def load_formdata_only():
 
     f.close()
     logger.info("Loaded formdata collection")
+
 
 # @flow
 # def load_formdata_afresh():

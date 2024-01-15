@@ -279,7 +279,7 @@ def is_race_date(string: str) -> str:
 
 
 def formdata_horse_processor():
-    try: 
+    try:
         while True:
             horse, date = yield
             logger = get_run_logger()
@@ -292,7 +292,7 @@ def formdata_horse_processor():
 
     except GeneratorExit:
         logger.info("Finished processing")
-        
+
 
 @task(tags=["Racing Research"])
 def transform_horse_data(data: dict) -> list[MongoHorse]:

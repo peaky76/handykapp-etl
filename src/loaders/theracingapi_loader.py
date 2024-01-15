@@ -64,33 +64,29 @@ def declaration_processor():
 
             if racecourse_id:
                 try:
-                    declaration = db.races.insert_one(
-                        {
-                            "racecourse": racecourse_id,
-                            "datetime": dec["datetime"],
-                            "title": dec["title"],
-                            "is_handicap": dec["is_handicap"],
-                            "distance_description": dec["distance_description"],
-                            "race_grade": dec["race_grade"],
-                            "race_class": dec["race_class"],
-                            "age_restriction": dec["age_restriction"],
-                            "rating_restriction": dec["rating_restriction"],
-                            "prize": dec["prize"],
-                        }
-                    )
+                    declaration = db.races.insert_one({
+                        "racecourse": racecourse_id,
+                        "datetime": dec["datetime"],
+                        "title": dec["title"],
+                        "is_handicap": dec["is_handicap"],
+                        "distance_description": dec["distance_description"],
+                        "race_grade": dec["race_grade"],
+                        "race_class": dec["race_class"],
+                        "age_restriction": dec["age_restriction"],
+                        "rating_restriction": dec["rating_restriction"],
+                        "prize": dec["prize"],
+                    })
                     declaration_adds_count += 1
 
                     for horse in dec["runners"]:
                         h.send({"name": horse["sire"], "sex": "M", "race_id": None})
                         h.send({"name": horse["damsire"], "sex": "M", "race_id": None})
-                        h.send(
-                            {
-                                "name": horse["dam"],
-                                "sex": "F",
-                                "sire": horse["damsire"],
-                                "race_id": None,
-                            }
-                        )
+                        h.send({
+                            "name": horse["dam"],
+                            "sex": "F",
+                            "sire": horse["damsire"],
+                            "race_id": None,
+                        })
                         h.send(horse | {"race_id": declaration.inserted_id})
                 except DuplicateKeyError:
                     logger.warning(
@@ -139,25 +135,23 @@ def horse_processor():
                     updated_count += 1
                     horse_ids[name] = result["_id"]
                 else:
-                    added_id = add_horse(
-                        {
-                            k: v
-                            for k, v in {
-                                "name": name,
-                                "sex": horse["sex"],
-                                "year": horse.get("year"),
-                                "country": horse.get("country"),
-                                "colour": horse.get("colour"),
-                                "sire": horse_ids.get(horse["sire"])
-                                if horse.get("sire")
-                                else None,
-                                "dam": horse_ids.get(horse["dam"])
-                                if horse.get("dam")
-                                else None,
-                            }.items()
-                            if v
-                        }
-                    )
+                    added_id = add_horse({
+                        k: v
+                        for k, v in {
+                            "name": name,
+                            "sex": horse["sex"],
+                            "year": horse.get("year"),
+                            "country": horse.get("country"),
+                            "colour": horse.get("colour"),
+                            "sire": horse_ids.get(horse["sire"])
+                            if horse.get("sire")
+                            else None,
+                            "dam": horse_ids.get(horse["dam"])
+                            if horse.get("dam")
+                            else None,
+                        }.items()
+                        if v
+                    })
                     logger.debug(f"{name} added to db")
                     adds_count += 1
                     horse_ids[name] = added_id
@@ -181,22 +175,18 @@ def horse_processor():
                         }
                     },
                 )
-                p.send(
-                    {
-                        "name": horse["trainer"],
-                        "role": "trainer",
-                        "race_id": race_id,
-                        "runner_id": horse_ids[name],
-                    }
-                )
-                p.send(
-                    {
-                        "name": horse["jockey"],
-                        "role": "jockey",
-                        "race_id": race_id,
-                        "runner_id": horse_ids[name],
-                    }
-                )
+                p.send({
+                    "name": horse["trainer"],
+                    "role": "trainer",
+                    "race_id": race_id,
+                    "runner_id": horse_ids[name],
+                })
+                p.send({
+                    "name": horse["jockey"],
+                    "role": "jockey",
+                    "race_id": race_id,
+                    "runner_id": horse_ids[name],
+                })
 
     except GeneratorExit:
         logger.info(
@@ -268,6 +258,7 @@ def person_processor():
             f"Finished processing people. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
         )
 
+
 def file_processor():
     logger = get_run_logger()
     logger.info("Starting theracingapi transformer")
@@ -282,9 +273,12 @@ def file_processor():
             file = yield
             day = read_file(file)
 
-            racecards = petl.fromdicts({k: v for k, v in dec.items() if k != "off_dt"} for dec in day["racecards"])
+            racecards = petl.fromdicts(
+                {k: v for k, v in dec.items() if k != "off_dt"}
+                for dec in day["racecards"]
+            )
             problems = validate_races(racecards)
-            
+
             if len(problems.dicts()) > 0:
                 logger.warning(f"Validation problems in {file}")
                 if len(problems.dicts()) > 10:
@@ -294,19 +288,21 @@ def file_processor():
                         log_validation_problem(problem)
                 reject_count += 1
             else:
-                races = transform_races(racecards)                
+                races = transform_races(racecards)
                 for race in races:
                     d.send(race)
 
                 transform_count += 1
                 if transform_count % 10 == 0:
                     logger.info(f"Read {transform_count} days of racecards")
-                    
+
     except GeneratorExit:
-        logger.info(f"Finished processing {transform_count} days of racecards, rejected {reject_count}")    
+        logger.info(
+            f"Finished processing {transform_count} days of racecards, rejected {reject_count}"
+        )
         d.close()
 
-    
+
 @flow
 def load_theracingapi_data():
     logger = get_run_logger()
@@ -314,10 +310,11 @@ def load_theracingapi_data():
 
     f = file_processor()
     next(f)
-    for file in get_files(f"{SOURCE}racecards"): 
+    for file in get_files(f"{SOURCE}racecards"):
         f.send(file)
 
     f.close()
+
 
 if __name__ == "__main__":
     load_theracingapi_data()

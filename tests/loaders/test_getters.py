@@ -7,6 +7,7 @@ from loaders.getters import lookup_racecourse_id
 def mock_find_one(mocker):
     return mocker.patch("pymongo.collection.Collection.find_one")
 
+
 def test_lookup_racecourse_id(mock_find_one):
     mock_find_one.return_value = {"_id": ObjectId("abcdef123456abcdef123456")}
 
