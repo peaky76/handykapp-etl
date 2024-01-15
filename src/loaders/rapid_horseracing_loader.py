@@ -27,20 +27,15 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 db = client.handykapp
 
+
 @cache
 def get_dam_id(horse):
-    return db.horses.find_one({
-            "name": horse,
-            "sex": "F"
-        }, {"_id": 1})["_id"]
+    return db.horses.find_one({"name": horse, "sex": "F"}, {"_id": 1})["_id"]
+
 
 @cache
-def get_sire_id(horse): 
-    return db.horses.find_one({
-            "name": horse,
-            "sex": "M"
-        }, {"_id": 1})["_id"]
-
+def get_sire_id(horse):
+    return db.horses.find_one({"name": horse, "sex": "M"}, {"_id": 1})["_id"]
 
 
 def make_search_dictionary(horse):
@@ -77,7 +72,7 @@ def person_processor():
             role = person["role"]
 
             name_parts = HumanName(name)
-                    
+
             possibilities = db.people.find({"last": name_parts.last})
             for possibility in possibilities:
                 if name_parts.first == possibility["first"] or (
@@ -116,6 +111,7 @@ def person_processor():
             f"Finished processing people. Updated {updated_count} and added {adds_count}"
         )
 
+
 def horse_processor():
     logger = get_run_logger()
     logger.info("Starting horse processor")
@@ -131,7 +127,9 @@ def horse_processor():
             race_id = horse["race_id"]
             name = horse["name"]
 
-            horse_id = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})["_id"]
+            horse_id = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})[
+                "_id"
+            ]
 
             if horse_id:
                 db.horses.update_one(
@@ -141,25 +139,21 @@ def horse_processor():
                 logger.debug(f"{name} updated")
                 updated_count += 1
             else:
-                horse_id = db.horses.insert_one(
-                    {
-                        k: v
-                        for k, v in {
-                            "name": name,
-                            "sex": horse["sex"],
-                            "year": horse.get("year"),
-                            "country": horse.get("country"),
-                            "colour": horse.get("colour"),
-                            "sire": get_sire_id(horse["sire"])
-                            if horse.get("sire")
-                            else None,
-                            "dam": get_dam_id(horse["dam"])
-                            if horse.get("dam")
-                            else None,
-                        }.items()
-                        if v
-                    }
-                )["inserted_id"]
+                horse_id = db.horses.insert_one({
+                    k: v
+                    for k, v in {
+                        "name": name,
+                        "sex": horse["sex"],
+                        "year": horse.get("year"),
+                        "country": horse.get("country"),
+                        "colour": horse.get("colour"),
+                        "sire": get_sire_id(horse["sire"])
+                        if horse.get("sire")
+                        else None,
+                        "dam": get_dam_id(horse["dam"]) if horse.get("dam") else None,
+                    }.items()
+                    if v
+                })["inserted_id"]
                 logger.debug(f"{name} added to db")
                 adds_count += 1
 
@@ -182,22 +176,18 @@ def horse_processor():
                         }
                     },
                 )
-                p.send(
-                    {
-                        "name": horse["trainer"],
-                        "role": "trainer",
-                        "race_id": race_id,
-                        "runner_id": horse_id,
-                    }
-                )
-                p.send(
-                    {
-                        "name": horse["jockey"],
-                        "role": "jockey",
-                        "race_id": race_id,
-                        "runner_id": horse_id,
-                    }
-                )
+                p.send({
+                    "name": horse["trainer"],
+                    "role": "trainer",
+                    "race_id": race_id,
+                    "runner_id": horse_id,
+                })
+                p.send({
+                    "name": horse["jockey"],
+                    "role": "jockey",
+                    "race_id": race_id,
+                    "runner_id": horse_id,
+                })
 
     except GeneratorExit:
         logger.info(
@@ -228,9 +218,10 @@ def result_processor():
             )
 
             if racecourse_id:
-                race = db.race.find_one(
-                    {"racecourse": racecourse_id, "datetime": result["datetime"]}
-                )
+                race = db.race.find_one({
+                    "racecourse": racecourse_id,
+                    "datetime": result["datetime"],
+                })
 
                 # TODO: Check race matches rapid_horseracing data
                 if race:
@@ -248,20 +239,18 @@ def result_processor():
                     race_updated_count += 1
                 else:
                     try:
-                        race_id = db.race.insert_one(
-                            {
-                                "racecourse": racecourse_id,
-                                "datetime": result["datetime"],
-                                "title": result["title"],
-                                "is_handicap": result["is_handicap"],
-                                "distance_description": result["distance_description"],
-                                "going_description": result["going_description"],
-                                "race_class": result["class"],
-                                "age_restriction": result["age_restriction"],
-                                "prize": result["prize"],
-                                "rapid_id": result["rapid_id"],
-                            }
-                        )["inserted_id"]
+                        race_id = db.race.insert_one({
+                            "racecourse": racecourse_id,
+                            "datetime": result["datetime"],
+                            "title": result["title"],
+                            "is_handicap": result["is_handicap"],
+                            "distance_description": result["distance_description"],
+                            "going_description": result["going_description"],
+                            "race_class": result["class"],
+                            "age_restriction": result["age_restriction"],
+                            "prize": result["prize"],
+                            "rapid_id": result["rapid_id"],
+                        })["inserted_id"]
                         logger.info(
                             f"{result['datetime']} at {result['course']} added to db"
                         )
@@ -275,15 +264,13 @@ def result_processor():
                 for horse in result["runners"]:
                     h.send({"name": horse["sire"], "sex": "M", "race_id": None})
                     h.send({"name": horse["damsire"], "sex": "M", "race_id": None})
-                    h.send(
-                        {
-                            "name": horse["dam"],
-                            "sex": "F",
-                            "sire": horse["damsire"],
-                            "race_id": None,
-                        }
-                    )
-                
+                    h.send({
+                        "name": horse["dam"],
+                        "sex": "F",
+                        "sire": horse["damsire"],
+                        "race_id": None,
+                    })
+
                 if race_id:
                     h.send(horse | {"race_id": race_id})
 
@@ -292,6 +279,7 @@ def result_processor():
             f"Finished processing results. Updated {race_updated_count} race, added {race_added_count} results"
         )
         h.close()
+
 
 def file_processor():
     logger = get_run_logger()
@@ -309,7 +297,7 @@ def file_processor():
             data = petl.fromdicts(result)
 
             problems = validate_results(data)
-            
+
             if len(problems.dicts()) > 0:
                 logger.warning(f"Validation problems in {file}")
                 if len(problems.dicts()) > 10:
@@ -319,17 +307,20 @@ def file_processor():
                         log_validation_problem(problem)
                 reject_count += 1
             else:
-                results = transform_results(result)                
+                results = transform_results(result)
                 for race in results:
                     r.send(result)
 
                 transform_count += 1
                 if transform_count % 10 == 0:
                     logger.info(f"Read {transform_count} results")
-                    
+
     except GeneratorExit:
-        logger.info(f"Finished transforming {transform_count} results, rejected {reject_count}")    
+        logger.info(
+            f"Finished transforming {transform_count} results, rejected {reject_count}"
+        )
         r.close()
+
 
 @flow
 def load_rapid_horseracing_data(data=None):
@@ -338,10 +329,11 @@ def load_rapid_horseracing_data(data=None):
 
     f = file_processor()
     next(f)
-    for file in get_files(f"{SOURCE}results"): 
+    for file in get_files(f"{SOURCE}results"):
         f.send(file)
 
     f.close()
+
 
 # @flow
 # def load_rapid_horseracing_data_afresh(data=None):

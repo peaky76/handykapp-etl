@@ -54,22 +54,20 @@ def transform_horse(data, race_date=pendulum.now()):
                 "ofr": "official_rating",
             },
         )
-        .convert(
-            {
-                "name": lambda x: x.upper(),
-                "sex": lambda x: Gender[x].sex.name[0],
-                "age": int,
-                "colour": lambda x: CoatColour[x].name.title(),
-                "sire": lambda x: x.upper(),
-                "dam": lambda x: x.upper(),
-                "damsire": lambda x: x.upper(),
-                "saddlecloth": int,
-                "draw": int,
-                "lbs_carried": int,
-                "headgear": lambda x: Headgear[x].name.title() if x else None,
-                "official_rating": int,
-            }
-        )
+        .convert({
+            "name": lambda x: x.upper(),
+            "sex": lambda x: Gender[x].sex.name[0],
+            "age": int,
+            "colour": lambda x: CoatColour[x].name.title(),
+            "sire": lambda x: x.upper(),
+            "dam": lambda x: x.upper(),
+            "damsire": lambda x: x.upper(),
+            "saddlecloth": int,
+            "draw": int,
+            "lbs_carried": int,
+            "headgear": lambda x: Headgear[x].name.title() if x else None,
+            "official_rating": int,
+        })
         .addfield(
             "year",
             lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
@@ -85,6 +83,7 @@ def transform_horse(data, race_date=pendulum.now()):
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]
     )
+
 
 def transform_races(data):
     return (
@@ -118,20 +117,18 @@ def transform_races(data):
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
-        .convert(
-            {
-                "course": lambda x: x.replace(" (AW)", ""),
-                "prize": lambda x: x.replace(",", ""),
-                "race_grade": lambda x: str(RaceGrade(x)) if x else None,
-                "race_class": lambda x: int(RaceClass(x)),
-                "age_restriction": lambda x: x or None,
-                "rating_restriction": lambda x: x or None,
-                "distance_description": lambda x: str(
-                    RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
-                ),
-                "runners": lambda x: [transform_horse(petl.fromdicts([h])) for h in x],
-            }
-        )
+        .convert({
+            "course": lambda x: x.replace(" (AW)", ""),
+            "prize": lambda x: x.replace(",", ""),
+            "race_grade": lambda x: str(RaceGrade(x)) if x else None,
+            "race_class": lambda x: int(RaceClass(x)),
+            "age_restriction": lambda x: x or None,
+            "rating_restriction": lambda x: x or None,
+            "distance_description": lambda x: str(
+                RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
+            ),
+            "runners": lambda x: [transform_horse(petl.fromdicts([h])) for h in x],
+        })
         .cutout("field_size", "region", "type", "date", "off_time")
         .dicts()
     )
@@ -181,6 +178,7 @@ def validate_horse(data):
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
+
 def validate_races(data):
     header = (
         "course",
@@ -227,7 +225,8 @@ def validate_races(data):
         {
             "name": "prize_valid",
             "field": "prize",
-            "assertion": lambda x: not x or ((x[0] == "£" or x[0] == "€") and x[1].isdigit()),
+            "assertion": lambda x: not x
+            or ((x[0] == "£" or x[0] == "€") and x[1].isdigit()),
         },
         {
             "name": "runners_list",
@@ -237,6 +236,7 @@ def validate_races(data):
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
+
 
 if __name__ == "__main__":
     print("Cannot run theracingapi_transformer.py as a script.")
