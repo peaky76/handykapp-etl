@@ -100,16 +100,16 @@ def test_transform_results_returns_correct_output(result_data):
         "class": "5",
         "result": [],
     }
-    assert expected == transform_results.fn(petl.fromdicts([result_data]))[0]
+    assert expected == transform_results(petl.fromdicts([result_data]))[0]
 
 
 def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):
     result_data["horses"] = [horse_data]
-    problems = validate_results.fn(petl.fromdicts([result_data]))
+    problems = validate_results(petl.fromdicts([result_data]))
     assert len(problems.dicts()) == 0
 
 
 def test_validate_results_returns_problems_for_incorrect_data(result_data):
-    problems = validate_results.fn(petl.fromdicts([result_data]))
+    problems = validate_results(petl.fromdicts([result_data]))
     assert len(problems.dicts()) == 1
     assert problems.dicts()[0]["field"] == "horses"
