@@ -42,18 +42,38 @@ def test_validate_date_fails_for_invalid_date():
 
 
 def test_validate_distance_passes_for_miles_and_furlongs():
-    assert validate_distance("1m2f")
+    assert validate_distance("1 mile 5 furlongs")
 
 
-def test_validate_distance_passes_for_miles_and_furlongs_with_space():
-    assert validate_distance("1m 2f")
+def test_validate_distance_passes_for_miles_and_fraction():
+    assert validate_distance("1 1/16 miles")
 
 
-def test_validate_distance_passes_for_miles():
-    assert validate_distance("1m")
+def test_validate_distance_passes_for_mile():
+    assert validate_distance("1 mile")
 
 
 def test_validate_distance_passes_for_furlongs():
+    assert validate_distance("5 furlongs")
+
+
+def test_validate_distance_passes_for_fractional_furlongs():
+    assert validate_distance("5 1/2 furlongs")
+
+
+def test_validate_distance_passes_for_miles_and_furlongs_abbreviated():
+    assert validate_distance("1m2f")
+
+
+def test_validate_distance_passes_for_miles_and_furlongs_abbreviated_with_space():
+    assert validate_distance("1m 2f")
+
+
+def test_validate_distance_passes_for_miles_abbreviated():
+    assert validate_distance("1m")
+
+
+def test_validate_distance_passes_for_furlongs_abbreviated():
     assert validate_distance("6f")
 
 
