@@ -51,6 +51,7 @@ select = [
     "PERF", # perflint
     "FURB", # refurb
     "RUF", # ruff specific
+    "NPY", # numpy specific
 
 ]
 ignore = [
