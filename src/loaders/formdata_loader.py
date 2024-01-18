@@ -201,11 +201,13 @@ def formdata_loader():
             entry = horse._asdict()
             entry["runs"] = [run._asdict() for run in entry["runs"]]
 
-            existing_entry = db.formdata.find_one({
-                "name": entry["name"],
-                "country": entry["country"],
-                "year": entry["year"],
-            })
+            existing_entry = db.formdata.find_one(
+                {
+                    "name": entry["name"],
+                    "country": entry["country"],
+                    "year": entry["year"],
+                }
+            )
 
             if existing_entry:
                 runs = existing_entry["runs"]

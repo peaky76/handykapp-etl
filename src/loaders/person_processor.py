@@ -4,8 +4,8 @@ from prefect import get_run_logger
 
 db = client.handykapp
 
+
 def person_processor():
-    
     logger = get_run_logger()
     logger.info("Starting person processor")
     updated_count = 0

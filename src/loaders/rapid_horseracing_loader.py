@@ -23,6 +23,7 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 db = client.handykapp
 
+
 @flow
 def load_rapid_horseracing_data():
     logger = get_run_logger()
@@ -36,9 +37,10 @@ def load_rapid_horseracing_data():
     for file in files:
         if file != "results_to_do_list.json":
             contents = read_file(file)
-            f.send([contents], validate_results, transform_results, file, "rapid") 
+            f.send([contents], validate_results, transform_results, file, "rapid")
 
     d.close()
+
 
 if __name__ == "__main__":
     load_rapid_horseracing_data()

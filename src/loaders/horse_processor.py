@@ -1,4 +1,3 @@
-
 from functools import cache
 
 from clients import mongo_client as client
@@ -7,6 +6,7 @@ from prefect import get_run_logger
 from loaders.person_processor import person_processor
 
 db = client.handykapp
+
 
 @cache
 def get_dam_id(horse):
@@ -62,21 +62,25 @@ def horse_processor():
                 logger.debug(f"{name} updated")
                 updated_count += 1
             else:
-                horse_id = db.horses.insert_one({
-                    k: v
-                    for k, v in {
-                        "name": name,
-                        "sex": horse["sex"],
-                        "year": horse.get("year"),
-                        "country": horse.get("country"),
-                        "colour": horse.get("colour"),
-                        "sire": get_sire_id(horse["sire"])
-                        if horse.get("sire")
-                        else None,
-                        "dam": get_dam_id(horse["dam"]) if horse.get("dam") else None,
-                    }.items()
-                    if v
-                })["inserted_id"]
+                horse_id = db.horses.insert_one(
+                    {
+                        k: v
+                        for k, v in {
+                            "name": name,
+                            "sex": horse["sex"],
+                            "year": horse.get("year"),
+                            "country": horse.get("country"),
+                            "colour": horse.get("colour"),
+                            "sire": get_sire_id(horse["sire"])
+                            if horse.get("sire")
+                            else None,
+                            "dam": get_dam_id(horse["dam"])
+                            if horse.get("dam")
+                            else None,
+                        }.items()
+                        if v
+                    }
+                )["inserted_id"]
                 logger.debug(f"{name} added to db")
                 adds_count += 1
 
@@ -99,22 +103,27 @@ def horse_processor():
                         }
                     },
                 )
-                p.send({
-                    "name": horse["trainer"],
-                    "role": "trainer",
-                    "race_id": race_id,
-                    "runner_id": horse_id,
-                }, source)
-                p.send({
-                    "name": horse["jockey"],
-                    "role": "jockey",
-                    "race_id": race_id,
-                    "runner_id": horse_id,
-                }, source)
+                p.send(
+                    {
+                        "name": horse["trainer"],
+                        "role": "trainer",
+                        "race_id": race_id,
+                        "runner_id": horse_id,
+                    },
+                    source,
+                )
+                p.send(
+                    {
+                        "name": horse["jockey"],
+                        "role": "jockey",
+                        "race_id": race_id,
+                        "runner_id": horse_id,
+                    },
+                    source,
+                )
 
     except GeneratorExit:
         logger.info(
             f"Finished processing horses. Updated {updated_count} and added {adds_count}"
         )
         p.close()
-
