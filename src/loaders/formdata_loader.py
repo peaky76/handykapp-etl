@@ -8,11 +8,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import fitz  # type: ignore
 import tomllib
 from clients import mongo_client as client
-from helpers import get_files, stream_file
+from helpers import stream_file
 from horsetalk import RacingCode
 from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger, task
-from pymongo import ASCENDING as ASC
 from pymongo.errors import DuplicateKeyError
 from transformers.formdata_transformer import (
     create_horse,
