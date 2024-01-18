@@ -8,14 +8,12 @@ import petl  # type: ignore
 import tomllib
 from clients import mongo_client as client
 from helpers import get_files, log_validation_problem, read_file
-from nameparser import HumanName
 from prefect import flow, get_run_logger
 from pymongo.errors import DuplicateKeyError
 from transformers.theracingapi_transformer import transform_races, validate_races
 
-from loaders.adders import add_horse, add_person
 from loaders.getters import lookup_racecourse_id
-from loaders.person_processor import person_processor
+from loaders.horse_processor import horse_processor
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -23,23 +21,6 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["theracingapi"]["spaces_dir"]
 
 db = client.handykapp
-
-
-def make_search_dictionary(horse):
-    keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
-
-    return {k: horse[k] for k in keys}
-
-
-def make_update_dictionary(horse, lookup):
-    update_dictionary = {}
-    if colour := horse.get("colour"):
-        update_dictionary["colour"] = colour
-    if horse.get("sire"):
-        update_dictionary["sire"] = lookup.get(horse["sire"])
-    if horse.get("dam"):
-        update_dictionary["dam"] = lookup.get(horse["dam"])
-    return update_dictionary
 
 
 def declaration_processor():
@@ -101,99 +82,6 @@ def declaration_processor():
             f"Finished processing declarations. Added {declaration_adds_count} declarations, skipped {declaration_skips_count}"
         )
         h.close()
-
-
-def horse_processor():
-    logger = get_run_logger()
-    logger.info("Starting horse processor")
-    horse_ids = {}
-    updated_count = 0
-    adds_count = 0
-    skips_count = 0
-
-    p = person_processor()
-    next(p)
-
-    try:
-        while True:
-            horse = yield
-            race_id = horse["race_id"]
-            name = horse["name"]
-
-            # Add horse to db if not already there
-            if name in horse_ids:
-                logger.debug(f"{name} skipped")
-                skips_count += 1
-            else:
-                result = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
-
-                if result:
-                    db.horses.update_one(
-                        {"_id": result["_id"]},
-                        {"$set": make_update_dictionary(horse, horse_ids)},
-                    )
-                    logger.debug(f"{name} updated")
-                    updated_count += 1
-                    horse_ids[name] = result["_id"]
-                else:
-                    added_id = add_horse({
-                        k: v
-                        for k, v in {
-                            "name": name,
-                            "sex": horse["sex"],
-                            "year": horse.get("year"),
-                            "country": horse.get("country"),
-                            "colour": horse.get("colour"),
-                            "sire": horse_ids.get(horse["sire"])
-                            if horse.get("sire")
-                            else None,
-                            "dam": horse_ids.get(horse["dam"])
-                            if horse.get("dam")
-                            else None,
-                        }.items()
-                        if v
-                    })
-                    logger.debug(f"{name} added to db")
-                    adds_count += 1
-                    horse_ids[name] = added_id
-
-            # Add horse to race
-            if race_id:
-                db.races.update_one(
-                    {"_id": race_id},
-                    {
-                        "$push": {
-                            "runners": {
-                                "horse": horse_ids[name],
-                                "owner": horse["owner"],
-                                "allowance": horse["allowance"],
-                                "saddlecloth": horse["saddlecloth"],
-                                "draw": horse["draw"],
-                                "headgear": horse["headgear"],
-                                "lbs_carried": horse["lbs_carried"],
-                                "official_rating": horse["official_rating"],
-                            }
-                        }
-                    },
-                )
-                p.send({
-                    "name": horse["trainer"],
-                    "role": "trainer",
-                    "race_id": race_id,
-                    "runner_id": horse_ids[name],
-                }, 'theracingapi')
-                p.send({
-                    "name": horse["jockey"],
-                    "role": "jockey",
-                    "race_id": race_id,
-                    "runner_id": horse_ids[name],
-                }, 'theracingapi')
-
-    except GeneratorExit:
-        logger.info(
-            f"Finished processing horses. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
-        )
-        p.close()
 
 def file_processor():
     logger = get_run_logger()
