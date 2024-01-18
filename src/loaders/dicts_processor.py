@@ -17,7 +17,7 @@ def dicts_processor():
 
     try:
         while True:
-            dicts, validator, transformer, filename = yield
+            dicts, validator, transformer, filename, source = yield
             data = petl.fromdicts(dicts)
             problems = validator(data)
 
@@ -32,7 +32,7 @@ def dicts_processor():
             else:
                 results = transformer(data)
                 for race in results:
-                    r.send(data)
+                    r.send(data, source)
 
                 transform_count += 1
                 if transform_count % 10 == 0:
