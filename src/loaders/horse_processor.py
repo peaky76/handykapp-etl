@@ -103,7 +103,7 @@ def horse_processor():
                         }
                     },
                 )
-                p.send(
+                p.send((
                     {
                         "name": horse["trainer"],
                         "role": "trainer",
@@ -111,8 +111,8 @@ def horse_processor():
                         "runner_id": horse_id,
                     },
                     source,
-                )
-                p.send(
+                ))
+                p.send((
                     {
                         "name": horse["jockey"],
                         "role": "jockey",
@@ -120,7 +120,7 @@ def horse_processor():
                         "runner_id": horse_id,
                     },
                     source,
-                )
+                ))
 
     except GeneratorExit:
         logger.info(

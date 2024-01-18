@@ -31,7 +31,7 @@ def dicts_processor():
             else:
                 results = transformer(data)
                 for race in results:
-                    r.send(data, source)
+                    r.send((data, source))
 
                 transform_count += 1
                 if transform_count % 10 == 0:

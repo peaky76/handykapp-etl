@@ -99,11 +99,11 @@ def race_processor():
                         race_skipped_count += 1
 
                 for horse in race["runners"]:
-                    h.send({"name": horse["sire"], "sex": "M", "race_id": None}, source)
-                    h.send(
+                    h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
+                    h.send((
                         {"name": horse["damsire"], "sex": "M", "race_id": None}, source
-                    )
-                    h.send(
+                    ))
+                    h.send((
                         {
                             "name": horse["dam"],
                             "sex": "F",
@@ -111,10 +111,10 @@ def race_processor():
                             "race_id": None,
                         },
                         source,
-                    )
+                    ))
 
                 if race_id:
-                    h.send((horse | {"race_id": race_id}), source)
+                    h.send(((horse | {"race_id": race_id}), source))
 
     except GeneratorExit:
         logger.info(
