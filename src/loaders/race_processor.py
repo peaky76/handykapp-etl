@@ -52,7 +52,7 @@ def race_processor():
 
     try:
         while True:
-            race = yield
+            race, source = yield
             racecourse_id = lookup_racecourse_id(race)
 
             if racecourse_id:
@@ -79,7 +79,7 @@ def race_processor():
                     try:
                         race_id = db.race.insert_one(make_update_dictionary(race, racecourse_id))["inserted_id"]
                         logger.info(
-                            f"{race.get('datetime')} at {race.get('course']} added to db"
+                            f"{race.get('datetime')} at {race.get('course')} added to db"
                         )
                         race_added_count += 1
                     except DuplicateKeyError:
