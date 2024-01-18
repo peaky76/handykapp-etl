@@ -4,7 +4,6 @@ from clients import mongo_client as client
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
-from loaders.getters import lookup_racecourse_id
 from loaders.horse_processor import horse_processor
 
 db = client.handykapp
@@ -59,7 +58,7 @@ def race_processor():
     try:
         while True:
             race, source = yield
-            racecourse_id = lookup_racecourse_id(race)
+            racecourse_id = get_racecourse_id(race)
 
             if racecourse_id:
                 race = db.race.find_one(
