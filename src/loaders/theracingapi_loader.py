@@ -15,6 +15,7 @@ from transformers.theracingapi_transformer import transform_races, validate_race
 
 from loaders.adders import add_horse, add_person
 from loaders.getters import lookup_racecourse_id
+from loaders.person_processor import person_processor
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -180,84 +181,19 @@ def horse_processor():
                     "role": "trainer",
                     "race_id": race_id,
                     "runner_id": horse_ids[name],
-                })
+                }, 'theracingapi')
                 p.send({
                     "name": horse["jockey"],
                     "role": "jockey",
                     "race_id": race_id,
                     "runner_id": horse_ids[name],
-                })
+                }, 'theracingapi')
 
     except GeneratorExit:
         logger.info(
             f"Finished processing horses. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
         )
         p.close()
-
-
-def person_processor():
-    logger = get_run_logger()
-    logger.info("Starting person processor")
-    person_ids = {}
-    updated_count = 0
-    adds_count = 0
-    skips_count = 0
-
-    try:
-        while True:
-            person = yield
-            found_id = None
-            name = person["name"]
-            race_id = person["race_id"]
-            runner_id = person["runner_id"]
-            role = person["role"]
-
-            # Add person to db if not there
-            if name in person_ids:
-                logger.debug(f"{person} skipped")
-                skips_count += 1
-            else:
-                name_parts = HumanName(name)
-                result = db.people.find({"last": name_parts.last})
-                for possibility in result:
-                    if name_parts.first == possibility["first"] or (
-                        name_parts.first
-                        and possibility["first"]
-                        and name_parts.first[0] == possibility["first"][0]
-                        and name_parts.title == possibility["title"]
-                    ):
-                        found_id = possibility["_id"]
-                        break
-
-                if found_id:
-                    db.people.update_one(
-                        {"_id": found_id},
-                        {"$set": {"references.theracingapi": name}},
-                    )
-                    logger.debug(f"{person} updated")
-                    updated_count += 1
-                else:
-                    found_id = db.people.insert_one(
-                        name_parts.as_dict() | {"references.theracingapi": name}
-                    )
-                    logger.info(f"{person} added to db")
-                    adds_count += 1
-
-                person_ids[name] = found_id
-
-            # Add person to horse in race
-            if race_id:
-                db.races.update_one(
-                    {"_id": race_id, "runners.horse": runner_id},
-                    {"$set": {f"runners.$.{role}": person_ids[name]}},
-                )
-                updated_count += 1
-
-    except GeneratorExit:
-        logger.info(
-            f"Finished processing people. Updated {updated_count}, added {adds_count}, skipped {skips_count}"
-        )
-
 
 def file_processor():
     logger = get_run_logger()
@@ -280,7 +216,7 @@ def file_processor():
             problems = validate_races(racecards)
 
             if len(problems.dicts()) > 0:
-                logger.warning(f"Validation problems in {file}")
+                logger.warning(f"Validation p3roblems in {file}")
                 if len(problems.dicts()) > 10:
                     logger.warning("Too many problems to log")
                 else:
