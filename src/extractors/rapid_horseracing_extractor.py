@@ -97,13 +97,15 @@ def update_results_to_do_list():
     done_race_ids = [filename.split(".")[0].split("_")[-1] for filename in result_files]
     to_do_race_ids = current_status["results_to_do"] + new_race_ids
 
-    content = json.dumps({
-        "last_checked": str(pendulum.now()),
-        "results_to_do": [
-            race_id for race_id in to_do_race_ids if race_id not in done_race_ids
-        ],
-        "results_done": done_race_ids,
-    })
+    content = json.dumps(
+        {
+            "last_checked": str(pendulum.now()),
+            "results_to_do": [
+                race_id for race_id in to_do_race_ids if race_id not in done_race_ids
+            ],
+            "results_done": done_race_ids,
+        }
+    )
     write_file(content, filename)
 
 
