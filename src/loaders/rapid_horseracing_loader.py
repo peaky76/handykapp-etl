@@ -323,27 +323,20 @@ def file_processor():
 
 
 @flow
-def load_rapid_horseracing_data(data=None):
+def load_rapid_horseracing_data():
     logger = get_run_logger()
     logger.info("Starting rapid_horseracing loader")
 
     f = file_processor()
     next(f)
-    for file in get_files(f"{SOURCE}results"):
-        f.send(file)
+
+    files = get_files(f"{SOURCE}results")
+
+    for file in files:
+        if file != "results_to_do_list.json":
+            f.send(file) 
 
     f.close()
-
-
-# @flow
-# def load_rapid_horseracing_data_afresh(data=None):
-#     if data is None:
-#         data = rapid_horseracing_transformer()
-
-#     db.horses.drop()
-#     db.races.drop()
-#     db.people.drop()
-#     load_rapid_horseracing_data(data)
 
 if __name__ == "__main__":
     load_rapid_horseracing_data()
