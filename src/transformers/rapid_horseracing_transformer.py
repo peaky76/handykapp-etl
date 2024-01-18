@@ -1,6 +1,5 @@
 # To allow running as a script
 import sys
-from datetime import timedelta
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -8,10 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from helpers import get_files, log_validation_problem, read_file
 from horsetalk import AWGoingDescription, Going, HorseAge, RaceWeight  # type: ignore
-from prefect import flow, get_run_logger, task
-from prefect.tasks import task_input_hash
 
 from transformers.parsers import (
     parse_code,
