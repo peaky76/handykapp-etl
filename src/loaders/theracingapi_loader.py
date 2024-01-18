@@ -34,7 +34,7 @@ def load_theracingapi_data():
             {k: v for k, v in dec.items() if k != "off_dt"}
             for dec in contents["racecards"]
         ]
-        d.send(filtered_contents, validate_races, transform_races, file, "theracingapi")
+        d.send((filtered_contents, validate_races, transform_races, file, "theracingapi"))
 
     d.close()
 
