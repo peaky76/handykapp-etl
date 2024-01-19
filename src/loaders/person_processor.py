@@ -36,7 +36,7 @@ def person_processor():
             if found_id:
                 db.people.update_one(
                     {"_id": found_id},
-                    {"$set": {f"references.#{source}": name}},
+                    {"$set": {f"references.{source}": name}},
                 )
                 logger.debug(f"{person} updated")
                 updated_count += 1
