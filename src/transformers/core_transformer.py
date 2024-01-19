@@ -48,14 +48,14 @@ def transform_racecourses_data(data) -> list:
         "Direction",
         "Speed",
         "Contour",
+        "Country",
         "RR Abbr",
     )
     return (
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
         .rename({"speed": "style", "direction": "handedness"})
-        .addfield("country", "GB", index=2)
-        .addfield("code", "Flat", index=3)
+        .addfield("code", "Flat", index=2)
         .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
         .convert(
             ("surface", "shape", "style", "handedness", "contour"), lambda x: x.title()
@@ -80,6 +80,7 @@ def validate_racecourses_data(data) -> bool:
         "Speed",
         "Contour",
         "Location",
+        "Country",
         "RR Abbr",
     )
     constraints = [
