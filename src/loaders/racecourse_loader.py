@@ -15,8 +15,7 @@ db = client.handykapp
 def load_racecourses():
     db.racecourses.drop()
     racecourses = core_transformer()
-    for racecourse in racecourses:
-        db.racecourses.insert_one(racecourse)
+    db.racecourses.insert_many(racecourses)
 
 
 if __name__ == "__main__":
