@@ -30,14 +30,11 @@ SOURCE = settings["core"]["spaces_dir"]
 
 
 @task(tags=["Core"], name="get_racecourses_csv")
-def read_csv():
-    csv = next(
-        file
-        for file in list(get_files(SOURCE))
-        if "flatstats_racecourses_edited" in file
-    )
-    source = petl.MemorySource(stream_file(csv))
-    return petl.fromcsv(source)
+def read_csvs():
+    for csv in list(get_files(SOURCE)): 
+        if "edited" in csv:
+            source = petl.MemorySource(stream_file(csv))
+            yield petl.fromcsv(source)
 
 
 @task(tags=["Core"])
@@ -144,11 +141,13 @@ def validate_racecourses_data(data) -> bool:
 
 @flow
 def core_transformer():
-    data = read_csv()
-    problems = validate_racecourses_data(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
-    return transform_racecourses_data(data)
+    racecourses = []
+    for csv in read_csvs():
+        problems = validate_racecourses_data(csv)
+        for problem in problems.dicts():
+            log_validation_problem(problem)
+        racecourses += transform_racecourses_data(csv)
+    return racecourses
 
 
 if __name__ == "__main__":
