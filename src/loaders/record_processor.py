@@ -5,9 +5,9 @@ from prefect import get_run_logger
 from loaders.race_processor import race_processor
 
 
-def dicts_processor():
+def record_processor():
     logger = get_run_logger()
-    logger.info("Starting file processor")
+    logger.info("Starting record processor")
     reject_count = 0
     transform_count = 0
 
@@ -16,8 +16,8 @@ def dicts_processor():
 
     try:
         while True:
-            dicts, validator, transformer, filename, source = yield
-            data = petl.fromdicts(dicts)
+            record, validator, transformer, filename, source = yield
+            data = petl.fromdicts([record])
             problems = validator(data)
 
             if len(problems.dicts()) > 0:
