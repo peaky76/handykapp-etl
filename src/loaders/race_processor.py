@@ -75,8 +75,8 @@ def race_processor():
                         {"_id": race_id},
                         {
                             "$set": {
-                                "rapid_id": race["rapid_id"],
-                                "going_description": race["going_description"],
+                                "rapid_id": race.get("rapid_id"),
+                                "going_description": race.get("going_description"),
                             }
                         },
                     )
