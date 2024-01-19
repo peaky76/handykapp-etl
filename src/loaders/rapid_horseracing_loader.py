@@ -37,7 +37,7 @@ def load_rapid_horseracing_data():
     for file in files:
         if file != "results_to_do_list.json":
             contents = read_file(file)
-            f.send(([contents], validate_results, transform_results, file, "rapid"))
+            d.send(([contents], validate_results, transform_results, file, "rapid"))
 
     d.close()
 
