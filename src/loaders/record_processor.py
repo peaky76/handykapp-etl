@@ -35,7 +35,7 @@ def record_processor():
 
                 transform_count += 1
                 if transform_count % 25 == 0:
-                    logger.info(f"Read {transform_count} races")
+                    logger.info(f"Read {transform_count} races. Current: {race['datetime']} at {race['course']}")
 
     except GeneratorExit:
         logger.info(
