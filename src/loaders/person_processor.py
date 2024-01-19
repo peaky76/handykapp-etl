@@ -41,9 +41,10 @@ def person_processor():
                 logger.debug(f"{person} updated")
                 updated_count += 1
             else:
-                found_id = db.people.insert_one(
+                inserted_person = db.people.insert_one(
                     name_parts.as_dict() | {f"references.#{source}": name}
                 )
+                found_id = inserted_person.inserted_id
                 logger.info(f"{person} added to db")
                 adds_count += 1
 
@@ -53,7 +54,6 @@ def person_processor():
                     {"_id": race_id, "runners.horse": runner_id},
                     {"$set": {f"runners.$.{role}": found_id}},
                 )
-                updated_count += 1
 
     except GeneratorExit:
         logger.info(
