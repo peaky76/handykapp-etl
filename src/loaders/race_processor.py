@@ -61,7 +61,7 @@ def race_processor():
             racecourse_id = get_racecourse_id(race["course"], race["surface"], race["code"], race["obstacle"])
 
             if racecourse_id:
-                found_race = db.race.find_one(
+                found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,
                         "datetime": race["datetime"],
@@ -71,7 +71,7 @@ def race_processor():
                 # TODO: Check race matches data
                 if found_race:
                     race_id = found_race["_id"]
-                    db.race.update_one(
+                    db.races.update_one(
                         {"_id": race_id},
                         {
                             "$set": {
@@ -84,7 +84,7 @@ def race_processor():
                     race_updated_count += 1
                 else:
                     try:
-                        race_id = db.race.insert_one(
+                        race_id = db.races.insert_one(
                             make_update_dictionary(race, racecourse_id)
                         ).inserted_id
                         logger.debug(
@@ -112,7 +112,7 @@ def race_processor():
                         source,
                     ))
 
-                    if race_id and horse:
+                    if race_id:
                         h.send((horse | {"race_id": race_id}, source))
 
     except GeneratorExit:
