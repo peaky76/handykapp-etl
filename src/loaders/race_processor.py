@@ -61,7 +61,7 @@ def race_processor():
             racecourse_id = get_racecourse_id(race["course"], race["surface"], race["code"], race["obstacle"])
 
             if racecourse_id:
-                race = db.race.find_one(
+                found_race = db.race.find_one(
                     {
                         "racecourse": racecourse_id,
                         "datetime": race["datetime"],
@@ -69,8 +69,8 @@ def race_processor():
                 )
 
                 # TODO: Check race matches data
-                if race:
-                    race_id = race["_id"]
+                if found_race:
+                    race_id = found_race["_id"]
                     db.race.update_one(
                         {"_id": race_id},
                         {
@@ -86,7 +86,7 @@ def race_processor():
                     try:
                         race_id = db.race.insert_one(
                             make_update_dictionary(race, racecourse_id)
-                        )["inserted_id"]
+                        ).inserted_id
                         logger.info(
                             f"{race.get('datetime')} at {race.get('course')} added to db"
                         )
