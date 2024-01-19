@@ -8,8 +8,6 @@ from clients import mongo_client as client
 from prefect import flow
 from transformers.core_transformer import core_transformer
 
-from loaders.adders import add_racecourse
-
 db = client.handykapp
 
 
@@ -18,7 +16,7 @@ def load_racecourses():
     db.racecourses.drop()
     racecourses = core_transformer()
     for racecourse in racecourses:
-        add_racecourse(racecourse)
+        db.racecourses.insert_one(racecourse)
 
 
 if __name__ == "__main__":
