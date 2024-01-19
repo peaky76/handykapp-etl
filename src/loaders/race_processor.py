@@ -112,8 +112,8 @@ def race_processor():
                         source,
                     ))
 
-                if race_id:
-                    h.send(((horse | {"race_id": race_id}), source))
+                    if race_id and horse:
+                        h.send((horse | {"race_id": race_id}, source))
 
     except GeneratorExit:
         logger.info(

@@ -50,9 +50,10 @@ def horse_processor():
             race_id = horse["race_id"]
             name = horse["name"]
 
-            horse_id = db.horses.find_one(make_search_dictionary(horse), {"_id": 1}).get("_id")
+            found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
-            if horse_id:
+            if found_horse:
+                horse_id = found_horse["_id"]
                 db.horses.update_one(
                     {"_id": horse_id},
                     {"$set": make_update_dictionary(horse)},
@@ -88,37 +89,39 @@ def horse_processor():
                     {"_id": race_id},
                     {
                         "$push": {
-                            "runners": {
+                            "runners": { k: v for k, v in {
                                 "horse": horse_id,
-                                "owner": horse["owner"],
-                                "allowance": horse["allowance"],
-                                "saddlecloth": horse["saddlecloth"],
-                                "draw": horse["draw"],
-                                "headgear": horse["headgear"],
-                                "lbs_carried": horse["lbs_carried"],
-                                "official_rating": horse["official_rating"],
-                            }
-                        }
+                                "owner": horse.get("owner"),
+                                "allowance": horse.get("allowance"),
+                                "saddlecloth": horse.get("saddlecloth"),
+                                "draw": horse.get("draw"),
+                                "headgear": horse.get("headgear"),
+                                "lbs_carried": horse.get("lbs_carried"),
+                                "official_rating": horse.get("official_rating"),
+                            }.items() if v }
+                        } 
                     },
                 )
-                p.send((
-                    {
-                        "name": horse["trainer"],
-                        "role": "trainer",
-                        "race_id": race_id,
-                        "runner_id": horse_id,
-                    },
-                    source,
-                ))
-                p.send((
-                    {
-                        "name": horse["jockey"],
-                        "role": "jockey",
-                        "race_id": race_id,
-                        "runner_id": horse_id,
-                    },
-                    source,
-                ))
+                if horse.get("trainer"):
+                    p.send((
+                        {
+                            "name": horse["trainer"],
+                            "role": "trainer",
+                            "race_id": race_id,
+                            "runner_id": horse_id,
+                        },
+                        source,
+                    ))
+                if horse.get("jockey"):
+                    p.send((
+                        {
+                            "name": horse["jockey"],
+                            "role": "jockey",
+                            "race_id": race_id,
+                            "runner_id": horse_id,
+                        },
+                        source,
+                    ))
 
     except GeneratorExit:
         logger.info(
