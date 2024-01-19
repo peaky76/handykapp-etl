@@ -50,9 +50,7 @@ def horse_processor():
             race_id = horse["race_id"]
             name = horse["name"]
 
-            horse_id = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})[
-                "_id"
-            ]
+            horse_id = db.horses.find_one(make_search_dictionary(horse), {"_id": 1}).get("_id")
 
             if horse_id:
                 db.horses.update_one(
