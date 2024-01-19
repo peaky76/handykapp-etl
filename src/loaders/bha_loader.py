@@ -10,7 +10,6 @@ from pymongo.errors import DuplicateKeyError
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
 
-from loaders.adders import add_horse, add_person
 from loaders.shared import convert_person, convert_value_to_id, select_set
 
 db = client.handykapp
@@ -31,7 +30,8 @@ def load_horses(horses, descriptor="horses"):
         horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
 
         try:
-            ret_val[(horse["name"], horse.get("country"))] = add_horse(horse)
+            inserted_horse = db.horses.insert_one(horse)
+            ret_val[(horse["name"], horse.get("country"))] = inserted_horse.inserted_id
             count += 1
         except DuplicateKeyError:
             logger.warning(f"{horse['name']} ({horse['country']}) already in database")
@@ -52,7 +52,8 @@ def load_people(people, source):
     for person in people:
         if person:
             try:
-                ret_val[person] = add_person(convert_person(person, source))
+                inserted_person = db.people.insert_one(convert_person(person, source))
+                ret_val[person] = inserted_person.inserted_id
                 count += 1
             except DuplicateKeyError:
                 logger.warning(f"{person} already in database")
