@@ -87,7 +87,7 @@ def race_processor():
                         race_id = db.race.insert_one(
                             make_update_dictionary(race, racecourse_id)
                         ).inserted_id
-                        logger.info(
+                        logger.debug(
                             f"{race.get('datetime')} at {race.get('course')} added to db"
                         )
                         race_added_count += 1

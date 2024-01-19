@@ -34,7 +34,7 @@ def record_processor():
                     r.send((race, source))
 
                 transform_count += 1
-                if transform_count % 10 == 0:
+                if transform_count % 25 == 0:
                     logger.info(f"Read {transform_count} races")
 
     except GeneratorExit:
