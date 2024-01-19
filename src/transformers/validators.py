@@ -32,9 +32,7 @@ def validate_going(going):
     if not going:
         return False
 
-    goings = [g.name for d in [TurfGoingDescription, AWGoingDescription] for g in d] + [
-        "YIELDING"
-    ]
+    goings = [g for d in [TurfGoingDescription, AWGoingDescription] for g in d.__members__ if len(g) > 3]
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
     return any(g in going[0] for g in goings) and (
         any(g in going[1] for g in goings) if len(going) == 2 else True
