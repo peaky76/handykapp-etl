@@ -10,14 +10,14 @@ db = client.handykapp
 
 
 @cache
-def get_racecourse_id(race) -> str:
-    surface_options = ["Tapeta", "Polytrack"] if race["surface"] == "AW" else ["Turf"]
+def get_racecourse_id(course, surface, code, obstacle) -> str:
+    surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
         {
-            "name": race["course"].title(),
+            "name": course.title(),
             "surface": {"$in": surface_options},
-            "code": race["code"],
-            "obstacle": race["obstacle"],
+            "code": code,
+            "obstacle": obstacle,
         },
         {"_id": 1},
     )
@@ -58,7 +58,7 @@ def race_processor():
     try:
         while True:
             race, source = yield
-            racecourse_id = get_racecourse_id(race)
+            racecourse_id = get_racecourse_id(race["course"], race["surface"], race["code"], race["obstacle"])
 
             if racecourse_id:
                 race = db.race.find_one(
