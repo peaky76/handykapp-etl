@@ -80,7 +80,7 @@ def horse_processor():
                         }.items()
                         if v
                     }
-                )["inserted_id"]
+                ).inserted_id
                 logger.debug(f"{name} added to db")
                 adds_count += 1
 
