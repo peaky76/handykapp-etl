@@ -74,10 +74,10 @@ def race_processor():
                     db.races.update_one(
                         {"_id": race_id},
                         {
-                            "$set": {
+                            "$set": {k: v for k, v in {
                                 "rapid_id": race.get("rapid_id"),
                                 "going_description": race.get("going_description"),
-                            }
+                            }.items() if v}
                         },
                     )
                     logger.debug(f"{race['datetime']} at {race['course']} updated")
