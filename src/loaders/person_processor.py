@@ -45,7 +45,7 @@ def person_processor():
                     name_parts.as_dict() | {f"references.#{source}": name}
                 )
                 found_id = inserted_person.inserted_id
-                logger.info(f"{person} added to db")
+                logger.debug(f"{person} added to db")
                 adds_count += 1
 
             # Add person to horse in race
