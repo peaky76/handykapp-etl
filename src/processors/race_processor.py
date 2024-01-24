@@ -1,10 +1,9 @@
 from functools import cache
 
 from clients import mongo_client as client
+from loaders.horse_processor import horse_processor
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
-
-from loaders.horse_processor import horse_processor
 
 db = client.handykapp
 
@@ -48,9 +47,9 @@ def make_update_dictionary(race, racecourse_id):
 def race_processor():
     logger = get_run_logger()
     logger.info("Starting race processor")
-    race_added_count = 0
-    race_updated_count = 0
-    race_skipped_count = 0
+    added_count = 0
+    updated_count = 0
+    skipped_count = 0
 
     h = horse_processor()
     next(h)
@@ -81,7 +80,7 @@ def race_processor():
                         },
                     )
                     logger.debug(f"{race['datetime']} at {race['course']} updated")
-                    race_updated_count += 1
+                    updated_count += 1
                 else:
                     try:
                         race_id = db.races.insert_one(
@@ -90,12 +89,12 @@ def race_processor():
                         logger.debug(
                             f"{race.get('datetime')} at {race.get('course')} added to db"
                         )
-                        race_added_count += 1
+                        added_count += 1
                     except DuplicateKeyError:
                         logger.warning(
                             f"Duplicate race for {race['datetime']} at {race['course']}"
                         )
-                        race_skipped_count += 1
+                        skipped_count += 1
 
                 for horse in race["runners"]:
                     h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
@@ -117,6 +116,6 @@ def race_processor():
 
     except GeneratorExit:
         logger.info(
-            f"Finished processing races. Updated {race_updated_count} race, added {race_added_count} races"
+            f"Finished processing races. Updated {updated_count} races, added {added_count}, skipped {skipped_count}"
         )
         h.close()
