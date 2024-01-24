@@ -1,8 +1,8 @@
 from functools import cache
 
 from clients import mongo_client as client
-from loaders.person_processor import person_processor
 from prefect import get_run_logger
+from processors.person_processor import person_processor
 from pymongo.errors import DuplicateKeyError
 
 db = client.handykapp

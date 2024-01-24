@@ -9,12 +9,11 @@ import tomllib
 from clients import mongo_client as client
 from helpers import get_files, read_file
 from prefect import flow, get_run_logger
+from processors.record_processor import record_processor
 from transformers.rapid_horseracing_transformer import (
     transform_results,
     validate_results,
 )
-
-from loaders.record_processor import record_processor
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
