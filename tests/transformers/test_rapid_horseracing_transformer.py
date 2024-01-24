@@ -98,7 +98,7 @@ def test_transform_results_returns_correct_output(result_data):
         "cancelled": False,
         "prize": "£2794",
         "class": "5",
-        "result": [],
+        "runners": [],
     }
     assert expected == transform_results(petl.fromdicts([result_data]))[0]
 
