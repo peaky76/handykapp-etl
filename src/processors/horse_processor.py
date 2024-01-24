@@ -10,12 +10,21 @@ db = client.handykapp
 
 @cache
 def get_dam_id(horse):
-    return db.horses.find_one({"name": horse, "sex": "F"}, {"_id": 1})["_id"]
-
+    found_horse = db.horses.find_one({"name": horse, "sex": "F"}, {"_id": 1})
+    
+    if not found_horse:
+        raise ValueError(f"Could not find dam {horse}")
+    
+    return found_horse["_id"]
 
 @cache
 def get_sire_id(horse):
-    return db.horses.find_one({"name": horse, "sex": "M"}, {"_id": 1})["_id"]
+    found_horse = db.horses.find_one({"name": horse, "sex": "M"}, {"_id": 1})
+    
+    if not found_horse:
+        raise ValueError(f"Could not find sire {horse}")
+
+    return found_horse["_id"]
 
 
 def make_search_dictionary(horse):
@@ -86,8 +95,11 @@ def horse_processor():
                     added_count += 1
                 except DuplicateKeyError:
                     logger.warning(
-                        f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} (horse['sex'])"
+                        f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} ({horse['sex']})"
                     )
+                    skipped_count += 1
+                except ValueError as e:
+                    logger.warning(e)
                     skipped_count += 1
 
             # Add horse to race
