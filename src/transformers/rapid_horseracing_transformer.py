@@ -113,7 +113,7 @@ def transform_results(data):
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
         .addfield(
-            "result",
+            "runners",
             lambda rec: [
                 transform_horses(
                     petl.fromdicts(rec["horses"]),
