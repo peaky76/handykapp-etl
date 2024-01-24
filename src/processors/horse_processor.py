@@ -38,9 +38,9 @@ def make_update_dictionary(horse):
 def horse_processor():
     logger = get_run_logger()
     logger.info("Starting horse processor")
+    added_count = 0
     updated_count = 0
-    adds_count = 0
-    skips_count = 0
+    skipped_count = 0
 
     p = person_processor()
     next(p)
@@ -83,12 +83,12 @@ def horse_processor():
                         }
                     ).inserted_id
                     logger.debug(f"{name} added to db")
-                    adds_count += 1
+                    added_count += 1
                 except DuplicateKeyError:
                     logger.warning(
                         f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} (horse['sex'])"
                     )
-                    skips_count += 1
+                    skipped_count += 1
 
             # Add horse to race
             if race_id:
@@ -132,6 +132,6 @@ def horse_processor():
 
     except GeneratorExit:
         logger.info(
-            f"Finished processing horses. Updated {updated_count} and added {adds_count}"
+            f"Finished processing horses. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
         )
         p.close()
