@@ -16,7 +16,7 @@ def person_processor():
     try:
         while True:
             person, source = yield
-            found_id = None
+            found_person = None
             name = person["name"]
             race_id = person["race_id"]
             runner_id = person["runner_id"]
