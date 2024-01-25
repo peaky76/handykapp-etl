@@ -105,7 +105,7 @@ def race_processor():
                         {
                             "name": horse["dam"],
                             "sex": "F",
-                            "sire": horse["damsire"],
+                            "sire": horse.get("damsire"),
                             "race_id": None,
                         },
                         source,
