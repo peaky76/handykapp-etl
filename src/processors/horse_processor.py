@@ -77,7 +77,7 @@ def horse_processor():
                             k: v
                             for k, v in {
                                 "name": name,
-                                "sex": horse["sex"],
+                                "sex": horse.get("sex"),
                                 "year": horse.get("year"),
                                 "country": horse.get("country"),
                                 "colour": horse.get("colour"),
