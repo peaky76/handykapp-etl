@@ -98,14 +98,16 @@ def race_processor():
 
                 for horse in race["runners"]:
                     h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
-                    h.send((
-                        {"name": horse["damsire"], "sex": "M", "race_id": None}, source
-                    ))
+                    damsire = horse.get("damsire")
+                    if damsire:
+                        h.send((
+                            {"name": damsire, "sex": "M", "race_id": None}, source
+                        ))
                     h.send((
                         {
                             "name": horse["dam"],
                             "sex": "F",
-                            "sire": horse.get("damsire"),
+                            "sire": damsire,
                             "race_id": None,
                         },
                         source,
