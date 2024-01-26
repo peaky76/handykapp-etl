@@ -124,65 +124,65 @@ def load_runs(formdata, horse_ids):
             )
 
 
-@flow
-def load_formdata_horses(formdata=None):
-    logger = get_run_logger()
+# @flow
+# def load_formdata_horses(formdata=None):
+#     logger = get_run_logger()
 
-    if formdata is None:
-        formdata = formdata_transformer()
+#     if formdata is None:
+#         formdata = formdata_transformer()
 
-    ret_val = {}
-    upsert_count = 0
-    added_count = 0
-    for entry in formdata:
-        entry = entry._asdict()
-        del entry["runs"]
-        del entry["trainer_form"]
-        entry_id = db.horses.update_one(
-            {
-                "name": entry["name"],
-                "country": entry["country"],
-                "year": entry["year"],
-            },
-            {"$set": {"prize_money": entry["prize_money"]}},
-            upsert=True,
-        )
-        upsert_count += int(bool(entry_id.matched_count > 0))
-        added_count += int(bool(entry_id.matched_count == 0))
+#     ret_val = {}
+#     upsert_count = 0
+#     added_count = 0
+#     for entry in formdata:
+#         entry = entry._asdict()
+#         del entry["runs"]
+#         del entry["trainer_form"]
+#         entry_id = db.horses.update_one(
+#             {
+#                 "name": entry["name"],
+#                 "country": entry["country"],
+#                 "year": entry["year"],
+#             },
+#             {"$set": {"prize_money": entry["prize_money"]}},
+#             upsert=True,
+#         )
+#         upsert_count += int(bool(entry_id.matched_count > 0))
+#         added_count += int(bool(entry_id.matched_count == 0))
 
-        ret_val[(entry["name"], entry["country"])] = entry_id.upserted_id
+#         ret_val[(entry["name"], entry["country"])] = entry_id.upserted_id
 
-    logger.info(f"Upserted {upsert_count} horses from Formdata")
-    logger.info(f"Added {added_count} horses from Formdata")
+#     logger.info(f"Upserted {upsert_count} horses from Formdata")
+#     logger.info(f"Added {added_count} horses from Formdata")
 
-    return ret_val
+#     return ret_val
 
 
-@flow
-def load_formdata_people(formdata=None):
-    logger = get_run_logger()
+# @flow
+# def load_formdata_people(formdata=None):
+#     logger = get_run_logger()
 
-    if formdata is None:
-        formdata = formdata_transformer()
+#     if formdata is None:
+#         formdata = formdata_transformer()
 
-    # ret_val = {}
+#     # ret_val = {}
 
-    all_jockeys = []
-    all_trainers = []
+#     all_jockeys = []
+#     all_trainers = []
 
-    for entry in formdata:
-        entry = entry._asdict()
-        all_trainers.append(entry["trainer"])
-        jockeys = list({run._asdict()["jockey"] for run in entry["runs"]})
-        all_jockeys.extend(jockeys)
+#     for entry in formdata:
+#         entry = entry._asdict()
+#         all_trainers.append(entry["trainer"])
+#         jockeys = list({run._asdict()["jockey"] for run in entry["runs"]})
+#         all_jockeys.extend(jockeys)
 
-    all_jockeys = list(set(all_jockeys))
-    all_trainers = list(set(all_trainers))
+#     all_jockeys = list(set(all_jockeys))
+#     all_trainers = list(set(all_trainers))
 
-    logger.info(f"Found {len(all_jockeys)} jockeys")
-    logger.info(f"Found {len(all_trainers)} trainers")
+#     logger.info(f"Found {len(all_jockeys)} jockeys")
+#     logger.info(f"Found {len(all_trainers)} trainers")
 
-    return {"jockeys": all_jockeys, "trainers": all_trainers}
+#     return {"jockeys": all_jockeys, "trainers": all_trainers}
 
 
 ###############################################
