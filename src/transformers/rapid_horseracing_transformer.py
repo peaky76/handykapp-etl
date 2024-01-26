@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import AWGoingDescription, Going, HorseAge, RaceWeight  # type: ignore
+from horsetalk import AWGoingDescription, HorseAge, RaceWeight  # type: ignore
 
 from transformers.parsers import (
     parse_code,

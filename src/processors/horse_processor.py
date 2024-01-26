@@ -108,7 +108,7 @@ def horse_processor():
                     {"_id": race_id},
                     {
                         "$push": {
-                            "runners": { k: v for k, v in {
+                            "runners": {k: v for k, v in {
                                 "horse": horse_id,
                                 "owner": horse.get("owner"),
                                 "allowance": horse.get("allowance"),
@@ -117,7 +117,7 @@ def horse_processor():
                                 "headgear": horse.get("headgear"),
                                 "lbs_carried": horse.get("lbs_carried"),
                                 "official_rating": horse.get("official_rating"),
-                            }.items() if v }
+                            }.items() if v}
                         } 
                     },
                 )

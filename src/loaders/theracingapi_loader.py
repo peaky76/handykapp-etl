@@ -30,7 +30,7 @@ def load_theracingapi_data():
     for file in get_files(f"{SOURCE}racecards"):
         contents = read_file(file)
         for dec in contents["racecards"]:
-            record =  {k: v for k, v in dec.items() if k != "off_dt"}
+            record = {k: v for k, v in dec.items() if k != "off_dt"}
             r.send((record, validate_races, transform_races, file, "theracingapi"))
 
     r.close()
