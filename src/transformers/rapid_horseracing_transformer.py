@@ -98,16 +98,15 @@ def transform_results(data):
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
         .addfield(
             "surface",
-            # TODO: Fix in horsetalk as will incorrectly categorise some turf races as AW
-            # but otherwise whole pipeline fails
-            lambda rec: "AW"
-            if "AW" in rec["going_description"]
-            or Going(
-                rec["going_description"].replace(" (", ", ").replace(")", "")
-            ).primary
-            in AWGoingDescription
-            else "Turf",
-            index=6,
+            lambda rec: (
+                "AW" if any(x.name in rec["going_description"].upper() for x in AWGoingDescription) else "TURF"
+                # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
+                # TODO: Handle mixed meetings as multiparse returns a list and only first used here
+                # Going(rec["going_description"]).surface.name.title() 
+                # if "COURSE" not in rec["going_description"].upper() 
+                # else next(iter(Going.multiparse(rec["going_description"]).values())).surface.name.title()
+                # )
+            )
         )
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
