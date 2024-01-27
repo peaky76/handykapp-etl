@@ -192,7 +192,7 @@ def validate_results(data):
         {"name": "title_str", "field": "title", "test": str},
         {"name": "distance_valid", "field": "distance", "assertion": validate_distance},
         {"name": "age_int", "field": "age", "test": int},
-        {"name": "going_valid", "field": "going", "assertion": validate_going},
+        {"name": "going_valid", "field": "going", "test": lambda x: validate_going(x, allow_empty=True)},
         {"name": "finished_bool", "field": "finished", "test": bool},
         {"name": "canceled_bool", "field": "canceled", "test": bool},
         {"name": "prize_valid", "field": "prize", "assertion": validate_prize},
