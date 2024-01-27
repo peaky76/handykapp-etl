@@ -5,6 +5,8 @@ from prefect import get_run_logger
 from processors.horse_processor import horse_processor
 from pymongo.errors import DuplicateKeyError
 
+from .utils import compact
+
 db = client.handykapp
 
 
@@ -24,9 +26,7 @@ def get_racecourse_id(course, surface, code, obstacle) -> str:
 
 
 def make_update_dictionary(race, racecourse_id):
-    return {
-        k: v
-        for k, v in {
+    return compact({
             "racecourse": racecourse_id,
             "datetime": race.get("datetime"),
             "title": race.get("title"),
@@ -39,9 +39,7 @@ def make_update_dictionary(race, racecourse_id):
             "rating_restriction": race.get("rating_restriction"),
             "prize": race.get("prize"),
             "rapid_id": race.get("rapid_id"),
-        }.items()
-        if v
-    }
+        })
 
 
 def race_processor():
@@ -73,10 +71,10 @@ def race_processor():
                     db.races.update_one(
                         {"_id": race_id},
                         {
-                            "$set": {k: v for k, v in {
+                            "$set": compact({
                                 "rapid_id": race.get("rapid_id"),
                                 "going_description": race.get("going_description"),
-                            }.items() if v}
+                            })
                         },
                     )
                     logger.debug(f"{race['datetime']} at {race['course']} updated")
