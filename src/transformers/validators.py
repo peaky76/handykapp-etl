@@ -28,9 +28,9 @@ def validate_distance(distance):
     return bool(re.match(pattern, distance)) if distance else False
 
 
-def validate_going(going):
+def validate_going(going, *, allow_empty=False):
     if not going:
-        return False
+        return allow_empty
 
     goings = [g for d in [TurfGoingDescription, AWGoingDescription] for g in d.__members__ if len(g) > 3]
     going = going.upper().replace(")", "").replace(" IN PLACES", "").split(" (")
