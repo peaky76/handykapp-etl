@@ -5,6 +5,8 @@ from prefect import get_run_logger
 from processors.person_processor import person_processor
 from pymongo.errors import DuplicateKeyError
 
+from .utils import compact
+
 db = client.handykapp
 
 
@@ -73,9 +75,7 @@ def horse_processor():
             else:
                 try:
                     horse_id = db.horses.insert_one(
-                        {
-                            k: v
-                            for k, v in {
+                        compact({
                                 "name": name,
                                 "sex": horse.get("sex"),
                                 "year": horse.get("year"),
@@ -87,9 +87,7 @@ def horse_processor():
                                 "dam": get_dam_id(horse["dam"])
                                 if horse.get("dam")
                                 else None,
-                            }.items()
-                            if v
-                        }
+                            })
                     ).inserted_id
                     logger.debug(f"{name} added to db")
                     added_count += 1
@@ -108,7 +106,7 @@ def horse_processor():
                     {"_id": race_id},
                     {
                         "$push": {
-                            "runners": {k: v for k, v in {
+                            "runners": compact({
                                 "horse": horse_id,
                                 "owner": horse.get("owner"),
                                 "allowance": horse.get("allowance"),
@@ -120,7 +118,7 @@ def horse_processor():
                                 "position": horse.get("position"),
                                 "distance_beaten": horse.get("distance_beaten"),
                                 "sp": horse.get("sp"),
-                            }.items() if v}
+                            })
                         } 
                     },
                 )
