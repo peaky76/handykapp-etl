@@ -29,10 +29,10 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
-def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
+def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
     return (
         petl.rename(
-            horse_data,
+            data,
             {
                 "id_horse": "rapid_id",
                 "weight": "lbs_carried",
@@ -72,7 +72,6 @@ def transform_horses(horse_data, race_date=pendulum.now(), finishing_time=None):
         .dicts()[0]
     )
 
-
 def transform_results(data):
     return (
         petl.rename(
@@ -99,7 +98,7 @@ def transform_results(data):
         .addfield(
             "surface",
             lambda rec: (
-                "AW" if any(x.name in rec["going_description"].upper() for x in AWGoingDescription) else "TURF"
+                "AW" if any(x.name in rec["going_description"].upper() for x in AWGoingDescription) else "Turf"
                 # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
                 # TODO: Handle mixed meetings as multiparse returns a list and only first used here
                 # Going(rec["going_description"]).surface.name.title() 
@@ -114,14 +113,12 @@ def transform_results(data):
         .addfield(
             "runners",
             lambda rec: [
-                transform_horses(
-                    petl.fromdicts(rec["horses"]),
+                transform_horse(
+                    petl.fromdicts([h]),
                     race_date=pendulum.parse(rec["datetime"]),
                     finishing_time=rec["finish_time"],
-                )
+                ) for h in rec["horses"]
             ]
-            if rec["horses"]
-            else [],
         )
         .cutout("horses", "finish_time")
         .dicts()

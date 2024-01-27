@@ -2,7 +2,7 @@ import pendulum
 import petl
 import pytest
 from transformers.rapid_horseracing_transformer import (
-    transform_horses,
+    transform_horse,
     transform_results,
     validate_results,
 )
@@ -51,7 +51,7 @@ def result_data():
     }
 
 
-def test_transform_horses_returns_correct_output(horse_data):
+def test_transform_horse_returns_correct_output(horse_data):
     expected = {
         "name": "DOBBIN",
         "country": "IRE",
@@ -76,9 +76,10 @@ def test_transform_horses_returns_correct_output(horse_data):
         "odds": [],
         "finishing_time": None,
     }
-    assert expected == transform_horses(
+    actual = transform_horse(
         petl.fromdicts([horse_data]), pendulum.parse("2023-03-08")
     )
+    assert actual == expected 
 
 
 def test_transform_results_returns_correct_output(result_data):
@@ -100,7 +101,8 @@ def test_transform_results_returns_correct_output(result_data):
         "class": "5",
         "runners": [],
     }
-    assert expected == transform_results(petl.fromdicts([result_data]))[0]
+    actual = transform_results(petl.fromdicts([result_data]))[0]
+    assert actual == expected
 
 
 def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):

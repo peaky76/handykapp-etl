@@ -117,6 +117,9 @@ def horse_processor():
                                 "headgear": horse.get("headgear"),
                                 "lbs_carried": horse.get("lbs_carried"),
                                 "official_rating": horse.get("official_rating"),
+                                "position": horse.get("position"),
+                                "distance_beaten": horse.get("distance_beaten"),
+                                "sp": horse.get("sp"),
                             }.items() if v}
                         } 
                     },
