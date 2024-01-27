@@ -121,6 +121,14 @@ def test_validate_going_passes_for_irish_going_descriptions():
     assert validate_going("yielding (yielding to soft in places)")
 
 
+def test_validate_going_when_empty_and_allow_empty_is_true():
+    assert validate_going("", allow_empty=True)
+
+
+def test_validate_going_when_empty_and_allow_empty_is_false():
+    assert not validate_going("", allow_empty=False)
+    
+
 def test_validate_going_fails_for_none():
     assert not validate_going(None)
 
