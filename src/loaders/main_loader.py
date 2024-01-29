@@ -9,6 +9,7 @@ from prefect import flow, task
 from pymongo import ASCENDING as ASC
 
 from loaders.bha_loader import load_bha
+from loaders.formdata_loader import load_formdata_only
 from loaders.racecourse_loader import load_racecourses
 from loaders.rapid_horseracing_loader import load_rapid_horseracing_data
 from loaders.theracingapi_loader import load_theracingapi_data
@@ -54,7 +55,7 @@ def load_database_afresh():
     spec_database()
     load_racecourses()
     load_bha()
-    # load_formdata_only()
+    load_formdata_only()
     load_theracingapi_data()
     load_rapid_horseracing_data()
     # load_formdata_horses()
