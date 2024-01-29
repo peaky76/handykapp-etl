@@ -226,7 +226,14 @@ def formdata_loader():
                         "country": entry["country"],
                         "year": entry["year"],
                     },
-                    {"$set": {"runs": runs}},
+                    {"$set": 
+                        {
+                            "runs": runs,
+                            "prize_money": entry["prize_money"],
+                            "trainer": entry["trainer"],
+                            "trainer_form": entry["trainer_form"],
+                        }
+                    },
                 )
             else:
                 db.formdata.insert_one(entry)
