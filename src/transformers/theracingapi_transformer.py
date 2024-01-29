@@ -130,7 +130,7 @@ def transform_races(data):
                 "distance_description": lambda x: str(
                     RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
                 ),
-                "runners": lambda x: [transform_horse(petl.fromdicts([h])) for h in x],
+                "runners": lambda x, rec: [transform_horse(petl.fromdicts([h]), rec["datetime"]) for h in x],
             }
         )
         .cutout("field_size", "region", "type", "date", "off_time")
