@@ -86,7 +86,6 @@ def transform_horse(data, race_date=pendulum.now()):
         .dicts()[0]
     )
 
-
 def transform_races(data):
     return (
         petl.rename(
@@ -129,10 +128,10 @@ def transform_races(data):
                 "rating_restriction": lambda x: x or None,
                 "distance_description": lambda x: str(
                     RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
-                ),
-                "runners": lambda x, rec: [transform_horse(petl.fromdicts([h]), rec["datetime"]) for h in x],
+                )
             }
         )
+        .convert("runners", lambda x, rec: [transform_horse(petl.fromdicts([h]), pendulum.parse(rec["datetime"])) for h in x], pass_row=True)
         .cutout("field_size", "region", "type", "date", "off_time")
         .dicts()
     )
