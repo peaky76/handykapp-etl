@@ -30,14 +30,14 @@ def record_processor():
             else:
                 try:
                     results = transformer(data)
-                    for race in results:
-                        r.send((race, source))
-                    transform_count += 1
-                
                 except Exception as e:
                     logger.error(f"Error transforming {filename}: {e}")
                     reject_count += 1
                     continue
+
+                for race in results:
+                    r.send((race, source))
+                    transform_count += 1
 
                 if transform_count % 25 == 0:
                     logger.info(f"Read {transform_count} races. Current: {race['datetime']} at {race['course']}")
