@@ -1,5 +1,6 @@
 {
   "bha-extractor": "src\\extractors\\bha_extractor.py:bha_extractor",
+  "increment-theracingapi-data": "src\\loaders\\theracingapi_loader.py:increment_theracingapi_data",
   "load-database-afresh": "src\\loaders\\main_loader.py:load_database_afresh",
   "load-formdata-only": "src\\loaders\\formdata_loader.py:load_formdata_only",
   "load-theracingapi-data": "src\\loaders\\theracingapi_loader.py:load_theracingapi_data",

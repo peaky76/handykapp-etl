@@ -53,7 +53,7 @@ deployments:
     version:
     tags: []
     description:
-    entrypoint: src\loaders\theracingapi_loader.py:load_theracingapi_data
+    entrypoint: src\loaders\theracingapi_loader.py:increment_theracingapi_data
     parameters: {}
     work_pool:
       name: municipal
