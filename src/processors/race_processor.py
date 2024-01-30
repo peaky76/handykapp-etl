@@ -94,25 +94,28 @@ def race_processor():
                         )
                         skipped_count += 1
 
-                for horse in race["runners"]:
-                    h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
-                    damsire = horse.get("damsire")
-                    if damsire:
+                try:
+                    for horse in race["runners"]:
+                        h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
+                        damsire = horse.get("damsire")
+                        if damsire:
+                            h.send((
+                                {"name": damsire, "sex": "M", "race_id": None}, source
+                            ))
                         h.send((
-                            {"name": damsire, "sex": "M", "race_id": None}, source
+                            {
+                                "name": horse["dam"],
+                                "sex": "F",
+                                "sire": damsire,
+                                "race_id": None,
+                            },
+                            source,
                         ))
-                    h.send((
-                        {
-                            "name": horse["dam"],
-                            "sex": "F",
-                            "sire": damsire,
-                            "race_id": None,
-                        },
-                        source,
-                    ))
 
-                    if race_id:
-                        h.send((horse | {"race_id": race_id}, source))
+                        if race_id:
+                            h.send((horse | {"race_id": race_id}, source))
+                except Exception as e:
+                    logger.error(f"Error processing {race_id}: {e}")
 
     except GeneratorExit:
         logger.info(
