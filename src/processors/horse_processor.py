@@ -131,6 +131,7 @@ def horse_processor():
                             "runner_id": horse_id,
                         },
                         source,
+                        {}
                     ))
                 if horse.get("jockey"):
                     p.send((
@@ -141,6 +142,7 @@ def horse_processor():
                             "runner_id": horse_id,
                         },
                         source,
+                        {}
                     ))
 
     except GeneratorExit:
