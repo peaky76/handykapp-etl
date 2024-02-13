@@ -15,12 +15,12 @@ def person_processor():
 
     try:
         while True:
-            person, source = yield
+            person, source, ratings = yield
             found_person = None
             name = person["name"]
-            race_id = person["race_id"]
-            runner_id = person["runner_id"]
-            role = person["role"]
+            race_id = person.get("race_id")
+            runner_id = person.get("runner_id")
+            role = person.get("role")
 
             name_parts = HumanName(name)
 
@@ -37,16 +37,17 @@ def person_processor():
 
             if found_person:
                 found_id = found_person["_id"]
+                update_data = {f"references.{source}": name} | { "ratings": ratings } if ratings else {}
                 db.people.update_one(
                     {"_id": found_id},
-                    {"$set": {f"references.{source}": name}},
+                    {"$set": update_data },
                 )
                 logger.debug(f"{person} updated")
                 updated_count += 1
             else:
                 try:
                     inserted_person = db.people.insert_one(
-                        name_parts.as_dict() | {f"references.#{source}": name}
+                        name_parts.as_dict() | {f"references.{source}": name} | { "ratings": ratings } if ratings else {}
                     )
                     found_id = inserted_person.inserted_id
                     logger.debug(f"{person} added to db")
