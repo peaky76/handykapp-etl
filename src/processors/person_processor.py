@@ -37,17 +37,17 @@ def person_processor():
 
             if found_person:
                 found_id = found_person["_id"]
-                update_data = {f"references.{source}": name} | { "ratings": ratings } if ratings else {}
+                update_data = {f"references.{source}": name} | {"ratings": ratings} if ratings else {}
                 db.people.update_one(
                     {"_id": found_id},
-                    {"$set": update_data },
+                    {"$set": update_data},
                 )
                 logger.debug(f"{person} updated")
                 updated_count += 1
             else:
                 try:
                     inserted_person = db.people.insert_one(
-                        name_parts.as_dict() | {f"references.{source}": name} | { "ratings": ratings } if ratings else {}
+                        name_parts.as_dict() | {f"references.{source}": name} | {"ratings": ratings} if ratings else {}
                     )
                     found_id = inserted_person.inserted_id
                     logger.debug(f"{person} added to db")
