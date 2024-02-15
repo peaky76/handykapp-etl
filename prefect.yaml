@@ -49,20 +49,6 @@ deployments:
       cron: 1 0 * * 1
       timezone: UTC
       day_or: true
-  - name: streamlined-tral
-    version:
-    tags: []
-    description:
-    entrypoint: src\loaders\theracingapi_loader.py:increment_theracingapi_data
-    parameters: {}
-    work_pool:
-      name: municipal
-      work_queue_name:
-      job_variables: {}
-    schedule:
-      cron: 0 10 * * *
-      timezone: UTC
-      day_or: true
   - name: streamlined-lfo
     version:
     tags: []
@@ -103,6 +89,20 @@ deployments:
       job_variables: {}
     schedule:
       cron: 30 9 * * *
+      timezone: UTC
+      day_or: true
+    - name: streamlined-tral
+    version:
+    tags: []
+    description:
+    entrypoint: src\loaders\theracingapi_loader.py:increment_theracingapi_data
+    parameters: {}
+    work_pool:
+      name: municipal
+      work_queue_name:
+      job_variables: {}
+    schedule:
+      cron: 0 10 * * *
       timezone: UTC
       day_or: true
   - name: streamlined-test
