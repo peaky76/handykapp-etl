@@ -22,9 +22,15 @@ db = client.handykapp
 @flow
 def increment_theracingapi_data():
     logger = get_run_logger()
-    most_recent = next(db.races.find().sort("datetime", -1))["datetime"]
-    logger.info(f"Most recent race on db is: {pendulum.parse(most_recent)}")
-    load_theracingapi_data(from_date=pendulum.parse(most_recent))
+    logger.info("Querying database for most recent race")
+    races = db.races.find().sort("datetime", -1)
+    if races:
+        most_recent = races[-1]["datetime"]
+        logger.info(f"Most recent race on db is: {pendulum.parse(most_recent)}")
+        load_theracingapi_data(from_date=pendulum.parse(most_recent))
+    else:
+        logger.info("No races currently in db")
+        load_theracingapi_data()
 
 @flow
 def load_theracingapi_data(*, from_date=None):
