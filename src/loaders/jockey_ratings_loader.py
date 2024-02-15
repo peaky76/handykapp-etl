@@ -12,7 +12,7 @@ from transformers.jockey_ratings_transformer import transform_jockey_ratings
 @flow
 def load_jockey_ratings():
     logger = get_run_logger()
-    logger.info("Starting theracingapi loader")
+    logger.info("Starting jockey rating loader")
 
     p = person_processor()
     next(p)
