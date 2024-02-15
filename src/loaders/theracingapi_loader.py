@@ -25,7 +25,7 @@ def increment_theracingapi_data():
     logger.info("Querying database for most recent race")
     races = db.races.find().sort("datetime", -1)
     if races:
-        most_recent = races[-1]["datetime"]
+        most_recent = list(races)[-1]["datetime"]
         logger.info(f"Most recent race on db is: {pendulum.parse(most_recent)}")
         load_theracingapi_data(from_date=pendulum.parse(most_recent))
     else:
