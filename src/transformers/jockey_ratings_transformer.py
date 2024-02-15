@@ -25,8 +25,7 @@ def transform_jockey_ratings():
         name_elements = row["Name"].split(" ")
         inverted_name = " ".join([*name_elements[1:], name_elements[0]])
         name = str(HumanName(inverted_name))
-        if row["2022"]:
-            jockey_ratings[name] = row["2022"]
+        jockey_ratings[name] = {k: v for k, v in row.items() if len(k) == 4 and k.isdigit()}
 
     return jockey_ratings
 

@@ -18,7 +18,7 @@ def load_jockey_ratings():
     next(p)
 
     for jockey, rating in transform_jockey_ratings().items():
-        p.send(({"name": jockey, "role": "jockey"}, "rr", {"2023": rating}))
+        p.send(({"name": jockey, "role": "jockey"}, "rr", {k: v for k, v in rating.items() if v}))
 
     p.close()
 
