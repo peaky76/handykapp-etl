@@ -195,10 +195,10 @@ def extract_middle_details(details: str) -> list[str] | None:
 
 def extract_prize(string: str) -> tuple[str] | None:
     pattern = r"""
-        ^                               # Start of the string
-        (?P<racetype>\d*[A-Za-z]+)?     # Race type
-        (?P<prize>\d{3,4})              # Prize money
-        $                               # End of the string
+        ^                                   # Start of the string
+        (?P<racetype>\d*[A-Za-z]+)?         # Race type
+        (?P<prize>\d{3,4})                  # Prize money
+        $                                   # End of the string
     """
 
     match = re.match(pattern, string, re.VERBOSE)
@@ -210,12 +210,27 @@ def extract_prize(string: str) -> tuple[str] | None:
     return None
 
 
+def extract_rating(string: str) -> str | None:
+    pattern = r"""
+        ^                                   # Start of the string
+        (?P<disaster>[a-z-]?)               # Disaster
+        (?P<rating>\d{1,3})                 # Rating
+        (?P<jumps_category>([a-z]-?)?)      # Jumps category
+        $                                   # End of the string
+    """
+    match = re.match(pattern, string, re.VERBOSE)
+    if match:
+        return int(match.group("rating")) if not match.group("disaster") else None
+
+    return None
+
+
 def extract_weight(string: str) -> tuple[str] | None:
     pattern = r"""
-        ^                               # Start of the string
-        (?P<weight>\d{1,2}\-\d{2})      # Weight
-        (?P<jockey>.*)                  # Jockey
-        $                               # End of the string
+        ^                                   # Start of the string
+        (?P<weight>\d{1,2}\-\d{2})          # Weight
+        (?P<jockey>.*)                      # Jockey
+        $                                   # End of the string
     """
 
     match = re.match(pattern, string, re.VERBOSE)
