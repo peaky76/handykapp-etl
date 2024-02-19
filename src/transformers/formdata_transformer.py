@@ -142,9 +142,9 @@ def create_run(words: list[str]) -> Run:
             *words[1:6],
             *middle_details.values(),
             float(words[-4].replace("*", "-")) if "." in words[-4] else None,
-            int(words[-3]) if words[-3].isdigit() else None,
+            extract_rating(words[-3]),
             *extract_dist_going(words[-2]),
-            int(words[-1]) if words[-1].isdigit() else None,
+            extract_rating(words[-1]),
         )
     except Exception as e:
         logger.error(f"Error creating run from {words}: {e}")
