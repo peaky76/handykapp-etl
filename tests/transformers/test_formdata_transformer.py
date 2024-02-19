@@ -4,6 +4,7 @@ from transformers.formdata_transformer import (
     extract_dist_going,
     extract_middle_details,
     extract_prize,
+    extract_rating,
     extract_weight,
     get_formdata_date,
     get_formdatas,
@@ -145,6 +146,34 @@ def test_extract_middle_details_when_position_includes_disqulification():
 
 def test_extract_prize():
     assert extract_prize("2CG1156") == ("2CG", "1156")
+
+
+def test_extract_rating_when_rating_only():
+    assert extract_rating("115") == 115
+
+
+def test_extract_rating_when_hurdle_rating():
+    assert extract_rating("115h") == 115
+
+
+def test_extract_rating_when_chase_rating():
+    assert extract_rating("115c") == 115
+
+
+def test_extract_rating_when_disaster():
+    assert extract_rating("p19c") is None
+
+
+def test_extract_rating_when_no_rating():
+    assert extract_rating("-") is None
+
+
+def test_extract_rating_when_no_rating_over_jumps():
+    assert extract_rating("-c") is None
+
+
+def test_extract_rating_when_less_than_zero():
+    assert extract_rating("-2") is None
 
 
 def test_extract_weight():
