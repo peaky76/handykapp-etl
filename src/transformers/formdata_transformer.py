@@ -151,7 +151,7 @@ def create_run(words: list[str]) -> Run:
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
             *words[1:6],
             *middle_details.values(),
-            float(words[-4].replace("*", "-")) if "." in words[-4] else None,
+            float(words[-4].replace("*", "-")) if "." in words[-4] and words[-4] != 'w.o.' else None,
             extract_rating(words[-3]),
             *extract_dist_going(words[-2]),
             extract_rating(words[-1]),
