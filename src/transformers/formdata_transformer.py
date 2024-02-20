@@ -133,7 +133,7 @@ def create_run(words: list[str]) -> Run:
         # Join non-finishing jump_details
         indices_to_join = []
         for i, word in enumerate(words[-5:-1]):
-            if word == "-" and words[-5 + i + 1] in ["b", "c", "h"]:
+            if word in ["-", "n"] and words[-5 + i + 1] in ["b", "c", "h"]:
                 indices_to_join.append(-5 + i)
 
         for index in indices_to_join:
