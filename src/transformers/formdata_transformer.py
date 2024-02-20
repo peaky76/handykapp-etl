@@ -130,6 +130,16 @@ def create_run(words: list[str]) -> Run:
                 words[7 + i] = position
                 words.insert(8 + i, f"-{beaten_distance}")
 
+        # Join non-finishing jump_details
+        indices_to_join = []
+        for i, word in enumerate(words[-5:-1]):
+            if word == "-" and words[-5 + i + 1] in ["b", "c", "h"]:
+                indices_to_join.append(-5 + i)
+
+        for index in indices_to_join:
+            words = words[:index] + ["".join(words[index:index+2])] + (words[index+2:] if index < -3 else []) 
+        
+
         # Join jockey details to be processed separately
         flat_non_finisher = any(
             letter in words[-4] for letter in ["b", "f", "n", "p", "u"]
