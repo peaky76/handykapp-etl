@@ -144,7 +144,7 @@ def create_run(words: list[str]) -> Run:
         flat_non_finisher = any(
             letter in words[-4] for letter in ["b", "f", "n", "p", "u"]
         )
-        joined_middle = "".join(words[6:-3] if flat_non_finisher else words[6:-4])
+        joined_middle = "".join(words[6:-3] if flat_non_finisher and words[-4] != 'alone' else words[6:-4])
         middle_details = extract_middle_details(joined_middle)
 
         run = Run(
