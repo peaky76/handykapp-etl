@@ -289,7 +289,7 @@ def get_formdatas(
 
 
 def is_horse(string: str) -> str:
-    horse_regex = r"^(?!.*FORMDATA)[A-Z\s]{3,18}(?: \([A-Z]{1,3}\))?$"
+    horse_regex = r"^(?!.*FORMDATA)[A-Z\s]{3,21}(?: \([A-Z]{1,3}\))?$"
     initial_regex = r"^[A-Z] [A-Z] [A-Z]$"
     return (
         string == string.upper()
