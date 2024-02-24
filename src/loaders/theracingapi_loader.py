@@ -23,10 +23,10 @@ db = client.handykapp
 def increment_theracingapi_data():
     logger = get_run_logger()
     logger.info("Querying database for most recent race")
-    races = db.races.find().sort("datetime", -1)
-    logger.info(f"{len(list(races))} races found")
-    if list(races): 
-        most_recent = list(races)[-1]["datetime"]
+    races = list(db.races.find().sort("datetime", -1))
+    logger.info(f"{len(races)} races found")
+    if races: 
+        most_recent = races[-1]["datetime"]
         logger.info(f"Most recent race on db is: {pendulum.parse(most_recent)}")
         load_theracingapi_data(from_date=pendulum.parse(most_recent))
     else:
