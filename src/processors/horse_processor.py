@@ -11,20 +11,26 @@ db = client.handykapp
 
 
 @cache
-def get_dam_id(horse):
-    found_horse = db.horses.find_one({"name": horse, "sex": "F"}, {"_id": 1})
+def get_dam_id(name: str | None):
+    if not name:
+        return None
+
+    found_horse = db.horses.find_one({"name": name, "sex": "F"}, {"_id": 1})
     
     if not found_horse:
-        raise ValueError(f"Could not find dam {horse}")
+        raise ValueError(f"Could not find dam {name}")
     
     return found_horse["_id"]
 
 @cache
-def get_sire_id(horse):
-    found_horse = db.horses.find_one({"name": horse, "sex": "M"}, {"_id": 1})
+def get_sire_id(name: str | None):
+    if not name:
+        return None
+
+    found_horse = db.horses.find_one({"name": name, "sex": "M"}, {"_id": 1})
     
     if not found_horse:
-        raise ValueError(f"Could not find sire {horse}")
+        raise ValueError(f"Could not find sire {name}")
 
     return found_horse["_id"]
 
@@ -81,12 +87,8 @@ def horse_processor():
                                 "year": horse.get("year"),
                                 "country": horse.get("country"),
                                 "colour": horse.get("colour"),
-                                "sire": get_sire_id(horse["sire"])
-                                if horse.get("sire")
-                                else None,
-                                "dam": get_dam_id(horse["dam"])
-                                if horse.get("dam")
-                                else None,
+                                "sire": get_sire_id(horse.get("sire")),
+                                "dam": get_dam_id(horse.get("dam"))
                             })
                     ).inserted_id
                     logger.debug(f"{name} added to db")
