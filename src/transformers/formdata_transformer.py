@@ -137,21 +137,28 @@ def create_run(words: list[str]) -> Run:
                 indices_to_join.append(-5 + i)
 
         for index in indices_to_join:
-            words = words[:index] + ["".join(words[index:index + 2])] + (words[index + 2:] if index < -3 else []) 
-        
+            words = (
+                words[:index]
+                + ["".join(words[index : index + 2])]
+                + (words[index + 2 :] if index < -3 else [])
+            )
 
         # Join jockey details to be processed separately
         flat_non_finisher = any(
             letter in words[-4] for letter in ["b", "f", "n", "p", "u"]
         )
-        joined_middle = "".join(words[6:-3] if flat_non_finisher and words[-4] != 'alone' else words[6:-4])
+        joined_middle = "".join(
+            words[6:-3] if flat_non_finisher and words[-4] != "alone" else words[6:-4]
+        )
         middle_details = extract_middle_details(joined_middle)
 
         run = Run(
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
             *words[1:6],
             *middle_details.values(),
-            float(words[-4].replace("*", "-")) if "." in words[-4] and words[-4] != 'w.o.' else None,
+            float(words[-4].replace("*", "-"))
+            if "." in words[-4] and words[-4] != "w.o."
+            else None,
             extract_rating(words[-3]),
             *extract_dist_going(words[-2]),
             extract_rating(words[-1]),

@@ -27,19 +27,19 @@ def get_racecourse_id(course, surface, code, obstacle) -> str:
 
 def make_update_dictionary(race, racecourse_id):
     return compact({
-            "racecourse": racecourse_id,
-            "datetime": race.get("datetime"),
-            "title": race.get("title"),
-            "is_handicap": race.get("is_handicap"),
-            "distance_description": race.get("distance_description"),
-            "going_description": race.get("going_description"),
-            "race_grade": race.get("race_grade"),
-            "race_class": race.get("race_class") or race.get("class"),
-            "age_restriction": race.get("age_restriction"),
-            "rating_restriction": race.get("rating_restriction"),
-            "prize": race.get("prize"),
-            "rapid_id": race.get("rapid_id"),
-        })
+        "racecourse": racecourse_id,
+        "datetime": race.get("datetime"),
+        "title": race.get("title"),
+        "is_handicap": race.get("is_handicap"),
+        "distance_description": race.get("distance_description"),
+        "going_description": race.get("going_description"),
+        "race_grade": race.get("race_grade"),
+        "race_class": race.get("race_class") or race.get("class"),
+        "age_restriction": race.get("age_restriction"),
+        "rating_restriction": race.get("rating_restriction"),
+        "prize": race.get("prize"),
+        "rapid_id": race.get("rapid_id"),
+    })
 
 
 def race_processor():
@@ -55,15 +55,15 @@ def race_processor():
     try:
         while True:
             race, source = yield
-            racecourse_id = get_racecourse_id(race["course"], race["surface"], race["code"], race["obstacle"])
+            racecourse_id = get_racecourse_id(
+                race["course"], race["surface"], race["code"], race["obstacle"]
+            )
 
             if racecourse_id:
-                found_race = db.races.find_one(
-                    {
-                        "racecourse": racecourse_id,
-                        "datetime": race["datetime"],
-                    }
-                )
+                found_race = db.races.find_one({
+                    "racecourse": racecourse_id,
+                    "datetime": race["datetime"],
+                })
 
                 # TODO: Check race matches data
                 if found_race:
@@ -96,11 +96,15 @@ def race_processor():
 
                 try:
                     for horse in race["runners"]:
-                        h.send(({"name": horse["sire"], "sex": "M", "race_id": None}, source))
+                        h.send((
+                            {"name": horse["sire"], "sex": "M", "race_id": None},
+                            source,
+                        ))
                         damsire = horse.get("damsire")
                         if damsire:
                             h.send((
-                                {"name": damsire, "sex": "M", "race_id": None}, source
+                                {"name": damsire, "sex": "M", "race_id": None},
+                                source,
                             ))
                         h.send((
                             {

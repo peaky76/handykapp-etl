@@ -76,10 +76,8 @@ def test_transform_horse_returns_correct_output(horse_data):
         "odds": [],
         "finishing_time": None,
     }
-    actual = transform_horse(
-        petl.fromdicts([horse_data]), pendulum.parse("2023-03-08")
-    )
-    assert actual == expected 
+    actual = transform_horse(petl.fromdicts([horse_data]), pendulum.parse("2023-03-08"))
+    assert actual == expected
 
 
 def test_transform_results_returns_correct_output(result_data):

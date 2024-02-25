@@ -31,7 +31,7 @@ SOURCE = settings["core"]["spaces_dir"]
 
 @task(tags=["Core"], name="get_racecourses_csv")
 def read_csvs():
-    for csv in list(get_files(SOURCE)): 
+    for csv in list(get_files(SOURCE)):
         if "edited" in csv:
             source = petl.MemorySource(stream_file(csv))
             yield petl.fromcsv(source)

@@ -18,19 +18,22 @@ def get_horse_id_by_name_and_sex(name: str | None, sex: str | None):
     found_horse = db.horses.find_one({"name": name, "sex": sex}, {"_id": 1})
 
     if not found_horse:
-        raise ValueError(f"Could not find {'fe' if sex == 'F' else ''}male horse {name}")
+        raise ValueError(
+            f"Could not find {'fe' if sex == 'F' else ''}male horse {name}"
+        )
 
     return found_horse["_id"]
 
 
 @cache
-def get_dam_id(name: str | None):    
+def get_dam_id(name: str | None):
     return get_horse_id_by_name_and_sex(name, "F")
+
 
 @cache
 def get_sire_id(name: str | None):
     return get_horse_id_by_name_and_sex(name, "M")
-    
+
 
 def make_search_dictionary(horse):
     keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
@@ -79,14 +82,14 @@ def horse_processor():
                 try:
                     horse_id = db.horses.insert_one(
                         compact({
-                                "name": name,
-                                "sex": horse.get("sex"),
-                                "year": horse.get("year"),
-                                "country": horse.get("country"),
-                                "colour": horse.get("colour"),
-                                "sire": get_sire_id(horse.get("sire")),
-                                "dam": get_dam_id(horse.get("dam"))
-                            })
+                            "name": name,
+                            "sex": horse.get("sex"),
+                            "year": horse.get("year"),
+                            "country": horse.get("country"),
+                            "colour": horse.get("colour"),
+                            "sire": get_sire_id(horse.get("sire")),
+                            "dam": get_dam_id(horse.get("dam")),
+                        })
                     ).inserted_id
                     logger.debug(f"{name} added to db")
                     added_count += 1
@@ -118,7 +121,7 @@ def horse_processor():
                                 "distance_beaten": horse.get("distance_beaten"),
                                 "sp": horse.get("sp"),
                             })
-                        } 
+                        }
                     },
                 )
                 if horse.get("trainer"):
@@ -130,7 +133,7 @@ def horse_processor():
                             "runner_id": horse_id,
                         },
                         source,
-                        {}
+                        {},
                     ))
                 if horse.get("jockey"):
                     p.send((
@@ -141,7 +144,7 @@ def horse_processor():
                             "runner_id": horse_id,
                         },
                         source,
-                        {}
+                        {},
                     ))
 
     except GeneratorExit:

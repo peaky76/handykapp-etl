@@ -41,15 +41,13 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
                 "OR": "official_rating",
             },
         )
-        .convert(
-            {
-                "age": int,
-                "days_since_prev_run": int,
-                "official_rating": int,
-                "non_runner": lambda x: bool(int(x)),
-                "lbs_carried": lambda x: RaceWeight(x).lb,
-            }
-        )
+        .convert({
+            "age": int,
+            "days_since_prev_run": int,
+            "official_rating": int,
+            "non_runner": lambda x: bool(int(x)),
+            "lbs_carried": lambda x: RaceWeight(x).lb,
+        })
         .addfield(
             "year",
             lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
@@ -71,6 +69,7 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
         .cutout("horse", "age")
         .dicts()[0]
     )
+
 
 def transform_results(data):
     return (
@@ -98,14 +97,19 @@ def transform_results(data):
         .addfield(
             "surface",
             lambda rec: (
-                "AW" if any(x.name in rec["going_description"].upper() for x in AWGoingDescription) else "Turf"
+                "AW"
+                if any(
+                    x.name in rec["going_description"].upper()
+                    for x in AWGoingDescription
+                )
+                else "Turf"
                 # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
                 # TODO: Handle mixed meetings as multiparse returns a list and only first used here
-                # Going(rec["going_description"]).surface.name.title() 
-                # if "COURSE" not in rec["going_description"].upper() 
+                # Going(rec["going_description"]).surface.name.title()
+                # if "COURSE" not in rec["going_description"].upper()
                 # else next(iter(Going.multiparse(rec["going_description"]).values())).surface.name.title()
                 # )
-            )
+            ),
         )
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
@@ -117,8 +121,9 @@ def transform_results(data):
                     petl.fromdicts([h]),
                     race_date=pendulum.parse(rec["datetime"]),
                     finishing_time=rec["finish_time"],
-                ) for h in rec["horses"]
-            ]
+                )
+                for h in rec["horses"]
+            ],
         )
         .cutout("horses", "finish_time")
         .dicts()
@@ -192,7 +197,11 @@ def validate_results(data):
         {"name": "title_str", "field": "title", "test": str},
         {"name": "distance_valid", "field": "distance", "assertion": validate_distance},
         {"name": "age_int", "field": "age", "test": int},
-        {"name": "going_valid", "field": "going", "test": lambda x: validate_going(x, allow_empty=True)},
+        {
+            "name": "going_valid",
+            "field": "going",
+            "test": lambda x: validate_going(x, allow_empty=True),
+        },
         {"name": "finished_bool", "field": "finished", "test": bool},
         {"name": "canceled_bool", "field": "canceled", "test": bool},
         {"name": "prize_valid", "field": "prize", "assertion": validate_prize},
