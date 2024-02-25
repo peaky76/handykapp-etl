@@ -137,7 +137,7 @@ def create_run(words: list[str]) -> Run:
                 indices_to_join.append(-5 + i)
 
         for index in indices_to_join:
-            words = words[:index] + ["".join(words[index:index+2])] + (words[index+2:] if index < -3 else []) 
+            words = words[:index] + ["".join(words[index:index + 2])] + (words[index + 2:] if index < -3 else []) 
         
 
         # Join jockey details to be processed separately
