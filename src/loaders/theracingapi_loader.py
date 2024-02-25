@@ -19,19 +19,21 @@ SOURCE = settings["theracingapi"]["spaces_dir"]
 
 db = client.handykapp
 
+
 @flow
 def increment_theracingapi_data():
     logger = get_run_logger()
     logger.info("Querying database for most recent race")
     races = list(db.races.find().sort("datetime", -1))
     logger.info(f"{len(races)} races found")
-    if races: 
+    if races:
         most_recent = races[-1]["datetime"]
         logger.info(f"Most recent race on db is: {pendulum.parse(most_recent)}")
         load_theracingapi_data(from_date=pendulum.parse(most_recent))
     else:
         logger.info("No races currently in db")
         load_theracingapi_data()
+
 
 @flow
 def load_theracingapi_data(*, from_date=None):
@@ -45,7 +47,7 @@ def load_theracingapi_data(*, from_date=None):
             file_date = pendulum.parse(file.split(".")[0][-8:])
             if file_date < from_date:
                 continue
-        
+
         logger.info(f"Reading {file}")
         contents = read_file(file)
         for dec in contents["racecards"]:

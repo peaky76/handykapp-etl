@@ -26,13 +26,11 @@ def drop_database():
 @task
 def spec_database():
     db.horses.create_index(
-        [("name", ASC), ("country", ASC), ("year", ASC)], unique=True, 
+        [("name", ASC), ("country", ASC), ("year", ASC)],
+        unique=True,
         partialFilterExpression={
-            "$and": [
-                {"country": {"$type": ["string"]}},
-                {"year": {"$type": ["int"]}}
-            ]
-        }
+            "$and": [{"country": {"$type": ["string"]}}, {"year": {"$type": ["int"]}}]
+        },
     )
     db.horses.create_index(
         [("name", ASC), ("country", ASC), ("year", ASC), ("sex", ASC)], unique=True
