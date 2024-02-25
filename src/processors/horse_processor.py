@@ -11,29 +11,26 @@ db = client.handykapp
 
 
 @cache
-def get_dam_id(name: str | None):
+def get_horse_id_by_name_and_sex(name: str | None, sex: str | None):
     if not name:
         return None
 
-    found_horse = db.horses.find_one({"name": name, "sex": "F"}, {"_id": 1})
-    
+    found_horse = db.horses.find_one({"name": name, "sex": sex}, {"_id": 1})
+
     if not found_horse:
-        raise ValueError(f"Could not find dam {name}")
-    
+        raise ValueError(f"Could not find {'fe' if sex == 'F' else ''}male horse {name}")
+
     return found_horse["_id"]
+
+
+@cache
+def get_dam_id(name: str | None):    
+    return get_horse_id_by_name_and_sex(name, "F")
 
 @cache
 def get_sire_id(name: str | None):
-    if not name:
-        return None
-
-    found_horse = db.horses.find_one({"name": name, "sex": "M"}, {"_id": 1})
+    return get_horse_id_by_name_and_sex(name, "M")
     
-    if not found_horse:
-        raise ValueError(f"Could not find sire {name}")
-
-    return found_horse["_id"]
-
 
 def make_search_dictionary(horse):
     keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
