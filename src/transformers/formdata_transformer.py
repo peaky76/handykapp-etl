@@ -295,7 +295,7 @@ def get_formdatas(
     return select_for_refresh(flat) + select_for_refresh(nh)
 
 
-def is_horse(string: str) -> str:
+def is_horse(string: str) -> bool:
     horse_regex = r"^(?!.*FORMDATA)[A-Z\s]{3,21}(?: \([A-Z]{1,3}\))?$"
     initial_regex = r"^[A-Z] [A-Z] [A-Z]$"
     return (
@@ -305,7 +305,7 @@ def is_horse(string: str) -> str:
     )
 
 
-def is_race_date(string: str) -> str:
+def is_race_date(string: str) -> bool:
     date_regex = r"\d{1,2}[A-Z][a-z]{2}\d{2}"
     return bool(re.match(date_regex, string))
 
