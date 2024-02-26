@@ -264,7 +264,7 @@ def get_formdata_date(filename: str) -> pendulum.Date:
 
 
 def get_formdatas(
-    *, code: RacingCode = None, after_year: int = 0, for_refresh: bool = False
+    *, code: RacingCode | None = None, after_year: int = 0, for_refresh: bool = False
 ) -> list[str]:
     base = [file for file in get_files(SOURCE) if int(file[-10:-8]) > after_year]
     flat = [file for file in base if "nh" not in file]
