@@ -1,13 +1,15 @@
-from typing import TypedDict
+from typing import Optional
+
+from pydantic import BaseModel
 
 from models.mongo_references import MongoReferences
 
 
-class MongoPerson(TypedDict, total=False):
-    title: str
-    first: str
-    middle: str
+class MongoPerson(BaseModel):
+    title: Optional[str] = None
+    first: Optional[str] = None
+    middle: Optional[str] = None
     last: str
-    suffix: str
-    nickname: str
-    references: MongoReferences
+    suffix: Optional[str] = None
+    nickname: Optional[str] = None
+    references: Optional[MongoReferences] = None
