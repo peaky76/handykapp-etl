@@ -1,27 +1,27 @@
-from typing import TypedDict
+from datetime import datetime
+from typing import Optional
 
-from bson import ObjectId
-from pendulum import DateTime
+from pydantic import BaseModel, Field
 
-
-class MongoRaceRestriction(TypedDict):
-    minimum: int | None
-    maximum: int | None
+from .pyobjectid import PyObjectId
 
 
-class MongoDeclaration(TypedDict, total=False):
-    racecourse: ObjectId
-    datetime: DateTime
+class MongoRaceRestriction(BaseModel):
+    minimum: Optional[int] = None
+    maximum: Optional[int] = None
+
+class MongoRace(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    racecourse: PyObjectId
+    datetime: datetime
     title: str
-    is_handicap: bool
-    obstacle: str | None
+    is_handicap: Optional[bool] = None
+    obstacle: Optional[str] = None
     distance_description: str
-    race_grade: str
-    race_class: int
-    age_restriction: MongoRaceRestriction
-    rating_restriction: MongoRaceRestriction
-    prize: str
-
-
-class MongoRace(MongoDeclaration, total=False):
-    going_description: str
+    race_grade: Optional[str] = None
+    race_class: Optional[int] = None
+    age_restriction: Optional[MongoRaceRestriction] = None
+    rating_restriction: Optional[MongoRaceRestriction] = None
+    prize: Optional[str] = None
+    going_description: Optional[str] = None
+    
