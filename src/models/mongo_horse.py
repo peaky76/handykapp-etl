@@ -1,31 +1,32 @@
 from datetime import date
-from typing import TypedDict
+from typing import Annotated, List, Literal, Optional
 
-from bson import ObjectId
+from pydantic import BaseModel, BeforeValidator, Field
 
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
-class MongoOperation(TypedDict):
+class MongoOperation(BaseModel):
     operation_type: str
-    date: date | None
+    date: Optional[date] = None
 
 
-class MongoOfficialRatings(TypedDict, total=False):
-    flat: int | None
-    aw: int | None
-    chase: int | None
-    hurdle: int | None
-
-
-class MongoHorseBase(TypedDict):
-    name: str
-    country: str
+class MongoOfficialRatings(BaseModel):
+    flat: Optional[int] = None
+    aw: Optional[int] = None
+    chase: Optional[int] = None
+    hurdle: Optional[int] = None
+    
+    
+class MongoHorse(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str = Field(..., min_length=3, max_length=21)
+    country: str = Field(..., min_length=2, max_length=3)
     year: int
-    sex: str
-
-
-class MongoHorse(MongoHorseBase, total=False):
-    sire: ObjectId
-    dam: ObjectId
-    trainer: ObjectId
-    operations: list[MongoOperation]
-    ratings: MongoOfficialRatings
+    sex: Optional[Literal["M", "F"]] = None
+    breed: Optional[str] = None
+    colour: Optional[str] = None
+    sire: Optional[PyObjectId] = None
+    dam: Optional[PyObjectId] = None
+    trainer: Optional[PyObjectId] = None
+    operations: Optional[List[MongoOperation]] = None
+    ratings: Optional[MongoOfficialRatings] = None
