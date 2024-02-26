@@ -67,7 +67,7 @@ def transform_ratings_data(data) -> list[MongoHorse]:
             if rec["sex"] == "GELDING"
             else None,
         )
-        .convert({"sex": lambda x: Gender[x].sex.name[0]})
+        .convert({"sex": lambda x: Gender[x].sex.name[0]})  # type: ignore
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types)
         .dicts()
