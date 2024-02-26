@@ -1,6 +1,8 @@
-from typing import TypedDict
+from typing import Optional
+
+from pydantic import BaseModel
 
 
-class MongoReferences(TypedDict, total=False):
-    bha: str
-    racing_research: str
+class MongoReferences(BaseModel):
+    bha: Optional[str] = None
+    racing_research: Optional[str] = None
