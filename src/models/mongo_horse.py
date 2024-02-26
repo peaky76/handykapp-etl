@@ -1,9 +1,10 @@
 from datetime import date
-from typing import Annotated, List, Literal, Optional
+from typing import List, Literal, Optional
 
-from pydantic import BaseModel, BeforeValidator, Field
+from pydantic import BaseModel, Field
 
-PyObjectId = Annotated[str, BeforeValidator(str)]
+from .pyobjectid import PyObjectId
+
 
 class MongoOperation(BaseModel):
     operation_type: str
