@@ -1,5 +1,5 @@
 from clients import mongo_client as client
-from nameparser import HumanName
+from nameparser import HumanName  # type: ignore
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 

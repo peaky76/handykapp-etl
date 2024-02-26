@@ -5,10 +5,10 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
-import petl
+import petl  # type: ignore
 import tomllib
 from helpers import read_file
-from nameparser import HumanName
+from nameparser import HumanName  # type: ignore
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
