@@ -118,7 +118,7 @@ def create_run(words: list[str]) -> Run:
         if (len(words[5]) > 5 and words[5][0].isdigit() and "-" in words[5][:3]) or (
             len(words[5]) == 5 and not words[5][-1].isdigit()
         ):
-            weight, jockey = extract_weight(words[5])
+            weight, jockey = extract_weight(words[5]) or ("", "")
             words[5] = weight
             words.insert(6, jockey)
 
