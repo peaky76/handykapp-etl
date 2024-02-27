@@ -84,12 +84,13 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 *words[-2:],
                 [],
             )
+        
+        if horse.trainer[0].isdigit():
+            logger.error(f"Trainer error on {horse.name}: {horse.trainer}")
+
     except Exception as e:
         logger.error(f"Error creating horse from {words}: {e}")
         horse = None
-
-    if horse.trainer[0].isdigit():
-        logger.error(f"Trainer error on {horse.name}: {horse.trainer}")
 
     return horse
 
