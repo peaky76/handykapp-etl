@@ -189,7 +189,7 @@ def extract_dist_going(string: str) -> tuple[str] | None:
     return None
 
 
-def extract_middle_details(details: str) -> list[str] | None:
+def extract_middle_details(details: str) -> dict | None:
     pattern = r"""
         ^                                       # Start of the string
         (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
