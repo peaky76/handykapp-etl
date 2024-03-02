@@ -84,19 +84,19 @@ def racecard_data(horse_1_data, horse_2_data):
 
 
 def test_build_datetime_with_morning_race():
-    assert build_datetime("2023-10-03", "11:15") == "2023-10-03T11:15:00Z"
+    assert build_datetime("2023-10-03", "11:15") == "2023-10-03T11:15:00+00:00"
 
 
 def test_build_datetime_with_afternoon_race():
-    assert build_datetime("2023-10-03", "3:15") == "2023-10-03T15:15:00Z"
+    assert build_datetime("2023-10-03", "3:15") == "2023-10-03T15:15:00+00:00"
 
 
 def test_build_datetime_with_evening_race():
-    assert build_datetime("2023-10-03", "9:15") == "2023-10-03T21:15:00Z"
+    assert build_datetime("2023-10-03", "9:15") == "2023-10-03T21:15:00+00:00"
 
 
 def test_build_datetime_with_minutes_below_ten():
-    assert build_datetime("2023-10-03", "3:05") == "2023-10-03T15:05:00Z"
+    assert build_datetime("2023-10-03", "3:05") == "2023-10-03T15:05:00+00:00"
 
 
 def test_transform_horse_returns_correct_output_when_professional_jockey(
@@ -162,7 +162,7 @@ def test_transform_races_returns_correct_output(racecard_data):
         "course": "Wolverhampton",
         "surface": "AW",
         "code": "Flat",
-        "datetime": "2023-10-03T13:42:00Z",
+        "datetime": "2023-10-03T13:42:00+00:00",
         "title": "Virgin Bet Apprentice Handicap",
         "is_handicap": True,
         "obstacle": None,
