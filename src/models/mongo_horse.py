@@ -16,8 +16,8 @@ class MongoOfficialRatings(BaseModel):
     aw: Optional[int] = None
     chase: Optional[int] = None
     hurdle: Optional[int] = None
-    
-    
+
+
 class MongoHorse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str = Field(..., min_length=3, max_length=21)
