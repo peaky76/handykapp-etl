@@ -2,8 +2,9 @@ from functools import cache
 
 from clients import mongo_client as client
 from prefect import get_run_logger
-from processors.person_processor import person_processor
 from pymongo.errors import DuplicateKeyError
+
+from processors.person_processor import person_processor
 
 from .utils import compact
 
