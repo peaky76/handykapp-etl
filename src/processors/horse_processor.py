@@ -1,6 +1,7 @@
 from functools import cache
 
 from clients import mongo_client as client
+from models import MongoHorse, PyObjectId
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
@@ -12,7 +13,7 @@ db = client.handykapp
 
 
 @cache
-def get_horse_id_by_name_and_sex(name: str | None, sex: str | None):
+def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectId:
     if not name:
         return None
 
@@ -27,16 +28,16 @@ def get_horse_id_by_name_and_sex(name: str | None, sex: str | None):
 
 
 @cache
-def get_dam_id(name: str | None):
+def get_dam_id(name: str | None) -> PyObjectId:
     return get_horse_id_by_name_and_sex(name, "F")
 
 
 @cache
-def get_sire_id(name: str | None):
+def get_sire_id(name: str | None) -> PyObjectId:
     return get_horse_id_by_name_and_sex(name, "M")
 
 
-def make_search_dictionary(horse):
+def make_search_dictionary(horse) -> MongoHorse:
     keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
 
     return {k: horse[k] for k in keys}
