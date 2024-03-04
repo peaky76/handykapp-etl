@@ -2,11 +2,11 @@ from functools import cache
 
 from clients import mongo_client as client
 from models import MongoHorse, PyObjectId
-from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from processors.person_processor import person_processor
 
+from .processor import Processor
 from .utils import compact
 
 db = client.handykapp
@@ -53,104 +53,102 @@ def make_update_dictionary(horse):
         update_dictionary["dam"] = get_dam_id(horse["dam"])
     return update_dictionary
 
+def horse_updater(horse, _source):
+    found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
-def horse_processor():
-    logger = get_run_logger()
-    logger.info("Starting horse processor")
+    if found_horse:
+        horse_id = found_horse["_id"]
+        db.horses.update_one(
+            {"_id": horse_id},
+            {"$set": make_update_dictionary(horse)},
+        )
+        return horse_id
+
+    return None
+
+def horse_inserter(horse, _source):
+    return db.horses.insert_one(
+                compact({
+                    "name": horse.get("name"),
+                    "sex": horse.get("sex"),
+                    "year": horse.get("year"),
+                    "country": horse.get("country"),
+                    "colour": horse.get("colour"),
+                    "sire": get_sire_id(horse.get("sire")),
+                    "dam": get_dam_id(horse.get("dam")),
+                })
+            ).inserted_id
+
+def horse_processor_func(horse, source, logger, next_processor):
     added_count = 0
     updated_count = 0
     skipped_count = 0
 
-    p = person_processor()
-    next(p)
+    race_id = horse["race_id"]
+    name = horse["name"]
 
-    try:
-        while True:
-            horse, source = yield
-            race_id = horse["race_id"]
-            name = horse["name"]
+    if (horse_id := horse_updater(horse, source)):
+        logger.debug(f"{name} updated")
+        updated_count += 1
+    else:
+        try:
+            horse_id = horse_inserter(horse, source)
+            logger.debug(f"{name} added to db")
+            added_count += 1
+        except DuplicateKeyError:
+            logger.warning(
+                f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} ({horse['sex']})"
+            )
+            skipped_count += 1
+        except ValueError as e:
+            logger.warning(e)
+            skipped_count += 1
 
-            found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
-
-            if found_horse:
-                horse_id = found_horse["_id"]
-                db.horses.update_one(
-                    {"_id": horse_id},
-                    {"$set": make_update_dictionary(horse)},
-                )
-                logger.debug(f"{name} updated")
-                updated_count += 1
-            else:
-                try:
-                    horse_id = db.horses.insert_one(
-                        compact({
-                            "name": name,
-                            "sex": horse.get("sex"),
-                            "year": horse.get("year"),
-                            "country": horse.get("country"),
-                            "colour": horse.get("colour"),
-                            "sire": get_sire_id(horse.get("sire")),
-                            "dam": get_dam_id(horse.get("dam")),
-                        })
-                    ).inserted_id
-                    logger.debug(f"{name} added to db")
-                    added_count += 1
-                except DuplicateKeyError:
-                    logger.warning(
-                        f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} ({horse['sex']})"
-                    )
-                    skipped_count += 1
-                except ValueError as e:
-                    logger.warning(e)
-                    skipped_count += 1
-
-            # Add horse to race
-            if race_id:
-                db.races.update_one(
-                    {"_id": race_id},
-                    {
-                        "$push": {
-                            "runners": compact({
-                                "horse": horse_id,
-                                "owner": horse.get("owner"),
-                                "allowance": horse.get("allowance"),
-                                "saddlecloth": horse.get("saddlecloth"),
-                                "draw": horse.get("draw"),
-                                "headgear": horse.get("headgear"),
-                                "lbs_carried": horse.get("lbs_carried"),
-                                "official_rating": horse.get("official_rating"),
-                                "position": horse.get("position"),
-                                "distance_beaten": horse.get("distance_beaten"),
-                                "sp": horse.get("sp"),
-                            })
-                        }
-                    },
-                )
-                if horse.get("trainer"):
-                    p.send((
-                        {
-                            "name": horse["trainer"],
-                            "role": "trainer",
-                            "race_id": race_id,
-                            "runner_id": horse_id,
-                        },
-                        source,
-                        {},
-                    ))
-                if horse.get("jockey"):
-                    p.send((
-                        {
-                            "name": horse["jockey"],
-                            "role": "jockey",
-                            "race_id": race_id,
-                            "runner_id": horse_id,
-                        },
-                        source,
-                        {},
-                    ))
-
-    except GeneratorExit:
-        logger.info(
-            f"Finished processing horses. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
+    # Add horse to race
+    if race_id:
+        db.races.update_one(
+            {"_id": race_id},
+            {
+                "$push": {
+                    "runners": compact({
+                        "horse": horse_id,
+                        "owner": horse.get("owner"),
+                        "allowance": horse.get("allowance"),
+                        "saddlecloth": horse.get("saddlecloth"),
+                        "draw": horse.get("draw"),
+                        "headgear": horse.get("headgear"),
+                        "lbs_carried": horse.get("lbs_carried"),
+                        "official_rating": horse.get("official_rating"),
+                        "position": horse.get("position"),
+                        "distance_beaten": horse.get("distance_beaten"),
+                        "sp": horse.get("sp"),
+                    })
+                }
+            },
         )
-        p.close()
+        if horse.get("trainer"):
+            next_processor.send((
+                {
+                    "name": horse["trainer"],
+                    "role": "trainer",
+                    "race_id": race_id,
+                    "runner_id": horse_id,
+                },
+                source,
+                {},
+            ))
+        if horse.get("jockey"):
+            next_processor.send((
+                {
+                    "name": horse["jockey"],
+                    "role": "jockey",
+                    "race_id": race_id,
+                    "runner_id": horse_id,
+                },
+                source,
+                {},
+            ))
+
+    return added_count, updated_count, skipped_count
+
+horse_processor = Processor("horse", horse_processor_func, person_processor).process
