@@ -14,6 +14,7 @@ Handedness = Literal["Left", "Right", "Both"]
 StyleType = Literal["Galloping", "Stiff", "Tight"]
 ContourType = Literal["Flat", "Undulating", "Uphill"]
 
+
 class MongoRacecourse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str

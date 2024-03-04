@@ -10,6 +10,7 @@ class MongoRaceRestriction(BaseModel):
     minimum: Optional[int] = None
     maximum: Optional[int] = None
 
+
 class MongoRace(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     racecourse: PyObjectId
