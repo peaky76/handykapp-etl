@@ -1,11 +1,11 @@
 from functools import cache
 
 from clients import mongo_client as client
-from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from processors.horse_processor import horse_processor
 
+from .processor import Processor
 from .utils import compact
 
 db = client.handykapp
@@ -42,88 +42,81 @@ def make_update_dictionary(race, racecourse_id):
         "rapid_id": race.get("rapid_id"),
     })
 
+def race_updater(racecourse_id, race, source):
+    found_race = db.races.find_one({
+        "racecourse": racecourse_id,
+        "datetime": race["datetime"],
+    })
 
-def race_processor():
-    logger = get_run_logger()
-    logger.info("Starting race processor")
+    # TODO: Check race matches data
+    if found_race:
+        race_id = found_race["_id"]
+        db.races.update_one(
+            {"_id": race_id},
+            {
+                "$set": compact({
+                    "rapid_id": race.get("rapid_id"),
+                    "going_description": race.get("going_description"),
+                })
+            },
+        )
+        return race_id
+
+    return None
+
+def race_processor_func(race, source, logger, next_processor):
     added_count = 0
     updated_count = 0
     skipped_count = 0
 
-    h = horse_processor()
-    next(h)
+    racecourse_id = get_racecourse_id(
+        race["course"], race["surface"], race["code"], race["obstacle"]
+    )
 
-    try:
-        while True:
-            race, source = yield
-            racecourse_id = get_racecourse_id(
-                race["course"], race["surface"], race["code"], race["obstacle"]
-            )
+    if racecourse_id:
+        if (race_id := race_updater(racecourse_id, race, source)):
+            logger.debug(f"{race['datetime']} at {race['course']} updated")
+            updated_count += 1
+        else:
+            try:
+                race_id = db.races.insert_one(
+                    make_update_dictionary(race, racecourse_id)
+                ).inserted_id
+                logger.debug(
+                    f"{race.get('datetime')} at {race.get('course')} added to db"
+                )
+                added_count += 1
+            except DuplicateKeyError:
+                logger.warning(
+                    f"Duplicate race for {race['datetime']} at {race['course']}"
+                )
+                skipped_count += 1
 
-            if racecourse_id:
-                found_race = db.races.find_one({
-                    "racecourse": racecourse_id,
-                    "datetime": race["datetime"],
-                })
+        try:
+            for horse in race["runners"]:
+                next_processor.send((
+                    {"name": horse["sire"], "sex": "M", "race_id": None},
+                    source,
+                ))
+                damsire = horse.get("damsire")
+                if damsire:
+                    next_processor.send((
+                        {"name": damsire, "sex": "M", "race_id": None},
+                        source,
+                    ))
+                next_processor.send((
+                    {
+                        "name": horse["dam"],
+                        "sex": "F",
+                        "sire": damsire,
+                        "race_id": None,
+                    },
+                    source,
+                ))
 
-                # TODO: Check race matches data
-                if found_race:
-                    race_id = found_race["_id"]
-                    db.races.update_one(
-                        {"_id": race_id},
-                        {
-                            "$set": compact({
-                                "rapid_id": race.get("rapid_id"),
-                                "going_description": race.get("going_description"),
-                            })
-                        },
-                    )
-                    logger.debug(f"{race['datetime']} at {race['course']} updated")
-                    updated_count += 1
-                else:
-                    try:
-                        race_id = db.races.insert_one(
-                            make_update_dictionary(race, racecourse_id)
-                        ).inserted_id
-                        logger.debug(
-                            f"{race.get('datetime')} at {race.get('course')} added to db"
-                        )
-                        added_count += 1
-                    except DuplicateKeyError:
-                        logger.warning(
-                            f"Duplicate race for {race['datetime']} at {race['course']}"
-                        )
-                        skipped_count += 1
+                if race_id:
+                    next_processor.send((horse | {"race_id": race_id}, source))
+        except Exception as e:
+            logger.error(f"Error processing {race_id}: {e}")
 
-                try:
-                    for horse in race["runners"]:
-                        h.send((
-                            {"name": horse["sire"], "sex": "M", "race_id": None},
-                            source,
-                        ))
-                        damsire = horse.get("damsire")
-                        if damsire:
-                            h.send((
-                                {"name": damsire, "sex": "M", "race_id": None},
-                                source,
-                            ))
-                        h.send((
-                            {
-                                "name": horse["dam"],
-                                "sex": "F",
-                                "sire": damsire,
-                                "race_id": None,
-                            },
-                            source,
-                        ))
-
-                        if race_id:
-                            h.send((horse | {"race_id": race_id}, source))
-                except Exception as e:
-                    logger.error(f"Error processing {race_id}: {e}")
-
-    except GeneratorExit:
-        logger.info(
-            f"Finished processing races. Updated {updated_count} races, added {added_count}, skipped {skipped_count}"
-        )
-        h.close()
+person_processor = Processor("person", race_processor_func, horse_processor).process
