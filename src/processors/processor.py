@@ -2,7 +2,7 @@ from prefect import get_run_logger
 
 
 class Processor:
-    def __init__(self, object_name, process_func, next_processor):
+    def __init__(self, object_name, process_func, next_processor = None):
         self.object_name = object_name
         self.process_func = process_func
         self.next_processor = next_processor
@@ -10,8 +10,11 @@ class Processor:
     def process(self):
         logger = get_run_logger()
         logger.info(f"Starting {self.object_name} processor")
-        n = self.next_processor()
-        next(n)
+        
+        if self.next_processor:
+            n = self.next_processor()
+            next(n)
+
         try:
             while True:
                 item, source = yield
