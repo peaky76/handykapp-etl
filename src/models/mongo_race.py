@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .pyobjectid import PyObjectId
+from .py_object_id import PyObjectId
 
 
 class MongoRaceRestriction(BaseModel):
