@@ -15,4 +15,3 @@ def test_mongo_racecourse_init_with_insufficient_fields():
 def test_mongo_racecourse_init_with_incorrect_fields():
     with pytest.raises(ValidationError):
         MongoRacecourse(name="Newbury", obstacle=1234)
-
