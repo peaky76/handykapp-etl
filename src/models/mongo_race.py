@@ -25,4 +25,3 @@ class MongoRace(BaseModel):
     rating_restriction: Optional[MongoRaceRestriction] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
-    
