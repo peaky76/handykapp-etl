@@ -1,4 +1,5 @@
 from functools import cache
+from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
 from models import MongoHorse, PyObjectId
@@ -43,21 +44,18 @@ def make_search_dictionary(horse) -> MongoHorse:
 
 
 def make_update_dictionary(horse):
-    update_dictionary = {}
-    if colour := horse.get("colour"):
-        update_dictionary["colour"] = colour
-    if horse.get("sire"):
-        update_dictionary["sire"] = get_sire_id(horse["sire"])
-    if horse.get("dam"):
-        update_dictionary["dam"] = get_dam_id(horse["dam"])
-    return update_dictionary
+    return compact({
+        "colour": horse.get("colour"),
+        "sire": get_sire_id(horse.get("sire")),
+        "dam": get_dam_id(horse.get("dam")),
+    })
 
 
 class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
 
-    def update(self, horse, _source):
+    def update(self, horse: MongoHorse, _source: str) -> PyObjectId | None:
         found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
         if found_horse:
@@ -70,7 +68,7 @@ class HorseProcessor(Processor):
 
         return None
     
-    def insert(self, horse, _source):
+    def insert(self, horse: MongoHorse, _source: str) -> PyObjectId | None:
         return db.horses.insert_one(
                     compact({
                         "name": horse.get("name"),
@@ -83,9 +81,8 @@ class HorseProcessor(Processor):
                     })
                 ).inserted_id
 
-    def post_process(self, horse, horse_id, source, logger, next_processor):
+    def post_process(self, horse: MongoHorse, horse_id: PyObjectId, source: str, logger: Logger | LoggerAdapter):
         race_id = horse["race_id"]
-        name = horse["name"]
 
         # Add horse to race
         if race_id:
@@ -111,7 +108,7 @@ class HorseProcessor(Processor):
             )
 
             if horse.get("trainer"):
-                next_processor.send((
+                person_processor.send((
                     {
                         "name": horse["trainer"],
                         "role": "trainer",
@@ -123,7 +120,7 @@ class HorseProcessor(Processor):
                 ))
 
             if horse.get("jockey"):
-                next_processor.send((
+                person_processor.send((
                     {
                         "name": horse["jockey"],
                         "role": "jockey",
