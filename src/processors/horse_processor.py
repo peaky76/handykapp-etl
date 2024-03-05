@@ -2,7 +2,6 @@ from functools import cache
 
 from clients import mongo_client as client
 from models import MongoHorse, PyObjectId
-from pymongo.errors import DuplicateKeyError
 
 from processors.person_processor import person_processor
 
@@ -53,61 +52,40 @@ def make_update_dictionary(horse):
         update_dictionary["dam"] = get_dam_id(horse["dam"])
     return update_dictionary
 
-def horse_updater(horse, _source):
-    found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
-
-    if found_horse:
-        horse_id = found_horse["_id"]
-        db.horses.update_one(
-            {"_id": horse_id},
-            {"$set": make_update_dictionary(horse)},
-        )
-        return horse_id
-
-    return None
-
-def horse_inserter(horse, _source):
-    return db.horses.insert_one(
-                compact({
-                    "name": horse.get("name"),
-                    "sex": horse.get("sex"),
-                    "year": horse.get("year"),
-                    "country": horse.get("country"),
-                    "colour": horse.get("colour"),
-                    "sire": get_sire_id(horse.get("sire")),
-                    "dam": get_dam_id(horse.get("dam")),
-                })
-            ).inserted_id
-
 
 class HorseProcessor(Processor):
-    _descriptor = "horses"
+    _descriptor = "horse"
     _next_processor = person_processor
 
-    def _process_func(self, horse, source, logger, next_processor):
-        added_count = 0
-        updated_count = 0
-        skipped_count = 0
+    def update(self, horse, _source):
+        found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
+        if found_horse:
+            horse_id = found_horse["_id"]
+            db.horses.update_one(
+                {"_id": horse_id},
+                {"$set": make_update_dictionary(horse)},
+            )
+            return horse_id
+
+        return None
+    
+    def insert(self, horse, _source):
+        return db.horses.insert_one(
+                    compact({
+                        "name": horse.get("name"),
+                        "sex": horse.get("sex"),
+                        "year": horse.get("year"),
+                        "country": horse.get("country"),
+                        "colour": horse.get("colour"),
+                        "sire": get_sire_id(horse.get("sire")),
+                        "dam": get_dam_id(horse.get("dam")),
+                    })
+                ).inserted_id
+
+    def post_process(self, horse, horse_id, source, logger, next_processor):
         race_id = horse["race_id"]
         name = horse["name"]
-
-        if (horse_id := horse_updater(horse, source)):
-            logger.debug(f"{name} updated")
-            updated_count += 1
-        else:
-            try:
-                horse_id = horse_inserter(horse, source)
-                logger.debug(f"{name} added to db")
-                added_count += 1
-            except DuplicateKeyError:
-                logger.warning(
-                    f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} ({horse['sex']})"
-                )
-                skipped_count += 1
-            except ValueError as e:
-                logger.warning(e)
-                skipped_count += 1
 
         # Add horse to race
         if race_id:
@@ -155,7 +133,5 @@ class HorseProcessor(Processor):
                     source,
                     # {},
                 ))
-
-        return added_count, updated_count, skipped_count
 
 horse_processor = HorseProcessor().process
