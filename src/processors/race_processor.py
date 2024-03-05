@@ -56,22 +56,22 @@ class RaceProcessor(Processor):
                     make_update_dictionary(race)
                 ).inserted_id
 
-    def post_process(self, race, race_id, source, logger, next_processor):
+    def post_process(self, race, race_id, source, logger):
         try:
             for horse in race["runners"]:
-                next_processor.send((
+                horse_processor.send((
                     {"name": horse["sire"], "sex": "M", "race_id": None},
                     source,
                 ))
 
                 damsire = horse.get("damsire")
                 if damsire:
-                    next_processor.send((
+                    horse_processor.send((
                         {"name": damsire, "sex": "M", "race_id": None},
                         source,
                     ))
                     
-                next_processor.send((
+                horse_processor.send((
                     {
                         "name": horse["dam"],
                         "sex": "F",
@@ -83,7 +83,7 @@ class RaceProcessor(Processor):
                 
                 if race_id:
                     creation_dict = horse | { "race_id": race_id }
-                    next_processor.send((creation_dict, source))
+                    horse_processor.send((creation_dict, source))
 
         except Exception as e:
             logger.error(f"Error processing {race_id}: {e}")

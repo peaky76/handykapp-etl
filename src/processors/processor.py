@@ -7,7 +7,6 @@ from pymongo.errors import DuplicateKeyError
 class Processor:
     _descriptor: str | None = None
     _next_processor: Optional["Processor"] = None
-    _process_func: Optional[callable] = None
 
     def update(self, item, source):
         raise NotImplementedError
@@ -48,7 +47,7 @@ class Processor:
                         logger.warning(e)
                         skipped += 1
 
-                self.post_process(item, item_id, source, logger, n)
+                self.post_process(item, item_id, source, logger)
 
         except GeneratorExit:
             logger.info(
