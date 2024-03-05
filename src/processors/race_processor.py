@@ -64,59 +64,69 @@ def race_updater(racecourse_id, race, source):
 
     return None
 
-def race_processor_func(race, source, logger, next_processor):
-    added_count = 0
-    updated_count = 0
-    skipped_count = 0
+class RaceProcessor(Processor):
+    _descriptor = "races"
+    _next_processor = horse_processor
 
-    racecourse_id = get_racecourse_id(
-        race["course"], race["surface"], race["code"], race["obstacle"]
-    )
+    def _process_func(self, race, source, logger, next_processor):
+        added_count = 0
+        updated_count = 0
+        skipped_count = 0
 
-    if racecourse_id:
-        if (race_id := race_updater(racecourse_id, race, source)):
-            logger.debug(f"{race['datetime']} at {race['course']} updated")
-            updated_count += 1
-        else:
+        racecourse_id = get_racecourse_id(
+            race["course"], race["surface"], race["code"], race["obstacle"]
+        )
+
+        if racecourse_id:
+            if (race_id := race_updater(racecourse_id, race, source)):
+                logger.debug(f"{race['datetime']} at {race['course']} updated")
+                updated_count += 1
+            else:
+                try:
+                    race_id = db.races.insert_one(
+                        make_update_dictionary(race, racecourse_id)
+                    ).inserted_id
+                    logger.debug(
+                        f"{race.get('datetime')} at {race.get('course')} added to db"
+                    )
+                    added_count += 1
+                except DuplicateKeyError:
+                    logger.warning(
+                        f"Duplicate race for {race['datetime']} at {race['course']}"
+                    )
+                    skipped_count += 1
+
             try:
-                race_id = db.races.insert_one(
-                    make_update_dictionary(race, racecourse_id)
-                ).inserted_id
-                logger.debug(
-                    f"{race.get('datetime')} at {race.get('course')} added to db"
-                )
-                added_count += 1
-            except DuplicateKeyError:
-                logger.warning(
-                    f"Duplicate race for {race['datetime']} at {race['course']}"
-                )
-                skipped_count += 1
-
-        try:
-            for horse in race["runners"]:
-                next_processor.send((
-                    {"name": horse["sire"], "sex": "M", "race_id": None},
-                    source,
-                ))
-                damsire = horse.get("damsire")
-                if damsire:
+                for horse in race["runners"]:
                     next_processor.send((
-                        {"name": damsire, "sex": "M", "race_id": None},
+                        {"name": horse["sire"], "sex": "M", "race_id": None},
                         source,
                     ))
-                next_processor.send((
-                    {
-                        "name": horse["dam"],
-                        "sex": "F",
-                        "sire": damsire,
-                        "race_id": None,
-                    },
-                    source,
-                ))
 
-                if race_id:
-                    next_processor.send((horse | {"race_id": race_id}, source))
-        except Exception as e:
-            logger.error(f"Error processing {race_id}: {e}")
+                    damsire = horse.get("damsire")
+                    if damsire:
+                        next_processor.send((
+                            {"name": damsire, "sex": "M", "race_id": None},
+                            source,
+                        ))
+                        
+                    next_processor.send((
+                        {
+                            "name": horse["dam"],
+                            "sex": "F",
+                            "sire": damsire,
+                            "race_id": None,
+                        },
+                        source,
+                    ))
+                    
+                    if race_id:
+                        creation_dict = horse | { "race_id": race_id }
+                        next_processor.send((creation_dict, source))
 
-person_processor = Processor("person", race_processor_func, horse_processor).process
+            except Exception as e:
+                logger.error(f"Error processing {race_id}: {e}")
+
+        return added_count, updated_count, skipped_count
+
+race_processor = RaceProcessor().process

@@ -49,36 +49,40 @@ def person_inserter(person, ratings, source):
     )
     found_id = inserted_person.inserted_id
 
-def person_processor_func(person, source, logger, next_processor):
-    added_count = 0
-    updated_count = 0
-    skipped_count = 0
+class PersonProcessor(Processor):
+    _descriptor = "people"
+    _next_processor = None
 
-    ratings = {} # TODO: Get ratings as an additional element in yield
-    name = person["name"]
-    race_id = person.get("race_id")
-    runner_id = person.get("runner_id")
-    role = person.get("role")
+    def _process_func(self, person, source, logger, next_processor):
+        added_count = 0
+        updated_count = 0
+        skipped_count = 0
 
-    if (person_id := person_updater(person, ratings, source)):
-        logger.debug(f"{person} updated")
-        updated_count += 1
-    else:
-        try:
-            person_id = person_inserter(person, ratings, source)
-            logger.debug(f"{person} added to db")
-            added_count += 1
-        except DuplicateKeyError:
-            logger.warning(f"Duplicate person: {name}")
-            skipped_count += 1
+        ratings = {} # TODO: Get ratings as an additional element in yield
+        name = person["name"]
+        race_id = person.get("race_id")
+        runner_id = person.get("runner_id")
+        role = person.get("role")
 
-    # Add person to horse in race
-    if race_id:
-        db.races.update_one(
-            {"_id": race_id, "runners.horse": runner_id},
-            {"$set": {f"runners.$.{role}": person_id}},
-        )
+        if (person_id := person_updater(person, ratings, source)):
+            logger.debug(f"{person} updated")
+            updated_count += 1
+        else:
+            try:
+                person_id = person_inserter(person, ratings, source)
+                logger.debug(f"{person} added to db")
+                added_count += 1
+            except DuplicateKeyError:
+                logger.warning(f"Duplicate person: {name}")
+                skipped_count += 1
 
-    return added_count, updated_count, skipped_count
+        # Add person to horse in race
+        if race_id:
+            db.races.update_one(
+                {"_id": race_id, "runners.horse": runner_id},
+                {"$set": {f"runners.$.{role}": person_id}},
+            )
 
-person_processor = Processor("person", person_processor_func).process
+        return added_count, updated_count, skipped_count
+
+person_processor = PersonProcessor().process
