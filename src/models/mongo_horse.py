@@ -31,3 +31,7 @@ class MongoHorse(BaseModel):
     trainer: Optional[PyObjectId] = None
     operations: Optional[List[MongoOperation]] = None
     ratings: Optional[MongoOfficialRatings] = None
+
+
+class MongoHorseInRace(MongoHorse):
+    race_id: PyObjectId

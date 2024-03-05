@@ -2,7 +2,7 @@ from functools import cache
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import MongoHorse, PyObjectId
+from models import MongoHorse, MongoHorseInRace, PyObjectId
 
 from processors.person_processor import person_processor
 
@@ -81,11 +81,8 @@ class HorseProcessor(Processor):
                     })
                 ).inserted_id
 
-    def post_process(self, horse: MongoHorse, horse_id: PyObjectId, source: str, logger: Logger | LoggerAdapter):
-        race_id = horse["race_id"]
-
-        # Add horse to race
-        if race_id:
+    def post_process(self, horse: MongoHorseInRace, horse_id: PyObjectId, source: str, logger: Logger | LoggerAdapter):
+        if (race_id := horse["race_id"]):
             db.races.update_one(
                 {"_id": race_id},
                 {
