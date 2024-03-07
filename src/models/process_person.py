@@ -9,4 +9,4 @@ class ProcessPerson(BaseModel):
     name: str
     role: Literal['jockey', 'owner', 'trainer']
     race_id: PyObjectId
-    runner_id: PyObjectId
+    horse_id: PyObjectId

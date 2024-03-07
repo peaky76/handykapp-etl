@@ -62,13 +62,13 @@ class PersonProcessor(Processor):
     def post_process(self, person, person_id, source, logger, next_processor) -> None:
         name = person["name"]
         race_id = person.get("race_id")
-        runner_id = person.get("runner_id")
+        horse_id = person.get("horse_id")
         role = person.get("role")
 
         # Add person to horse in race
         if race_id:
             db.races.update_one(
-                {"_id": race_id, "runners.horse": runner_id},
+                {"_id": race_id, "runners.horse": horse_id},
                 {"$set": {f"runners.$.{role}": person_id}},
             )
 
