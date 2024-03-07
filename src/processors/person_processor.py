@@ -1,5 +1,7 @@
+from logging import Logger, LoggerAdapter
+
 from clients import mongo_client as client
-from models import PyObjectId
+from models import ProcessPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
 
 from .processor import Processor
@@ -11,7 +13,7 @@ class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
 
-    def update(self, person, source) -> PyObjectId | None:
+    def update(self, person: ProcessPerson, source: str) -> PyObjectId | None:
         found_person = db.people.find_one({"references": { source: person }})
 
         if not found_person:
@@ -44,7 +46,7 @@ class PersonProcessor(Processor):
         return None
 
 
-    def insert(self, person, source) -> PyObjectId:
+    def insert(self, person: ProcessPerson, source: str) -> PyObjectId:
         name_parts = HumanName(person["name"])
         ratings = {} # TODO: Get ratings
 
@@ -59,7 +61,7 @@ class PersonProcessor(Processor):
         return inserted_person.inserted_id
 
 
-    def post_process(self, person, person_id, source, logger, next_processor) -> None:
+    def post_process(self, person: ProcessPerson, person_id: PyObjectId, source: str, logger: Logger | LoggerAdapter, next_processor: Processor) -> None:
         name = person["name"]
         race_id = person.get("race_id")
         horse_id = person.get("horse_id")
