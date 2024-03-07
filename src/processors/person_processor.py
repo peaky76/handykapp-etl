@@ -11,20 +11,21 @@ class PersonProcessor(Processor):
     _next_processor = None
 
     def update(self, person, source):
-        name_parts = HumanName(person["name"])
-        found_person = None
-        ratings = {} # TODO: Get ratings 
+        found_person = db.people.find_one({"references": { source: person }})
 
-        possibilities = db.people.find({"last": name_parts.last})
-        for possibility in possibilities:
-            if name_parts.first == possibility["first"] or (
-                name_parts.first
-                and possibility["first"]
-                and name_parts.first[0] == possibility["first"][0]
-                and name_parts.title == possibility["title"]
-            ):
-                found_person = possibility
-                break
+        if not found_person:
+            name_parts = HumanName(person["name"])
+            ratings = {} # TODO: Get ratings         
+            possibilities = db.people.find({"last": name_parts.last})
+            for possibility in possibilities:
+                if name_parts.first == possibility["first"] or (
+                    name_parts.first
+                    and possibility["first"]
+                    and name_parts.first[0] == possibility["first"][0]
+                    and name_parts.title == possibility["title"]
+                ):
+                    found_person = possibility
+                    break
 
         if found_person:
             person_id = found_person["_id"]
