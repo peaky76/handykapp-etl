@@ -1,21 +1,10 @@
-from datetime import date
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from .official_ratings import OfficialRatings
+from .operation import Operation
 from .py_object_id import PyObjectId
-
-
-class MongoOperation(BaseModel):
-    operation_type: str
-    date: Optional[date] = None
-
-
-class MongoOfficialRatings(BaseModel):
-    flat: Optional[int] = None
-    aw: Optional[int] = None
-    chase: Optional[int] = None
-    hurdle: Optional[int] = None
 
 
 class MongoHorse(BaseModel):
@@ -29,5 +18,5 @@ class MongoHorse(BaseModel):
     sire: Optional[PyObjectId] = None
     dam: Optional[PyObjectId] = None
     trainer: Optional[PyObjectId] = None
-    operations: Optional[List[MongoOperation]] = None
-    ratings: Optional[MongoOfficialRatings] = None
+    operations: Optional[List[Operation]] = None
+    ratings: Optional[OfficialRatings] = None
