@@ -31,9 +31,8 @@ class PersonProcessor(Processor):
         
         return found_person
 
-    def update(self, person: ProcessPerson, source: str) -> PyObjectId | None:
+    def update(self, person: ProcessPerson, source: str) -> MongoPerson | None:
         if (found_person := self.find(person, source)):
-            person_id = found_person["_id"]
             ratings = {} # TODO: Get ratings  
             update_data = (
                 {f"references.{source}": person["name"]} | {"ratings": ratings}
@@ -41,30 +40,27 @@ class PersonProcessor(Processor):
                 else {}
             )
             db.people.update_one(
-                {"_id": person_id},
+                {"_id": found_person["_id"]},
                 {"$set": update_data},
             )
-            return person_id
+            return found_person
 
         return None
 
 
-    def insert(self, person: ProcessPerson, source: str) -> PyObjectId:
+    def insert(self, person: ProcessPerson, source: str) -> MongoPerson:
         name_parts = HumanName(person["name"])
         ratings = {} # TODO: Get ratings
 
-        inserted_person = db.people.insert_one(
+        return db.people.insert_one(
             name_parts.as_dict()
             | {f"references.{source}": person["name"]}
             | {"ratings": ratings}
             if ratings
             else {}
         )
-        
-        return inserted_person.inserted_id
 
-
-    def post_process(self, person: ProcessPerson, person_id: PyObjectId, source: str, logger: Logger | LoggerAdapter, next_processor: Processor) -> None:
+    def post_process(self, person: ProcessPerson, db_id: PyObjectId, source: str, logger: Logger | LoggerAdapter, next_processor: Processor) -> None:
         name = person["name"]
         race_id = person.get("race_id")
         horse_id = person.get("horse_id")
@@ -74,7 +70,7 @@ class PersonProcessor(Processor):
         if race_id:
             db.races.update_one(
                 {"_id": race_id, "runners.horse": horse_id},
-                {"$set": {f"runners.$.{role}": person_id}},
+                {"$set": {f"runners.$.{role}": db_id}},
             )
 
 person_processor = PersonProcessor().process

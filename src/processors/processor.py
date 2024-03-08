@@ -32,12 +32,12 @@ class Processor:
             while True:
                 item, source = yield
 
-                if (item_id := self.update(item, source)):
+                if (db_item := self.update(item, source)):
                     logger.debug(f"{item} updated")
                     updated += 1
                 else:
                     try:
-                        item_id = self.insert(item, source)
+                        db_item = self.insert(item, source)
                         logger.debug(f"{item} added to db")
                         added += 1
                     except DuplicateKeyError:
@@ -47,7 +47,7 @@ class Processor:
                         logger.warning(e)
                         skipped += 1
 
-                self.post_process(item, item_id, source, logger)
+                self.post_process(item, db_item["_id"], source, logger)
 
         except GeneratorExit:
             logger.info(

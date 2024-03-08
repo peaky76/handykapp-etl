@@ -55,20 +55,19 @@ class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
 
-    def update(self, horse: MongoHorse, _source: str) -> PyObjectId | None:
+    def update(self, horse: MongoHorse, _source: str) -> MongoHorse | None:
         found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
-        if found_horse:
-            horse_id = found_horse["_id"]
-            db.horses.update_one(
-                {"_id": horse_id},
-                {"$set": make_update_dictionary(horse)},
-            )
-            return horse_id
+        if not found_horse:
+            return None
 
-        return None
+        db.horses.update_one(
+            {"_id": found_horse["_id"]},
+            {"$set": make_update_dictionary(horse)},
+        )
+        return found_horse
     
-    def insert(self, horse: MongoHorse, _source: str) -> PyObjectId | None:
+    def insert(self, horse: MongoHorse, _source: str) -> MongoHorse:
         return db.horses.insert_one(
                     compact({
                         "name": horse.get("name"),
@@ -79,16 +78,16 @@ class HorseProcessor(Processor):
                         "sire": get_sire_id(horse.get("sire")),
                         "dam": get_dam_id(horse.get("dam")),
                     })
-                ).inserted_id
+                )
 
-    def post_process(self, horse: MongoHorseInRace, horse_id: PyObjectId, source: str, logger: Logger | LoggerAdapter):
+    def post_process(self, horse: MongoHorseInRace, db_id: PyObjectId, source: str, logger: Logger | LoggerAdapter):
         if (race_id := horse["race_id"]):
             db.races.update_one(
                 {"_id": race_id},
                 {
                     "$push": {
                         "runners": compact({
-                            "horse": horse_id,
+                            "horse": db_id,
                             "owner": horse.get("owner"),
                             "allowance": horse.get("allowance"),
                             "saddlecloth": horse.get("saddlecloth"),
@@ -110,7 +109,7 @@ class HorseProcessor(Processor):
                         "name": horse["trainer"],
                         "role": "trainer",
                         "race_id": race_id,
-                        "horse_id": horse_id,
+                        "horse_id": db_id,
                     },
                     source,
                     # {},
@@ -122,7 +121,7 @@ class HorseProcessor(Processor):
                         "name": horse["jockey"],
                         "role": "jockey",
                         "race_id": race_id,
-                        "horse_id": horse_id,
+                        "horse_id": db_id,
                     },
                     source,
                     # {},
