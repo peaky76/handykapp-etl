@@ -60,7 +60,7 @@ class PersonProcessor(Processor):
             else {}
         )
 
-    def post_process(self, person: ProcessPerson, db_id: PyObjectId, source: str, logger: Logger | LoggerAdapter, next_processor: Processor) -> None:
+    def post_process(self, person: ProcessPerson, db_id: PyObjectId, source: str, logger: Logger | LoggerAdapter) -> None:
         name = person["name"]
         race_id = person.get("race_id")
         horse_id = person.get("horse_id")

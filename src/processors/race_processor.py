@@ -1,4 +1,7 @@
+from logging import Logger, LoggerAdapter
+
 from clients import mongo_client as client
+from models import MongoRace, ProcessRace, PyObjectId
 
 from processors.horse_processor import horse_processor
 
@@ -29,34 +32,33 @@ class RaceProcessor(Processor):
     _descriptor = "race"
     _next_processor = horse_processor
 
-    def update(self, race, source):
+    def update(self, race: ProcessRace, source: str) -> MongoRace | None:
         found_race = db.races.find_one({
             "racecourse": race["racecourse_id"],
             "datetime": race["datetime"],
         })
 
+        if not found_race:
+            return None
+        
         # TODO: Check race matches data
-        if found_race:
-            race_id = found_race["_id"]
-            db.races.update_one(
-                {"_id": race_id},
-                {
-                    "$set": compact({
-                        "rapid_id": race.get("rapid_id"),
-                        "going_description": race.get("going_description"),
-                    })
-                },
-            )
-            return race_id
+        db.races.update_one(
+            {"_id": found_race["_id"]},
+            {
+                "$set": compact({
+                    "rapid_id": race.get("rapid_id"),
+                    "going_description": race.get("going_description"),
+                })
+            },
+        )
+        return found_race
 
-        return None 
-
-    def insert(self, race, source):
+    def insert(self, race: ProcessRace, source: str) -> MongoRace:
         return db.races.insert_one(
                     make_update_dictionary(race)
-                ).inserted_id
+                )
 
-    def post_process(self, race, race_id, source, logger):
+    def post_process(self, race: ProcessRace, race_id: PyObjectId, source: str, logger: Logger | LoggerAdapter) -> None:
         try:
             for horse in race["runners"]:
                 horse_processor.send((
