@@ -1,7 +1,7 @@
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import ProcessPerson, PyObjectId
+from models import MongoPerson, ProcessPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
 
 from .processor import Processor
@@ -13,12 +13,11 @@ class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
 
-    def update(self, person: ProcessPerson, source: str) -> PyObjectId | None:
+    def find(self, person: ProcessPerson, source: str) -> MongoPerson:
         found_person = db.people.find_one({"references": { source: person }})
 
         if not found_person:
-            name_parts = HumanName(person["name"])
-            ratings = {} # TODO: Get ratings         
+            name_parts = HumanName(person["name"])       
             possibilities = db.people.find({"last": name_parts.last})
             for possibility in possibilities:
                 if name_parts.first == possibility["first"] or (
@@ -29,9 +28,13 @@ class PersonProcessor(Processor):
                 ):
                     found_person = possibility
                     break
+        
+        return found_person
 
-        if found_person:
+    def update(self, person: ProcessPerson, source: str) -> PyObjectId | None:
+        if (found_person := self.find(person, source)):
             person_id = found_person["_id"]
+            ratings = {} # TODO: Get ratings  
             update_data = (
                 {f"references.{source}": person["name"]} | {"ratings": ratings}
                 if ratings
