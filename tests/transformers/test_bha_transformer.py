@@ -75,7 +75,8 @@ def test_read_csv(mocker):
 
 def test_transform_ratings_data_returns_correct_output(mock_data):
     expected = {
-        "name": "A DAY TO DREAM (IRE)",
+        "name": "A DAY TO DREAM",
+        "country": "IRE",
         "year": 2020,
         "sex": "M",
         "trainer": "Ollie Pears",

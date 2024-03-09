@@ -10,6 +10,7 @@ from horsetalk import Gender  # type: ignore
 from models.mongo_horse import MongoHorse
 from prefect import flow, task
 
+from transformers.parsers import parse_horse
 from transformers.validators import (
     validate_horse,
     validate_rating,
@@ -61,6 +62,9 @@ def transform_ratings_data(data) -> list[MongoHorse]:
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
+        .addfield("name_and_country", lambda rec: parse_horse(rec["name"], "GB"))
+        .cutout("name")
+        .unpack("name_and_country", ["name", "country"])
         .addfield(
             "operations",
             lambda rec: [{"type": "gelding", "date": None}]
