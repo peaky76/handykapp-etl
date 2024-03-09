@@ -3,11 +3,13 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from typing import Any, List
+
 import petl  # type: ignore
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import Gender  # type: ignore
-from models.mongo_horse import MongoHorse
+from models.process_horse import ProcessHorse
 from prefect import flow, task
 
 from transformers.parsers import parse_horse
@@ -43,7 +45,7 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_data(data) -> list[MongoHorse]:
+def transform_ratings_data(data: Any) -> List[ProcessHorse]:
     used_fields = (
         "Name",
         "Year",
