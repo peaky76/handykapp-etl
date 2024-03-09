@@ -6,6 +6,7 @@ from .mongo_references import MongoReferences
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .process_horse import ProcessHorse
+from .process_horse_core import ProcessHorseCore
 from .process_person import ProcessPerson
 from .process_race import ProcessRace
 from .py_object_id import PyObjectId
@@ -19,6 +20,7 @@ __all__ = [
     "OfficialRatings",
     "Operation",
     "ProcessHorse",
+    "ProcessHorseCore",
     "ProcessPerson",
     "ProcessRace",
     "PyObjectId",
