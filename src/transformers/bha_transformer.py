@@ -59,7 +59,7 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
         "Hurdle rating",
     )
     rating_types = ["flat", "aw", "chase", "hurdle"]
-    return (
+    horse_dicts = ( 
         petl.cut(data, used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
@@ -71,15 +71,17 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
         .unpack("name_and_country", ["name", "country"])
         .addfield("sire", lambda rec: {
             "name": rec["sire_name_and_country"][0],
-            "country": rec["sire_name_and_country"][1]
+            "country": rec["sire_name_and_country"][1],
+            "sex": "M"
         })
         .addfield("dam", lambda rec: {
             "name": rec["dam_name_and_country"][0],
-            "country": rec["dam_name_and_country"][1]
+            "country": rec["dam_name_and_country"][1],
+            "sex": "F"
         })
         .addfield(
             "operations",
-            lambda rec: [{"type": "gelding", "date": None}]
+            lambda rec: [{"operation_type": "gelding", "date": None}]
             if rec["sex"] == "GELDING"
             else None,
         )
@@ -88,6 +90,7 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
         .cutout(*rating_types, "sire_name_and_country", "dam_name_and_country")
         .dicts()
     )
+    return [ProcessHorse(**horse) for horse in horse_dicts]
 
 
 @task(tags=["BHA"])
