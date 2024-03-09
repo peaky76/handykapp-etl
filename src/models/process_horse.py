@@ -2,7 +2,8 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from .mongo_horse import MongoOfficialRatings, MongoOperation
+from .official_ratings import OfficialRatings
+from .operation import Operation
 from .py_object_id import PyObjectId
 
 
@@ -17,6 +18,6 @@ class ProcessHorse(BaseModel):
     dam: Optional[str] = None
     jockey: Optional[str] = None
     trainer: Optional[str] = None
-    operations: Optional[List[MongoOperation]] = None
-    ratings: Optional[MongoOfficialRatings] = None
-    race_id: PyObjectId
+    operations: Optional[List[Operation]] = None
+    ratings: Optional[OfficialRatings] = None
+    race_id: Optional[PyObjectId] = None
