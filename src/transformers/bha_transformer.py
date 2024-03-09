@@ -91,7 +91,7 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
 
 
 @task(tags=["BHA"])
-def validate_ratings_data(data) -> bool:
+def validate_ratings_data(data: Any) -> bool:
     header = (
         "Name",
         "Year",
@@ -133,7 +133,7 @@ def validate_ratings_data(data) -> bool:
 
 
 @flow
-def bha_transformer():
+def bha_transformer() -> List[ProcessHorse]:
     csv = get_csv()
     data = read_csv(csv)
     problems = validate_ratings_data(data)
