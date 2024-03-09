@@ -4,7 +4,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from typing import List, Optional
+
 from clients import mongo_client as client
+from models.process_horse import ProcessHorse
 from prefect import flow, get_run_logger, task
 from pymongo.errors import DuplicateKeyError
 from transformers.bha_transformer import bha_transformer
@@ -26,8 +29,6 @@ def load_horses(horses, descriptor="horses"):
             del horse["trainer"]
         if horse.get("ratings"):
             del horse["ratings"]
-
-        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
 
         try:
             inserted_horse = db.horses.insert_one(horse)
@@ -66,7 +67,7 @@ def load_people(people, source):
 
 
 @flow
-def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
+def associate_horse_with_trainer(data: Optional[List[ProcessHorse]] = None, horse_lookup={}, person_lookup={}):
     logger = get_run_logger()
 
     if data is None:
@@ -99,7 +100,7 @@ def associate_horse_with_trainer(data=None, horse_lookup={}, person_lookup={}):
 
 
 @flow
-def enrich_with_bha_ratings(data=None, lookup={}):
+def enrich_with_bha_ratings(data: Optional[List[ProcessHorse]] = None, lookup={}):
     logger = get_run_logger()
 
     if data is None:
@@ -122,21 +123,21 @@ def enrich_with_bha_ratings(data=None, lookup={}):
 
 
 @flow
-def load_bha_horses(data=None):
+def load_bha_horses(data: Optional[List[ProcessHorse]] = None):
     if data is None:
         data = bha_transformer()
 
     sires = select_set(data, "sire")
     dams = select_set(data, "dam")
-    sires_ids = load_horses([{"name": name, "sex": "M"} for name in sires], "sires")
-    dams_ids = load_horses([{"name": name, "sex": "F"} for name in dams], "dams")
+    sires_ids = load_horses([{"name": sire["name"], "country": sire["country"], "sex": "M"} for sire in sires], "sires")
+    dams_ids = load_horses([{"name": dam["name"], "country": dam["country"], "sex": "F"} for dam in dams], "dams")
     data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
     data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
     return load_horses(data)
 
 
 @flow
-def load_bha_people(data=None):
+def load_bha_people(data: Optional[List[ProcessHorse]] = None):
     if data is None:
         data = bha_transformer()
 
@@ -145,7 +146,7 @@ def load_bha_people(data=None):
 
 
 @flow
-def load_bha(data=None):
+def load_bha(data: Optional[List[ProcessHorse]] = None):
     if data is None:
         data = bha_transformer()
 
@@ -156,7 +157,7 @@ def load_bha(data=None):
 
 
 @flow
-def load_bha_afresh(data=None):
+def load_bha_afresh(data: Optional[List[ProcessHorse]] = None):
     if data is None:
         data = bha_transformer()
 
