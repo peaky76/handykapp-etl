@@ -7,7 +7,6 @@ from .py_object_id import PyObjectId
 
 
 class ProcessHorse(ProcessHorseCore):
-    year: int
     sex: Optional[Literal["M", "F"]] = None
     breed: Optional[str] = None
     colour: Optional[str] = None
