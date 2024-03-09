@@ -65,8 +65,18 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
         .addfield("name_and_country", lambda rec: parse_horse(rec["name"], "GB"))
-        .cutout("name")
+        .addfield("sire_name_and_country", lambda rec: parse_horse(rec["sire"], "GB"))
+        .addfield("dam_name_and_country", lambda rec: parse_horse(rec["dam"], "GB"))
+        .cutout("name", "sire", "dam")
         .unpack("name_and_country", ["name", "country"])
+        .addfield("sire", lambda rec: {
+            "name": rec["sire_name_and_country"][0],
+            "country": rec["sire_name_and_country"][1]
+        })
+        .addfield("dam", lambda rec: {
+            "name": rec["dam_name_and_country"][0],
+            "country": rec["dam_name_and_country"][1]
+        })
         .addfield(
             "operations",
             lambda rec: [{"type": "gelding", "date": None}]

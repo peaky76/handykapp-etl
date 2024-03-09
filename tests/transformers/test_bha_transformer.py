@@ -80,8 +80,14 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
         "year": 2020,
         "sex": "M",
         "trainer": "Ollie Pears",
-        "sire": "ADAAY (IRE)",
-        "dam": "TARA TOO (IRE)",
+        "sire": {
+            "name": "ADAAY",
+            "country": "IRE"
+        },
+        "dam": {
+            "name": "TARA TOO",
+            "country": "IRE"
+        },
         "operations": [{"type": "gelding", "date": None}],
         "ratings": {
             "flat": 49,
