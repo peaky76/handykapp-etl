@@ -3,35 +3,61 @@ from processors.processor import Processor
 
 
 @pytest.fixture()
-def mock_processor(mocker):
+def processor(mocker):
+    processor = Processor()
+    processor._descriptor = "Foobar"
+    processor._next_processor = None
+    processor.post_process = mocker.Mock()
+    return processor
+
+def test_processor_update():
+    processor = Processor()
+    with pytest.raises(NotImplementedError):
+        processor.update(None, None)
+
+def test_processor_insert():
+    processor = Processor()
+    with pytest.raises(NotImplementedError):
+        processor.insert(None, None)
+
+def test_processor_process_when_update_made(mocker, processor):
     mocker.patch("prefect.context.TaskRunContext")
-    logger = mocker.patch("prefect.get_run_logger")
-    process_func = mocker.Mock()
-    process_func.return_value = (0, 0, 0)
-    next_processor = mocker.patch('processors.processor.Processor')
-    p = Processor("foobar", process_func, next_processor).process
-    return p, logger, process_func, next_processor
+    logger_mock = mocker.patch("processors.processor.get_run_logger")
 
-def test_processor_process_calls_logger_info(mock_processor):
-    p, logger, _, _ = mock_processor
-    x = p()
-    next(x)
-    assert logger.info.called_with("Starting foobar processor")
+    mock_update = mocker.Mock()
+    mock_update.return_value = {"_id": 1}
+    mock_insert = mocker.Mock()
+    
+    processor.update = mock_update
+    processor.insert = mock_insert
 
-def test_processor_process_calls_next_processor(mock_processor):
-    p, _, _, next_processor = mock_processor
-    x = p()
-    next(x)
-    assert next_processor.called
+    generator = processor.process()
+    next(generator)
 
-def test_processor_process_calls_process_func_with_item_and_source(mock_processor):
-    p, _, process_func, _ = mock_processor
-    x = p()
-    next(x)
-    assert process_func.called_with(None, None)
+    generator.send(("item", "source"))
 
-def test_processor_process_calls_logger_info_on_exit(mock_processor):
-    p, logger, _, _ = mock_processor
-    x = p()
-    x.close()
-    assert logger.info.called_with("Finished processing foobar. Updated 0, added 0, skipped 0")
+    assert processor.update.called_once_with("item", "source")
+    assert not processor.insert.called
+    assert processor.post_process.called_once_with("item", 1, "source", logger_mock)
+
+def test_processor_process_when_update_not_made(mocker, processor):
+    mocker.patch("prefect.context.TaskRunContext")
+    logger_mock = mocker.patch("processors.processor.get_run_logger")
+
+    
+    mock_update = mocker.Mock()
+    mock_update.return_value = None
+    mock_insert = mocker.Mock()
+    mock_insert.return_value = {"_id": 1}
+    
+    processor.update = mock_update
+    processor.insert = mock_insert
+
+    generator = processor.process()
+    next(generator)
+
+    generator.send(("item", "source"))
+
+    assert processor.update.called_once_with("item", "source")
+    assert processor.insert.called_once_with("item", "source")
+    assert processor.post_process.called_once_with("item", 1, "source", logger_mock)
