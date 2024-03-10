@@ -2,7 +2,7 @@ from functools import cache
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import ProcessHorse, PyObjectId
+from models import ProcessHorse, ProcessHorseCore, PyObjectId
 
 from processors.person_processor import person_processor
 
@@ -10,57 +10,26 @@ from .processor import Processor
 from .utils import compact
 
 
-@cache
-def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectId:
-    if not name:
-        return None
-
-    found_horse = client.handykapp.horses.find_one({"name": name, "sex": sex}, {"_id": 1})
-
-    if not found_horse:
-        raise ValueError(
-            f"Could not find {'fe' if sex == 'F' else ''}male horse {name}"
-        )
-
-    return found_horse["_id"]
-
-
-@cache
-def get_dam_id(name: str | None) -> PyObjectId:
-    return get_horse_id_by_name_and_sex(name, "F")
-
-
-@cache
-def get_sire_id(name: str | None) -> PyObjectId:
-    return get_horse_id_by_name_and_sex(name, "M")
-
 class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
     _table = client.handykapp.horses
 
-    def _search_dictionary(self, horse: ProcessHorse) -> dict:
-        keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
+    def _search_dictionary(self, horse: ProcessHorse | ProcessHorseCore) -> dict:
+        return compact(horse.model_dump(include=["name", "country", "sex", "year"]))
 
-        return {k: horse[k] for k in keys}
+    def _update_dictionary(self, horse: ProcessHorse) -> dict:
+        sire = self._table.find_one(horse.sire.model_dump(), {"_id": 1})
+        dam = self._table.find_one(horse.dam.model_dump(), {"_id": 1})
 
-    def _update_dictionary(self, horse) -> dict:
         return compact({
-            "colour": horse.get("colour"),
-            "sire": get_sire_id(horse.get("sire")),
-            "dam": get_dam_id(horse.get("dam")),
+            "colour": horse.colour,
+            "sire": sire["_id"] if sire else None,
+            "dam": dam["_id"] if dam else None
         })
 
-    def _insert_dictionary(self, horse) -> dict:
-        return compact({
-                        "name": horse.get("name"),
-                        "sex": horse.get("sex"),
-                        "year": horse.get("year"),
-                        "country": horse.get("country"),
-                        "colour": horse.get("colour"),
-                        "sire": get_sire_id(horse.get("sire")),
-                        "dam": get_dam_id(horse.get("dam")),
-                    })
+    def _insert_dictionary(self, horse: ProcessHorse) -> dict:
+        return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
     
     def post_process(self, horse: ProcessHorse, db_id: PyObjectId, logger: Logger | LoggerAdapter):
         if (race_id := horse["race_id"]):
