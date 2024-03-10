@@ -19,7 +19,6 @@ class Processor:
     def find(self, item: ProcessBaseModel) -> BaseModel | None:
         return self._table.find_one(self._search_dictionary(item))
 
-
     def update(self, item: ProcessBaseModel, db_id: PyObjectId) -> None:
         self._table.update_one(
             {"_id": db_id},
@@ -71,12 +70,12 @@ class Processor:
                         skipped += 1
 
                 total = updated + added + skipped
-                if total % 100 == 0:
+                if total % 250 == 0:
                     logger.info(f"Processed {total} {self._descriptor}s.")
 
                 self.post_process(item, db_id, logger)
 
         except GeneratorExit:
             logger.info(
-                f"Finished {self._descriptor} processing. Updated {updated}, added {added}, skipped {skipped}"
+                f"Finished {self._descriptor} processing. Updated {updated}, added {added}, skipped {skipped}."
             )

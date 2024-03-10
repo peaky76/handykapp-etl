@@ -8,153 +8,36 @@ from typing import List, Optional
 
 from clients import mongo_client as client
 from models.process_horse import ProcessHorse
-from prefect import flow, get_run_logger, task
-from pymongo.errors import DuplicateKeyError
+from prefect import flow, get_run_logger
+from processors.horse_processor import horse_processor
 from transformers.bha_transformer import bha_transformer
-from transformers.parsers import parse_horse
-
-from loaders.shared import convert_person, convert_value_to_id, select_set
 
 db = client.handykapp
 
-
-@task(tags=["BHA"], task_run_name="load_{descriptor}")
-def load_horses(horses, descriptor="horses"):
-    logger = get_run_logger()
-    ret_val = {}
-    count = 0
-
-    for horse in horses:
-        if horse.get("trainer") or horse.get("trainer") == "":
-            del horse["trainer"]
-        if horse.get("ratings"):
-            del horse["ratings"]
-
-        try:
-            inserted_horse = db.horses.insert_one(horse)
-            ret_val[(horse["name"], horse.get("country"))] = inserted_horse.inserted_id
-            count += 1
-        except DuplicateKeyError:
-            logger.warning(f"{horse['name']} ({horse['country']}) already in database")
-
-        if count and count % 250 == 0:
-            logger.info(f"Loaded {count} {descriptor}")
-
-    logger.info(f"Loaded {count} {descriptor}")
-    return ret_val
-
-
-@task(tags=["BHA"])
-def load_people(people, source):
-    logger = get_run_logger()
-    ret_val = {}
-    count = 0
-
-    for person in people:
-        if person:
-            try:
-                inserted_person = db.people.insert_one(convert_person(person, source))
-                ret_val[person] = inserted_person.inserted_id
-                count += 1
-            except DuplicateKeyError:
-                logger.warning(f"{person} already in database")
-
-        if count and count % 100 == 0:
-            logger.info(f"Loaded {count} people")
-
-    logger.info(f"Loaded {count} people")
-    return ret_val
-
-
-@flow
-def associate_horse_with_trainer(data: Optional[List[ProcessHorse]] = None, horse_lookup={}, person_lookup={}):
-    logger = get_run_logger()
-
-    if data is None:
-        data = bha_transformer()
-
-    count = 0
-    for horse in data:
-        if not horse.get("trainer"):
-            continue
-
-        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
-        horse_id = horse_lookup.get((horse["name"], horse["country"]))
-        if not horse_id:
-            logger.warning(f"{horse['name']} ({horse['country']}) not in lookup table")
-            continue
-
-        convert_value_to_id(horse, "trainer", person_lookup)
-
-        db.horses.update_one(
-            {"_id": horse_id},
-            {"$set": {"current_trainer": horse["trainer"]}},
-            upsert=False,
-        )
-        count += 1
-
-        if count and count % 250 == 0:
-            logger.info(f"Added trainers to {count} horses")
-
-    logger.info(f"Added trainers to {count} horses")
-
-
-@flow
-def enrich_with_bha_ratings(data: Optional[List[ProcessHorse]] = None, lookup={}):
-    logger = get_run_logger()
-
-    if data is None:
-        data = bha_transformer()
-
-    count = 0
-    for horse in data:
-        horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
-        db.horses.update_one(
-            {"_id": lookup[(horse["name"], horse["country"])]},
-            {"$set": {"ratings": horse["ratings"]}},
-            upsert=False,
-        )
-        count += 1
-
-        if count and count % 250 == 0:
-            logger.info(f"Enriched {count} horses with ratings")
-
-    logger.info(f"Enriched {count} horses with ratings")
-
-
-@flow
-def load_bha_horses(data: Optional[List[ProcessHorse]] = None):
-    if data is None:
-        data = bha_transformer()
-
-    sires = select_set(data, "sire")
-    dams = select_set(data, "dam")
-    sires_ids = load_horses([{"name": sire["name"], "country": sire["country"], "sex": "M"} for sire in sires], "sires")
-    dams_ids = load_horses([{"name": dam["name"], "country": dam["country"], "sex": "F"} for dam in dams], "dams")
-    data = [convert_value_to_id(x, "sire", sires_ids) for x in data]
-    data = [convert_value_to_id(x, "dam", dams_ids) for x in data]
-    return load_horses(data)
-
-
-@flow
-def load_bha_people(data: Optional[List[ProcessHorse]] = None):
-    if data is None:
-        data = bha_transformer()
-
-    trainers = select_set(data, "trainer")
-    return load_people(trainers, "bha")
-
-
 @flow
 def load_bha(data: Optional[List[ProcessHorse]] = None):
+    logger = get_run_logger()
+    logger.info("Starting bha loader")
+
     if data is None:
         data = bha_transformer()
 
-    horse_lookup = load_bha_horses(data)
-    person_lookup = load_bha_people(data)
-    enrich_with_bha_ratings(data, horse_lookup)
-    associate_horse_with_trainer(data, horse_lookup, person_lookup)
+    h = horse_processor()
+    next(h)
 
+    sires = list({horse.sire for horse in data if horse.sire})
+    dams = list({horse.dam for horse in data if horse.dam})
+
+    for sire in sires:
+        h.send(sire)
+
+    for dam in dams:
+        h.send(dam)
+    
+    for horse in data:
+        h.send(horse)
+
+    h.close()
 
 @flow
 def load_bha_afresh(data: Optional[List[ProcessHorse]] = None):
