@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import List, Optional
 
 from .official_ratings import OfficialRatings
 from .operation import Operation
@@ -7,7 +7,7 @@ from .py_object_id import PyObjectId
 
 
 class ProcessHorse(ProcessHorseCore):
-    sex: Optional[Literal["M", "F"]] = None
+    year: int
     breed: Optional[str] = None
     colour: Optional[str] = None
     sire: Optional[ProcessHorseCore] = None

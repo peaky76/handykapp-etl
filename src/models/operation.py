@@ -1,9 +1,9 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class Operation(BaseModel):
+class Operation(HashableBaseModel):
     operation_type: str
     date: Optional[date] = None

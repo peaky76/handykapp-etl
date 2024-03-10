@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class OfficialRatings(BaseModel):
+class OfficialRatings(HashableBaseModel):
     flat: Optional[int] = None
     aw: Optional[int] = None
     chase: Optional[int] = None
