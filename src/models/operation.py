@@ -1,9 +1,9 @@
 from datetime import date
 from typing import Optional
 
-from .process_base_model import ProcessBaseModel
+from pydantic import BaseModel
 
 
-class Operation(ProcessBaseModel):
+class Operation(BaseModel):
     operation_type: str
     date: Optional[date] = None

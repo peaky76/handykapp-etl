@@ -1,9 +1,9 @@
 from typing import Optional
 
-from .process_base_model import ProcessBaseModel
+from pydantic import BaseModel
 
 
-class OfficialRatings(ProcessBaseModel):
+class OfficialRatings(BaseModel):
     flat: Optional[int] = None
     aw: Optional[int] = None
     chase: Optional[int] = None
