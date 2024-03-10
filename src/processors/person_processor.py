@@ -13,8 +13,8 @@ class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
 
-    def find(self, person: ProcessPerson, source: str) -> MongoPerson:
-        found_person = db.people.find_one({"references": { source: person }})
+    def find(self, person: ProcessPerson) -> MongoPerson:
+        found_person = db.people.find_one({"references": { person["source"]: person }})
 
         if not found_person:
             name_parts = HumanName(person["name"])       
@@ -31,11 +31,11 @@ class PersonProcessor(Processor):
         
         return found_person
 
-    def update(self, person: ProcessPerson, source: str) -> MongoPerson | None:
-        if (found_person := self.find(person, source)):
+    def update(self, person: ProcessPerson) -> MongoPerson | None:
+        if (found_person := self.find(person, person["source"])):
             ratings = {} # TODO: Get ratings  
             update_data = (
-                {f"references.{source}": person["name"]} | {"ratings": ratings}
+                {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
                 if ratings
                 else {}
             )
@@ -48,19 +48,19 @@ class PersonProcessor(Processor):
         return None
 
 
-    def insert(self, person: ProcessPerson, source: str) -> MongoPerson:
+    def insert(self, person: ProcessPerson) -> MongoPerson:
         name_parts = HumanName(person["name"])
         ratings = {} # TODO: Get ratings
 
         return db.people.insert_one(
             name_parts.as_dict()
-            | {f"references.{source}": person["name"]}
+            | {f"references.{person['source']}": person["name"]}
             | {"ratings": ratings}
             if ratings
             else {}
         )
 
-    def post_process(self, person: ProcessPerson, db_id: PyObjectId, source: str, logger: Logger | LoggerAdapter) -> None:
+    def post_process(self, person: ProcessPerson, db_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         name = person["name"]
         race_id = person.get("race_id")
         horse_id = person.get("horse_id")

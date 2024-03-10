@@ -32,7 +32,7 @@ class RaceProcessor(Processor):
     _descriptor = "race"
     _next_processor = horse_processor
 
-    def update(self, race: ProcessRace, source: str) -> MongoRace | None:
+    def update(self, race: ProcessRace) -> MongoRace | None:
         found_race = db.races.find_one({
             "racecourse": race["racecourse_id"],
             "datetime": race["datetime"],
@@ -53,24 +53,24 @@ class RaceProcessor(Processor):
         )
         return found_race
 
-    def insert(self, race: ProcessRace, source: str) -> MongoRace:
+    def insert(self, race: ProcessRace) -> MongoRace:
         return db.races.insert_one(
                     make_update_dictionary(race)
                 )
 
-    def post_process(self, race: ProcessRace, race_id: PyObjectId, source: str, logger: Logger | LoggerAdapter) -> None:
+    def post_process(self, race: ProcessRace, race_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         try:
             for horse in race["runners"]:
                 horse_processor.send((
                     {"name": horse["sire"], "sex": "M", "race_id": None},
-                    source,
+                    race["source"],
                 ))
 
                 damsire = horse.get("damsire")
                 if damsire:
                     horse_processor.send((
                         {"name": damsire, "sex": "M", "race_id": None},
-                        source,
+                        race["source"],
                     ))
                     
                 horse_processor.send((
@@ -80,12 +80,12 @@ class RaceProcessor(Processor):
                         "sire": damsire,
                         "race_id": None,
                     },
-                    source,
+                    race["source"],
                 ))
                 
                 if race_id:
                     creation_dict = horse | { "race_id": race_id }
-                    horse_processor.send((creation_dict, source))
+                    horse_processor.send((creation_dict, race["source"]))
 
         except Exception as e:
             logger.error(f"Error processing {race_id}: {e}")

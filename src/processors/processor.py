@@ -8,10 +8,10 @@ class Processor:
     _descriptor: str | None = None
     _next_processor: Optional["Processor"] = None
 
-    def update(self, item, source):
+    def update(self, item):
         raise NotImplementedError
 
-    def insert(self, item, source):
+    def insert(self, item):
         raise NotImplementedError
 
     def process(self):
@@ -30,14 +30,14 @@ class Processor:
 
         try:
             while True:
-                item, source = yield
+                item = yield
 
-                if (db_item := self.update(item, source)):
+                if (db_item := self.update(item)):
                     logger.debug(f"{item} updated")
                     updated += 1
                 else:
                     try:
-                        db_item = self.insert(item, source)
+                        db_item = self.insert(item)
                         logger.debug(f"{item} added to db")
                         added += 1
                     except DuplicateKeyError:
@@ -47,7 +47,7 @@ class Processor:
                         logger.warning(e)
                         skipped += 1
 
-                self.post_process(item, db_item["_id"], source, logger)
+                self.post_process(item, db_item["_id"], logger)
 
         except GeneratorExit:
             logger.info(

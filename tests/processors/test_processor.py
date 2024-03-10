@@ -13,12 +13,12 @@ def processor(mocker):
 def test_processor_update():
     processor = Processor()
     with pytest.raises(NotImplementedError):
-        processor.update(None, None)
+        processor.update(None)
 
 def test_processor_insert():
     processor = Processor()
     with pytest.raises(NotImplementedError):
-        processor.insert(None, None)
+        processor.insert(None)
 
 def test_processor_process_when_update_made(mocker, processor):
     mocker.patch("prefect.context.TaskRunContext")
@@ -34,11 +34,11 @@ def test_processor_process_when_update_made(mocker, processor):
     generator = processor.process()
     next(generator)
 
-    generator.send(("item", "source"))
+    generator.send("item")
 
-    assert processor.update.called_once_with("item", "source")
+    assert processor.update.called_once_with("item")
     assert not processor.insert.called
-    assert processor.post_process.called_once_with("item", 1, "source", logger_mock)
+    assert processor.post_process.called_once_with("item", 1, logger_mock)
 
 def test_processor_process_when_update_not_made(mocker, processor):
     mocker.patch("prefect.context.TaskRunContext")
@@ -56,8 +56,8 @@ def test_processor_process_when_update_not_made(mocker, processor):
     generator = processor.process()
     next(generator)
 
-    generator.send(("item", "source"))
+    generator.send("item")
 
-    assert processor.update.called_once_with("item", "source")
-    assert processor.insert.called_once_with("item", "source")
-    assert processor.post_process.called_once_with("item", 1, "source", logger_mock)
+    assert processor.update.called_once_with("item")
+    assert processor.insert.called_once_with("item")
+    assert processor.post_process.called_once_with("item", 1, logger_mock)
