@@ -98,6 +98,7 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "chase": None,
             "hurdle": None,
         },
+        "source": "bha"
     }
     actual = compact(transform_ratings_data.fn(mock_data)[0].model_dump())
     assert expected == actual
