@@ -2,14 +2,12 @@ from functools import cache
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import MongoHorse, ProcessHorse, PyObjectId
+from models import ProcessHorse, PyObjectId
 
 from processors.person_processor import person_processor
 
 from .processor import Processor
 from .utils import compact
-
-db = client.handykapp
 
 
 @cache
@@ -17,7 +15,7 @@ def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectI
     if not name:
         return None
 
-    found_horse = db.horses.find_one({"name": name, "sex": sex}, {"_id": 1})
+    found_horse = client.handykapp.horses.find_one({"name": name, "sex": sex}, {"_id": 1})
 
     if not found_horse:
         raise ValueError(
@@ -39,6 +37,7 @@ def get_sire_id(name: str | None) -> PyObjectId:
 class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
+    _table = client.handykapp.horses
 
     def _search_dictionary(self, horse: ProcessHorse) -> dict:
         keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
@@ -62,23 +61,10 @@ class HorseProcessor(Processor):
                         "sire": get_sire_id(horse.get("sire")),
                         "dam": get_dam_id(horse.get("dam")),
                     })
-
-    def find(self, horse: ProcessHorse) -> PyObjectId | None:
-        found_horse = db.horses.find_one(self._search_dictionary(horse), {"_id": 1})
-        return found_horse["_id"] if found_horse else None
-
-    def update(self, horse: ProcessHorse, db_id: PyObjectId) -> None:
-        db.horses.update_one(
-            {"_id": db_id},
-            {"$set": self._update_dictionary(horse)},
-        )
     
-    def insert(self, horse: ProcessHorse) -> PyObjectId:
-        return db.horses.insert_one(self._insert_dictionary(horse)).inserted_id
-
     def post_process(self, horse: ProcessHorse, db_id: PyObjectId, logger: Logger | LoggerAdapter):
         if (race_id := horse["race_id"]):
-            db.races.update_one(
+            client.handykapp.races.update_one(
                 {"_id": race_id},
                 {
                     "$push": {

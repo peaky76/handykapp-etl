@@ -6,14 +6,13 @@ from nameparser import HumanName  # type: ignore
 
 from .processor import Processor
 
-db = client.handykapp
-
 
 class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
+    _table = client.handykapp.people
 
-    def _update_dictionary(self, person):
+    def _update_dictionary(self, person) ->  dict:
         ratings = {} # TODO: Get ratings  
         return (
             {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
@@ -21,7 +20,7 @@ class PersonProcessor(Processor):
             else {}
         )
 
-    def _insert_dictionary(self, person):
+    def _insert_dictionary(self, person) -> dict:
         name_parts = HumanName(person["name"])
         ratings = {} # TODO: Get ratings
 
@@ -34,11 +33,11 @@ class PersonProcessor(Processor):
         )
 
     def find(self, person: ProcessPerson) -> PyObjectId | None:
-        found_person = db.people.find_one({"references": { person["source"]: person }}, {"_id": 1})
+        found_person = self._table.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
         if not found_person:
             name_parts = HumanName(person["name"])       
-            possibilities = db.people.find({"last": name_parts.last})
+            possibilities = self._table.find({"last": name_parts.last})
             for possibility in possibilities:
                 if name_parts.first == possibility["first"] or (
                     name_parts.first
@@ -51,17 +50,6 @@ class PersonProcessor(Processor):
         
         return found_person["_id"]
 
-    def update(self, person: ProcessPerson, db_id: PyObjectId) -> None:
-        db.people.update_one(
-            {"_id": db_id},
-            {"$set": self._update_dictionary(person)},
-        )
-        
-
-    def insert(self, person: ProcessPerson) -> PyObjectId:
-
-        return db.people.insert_one(self._update_dictionary).inserted_id
-
     def post_process(self, person: ProcessPerson, db_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         name = person["name"]
         race_id = person.get("race_id")
@@ -70,7 +58,7 @@ class PersonProcessor(Processor):
 
         # Add person to horse in race
         if race_id:
-            db.races.update_one(
+            self._table.races.update_one(
                 {"_id": race_id, "runners.horse": horse_id},
                 {"$set": {f"runners.$.{role}": db_id}},
             )

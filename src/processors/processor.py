@@ -3,21 +3,31 @@ from typing import Optional
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
+from .process_base_model import ProcessBaseModel
 from .py_object_id import PyObjectId
 
 
 class Processor:
     _descriptor: str | None = None
     _next_processor: Optional["Processor"] = None
+    _table = None
+    _search_dictionary = {}
+    _update_dictionary = {} 
+    _insert_dictionary = {}
 
-    def find(self, item) -> PyObjectId | None:
-        raise NotImplementedError
+    def find(self, item: ProcessBaseModel) -> PyObjectId | None:
+        found_item = self._table.find_one(self._search_dictionary(item), {"_id": 1})
+        return found_item["_id"] if found_item else None
 
-    def update(self, item) -> None:
-        raise NotImplementedError
 
-    def insert(self, item) -> PyObjectId:
-        raise NotImplementedError
+    def update(self, item: ProcessBaseModel, db_id: PyObjectId) -> None:
+        self._table.update_one(
+            {"_id": db_id},
+            {"$set": self._update_dictionary(item)},
+        )
+
+    def insert(self, item: ProcessBaseModel) -> PyObjectId:
+        return self._table.insert_one(self._insert_dictionary(item))
 
     def process(self):
         added = 0

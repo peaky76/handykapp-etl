@@ -1,21 +1,18 @@
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import MongoRace, ProcessRace, PyObjectId
+from models import ProcessRace, PyObjectId
 
 from processors.horse_processor import horse_processor
 
 from .processor import Processor
 from .utils import compact
 
-db = client.handykapp
-
-
-
 
 class RaceProcessor(Processor):
     _descriptor = "race"
     _next_processor = horse_processor
+    _table = client.handykapp.races
 
     def _search_dictionary(self, race: ProcessRace) -> dict:
         return {
@@ -45,21 +42,6 @@ class RaceProcessor(Processor):
             "rapid_id": race.get("rapid_id"),
         })
 
-    def find(self, race: ProcessRace) -> PyObjectId | None:
-        found_race = db.races.find_one(self._search_dictionary(race))
-        return found_race["_id"] if found_race else None
-
-    def update(self, race: ProcessRace, db_id: PyObjectId) -> None:
-        # TODO: Check race matches data
-        db.races.update_one(
-            {"_id": db_id},
-            {
-                "$set": self._update_dictionary 
-            },
-        )
-
-    def insert(self, race: ProcessRace) -> MongoRace:
-        return db.races.insert_one(self._insert_dictionary(race))
 
     def post_process(self, race: ProcessRace, race_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         try:
