@@ -1,11 +1,7 @@
-from typing import Literal
-
 from pydantic import BaseModel
 
 
 class ProcessBaseModel(BaseModel):
-    source: Literal["bha", "rapid", "theracingapi"]
-
     def __hash__(self):
         values = tuple(tuple(v) if isinstance(v, list) else v for v in self.__dict__.values())
         return hash((type(self), *values))
