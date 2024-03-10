@@ -13,6 +13,26 @@ class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
 
+    def _update_dictionary(self, person):
+        ratings = {} # TODO: Get ratings  
+        return (
+            {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
+            if ratings
+            else {}
+        )
+
+    def _insert_dictionary(self, person):
+        name_parts = HumanName(person["name"])
+        ratings = {} # TODO: Get ratings
+
+        return (
+            name_parts.as_dict()
+            | {f"references.{person['source']}": person["name"]}
+            | {"ratings": ratings}
+            if ratings
+            else {}
+        )
+
     def find(self, person: ProcessPerson) -> PyObjectId | None:
         found_person = db.people.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
@@ -32,29 +52,15 @@ class PersonProcessor(Processor):
         return found_person["_id"]
 
     def update(self, person: ProcessPerson, db_id: PyObjectId) -> None:
-        ratings = {} # TODO: Get ratings  
-        update_data = (
-            {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
-            if ratings
-            else {}
-        )
         db.people.update_one(
             {"_id": db_id},
-            {"$set": update_data},
+            {"$set": self._update_dictionary(person)},
         )
         
 
     def insert(self, person: ProcessPerson) -> PyObjectId:
-        name_parts = HumanName(person["name"])
-        ratings = {} # TODO: Get ratings
 
-        return db.people.insert_one(
-            name_parts.as_dict()
-            | {f"references.{person['source']}": person["name"]}
-            | {"ratings": ratings}
-            if ratings
-            else {}
-        ).inserted_id
+        return db.people.insert_one(self._update_dictionary).inserted_id
 
     def post_process(self, person: ProcessPerson, db_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         name = person["name"]

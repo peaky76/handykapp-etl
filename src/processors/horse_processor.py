@@ -36,38 +36,24 @@ def get_dam_id(name: str | None) -> PyObjectId:
 def get_sire_id(name: str | None) -> PyObjectId:
     return get_horse_id_by_name_and_sex(name, "M")
 
-
-def make_search_dictionary(horse) -> MongoHorse:
-    keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
-
-    return {k: horse[k] for k in keys}
-
-
-def make_update_dictionary(horse):
-    return compact({
-        "colour": horse.get("colour"),
-        "sire": get_sire_id(horse.get("sire")),
-        "dam": get_dam_id(horse.get("dam")),
-    })
-
-
 class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
 
-    def find(self, horse: ProcessHorse) -> PyObjectId | None:
-        found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
-        return found_horse["_id"] if found_horse else None
+    def _search_dictionary(self, horse: ProcessHorse) -> dict:
+        keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
 
-    def update(self, horse: ProcessHorse, db_id: PyObjectId) -> None:
-        db.horses.update_one(
-            {"_id": db_id},
-            {"$set": make_update_dictionary(horse)},
-        )
-    
-    def insert(self, horse: ProcessHorse) -> PyObjectId:
-        return db.horses.insert_one(
-                    compact({
+        return {k: horse[k] for k in keys}
+
+    def _update_dictionary(self, horse) -> dict:
+        return compact({
+            "colour": horse.get("colour"),
+            "sire": get_sire_id(horse.get("sire")),
+            "dam": get_dam_id(horse.get("dam")),
+        })
+
+    def _insert_dictionary(self, horse) -> dict:
+        return compact({
                         "name": horse.get("name"),
                         "sex": horse.get("sex"),
                         "year": horse.get("year"),
@@ -76,7 +62,19 @@ class HorseProcessor(Processor):
                         "sire": get_sire_id(horse.get("sire")),
                         "dam": get_dam_id(horse.get("dam")),
                     })
-                ).inserted_id
+
+    def find(self, horse: ProcessHorse) -> PyObjectId | None:
+        found_horse = db.horses.find_one(self._search_dictionary(horse), {"_id": 1})
+        return found_horse["_id"] if found_horse else None
+
+    def update(self, horse: ProcessHorse, db_id: PyObjectId) -> None:
+        db.horses.update_one(
+            {"_id": db_id},
+            {"$set": self._update_dictionary(horse)},
+        )
+    
+    def insert(self, horse: ProcessHorse) -> PyObjectId:
+        return db.horses.insert_one(self._insert_dictionary(horse)).inserted_id
 
     def post_process(self, horse: ProcessHorse, db_id: PyObjectId, logger: Logger | LoggerAdapter):
         if (race_id := horse["race_id"]):
