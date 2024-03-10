@@ -3,6 +3,7 @@ from typing import Optional
 
 from models import ProcessBaseModel, PyObjectId
 from prefect import get_run_logger
+from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
 
 
@@ -15,9 +16,8 @@ class Processor:
     _insert_dictionary = {}
 
     @cache
-    def find(self, item: ProcessBaseModel) -> PyObjectId | None:
-        found_item = self._table.find_one(self._search_dictionary(item), {"_id": 1})
-        return found_item["_id"] if found_item else None
+    def find(self, item: ProcessBaseModel) -> BaseModel | None:
+        return self._table.find_one(self._search_dictionary(item))
 
 
     def update(self, item: ProcessBaseModel, db_id: PyObjectId) -> None:
@@ -46,11 +46,18 @@ class Processor:
         try:
             while True:
                 item = yield
+                db_id = None
 
-                if (db_id := self.find(item)):
-                    self.update(item, db_id)
-                    logger.debug(f"{item} updated")
-                    updated += 1
+                if (db_item := self.find(item)):
+                    db_id = db_item["_id"]
+                    d = self._update_dictionary(item)
+                    if any(db_item[k] != d[k] for k in d):
+                        self.update(item, db_id)
+                        logger.debug(f"{item} updated")
+                        updated += 1
+                    else:
+                        logger.debug(f"{item} unchanged")
+                        skipped += 1
                 else:
                     try:
                         db_id = self.insert(item)
@@ -62,6 +69,10 @@ class Processor:
                     except ValueError as e:
                         logger.warning(e)
                         skipped += 1
+
+                total = updated + added + skipped
+                if total % 100 == 0:
+                    logger.info(f"Processed {total} {self._descriptor}s.")
 
                 self.post_process(item, db_id, logger)
 
