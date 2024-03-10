@@ -55,19 +55,17 @@ class HorseProcessor(Processor):
     _descriptor = "horse"
     _next_processor = person_processor
 
-    def update(self, horse: ProcessHorse) -> MongoHorse | None:
+    def find(self, horse: ProcessHorse) -> PyObjectId | None:
         found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
+        return found_horse["_id"] if found_horse else None
 
-        if not found_horse:
-            return None
-
+    def update(self, horse: ProcessHorse, db_id: PyObjectId) -> None:
         db.horses.update_one(
-            {"_id": found_horse["_id"]},
+            {"_id": db_id},
             {"$set": make_update_dictionary(horse)},
         )
-        return found_horse
     
-    def insert(self, horse: ProcessHorse) -> MongoHorse:
+    def insert(self, horse: ProcessHorse) -> PyObjectId:
         return db.horses.insert_one(
                     compact({
                         "name": horse.get("name"),
@@ -78,7 +76,7 @@ class HorseProcessor(Processor):
                         "sire": get_sire_id(horse.get("sire")),
                         "dam": get_dam_id(horse.get("dam")),
                     })
-                )
+                ).inserted_id
 
     def post_process(self, horse: ProcessHorse, db_id: PyObjectId, logger: Logger | LoggerAdapter):
         if (race_id := horse["race_id"]):

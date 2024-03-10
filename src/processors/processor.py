@@ -3,15 +3,20 @@ from typing import Optional
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
+from .py_object_id import PyObjectId
+
 
 class Processor:
     _descriptor: str | None = None
     _next_processor: Optional["Processor"] = None
 
-    def update(self, item):
+    def find(self, item) -> PyObjectId | None:
         raise NotImplementedError
 
-    def insert(self, item):
+    def update(self, item) -> None:
+        raise NotImplementedError
+
+    def insert(self, item) -> PyObjectId:
         raise NotImplementedError
 
     def process(self):
@@ -32,12 +37,13 @@ class Processor:
             while True:
                 item = yield
 
-                if (db_item := self.update(item)):
+                if (db_id := self.find(item)):
+                    self.update(item, db_id)
                     logger.debug(f"{item} updated")
                     updated += 1
                 else:
                     try:
-                        db_item = self.insert(item)
+                        db_id = self.insert(item)
                         logger.debug(f"{item} added to db")
                         added += 1
                     except DuplicateKeyError:
@@ -47,7 +53,7 @@ class Processor:
                         logger.warning(e)
                         skipped += 1
 
-                self.post_process(item, db_item["_id"], logger)
+                self.post_process(item, db_id, logger)
 
         except GeneratorExit:
             logger.info(

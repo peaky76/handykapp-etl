@@ -32,18 +32,17 @@ class RaceProcessor(Processor):
     _descriptor = "race"
     _next_processor = horse_processor
 
-    def update(self, race: ProcessRace) -> MongoRace | None:
+    def find(self, race: ProcessRace) -> PyObjectId | None:
         found_race = db.races.find_one({
             "racecourse": race["racecourse_id"],
             "datetime": race["datetime"],
         })
+        return found_race["_id"] if found_race else None
 
-        if not found_race:
-            return None
-        
+    def update(self, race: ProcessRace, db_id: PyObjectId) -> None:
         # TODO: Check race matches data
         db.races.update_one(
-            {"_id": found_race["_id"]},
+            {"_id": db_id},
             {
                 "$set": compact({
                     "rapid_id": race.get("rapid_id"),
@@ -51,7 +50,6 @@ class RaceProcessor(Processor):
                 })
             },
         )
-        return found_race
 
     def insert(self, race: ProcessRace) -> MongoRace:
         return db.races.insert_one(

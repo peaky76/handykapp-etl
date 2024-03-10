@@ -1,7 +1,7 @@
 from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
-from models import MongoPerson, ProcessPerson, PyObjectId
+from models import ProcessPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
 
 from .processor import Processor
@@ -13,8 +13,8 @@ class PersonProcessor(Processor):
     _descriptor = "person"
     _next_processor = None
 
-    def find(self, person: ProcessPerson) -> MongoPerson:
-        found_person = db.people.find_one({"references": { person["source"]: person }})
+    def find(self, person: ProcessPerson) -> PyObjectId | None:
+        found_person = db.people.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
         if not found_person:
             name_parts = HumanName(person["name"])       
@@ -29,26 +29,22 @@ class PersonProcessor(Processor):
                     found_person = possibility
                     break
         
-        return found_person
+        return found_person["_id"]
 
-    def update(self, person: ProcessPerson) -> MongoPerson | None:
-        if (found_person := self.find(person, person["source"])):
-            ratings = {} # TODO: Get ratings  
-            update_data = (
-                {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
-                if ratings
-                else {}
-            )
-            db.people.update_one(
-                {"_id": found_person["_id"]},
-                {"$set": update_data},
-            )
-            return found_person
+    def update(self, person: ProcessPerson, db_id: PyObjectId) -> None:
+        ratings = {} # TODO: Get ratings  
+        update_data = (
+            {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
+            if ratings
+            else {}
+        )
+        db.people.update_one(
+            {"_id": db_id},
+            {"$set": update_data},
+        )
+        
 
-        return None
-
-
-    def insert(self, person: ProcessPerson) -> MongoPerson:
+    def insert(self, person: ProcessPerson) -> PyObjectId:
         name_parts = HumanName(person["name"])
         ratings = {} # TODO: Get ratings
 
@@ -58,7 +54,7 @@ class PersonProcessor(Processor):
             | {"ratings": ratings}
             if ratings
             else {}
-        )
+        ).inserted_id
 
     def post_process(self, person: ProcessPerson, db_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
         name = person["name"]
