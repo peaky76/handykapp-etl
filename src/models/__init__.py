@@ -5,6 +5,7 @@ from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .official_ratings import OfficialRatings
 from .operation import Operation
+from .process_base_model import ProcessBaseModel
 from .process_horse import ProcessHorse
 from .process_horse_core import ProcessHorseCore
 from .process_person import ProcessPerson
@@ -19,6 +20,7 @@ __all__ = [
     "MongoReferences",
     "OfficialRatings",
     "Operation",
+    "ProcessBaseModel",
     "ProcessHorse",
     "ProcessHorseCore",
     "ProcessPerson",

@@ -1,10 +1,9 @@
+from functools import cache
 from typing import Optional
 
+from models import ProcessBaseModel, PyObjectId
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
-
-from .process_base_model import ProcessBaseModel
-from .py_object_id import PyObjectId
 
 
 class Processor:
@@ -15,6 +14,7 @@ class Processor:
     _update_dictionary = {} 
     _insert_dictionary = {}
 
+    @cache
     def find(self, item: ProcessBaseModel) -> PyObjectId | None:
         found_item = self._table.find_one(self._search_dictionary(item), {"_id": 1})
         return found_item["_id"] if found_item else None
