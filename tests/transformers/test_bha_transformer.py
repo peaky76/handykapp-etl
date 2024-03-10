@@ -1,5 +1,6 @@
 import petl
 import pytest
+from peak_utility.listish import compact
 
 from src.transformers.bha_transformer import (
     get_csv,
@@ -82,13 +83,15 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
         "trainer": "Ollie Pears",
         "sire": {
             "name": "ADAAY",
-            "country": "IRE"
+            "country": "IRE",
+            "sex": "M"
         },
         "dam": {
             "name": "TARA TOO",
-            "country": "IRE"
+            "country": "IRE",
+            "sex": "F"
         },
-        "operations": [{"type": "gelding", "date": None}],
+        "operations": [{"operation_type": "gelding", "date": None}],
         "ratings": {
             "flat": 49,
             "aw": None,
@@ -96,7 +99,7 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "hurdle": None,
         },
     }
-    actual = transform_ratings_data.fn(mock_data)[0]
+    actual = compact(transform_ratings_data.fn(mock_data)[0].model_dump())
     assert expected == actual
 
 
