@@ -57,8 +57,8 @@ def transform_racecourses_data(data) -> List[TransformedRacecourse]:
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
         .rename({"speed": "style", "direction": "handedness", "rr_abbr": "abbr"})
-        .addfield("code", "Flat", index=2)
-        .addfield("source", "rr")
+        .addfield("code", lambda rec: "NH" if rec["obstacle"] else "Flat", index=2)
+        .addfield("source", "racing_research")
         .convert("obstacle", lambda x: x.replace("Steeple", "") if x else x)
         .convert(
             ("obstacle", "surface", "shape", "style", "handedness", "contour"), lambda x: x.title() if x else None
