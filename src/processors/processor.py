@@ -14,6 +14,11 @@ class Processor:
     _search_dictionary = {}
     _update_dictionary = {} 
     _insert_dictionary = {}
+    
+    def __init__(self):
+        self.added = 0
+        self.updated = 0
+        self.skipped = 0
 
     @cache
     def find(self, item: ProcessBaseModel) -> BaseModel | None:
@@ -28,10 +33,7 @@ class Processor:
     def insert(self, item: ProcessBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self):
-        added = 0
-        updated = 0
-        skipped = 0
+    def process(self, *, find_first: bool = True):
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor} processor")
                 
@@ -46,29 +48,74 @@ class Processor:
                 item = yield
                 db_id = None
 
-                if (db_item := self.find(item)):
-                    db_id = db_item["_id"]
+                def update_if_needed(item, db_item):
                     d = self._update_dictionary(item)
                     if any(db_item[k] != d[k] for k in d):
-                        self.update(item, db_id)
+                        self.update(item, db_item["_id"])
                         logger.debug(f"{item} updated")
-                        updated += 1
+                        self.updated += 1
                     else:
                         logger.debug(f"{item} unchanged")
-                        skipped += 1
-                else:
-                    try:
+                        self.skipped += 1
+
+                try:
+                    if find_first and (db_item := self.find(item)):
+                        update_if_needed(item, db_item)
+                    else:
                         db_id = self.insert(item)
                         logger.debug(f"{item} added to db")
-                        added += 1
-                    except DuplicateKeyError:
-                        logger.warning(f"Duplicate {self._descriptor}: {item}")
-                        skipped += 1
-                    except ValueError as e:
-                        logger.warning(e)
-                        skipped += 1
+                        self.added += 1
+                except DuplicateKeyError:
+                    if not find_first:
+                        db_item = self.find(item)
+                        update_if_needed(item, db_item)
+                        db_id = db_item["_id"]
+                except ValueError as e:
+                    logger.warning(e)
+                    self.skipped += 1
 
-                total = updated + added + skipped
+                # if (db_item := self.find(item)):
+                #     db_id = db_item["_id"]
+                #     d = self._update_dictionary(item)
+                #     if any(db_item[k] != d[k] for k in d):
+                #         self.update(item, db_id)
+                #         logger.debug(f"{item} updated")
+                #         updated += 1
+                #     else:
+                #         logger.debug(f"{item} unchanged")
+                #         skipped += 1
+                # else:
+                #     try:
+                #         db_id = self.insert(item)
+                #         logger.debug(f"{item} added to db")
+                #         added += 1
+                #     except DuplicateKeyError:
+                #         logger.warning(f"Duplicate {self._descriptor}: {item}")
+                #         skipped += 1
+                #     except ValueError as e:
+                #         logger.warning(e)
+                #         skipped += 1
+
+                # try:
+                #     db_id = self.insert(item)
+                #     logger.debug(f"{item} added to db")
+                #     added += 1
+                # except DuplicateKeyError:
+                #     db_item = self.find(item)
+                #     db_id = db_item["_id"]
+                #     d = self._update_dictionary(item)
+                #     if any(db_item[k] != d[k] for k in d):
+                #         self.update(item, db_id)
+                #         logger.debug(f"{item} updated")
+                #         updated += 1
+                #     else:
+                #         logger.debug(f"{item} unchanged")
+                #         skipped += 1
+                # except ValueError as e:
+                #     logger.warning(e)
+                #     skipped += 1
+                    
+                total = self.updated + self.added + self.skipped
                 if total % 250 == 0:
                     logger.info(f"Processed {total} {self._descriptor}s.")
 
@@ -76,5 +123,5 @@ class Processor:
 
         except GeneratorExit:
             logger.info(
-                f"Finished {self._descriptor} processing. Updated {updated}, added {added}, skipped {skipped}."
+                f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
             )
