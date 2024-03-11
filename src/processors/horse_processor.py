@@ -1,7 +1,7 @@
 from functools import cache
 
 from clients import mongo_client as client
-from models import ProcessHorse, ProcessHorseCore, PyObjectId
+from models import ProcessHorse, ProcessHorseCore, ProcessRunner, PyObjectId
 
 from processors.person_processor import person_processor
 
@@ -37,29 +37,29 @@ class HorseProcessor(Processor):
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
     def post_process(self, horse: ProcessHorse | ProcessHorseCore, db_id: PyObjectId):
-        if isinstance(horse, ProcessHorse) and horse.race_id:
+        if isinstance(horse, ProcessRunner) and horse.race_id:
             client.handykapp.races.update_one(
                 {"_id": horse.race_id},
                 {
                     "$push": {
-                        "runners": compact({
-                            "horse": db_id,
-                            "owner": horse.owner,
-                            "allowance": horse.allowance,
-                            "saddlecloth": horse.saddlecloth,
-                            "draw": horse.draw,
-                            "headgear": horse.headgear,
-                            "lbs_carried": horse.lbs_carried,
-                            "official_rating": horse.official_rating,
-                            "position": horse.position,
-                            "distance_beaten": horse.distance_beaten,
-                            "sp": horse.sp,
-                        })
+                        "runners": {"horse": horse.db_id } | 
+                            compact(horse.model_dump(include=[
+                                "owner",
+                                "allowance",
+                                "saddlecloth",
+                                "draw",
+                                "headgear",
+                                "lbs_carried",
+                                "official_rating",
+                                "position",
+                                "distance_beaten",
+                                "sp",
+                        ]))
                     }
                 },
             )
 
-            if horse.get("trainer"):
+            if horse.trainer:
                 person_processor.send((
                     {
                         "name": horse["trainer"],
@@ -71,7 +71,7 @@ class HorseProcessor(Processor):
                     # {},
                 ))
 
-            if horse.get("jockey"):
+            if horse.jockey:
                 person_processor.send((
                     {
                         "name": horse["jockey"],
