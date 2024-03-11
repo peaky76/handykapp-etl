@@ -1,5 +1,7 @@
 from typing import Literal, Optional
 
+from pydantic import Field
+
 from .transformed_base_model import TransformedBaseModel
 
 CodeType = Literal["Flat", "NH"]
@@ -15,6 +17,7 @@ class TransformedRacecourse(TransformedBaseModel):
     name: str
     formal_name: Optional[str] = None
     abbr: Optional[str] = None
+    country: str = Field(..., min_length=2, max_length=3)
     code: Optional[CodeType] = None
     surface: Optional[SurfaceType] = None
     obstacle: ObstacleType | None
@@ -22,4 +25,4 @@ class TransformedRacecourse(TransformedBaseModel):
     handedness: Optional[Handedness] = None
     style: Optional[StyleType] = None
     contour: Optional[ContourType] = None
-    source: Literal["bha", "rapid", "rr", "theracingapi"]
+    source: Literal["bha", "rapid", "racing_research", "theracingapi"]
