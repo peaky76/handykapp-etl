@@ -5,13 +5,14 @@ from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .official_ratings import OfficialRatings
 from .operation import Operation
+from .py_object_id import PyObjectId
 from .transformed_base_model import TransformedBaseModel
 from .transformed_horse import TransformedHorse
 from .transformed_horse_core import TransformedHorseCore
 from .transformed_person import TransformedPerson
 from .transformed_race import TransformedRace
+from .transformed_racecourse import TransformedRacecourse
 from .transformed_runner import TransformedRunner
-from .py_object_id import PyObjectId
 
 __all__ = [
     "MongoHorse",
@@ -26,6 +27,7 @@ __all__ = [
     "TransformedHorseCore",
     "TransformedPerson",
     "TransformedRace",
+    "TransformedRacecourse",
     "TransformedRunner",
     "PyObjectId",
 ]
