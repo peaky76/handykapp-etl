@@ -1,5 +1,4 @@
 from functools import cache
-from logging import Logger, LoggerAdapter
 
 from clients import mongo_client as client
 from models import ProcessHorse, ProcessHorseCore, PyObjectId
@@ -37,7 +36,7 @@ class HorseProcessor(Processor):
     def _insert_dictionary(self, horse: ProcessHorse | ProcessHorseCore) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
-    def post_process(self, horse: ProcessHorse | ProcessHorseCore, db_id: PyObjectId, logger: Logger | LoggerAdapter):
+    def post_process(self, horse: ProcessHorse | ProcessHorseCore, db_id: PyObjectId):
         if isinstance(horse, ProcessHorse) and horse.race_id:
             client.handykapp.races.update_one(
                 {"_id": horse.race_id},

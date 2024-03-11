@@ -1,7 +1,6 @@
-from logging import Logger, LoggerAdapter
-
 from clients import mongo_client as client
 from models import ProcessRace, PyObjectId
+from prefect import get_run_logger
 
 from processors.horse_processor import horse_processor
 
@@ -43,7 +42,7 @@ class RaceProcessor(Processor):
         })
 
 
-    def post_process(self, race: ProcessRace, race_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
+    def post_process(self, race: ProcessRace, race_id: PyObjectId) -> None:
         try:
             for horse in race["runners"]:
                 horse_processor.send((
@@ -73,6 +72,7 @@ class RaceProcessor(Processor):
                     horse_processor.send((creation_dict, race["source"]))
 
         except Exception as e:
+            logger = get_run_logger()
             logger.error(f"Error processing {race_id}: {e}")
 
 race_processor = RaceProcessor().process

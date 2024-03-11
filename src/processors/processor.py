@@ -32,7 +32,6 @@ class Processor:
         added = 0
         updated = 0
         skipped = 0
-
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor} processor")
                 
@@ -73,7 +72,7 @@ class Processor:
                 if total % 250 == 0:
                     logger.info(f"Processed {total} {self._descriptor}s.")
 
-                self.post_process(item, db_id, logger)
+                self.post_process(item, db_id)
 
         except GeneratorExit:
             logger.info(

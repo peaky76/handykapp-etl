@@ -1,5 +1,3 @@
-from logging import Logger, LoggerAdapter
-
 from clients import mongo_client as client
 from models import ProcessPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
@@ -50,7 +48,7 @@ class PersonProcessor(Processor):
         
         return found_person["_id"]
 
-    def post_process(self, person: ProcessPerson, db_id: PyObjectId, logger: Logger | LoggerAdapter) -> None:
+    def post_process(self, person: ProcessPerson, db_id: PyObjectId) -> None:
         name = person["name"]
         race_id = person.get("race_id")
         horse_id = person.get("horse_id")
