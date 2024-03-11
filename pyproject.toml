@@ -21,7 +21,7 @@ pydantic = "^2.6.2"
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.4.3"
 monkeytype = "^23.3.0"
-mypy = "^1.8.0"
+mypy = "^1.9.0"
 pytest = "^8.1.1"
 pytest-cov = "^4.1.0"
 pytest-mock = "^3.12.0"
