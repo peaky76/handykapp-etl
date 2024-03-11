@@ -14,6 +14,7 @@ ContourType = Literal["Flat", "Undulating", "Uphill"]
 class TransformedRacecourse(ProcessBaseModel):
     name: str
     formal_name: Optional[str] = None
+    abbr: Optional[str] = None
     code: Optional[CodeType] = None
     surface: Optional[SurfaceType] = None
     obstacle: ObstacleType | None
