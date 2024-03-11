@@ -1,7 +1,7 @@
 from functools import cache
 
 from clients import mongo_client as client
-from models import ProcessHorse, ProcessHorseCore, ProcessRunner, PyObjectId
+from models import TransformedHorse, TransformedHorseCore, TransformedRunner, PyObjectId
 
 from processors.person_processor import person_processor
 
@@ -15,15 +15,15 @@ class HorseProcessor(Processor):
     _table = client.handykapp.horses
 
     @cache
-    def _search_dictionary(self, horse: ProcessHorse | ProcessHorseCore) -> dict:
-        if not isinstance(horse, ProcessHorse) and not isinstance(horse, ProcessHorseCore):
-            raise TypeError(f"Expected ProcessHorse or ProcessHorseCore, got {type(horse)}: {horse}")
+    def _search_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
+        if not isinstance(horse, TransformedHorse) and not isinstance(horse, TransformedHorseCore):
+            raise TypeError(f"Expected TransformedHorse or TransformedHorseCore, got {type(horse)}: {horse}")
 
         return compact(horse.model_dump(include=["name", "country", "sex", "year"]))
 
     @cache
-    def _update_dictionary(self, horse: ProcessHorse | ProcessHorseCore) -> dict:
-        if isinstance(horse, ProcessHorseCore):
+    def _update_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
+        if isinstance(horse, TransformedHorseCore):
             return {}
 
         return compact({
@@ -33,11 +33,11 @@ class HorseProcessor(Processor):
         })
 
     @cache
-    def _insert_dictionary(self, horse: ProcessHorse | ProcessHorseCore) -> dict:
+    def _insert_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
-    def post_process(self, horse: ProcessHorse | ProcessHorseCore, db_id: PyObjectId):
-        if isinstance(horse, ProcessRunner) and horse.race_id:
+    def post_process(self, horse: TransformedHorse | TransformedHorseCore, db_id: PyObjectId):
+        if isinstance(horse, TransformedRunner) and horse.race_id:
             client.handykapp.races.update_one(
                 {"_id": horse.race_id},
                 {

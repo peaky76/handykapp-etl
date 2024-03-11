@@ -9,7 +9,7 @@ import petl  # type: ignore
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import Gender  # type: ignore
-from models.process_horse import ProcessHorse
+from models.transformed_horse import TransformedHorse
 from prefect import flow, task
 
 from transformers.parsers import parse_horse
@@ -45,7 +45,7 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_data(data: Any) -> List[ProcessHorse]:
+def transform_ratings_data(data: Any) -> List[TransformedHorse]:
     used_fields = (
         "Name",
         "Year",
@@ -91,7 +91,7 @@ def transform_ratings_data(data: Any) -> List[ProcessHorse]:
         .addfield("source", "bha")
         .dicts()
     )
-    return [ProcessHorse(**horse) for horse in horse_dicts]
+    return [TransformedHorse(**horse) for horse in horse_dicts]
 
 
 @task(tags=["BHA"])
@@ -137,7 +137,7 @@ def validate_ratings_data(data: Any) -> bool:
 
 
 @flow
-def bha_transformer() -> List[ProcessHorse]:
+def bha_transformer() -> List[TransformedHorse]:
     csv = get_csv()
     data = read_csv(csv)
     problems = validate_ratings_data(data)

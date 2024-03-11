@@ -1,7 +1,7 @@
 from functools import cache
 from typing import Any, Optional
 
-from models import ProcessBaseModel, PyObjectId
+from models import TransformedBaseModel, PyObjectId
 from prefect import get_run_logger
 from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
@@ -21,16 +21,16 @@ class Processor:
         self.skipped = 0
 
     @cache
-    def find(self, item: ProcessBaseModel) -> BaseModel | None:
+    def find(self, item: TransformedBaseModel) -> BaseModel | None:
         return self._table.find_one(self._search_dictionary(item))
 
-    def update(self, item: ProcessBaseModel, db_id: PyObjectId) -> None:
+    def update(self, item: TransformedBaseModel, db_id: PyObjectId) -> None:
         self._table.update_one(
             {"_id": db_id},
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: ProcessBaseModel) -> PyObjectId:
+    def insert(self, item: TransformedBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
     def process(self, *, find_first: bool = True):
@@ -48,7 +48,7 @@ class Processor:
                 item = yield
                 db_id = None
 
-                def update_if_needed(item: ProcessBaseModel, db_item: BaseModel):
+                def update_if_needed(item: TransformedBaseModel, db_item: BaseModel):
                     d = self._update_dictionary(item)
                     if any(db_item[k] != d[k] for k in d):
                         self.update(item, db_item["_id"])

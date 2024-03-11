@@ -1,5 +1,5 @@
 from clients import mongo_client as client
-from models import ProcessPerson, PyObjectId
+from models import TransformedPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
 
@@ -31,7 +31,7 @@ class PersonProcessor(Processor):
             else {}
         )
 
-    def find(self, person: ProcessPerson) -> BaseModel | None:
+    def find(self, person: TransformedPerson) -> BaseModel | None:
         found_person = self._table.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
         if not found_person:
@@ -49,7 +49,7 @@ class PersonProcessor(Processor):
         
         return found_person
 
-    def post_process(self, person: ProcessPerson, db_id: PyObjectId) -> None:
+    def post_process(self, person: TransformedPerson, db_id: PyObjectId) -> None:
         if person.race_id:
             client.handykapp.races.update_one(
                 {"_id": person.race_id, "runners.horse": person.horse_id},

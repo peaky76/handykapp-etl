@@ -1,9 +1,9 @@
 from typing import Optional
 
-from .process_base_model import ProcessBaseModel
+from .transformed_base_model import TransformedBaseModel
 
 
-class OfficialRatings(ProcessBaseModel):
+class OfficialRatings(TransformedBaseModel):
     flat: Optional[int] = None
     aw: Optional[int] = None
     chase: Optional[int] = None

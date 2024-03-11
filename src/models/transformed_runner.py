@@ -1,10 +1,10 @@
 from typing import Optional
 
-from .process_horse import ProcessHorse
 from .pyobject_id import PyObjectId
+from .transformed_horse import TransformedHorse
 
 
-class ProcessRunner(ProcessHorse):
+class TransformedRunner(TransformedHorse):
     race_id: PyObjectId
     jockey: Optional[str] = None
     trainer: Optional[str] = None    

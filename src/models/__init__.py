@@ -5,12 +5,12 @@ from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .official_ratings import OfficialRatings
 from .operation import Operation
-from .process_base_model import ProcessBaseModel
-from .process_horse import ProcessHorse
-from .process_horse_core import ProcessHorseCore
-from .process_person import ProcessPerson
-from .process_race import ProcessRace
-from .process_runner import ProcessRunner
+from .transformed_base_model import TransformedBaseModel
+from .transformed_horse import TransformedHorse
+from .transformed_horse_core import TransformedHorseCore
+from .transformed_person import TransformedPerson
+from .transformed_race import TransformedRace
+from .transformed_runner import TransformedRunner
 from .py_object_id import PyObjectId
 
 __all__ = [
@@ -21,11 +21,11 @@ __all__ = [
     "MongoReferences",
     "OfficialRatings",
     "Operation",
-    "ProcessBaseModel",
-    "ProcessHorse",
-    "ProcessHorseCore",
-    "ProcessPerson",
-    "ProcessRace",
-    "ProcessRunner",
+    "TransformedBaseModel",
+    "TransformedHorse",
+    "TransformedHorseCore",
+    "TransformedPerson",
+    "TransformedRace",
+    "TransformedRunner",
     "PyObjectId",
 ]

@@ -1,10 +1,10 @@
 from typing import Literal
 
-from .process_base_model import ProcessBaseModel
+from .transformed_base_model import TransformedBaseModel
 from .py_object_id import PyObjectId
 
 
-class ProcessPerson(ProcessBaseModel):
+class TransformedPerson(TransformedBaseModel):
     name: str
     role: Literal['jockey', 'owner', 'trainer']
     race_id: PyObjectId

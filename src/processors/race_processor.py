@@ -1,5 +1,5 @@
 from clients import mongo_client as client
-from models import ProcessRace, PyObjectId
+from models import TransformedRace, PyObjectId
 from prefect import get_run_logger
 
 from processors.horse_processor import horse_processor
@@ -13,7 +13,7 @@ class RaceProcessor(Processor):
     _next_processor = horse_processor
     _table = client.handykapp.races
 
-    def _search_dictionary(self, race: ProcessRace) -> dict:
+    def _search_dictionary(self, race: TransformedRace) -> dict:
         return {
             "racecourse": race["racecourse_id"],
             "datetime": race["datetime"],
@@ -42,7 +42,7 @@ class RaceProcessor(Processor):
         })
 
 
-    def post_process(self, race: ProcessRace, race_id: PyObjectId) -> None:
+    def post_process(self, race: TransformedRace, race_id: PyObjectId) -> None:
         try:
             for horse in race["runners"]:
                 horse_processor.send((
