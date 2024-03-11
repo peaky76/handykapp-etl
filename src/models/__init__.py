@@ -10,6 +10,7 @@ from .process_horse import ProcessHorse
 from .process_horse_core import ProcessHorseCore
 from .process_person import ProcessPerson
 from .process_race import ProcessRace
+from .process_runner import ProcessRunner
 from .py_object_id import PyObjectId
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     "ProcessHorseCore",
     "ProcessPerson",
     "ProcessRace",
+    "ProcessRunner",
     "PyObjectId",
 ]

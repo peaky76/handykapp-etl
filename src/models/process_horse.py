@@ -18,8 +18,6 @@ class ProcessHorse(ProcessBaseModel):
     colour: Optional[str] = None
     sire: Optional[ProcessHorseCore] = None
     dam: Optional[ProcessHorseCore] = None
-    jockey: Optional[str] = None
-    trainer: Optional[str] = None
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     race_id: Optional[PyObjectId] = None
