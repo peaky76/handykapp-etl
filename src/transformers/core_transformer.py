@@ -59,6 +59,7 @@ def transform_racecourses_data(data) -> List[TransformedRacecourse]:
         .rename({"speed": "style", "direction": "handedness", "rr_abbr": "abbr"})
         .addfield("code", lambda rec: "NH" if rec["obstacle"] else "Flat", index=2)
         .addfield("source", "racing_research")
+        .convert("formal_name", lambda x, rec: x if x else rec["name"], pass_row=True)
         .convert("obstacle", lambda x: x.replace("Steeple", "") if x else x)
         .convert(
             ("obstacle", "surface", "shape", "style", "handedness", "contour"), lambda x: x.title() if x else None
