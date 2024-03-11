@@ -1,7 +1,7 @@
 from functools import cache
 
 from clients import mongo_client as client
-from models import TransformedHorse, TransformedHorseCore, TransformedRunner, PyObjectId
+from models import PyObjectId, TransformedHorse, TransformedHorseCore, TransformedRunner
 
 from processors.person_processor import person_processor
 

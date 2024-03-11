@@ -1,5 +1,5 @@
 from clients import mongo_client as client
-from models import TransformedPerson, PyObjectId
+from models import PyObjectId, TransformedPerson
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
 

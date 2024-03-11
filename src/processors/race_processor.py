@@ -1,5 +1,5 @@
 from clients import mongo_client as client
-from models import TransformedRace, PyObjectId
+from models import PyObjectId, TransformedRace
 from prefect import get_run_logger
 
 from processors.horse_processor import horse_processor

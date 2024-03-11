@@ -1,7 +1,7 @@
 from typing import Literal
 
-from .transformed_base_model import TransformedBaseModel
 from .py_object_id import PyObjectId
+from .transformed_base_model import TransformedBaseModel
 
 
 class TransformedPerson(TransformedBaseModel):
