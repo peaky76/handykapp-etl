@@ -21,4 +21,4 @@ class TransformedHorse(TransformedBaseModel):
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     race_id: Optional[PyObjectId] = None
-    source: Literal["bha", "rapid", "theracingapi"]
+    source: Literal["bha", "rapid", "rr", "theracingapi"]

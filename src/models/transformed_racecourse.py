@@ -21,4 +21,4 @@ class TransformedRacecourse(ProcessBaseModel):
     handedness: Optional[Handedness] = None
     style: Optional[StyleType] = None
     contour: Optional[ContourType] = None
-    source: Literal["bha", "rapid", "theracingapi"]
+    source: Literal["bha", "rapid", "rr", "theracingapi"]

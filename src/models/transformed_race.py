@@ -7,4 +7,4 @@ from .transformed_horse import TransformedHorse
 
 class TransformedRace(MongoRace, TransformedBaseModel):
     runners: list[TransformedHorse]
-    source: Literal["bha", "rapid", "theracingapi"]
+    source: Literal["bha", "rapid", "rr", "theracingapi"]
