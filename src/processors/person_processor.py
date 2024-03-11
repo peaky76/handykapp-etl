@@ -1,6 +1,7 @@
 from clients import mongo_client as client
 from models import ProcessPerson, PyObjectId
 from nameparser import HumanName  # type: ignore
+from pydantic import BaseModel
 
 from .processor import Processor
 
@@ -30,7 +31,7 @@ class PersonProcessor(Processor):
             else {}
         )
 
-    def find(self, person: ProcessPerson) -> PyObjectId | None:
+    def find(self, person: ProcessPerson) -> BaseModel | None:
         found_person = self._table.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
         if not found_person:
@@ -46,19 +47,13 @@ class PersonProcessor(Processor):
                     found_person = possibility
                     break
         
-        return found_person["_id"]
+        return found_person
 
     def post_process(self, person: ProcessPerson, db_id: PyObjectId) -> None:
-        name = person["name"]
-        race_id = person.get("race_id")
-        horse_id = person.get("horse_id")
-        role = person.get("role")
-
-        # Add person to horse in race
-        if race_id:
-            self._table.races.update_one(
-                {"_id": race_id, "runners.horse": horse_id},
-                {"$set": {f"runners.$.{role}": db_id}},
+        if person.race_id:
+            client.handykapp.races.update_one(
+                {"_id": person.race_id, "runners.horse": person.horse_id},
+                {"$set": {f"runners.$.{person.role}": db_id}},
             )
 
 person_processor = PersonProcessor().process
