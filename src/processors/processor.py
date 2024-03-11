@@ -1,7 +1,7 @@
 from functools import cache
-from typing import Any, Optional
+from typing import Optional
 
-from models import TransformedBaseModel, PyObjectId
+from models import PyObjectId, TransformedBaseModel
 from prefect import get_run_logger
 from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
@@ -84,3 +84,6 @@ class Processor:
             logger.info(
                 f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
             )
+
+    def post_process(self, item: TransformedBaseModel, db_id: PyObjectId) -> None:
+        pass
