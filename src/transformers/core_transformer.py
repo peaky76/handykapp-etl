@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import re
+from typing import Any, List
 
 import petl  # type: ignore
 import tomllib
@@ -18,6 +19,7 @@ from horsetalk import (  # type: ignore
     RaceDistance,
     Surface,
 )
+from models.transformed_racecourse import TransformedRacecourse
 from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
 
@@ -29,7 +31,7 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["core"]["spaces_dir"]
 
 
-@task(tags=["Core"], name="get_racecourses_csv")
+@task(tags=["Core"], name="get_racecourses_csvs")
 def read_csvs():
     for csv in list(get_files(SOURCE)):
         if "edited" in csv:
@@ -38,7 +40,7 @@ def read_csvs():
 
 
 @task(tags=["Core"])
-def transform_racecourses_data(data) -> list:
+def transform_racecourses_data(data) -> List[TransformedRacecourse]:
     used_fields = (
         "Name",
         "Formal Name",
@@ -51,23 +53,24 @@ def transform_racecourses_data(data) -> list:
         "Country",
         "RR Abbr",
     )
-    return (
+    racecourse_dicts = (
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
-        .rename({"speed": "style", "direction": "handedness"})
+        .rename({"speed": "style", "direction": "handedness", "rr_abbr": "abbr"})
         .addfield("code", "Flat", index=2)
-        .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
+        .addfield("source", "rr")
+        .convert("obstacle", lambda x: x.replace("Steeple", "") if x else x)
         .convert(
-            ("surface", "shape", "style", "handedness", "contour"), lambda x: x.title()
+            ("obstacle", "surface", "shape", "style", "handedness", "contour"), lambda x: x.title() if x else None
         )
-        .convert("obstacle", lambda x: x or None)
-        .cutout("rr_abbr")
+        .replace("handedness", "Straight", "Neither")
         .dicts()
     )
+    return [TransformedRacecourse(**racecourse) for racecourse in racecourse_dicts]
 
 
 @task(tags=["Core"])
-def validate_racecourses_data(data) -> bool:
+def validate_racecourses_data(data: Any) -> bool:
     header = (
         "Name",
         "Formal Name",
@@ -141,7 +144,7 @@ def validate_racecourses_data(data) -> bool:
 
 
 @flow
-def core_transformer():
+def core_transformer() -> List[TransformedRacecourse]:
     racecourses = []
     for csv in read_csvs():
         problems = validate_racecourses_data(csv)
