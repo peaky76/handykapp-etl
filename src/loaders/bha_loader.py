@@ -4,10 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from typing import List, Optional
-
 from clients import mongo_client as client
-from models.process_horse import ProcessHorse
 from prefect import flow, get_run_logger
 from processors.horse_processor import horse_processor
 from transformers.bha_transformer import bha_transformer
@@ -15,12 +12,11 @@ from transformers.bha_transformer import bha_transformer
 db = client.handykapp
 
 @flow
-def load_bha(data: Optional[List[ProcessHorse]] = None):
+def load_bha():
     logger = get_run_logger()
     logger.info("Starting bha loader")
 
-    if data is None:
-        data = bha_transformer()
+    data = bha_transformer()
 
     h = horse_processor()
     next(h)
@@ -40,13 +36,10 @@ def load_bha(data: Optional[List[ProcessHorse]] = None):
     h.close()
 
 @flow
-def load_bha_afresh(data: Optional[List[ProcessHorse]] = None):
-    if data is None:
-        data = bha_transformer()
-
+def load_bha_afresh():
     db.horses.drop()
     db.people.drop()
-    load_bha(data)
+    load_bha()
 
 
 if __name__ == "__main__":
