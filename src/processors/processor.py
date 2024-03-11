@@ -1,5 +1,5 @@
 from functools import cache
-from typing import Optional
+from typing import Any, Optional
 
 from models import ProcessBaseModel, PyObjectId
 from prefect import get_run_logger
@@ -48,7 +48,7 @@ class Processor:
                 item = yield
                 db_id = None
 
-                def update_if_needed(item, db_item):
+                def update_if_needed(item: ProcessBaseModel, db_item: BaseModel):
                     d = self._update_dictionary(item)
                     if any(db_item[k] != d[k] for k in d):
                         self.update(item, db_item["_id"])
@@ -73,47 +73,6 @@ class Processor:
                 except ValueError as e:
                     logger.warning(e)
                     self.skipped += 1
-
-                # if (db_item := self.find(item)):
-                #     db_id = db_item["_id"]
-                #     d = self._update_dictionary(item)
-                #     if any(db_item[k] != d[k] for k in d):
-                #         self.update(item, db_id)
-                #         logger.debug(f"{item} updated")
-                #         updated += 1
-                #     else:
-                #         logger.debug(f"{item} unchanged")
-                #         skipped += 1
-                # else:
-                #     try:
-                #         db_id = self.insert(item)
-                #         logger.debug(f"{item} added to db")
-                #         added += 1
-                #     except DuplicateKeyError:
-                #         logger.warning(f"Duplicate {self._descriptor}: {item}")
-                #         skipped += 1
-                #     except ValueError as e:
-                #         logger.warning(e)
-                #         skipped += 1
-
-                # try:
-                #     db_id = self.insert(item)
-                #     logger.debug(f"{item} added to db")
-                #     added += 1
-                # except DuplicateKeyError:
-                #     db_item = self.find(item)
-                #     db_id = db_item["_id"]
-                #     d = self._update_dictionary(item)
-                #     if any(db_item[k] != d[k] for k in d):
-                #         self.update(item, db_id)
-                #         logger.debug(f"{item} updated")
-                #         updated += 1
-                #     else:
-                #         logger.debug(f"{item} unchanged")
-                #         skipped += 1
-                # except ValueError as e:
-                #     logger.warning(e)
-                #     skipped += 1
                     
                 total = self.updated + self.added + self.skipped
                 if total % 250 == 0:
