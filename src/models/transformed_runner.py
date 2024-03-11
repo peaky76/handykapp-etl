@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .pyobject_id import PyObjectId
+from .py_object_id import PyObjectId
 from .transformed_horse import TransformedHorse
 
 
