@@ -7,11 +7,11 @@ from models.mongo_references import MongoReferences
 from .py_object_id import PyObjectId
 
 CodeType = Literal["Flat", "NH"]
-SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta"]
+SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta", "Sand", "Snow"]
 ObstacleType = Literal["Hurdle", "Chase"]
 ShapeType = Literal["Circle", "Horseshoe", "Oval", "Pear", "Triangle"]
-Handedness = Literal["Left", "Right", "Both"]
-StyleType = Literal["Galloping", "Stiff", "Tight"]
+Handedness = Literal["Left", "Right", "Both", "Neither"]
+StyleType = Literal["Galloping", "Sharp", "Stiff", "Tight"]
 ContourType = Literal["Flat", "Undulating", "Uphill"]
 
 

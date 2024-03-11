@@ -1,17 +1,17 @@
 from typing import Literal, Optional
 
-from .process_base_model import ProcessBaseModel
+from .transformed_base_model import TransformedBaseModel
 
 CodeType = Literal["Flat", "NH"]
-SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta"]
+SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta", "Sand", "Snow"]
 ObstacleType = Literal["Hurdle", "Chase"]
 ShapeType = Literal["Circle", "Horseshoe", "Oval", "Pear", "Triangle"]
-Handedness = Literal["Left", "Right", "Both"]
-StyleType = Literal["Galloping", "Stiff", "Tight"]
+Handedness = Literal["Left", "Right", "Both", "Neither"]
+StyleType = Literal["Galloping", "Sharp", "Stiff", "Tight"]
 ContourType = Literal["Flat", "Undulating", "Uphill"]
 
 
-class TransformedRacecourse(ProcessBaseModel):
+class TransformedRacecourse(TransformedBaseModel):
     name: str
     formal_name: Optional[str] = None
     abbr: Optional[str] = None
