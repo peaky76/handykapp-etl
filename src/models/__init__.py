@@ -7,6 +7,8 @@ from .official_ratings import OfficialRatings
 from .operation import Operation
 from .py_object_id import PyObjectId
 from .transformed_base_model import TransformedBaseModel
+from .transformed_formdata_entry import TransformedFormdataEntry
+from .transformed_formdata_run import TransformedFormdataRun
 from .transformed_horse import TransformedHorse
 from .transformed_horse_core import TransformedHorseCore
 from .transformed_person import TransformedPerson
@@ -25,6 +27,8 @@ __all__ = [
     "TransformedBaseModel",
     "TransformedHorse",
     "TransformedHorseCore",
+    "TransformedFormdataEntry",
+    "TransformedFormdataRun",
     "TransformedPerson",
     "TransformedRace",
     "TransformedRacecourse",
