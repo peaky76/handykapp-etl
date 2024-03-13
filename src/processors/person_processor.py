@@ -11,7 +11,6 @@ from .database_processor import DatabaseProcessor
 
 class PersonProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "person"
-    _next_processor: ClassVar[None] = None
     _table: ClassVar[Collection]= client.handykapp.people
 
     def _update_dictionary(self, person) ->  dict:

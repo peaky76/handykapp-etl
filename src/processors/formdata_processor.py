@@ -9,7 +9,6 @@ from .database_processor import DatabaseProcessor
 
 class FormdataProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "formdata"
-    _next_processor: ClassVar[None] = None
     _table: ClassVar[Collection] = client.handykapp.formdata
     _search_keys: ClassVar[list[str]] = ["name", "country", "year"]
 

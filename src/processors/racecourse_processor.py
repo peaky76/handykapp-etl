@@ -11,7 +11,6 @@ from .utils import compact
 
 class RacecourseProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "racecourse"
-    _next_processor: ClassVar[None] = None
     _table: ClassVar[Collection] = client.handykapp.racecourses
     _search_keys: ClassVar[str] = ["name", "country", "obstacle", "surface"]
 
