@@ -14,7 +14,7 @@ from .utils import compact
 
 class HorseProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "horse"
-    _next_processor: ClassVar[Processor] = person_processor
+    _next_processors: ClassVar[List[Processor]] = [person_processor]
     _table: ClassVar[Collection] = client.handykapp.horses
     _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 

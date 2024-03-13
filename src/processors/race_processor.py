@@ -12,7 +12,7 @@ from .processor import Processor
 
 class RaceProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "race"
-    _next_processor: ClassVar[Processor] = horse_processor
+    _next_processors: ClassVar[List[Processor]] = [horse_processor]
     _table: ClassVar[Collection] = client.handykapp.races
     _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
     _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]

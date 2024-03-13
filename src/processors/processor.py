@@ -5,15 +5,15 @@ from prefect import get_run_logger
 
 class Processor:
     _descriptor: ClassVar[Optional[str]] = None
-    _next_processor: ClassVar[Optional["Processor"]] = None
+    _next_processors: ClassVar[Optional["Processor"]] = None
 
     def process_wrapper(self):
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor} processor")
                 
-        if self._next_processor:
-            n = self._next_processor()
-            next(n)
+        for processor in self._next_processors:
+            p = processor()
+            next(p)
 
         try:
             while True:
@@ -22,6 +22,8 @@ class Processor:
 
         except GeneratorExit:
             logger.info(self._exit_message)
+            for processor in self._next_processors:
+                processor.close()
 
     def process(self, item: Any):
         raise NotImplementedError
