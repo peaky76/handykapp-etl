@@ -1,9 +1,10 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from pydantic import Field
 
 import models.racecourse_fields as rf
 
+from .source import Source
 from .transformed_base_model import TransformedBaseModel
 
 
@@ -19,4 +20,4 @@ class TransformedRacecourse(TransformedBaseModel):
     handedness: Optional[rf.Handedness] = None
     style: Optional[rf.StyleType] = None
     contour: Optional[rf.ContourType] = None
-    source: Literal["bha", "rapid", "racing_research", "theracingapi"]
+    source: Source

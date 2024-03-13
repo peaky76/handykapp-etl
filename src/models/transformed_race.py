@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Optional
 
 from .py_object_id import PyObjectId
 from .race_restriction import RaceRestriction
+from .source import Source
 from .transformed_base_model import TransformedBaseModel
 from .transformed_horse import TransformedHorse
 
@@ -21,4 +22,4 @@ class TransformedRace(TransformedBaseModel):
     prize: Optional[str] = None
     going_description: Optional[str] = None
     runners: list[TransformedHorse]
-    source: Literal["bha", "rapid", "racing_research", "theracingapi"]
+    source: Source

@@ -5,6 +5,7 @@ from pydantic import Field
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .py_object_id import PyObjectId
+from .source import Source
 from .transformed_base_model import TransformedBaseModel
 from .transformed_horse_core import TransformedHorseCore
 
@@ -21,4 +22,4 @@ class TransformedHorse(TransformedBaseModel):
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     race_id: Optional[PyObjectId] = None
-    source: Literal["bha", "rapid", "racing_research", "theracingapi"]
+    source: Source
