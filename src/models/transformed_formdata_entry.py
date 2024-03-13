@@ -1,6 +1,6 @@
-from typing import List
+from typing import Annotated, List
 
-from pydantic import Field, constr
+from pydantic import Field, StringConstraints
 
 from .transformed_base_model import TransformedBaseModel
 from .transformed_formdata_run import TransformedFormdataRun
@@ -11,6 +11,6 @@ class TransformedFormdataEntry(TransformedBaseModel):
     country: str = Field(..., min_length=2, max_length=3)
     year: int
     trainer: str
-    trainer_form: constr(regex='^F[1-5]|F-$')
-    prize_money: constr(regex='^£[1-9][0-9]*|£-$')
+    trainer_form: Annotated[str, StringConstraints(pattern=r'^F[1-5]|F-$')]
+    prize_money: Annotated[str, StringConstraints(pattern=r'^£[1-9][0-9]*|£-$')]
     runs: List[TransformedFormdataRun]

@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, constr
+from pydantic import Field, StringConstraints
 
 from .transformed_base_model import TransformedBaseModel
 
@@ -12,7 +12,7 @@ class TransformedFormdataRun(TransformedBaseModel):
     win_prize: int
     course: str = Field(..., min_length=2, max_length=3)
     number_of_runners: int
-    weight: constr(regex='^(7|8|9|10|11|12)-([0-9]|10|11|12|13)$')
+    weight: Annotated[str, StringConstraints(pattern=r'^(7|8|9|10|11|12)-([0-9]|10|11|12|13)$')]
     headgear: str
     allowance: int
     jockey: str
