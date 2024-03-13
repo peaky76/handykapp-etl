@@ -1,7 +1,9 @@
 from functools import cache
+from typing import ClassVar, List
 
 from clients import mongo_client as client
 from models import PyObjectId, TransformedHorse, TransformedHorseCore, TransformedRunner
+from pymongo.collection import Collection
 
 from processors.person_processor import person_processor
 
@@ -10,16 +12,10 @@ from .utils import compact
 
 
 class HorseProcessor(Processor):
-    _descriptor = "horse"
-    _next_processor = person_processor
-    _table = client.handykapp.horses
-
-    @cache
-    def _search_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
-        if not isinstance(horse, TransformedHorse) and not isinstance(horse, TransformedHorseCore):
-            raise TypeError(f"Expected TransformedHorse or TransformedHorseCore, got {type(horse)}: {horse}")
-
-        return compact(horse.model_dump(include=["name", "country", "sex", "year"]))
+    _descriptor: ClassVar[str] = "horse"
+    _next_processor: ClassVar[Processor] = person_processor
+    _table: ClassVar[Collection] = client.handykapp.horses
+    _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 
     @cache
     def _update_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
