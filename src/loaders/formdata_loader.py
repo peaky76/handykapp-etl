@@ -186,59 +186,6 @@ def load_runs(formdata, horse_ids):
 
 ###############################################
 
-
-def formdata_loader():
-    logger = get_run_logger()
-    logger.info("Starting formdata loader")
-
-    try:
-        while True:
-            item = yield
-            horse, date = item
-
-            entry = horse._asdict()
-            entry["runs"] = [run._asdict() for run in entry["runs"]]
-
-            existing_entry = db.formdata.find_one({
-                "name": entry["name"],
-                "country": entry["country"],
-                "year": entry["year"],
-            })
-
-            if existing_entry:
-                runs = existing_entry["runs"]
-
-                for new_run in entry["runs"]:
-                    matched_run = next(
-                        (r for r in runs if r["date"] == new_run["date"]),
-                        None,
-                    )
-                    if matched_run:
-                        runs.remove(matched_run)
-                    runs.append(new_run)
-
-                db.formdata.find_one_and_update(
-                    {
-                        "name": entry["name"],
-                        "country": entry["country"],
-                        "year": entry["year"],
-                    },
-                    {
-                        "$set": {
-                            "runs": runs,
-                            "prize_money": entry["prize_money"],
-                            "trainer": entry["trainer"],
-                            "trainer_form": entry["trainer_form"],
-                        }
-                    },
-                )
-            else:
-                db.formdata.insert_one(entry)
-
-    except GeneratorExit:
-        pass
-
-
 def horse_loader():
     try:
         while True:
@@ -258,7 +205,7 @@ def word_processor():
     adding_horses = False
     adding_runs = False
 
-    fl = formdata_loader()
+    fl = formdata_processor()
     next(fl)
     hl = horse_loader()
     next(hl)
