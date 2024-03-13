@@ -11,16 +11,24 @@ class Processor:
     _descriptor: str | None = None
     _next_processor: Optional["Processor"] = None
     _table = None
+    _search_keys = None
+    _update_keys = None
+    _insert_keys = None
     
     def __init__(self):
         self.added = 0
         self.updated = 0
         self.skipped = 0
 
-    def _search_dictionary(self, item: TransformedBaseModel) -> dict: item.model_dump()
-    def _update_dictionary(self, item: TransformedBaseModel) -> dict: item.model_dump()
-    def _insert_dictionary(self, item: TransformedBaseModel) -> dict: item.model_dump()
+    def _search_dictionary(self, item: TransformedBaseModel) -> dict: 
+        return item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump()
 
+    def _update_dictionary(self, item: TransformedBaseModel) -> dict:
+        return item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump()
+
+    def _insert_dictionary(self, item: TransformedBaseModel) -> dict:
+        return item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump()
+        
     @cache
     def find(self, item: TransformedBaseModel) -> BaseModel | None:
         return self._table.find_one(self._search_dictionary(item))
