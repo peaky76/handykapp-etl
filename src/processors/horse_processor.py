@@ -7,11 +7,12 @@ from pymongo.collection import Collection
 
 from processors.person_processor import person_processor
 
+from .database_processor import DatabaseProcessor
 from .processor import Processor
 from .utils import compact
 
 
-class HorseProcessor(Processor):
+class HorseProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "horse"
     _next_processor: ClassVar[Processor] = person_processor
     _table: ClassVar[Collection] = client.handykapp.horses

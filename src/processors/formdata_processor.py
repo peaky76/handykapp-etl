@@ -4,10 +4,10 @@ from clients import mongo_client as client
 from models import PyObjectId, TransformedFormdataEntry
 from pymongo.collection import Collection
 
-from .processor import Processor
+from .database_processor import DatabaseProcessor
 
 
-class FormdataProcessor(Processor):
+class FormdataProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "formdata"
     _next_processor: ClassVar[None] = None
     _table: ClassVar[Collection] = client.handykapp.formdata

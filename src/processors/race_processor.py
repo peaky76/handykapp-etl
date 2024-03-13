@@ -6,10 +6,11 @@ from prefect import get_run_logger
 
 from processors.horse_processor import horse_processor
 
+from .database_processor import DatabaseProcessor
 from .processor import Processor
 
 
-class RaceProcessor(Processor):
+class RaceProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "race"
     _next_processor: ClassVar[Processor] = horse_processor
     _table: ClassVar[Collection] = client.handykapp.races

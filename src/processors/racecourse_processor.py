@@ -5,11 +5,11 @@ from clients import mongo_client as client
 from models import TransformedRacecourse
 from pymongo.collection import Collection
 
-from .processor import Processor
+from .database_processor import DatabaseProcessor
 from .utils import compact
 
 
-class RacecourseProcessor(Processor):
+class RacecourseProcessor(DatabaseProcessor):
     _descriptor: ClassVar[str] = "racecourse"
     _next_processor: ClassVar[None] = None
     _table: ClassVar[Collection] = client.handykapp.racecourses

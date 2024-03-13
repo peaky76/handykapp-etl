@@ -1,15 +1,18 @@
+from typing import ClassVar
+
 from clients import mongo_client as client
 from models import PyObjectId, TransformedPerson
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
+from pymongo.collection import Collection
 
-from .processor import Processor
+from .database_processor import DatabaseProcessor
 
 
-class PersonProcessor(Processor):
-    _descriptor = "person"
-    _next_processor = None
-    _table = client.handykapp.people
+class PersonProcessor(DatabaseProcessor):
+    _descriptor: ClassVar[str] = "person"
+    _next_processor: ClassVar[None] = None
+    _table: ClassVar[Collection]= client.handykapp.people
 
     def _update_dictionary(self, person) ->  dict:
         ratings = {} # TODO: Get ratings  
