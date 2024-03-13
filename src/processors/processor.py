@@ -2,6 +2,7 @@ from functools import cache
 from typing import ClassVar, List, Optional
 
 from models import PyObjectId, TransformedBaseModel
+from peak_utility.listish import compact
 from prefect import get_run_logger
 from pydantic import BaseModel
 from pymongo.collection import Collection
@@ -22,13 +23,13 @@ class Processor:
         self.skipped = 0
 
     def _search_dictionary(self, item: TransformedBaseModel) -> dict: 
-        return item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump()
+        return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
     def _update_dictionary(self, item: TransformedBaseModel) -> dict:
-        return item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump()
+        return compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
 
     def _insert_dictionary(self, item: TransformedBaseModel) -> dict:
-        return item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump()
+        return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
     def find(self, item: TransformedBaseModel) -> BaseModel | None:
@@ -50,8 +51,6 @@ class Processor:
         if self._next_processor:
             n = self._next_processor()
             next(n)
-        else:
-            n = None
 
         try:
             while True:
