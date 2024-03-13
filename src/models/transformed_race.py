@@ -22,4 +22,5 @@ class TransformedRace(TransformedBaseModel):
     prize: Optional[str] = None
     going_description: Optional[str] = None
     runners: list[TransformedHorse]
+    rapid_id: Optional[str] = None
     source: Source
