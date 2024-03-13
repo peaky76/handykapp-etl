@@ -1,24 +1,23 @@
 from functools import cache
+from typing import ClassVar
 
 from clients import mongo_client as client
 from models import TransformedRacecourse
+from pymongo.collection import Collection
 
 from .processor import Processor
 from .utils import compact
 
 
 class RacecourseProcessor(Processor):
-    _descriptor = "racecourse"
-    _next_processor = None
-    _table = client.handykapp.racecourses
-
-    @cache
-    def _search_dictionary(self, racecourse: TransformedRacecourse) -> dict:
-        return compact(racecourse.model_dump(include=["name", "country", "obstacle", "surface"]))
+    _descriptor: ClassVar[str] = "racecourse"
+    _next_processor: ClassVar[None] = None
+    _table: ClassVar[Collection] = client.handykapp.racecourses
+    _search_keys: ClassVar[str] = ["name", "country", "obstacle", "surface"]
 
     @cache
     def _update_dictionary(self, racecourse: TransformedRacecourse) -> dict:  
-        return compact({"references": { f"{racecourse.source}": racecourse.abbr } } |  racecourse.model_dump(exclude=["abbr", "source"]))
+        return self._insert_dictionary(racecourse)
 
     @cache
     def _insert_dictionary(self, racecourse: TransformedRacecourse) -> dict:
