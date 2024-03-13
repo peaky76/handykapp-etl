@@ -4,13 +4,14 @@ from typing import ClassVar, List, Optional
 from models import PyObjectId, TransformedBaseModel
 from prefect import get_run_logger
 from pydantic import BaseModel
+from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
 
 class Processor:
     _descriptor: ClassVar[Optional[str]] = None
     _next_processor: ClassVar[Optional["Processor"]] = None
-    _table: ClassVar[Optional[str]] = None
+    _table: ClassVar[Optional[Collection]] = None
     _search_keys: ClassVar[Optional[List[str]]] = None
     _update_keys: ClassVar[Optional[List[str]]] = None
     _insert_keys: ClassVar[Optional[List[str]]] = None
