@@ -2,15 +2,9 @@ from typing import Literal, Optional
 
 from pydantic import Field
 
-from .transformed_base_model import TransformedBaseModel
+import models.racecourse_fields as rf
 
-CodeType = Literal["Flat", "NH"]
-SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta", "Sand", "Snow"]
-ObstacleType = Literal["Hurdle", "Chase"]
-ShapeType = Literal["Circle", "Horseshoe", "Oval", "Pear", "Triangle"]
-Handedness = Literal["Left", "Right", "Both", "Neither"]
-StyleType = Literal["Galloping", "Sharp", "Stiff", "Tight"]
-ContourType = Literal["Flat", "Undulating", "Uphill"]
+from .transformed_base_model import TransformedBaseModel
 
 
 class TransformedRacecourse(TransformedBaseModel):
@@ -18,11 +12,11 @@ class TransformedRacecourse(TransformedBaseModel):
     formal_name: Optional[str] = None
     abbr: Optional[str] = None
     country: str = Field(..., min_length=2, max_length=3)
-    code: Optional[CodeType] = None
-    surface: Optional[SurfaceType] = None
-    obstacle: ObstacleType | None
-    shape: Optional[ShapeType] = None
-    handedness: Optional[Handedness] = None
-    style: Optional[StyleType] = None
-    contour: Optional[ContourType] = None
+    code: Optional[rf.CodeType] = None
+    surface: Optional[rf.SurfaceType] = None
+    obstacle: rf.ObstacleType | None
+    shape: Optional[rf.ShapeType] = None
+    handedness: Optional[rf.Handedness] = None
+    style: Optional[rf.StyleType] = None
+    contour: Optional[rf.ContourType] = None
     source: Literal["bha", "rapid", "racing_research", "theracingapi"]
