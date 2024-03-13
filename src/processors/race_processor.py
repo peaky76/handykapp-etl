@@ -1,3 +1,5 @@
+from typing import ClassVar, Collection, List
+
 from clients import mongo_client as client
 from models import PyObjectId, TransformedRace
 from prefect import get_run_logger
@@ -5,43 +7,15 @@ from prefect import get_run_logger
 from processors.horse_processor import horse_processor
 
 from .processor import Processor
-from .utils import compact
 
 
 class RaceProcessor(Processor):
-    _descriptor = "race"
-    _next_processor = horse_processor
-    _table = client.handykapp.races
-
-    def _search_dictionary(self, race: TransformedRace) -> dict:
-        return {
-            "racecourse": race["racecourse_id"],
-            "datetime": race["datetime"],
-        }
-
-    def _update_dictionary(self, race) -> dict:
-        return compact({
-                    "rapid_id": race.get("rapid_id"),
-                    "going_description": race.get("going_description"),
-                })
-
-    def _insert_dictionary(self, race) -> dict:
-        return compact({
-            "racecourse": race.get("racecourse_id"),
-            "datetime": race.get("datetime"),
-            "title": race.get("title"),
-            "is_handicap": race.get("is_handicap"),
-            "distance_description": race.get("distance_description"),
-            "going_description": race.get("going_description"),
-            "race_grade": race.get("race_grade"),
-            "race_class": race.get("race_class") or race.get("class"),
-            "age_restriction": race.get("age_restriction"),
-            "rating_restriction": race.get("rating_restriction"),
-            "prize": race.get("prize"),
-            "rapid_id": race.get("rapid_id"),
-        })
-
-
+    _descriptor: ClassVar[str] = "race"
+    _next_processor: ClassVar[Processor] = horse_processor
+    _table: ClassVar[Collection] = client.handykapp.races
+    _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
+    _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]
+    
     def post_process(self, race: TransformedRace, race_id: PyObjectId) -> None:
         try:
             for horse in race["runners"]:
