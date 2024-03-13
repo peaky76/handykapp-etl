@@ -4,11 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from .py_object_id import PyObjectId
-
-
-class MongoRaceRestriction(BaseModel):
-    minimum: Optional[int] = None
-    maximum: Optional[int] = None
+from .race_restriction import RaceRestriction
 
 
 class MongoRace(BaseModel):
@@ -21,7 +17,7 @@ class MongoRace(BaseModel):
     distance_description: str
     race_grade: Optional[str] = None
     race_class: Optional[int] = None
-    age_restriction: Optional[MongoRaceRestriction] = None
-    rating_restriction: Optional[MongoRaceRestriction] = None
+    age_restriction: Optional[RaceRestriction] = None
+    rating_restriction: Optional[RaceRestriction] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
