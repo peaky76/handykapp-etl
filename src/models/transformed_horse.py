@@ -21,5 +21,5 @@ class TransformedHorse(TransformedBaseModel):
     dam: Optional[TransformedHorseCore] = None
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
-    race_id: Optional[PyObjectId] = None
+    current_trainer: Optional[str] = None
     source: Source

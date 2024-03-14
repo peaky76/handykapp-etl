@@ -80,16 +80,17 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
         "country": "IRE",
         "year": 2020,
         "sex": "M",
-        "trainer": "Ollie Pears",
         "sire": {
             "name": "ADAAY",
             "country": "IRE",
-            "sex": "M"
+            "sex": "M",
+            "year": None
         },
         "dam": {
             "name": "TARA TOO",
             "country": "IRE",
-            "sex": "F"
+            "sex": "F",
+            "year": None
         },
         "operations": [{"operation_type": "gelding", "date": None}],
         "ratings": {
@@ -98,6 +99,7 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "chase": None,
             "hurdle": None,
         },
+        "current_trainer": "Ollie Pears",
         "source": "bha"
     }
     actual = compact(transform_ratings_data.fn(mock_data)[0].model_dump())
