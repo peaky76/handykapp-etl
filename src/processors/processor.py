@@ -1,11 +1,11 @@
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar, List, Optional
 
 from prefect import get_run_logger
 
 
 class Processor:
     _descriptor: ClassVar[Optional[str]] = None
-    _next_processors: ClassVar[Optional["Processor"]] = None
+    _next_processors: ClassVar[List["Processor"]] = []
 
     def process_wrapper(self):
         logger = get_run_logger()
