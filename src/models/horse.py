@@ -2,12 +2,11 @@ from typing import List, Literal, Optional
 
 from pydantic import Field
 
-from .official_ratings import OfficialRatings
-from .operation import Operation
-from .py_object_id import PyObjectId
-from .source import Source
 from .hashable_base_model import HashableBaseModel
 from .horse_core import HorseCore
+from .official_ratings import OfficialRatings
+from .operation import Operation
+from .source import Source
 
 
 class Horse(HashableBaseModel):
