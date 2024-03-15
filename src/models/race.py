@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
+from .hashable_base_model import HashableBaseModel
+from .horse import Horse
 from .py_object_id import PyObjectId
 from .race_restriction import RaceRestriction
 from .source import Source
-from .hashable_base_model import HashableBaseModel
-from .horse import Horse
 
 
 class Race(HashableBaseModel):

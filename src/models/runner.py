@@ -1,7 +1,7 @@
 from typing import Optional
 
-from .py_object_id import PyObjectId
 from .horse import Horse
+from .py_object_id import PyObjectId
 
 
 class Runner(Horse):

@@ -4,8 +4,8 @@ from pydantic import Field
 
 import models.racecourse_fields as rf
 
-from .source import Source
 from .hashable_base_model import HashableBaseModel
+from .source import Source
 
 
 class Racecourse(HashableBaseModel):

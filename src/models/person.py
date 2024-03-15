@@ -1,8 +1,8 @@
 from typing import Literal, Optional
 
+from .hashable_base_model import HashableBaseModel
 from .py_object_id import PyObjectId
 from .source import Source
-from .hashable_base_model import HashableBaseModel
 
 
 class Person(HashableBaseModel):
