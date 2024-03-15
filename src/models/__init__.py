@@ -1,41 +1,33 @@
-from .mongo_horse import MongoHorse
-from .mongo_person import MongoPerson
-from .mongo_race import MongoRace
-from .mongo_racecourse import MongoRacecourse
-from .mongo_references import MongoReferences
+from .formdata_entry import FormdataEntry
+from .formdata_run import FormdataRun
+from .hashable_base_model import HashableBaseModel
+from .horse import Horse
+from .horse_core import HorseCore
 from .official_ratings import OfficialRatings
 from .operation import Operation
+from .person import Person
 from .py_object_id import PyObjectId
+from .race import Race
 from .race_restriction import RaceRestriction
+from .racecourse import Racecourse
+from .references import References
+from .runner import Runner
 from .source import Source
-from .transformed_base_model import TransformedBaseModel
-from .transformed_formdata_entry import TransformedFormdataEntry
-from .transformed_formdata_run import TransformedFormdataRun
-from .transformed_horse import TransformedHorse
-from .transformed_horse_core import TransformedHorseCore
-from .transformed_person import TransformedPerson
-from .transformed_race import TransformedRace
-from .transformed_racecourse import TransformedRacecourse
-from .transformed_runner import TransformedRunner
 
 __all__ = [
-    "MongoHorse",
-    "MongoPerson",
-    "MongoRace",
-    "MongoRacecourse",
-    "MongoReferences",
+    "FormdataEntry",
+    "FormdataRun",
+    "HashableBaseModel",
+    "Horse",
+    "HorseCore",
     "OfficialRatings",
     "Operation",
-    "RaceRestriction",
-    "Source",
-    "TransformedBaseModel",
-    "TransformedHorse",
-    "TransformedHorseCore",
-    "TransformedFormdataEntry",
-    "TransformedFormdataRun",
-    "TransformedPerson",
-    "TransformedRace",
-    "TransformedRacecourse",
-    "TransformedRunner",
+    "Person",
     "PyObjectId",
+    "Race",
+    "RaceRestriction",
+    "Racecourse",
+    "References",
+    "Runner",
+    "Source",
 ]

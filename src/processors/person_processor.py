@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from clients import mongo_client as client
-from models import PyObjectId, TransformedPerson
+from models import PyObjectId, Person
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
 from pymongo.collection import Collection
@@ -33,7 +33,7 @@ class PersonProcessor(DatabaseProcessor):
             else {}
         )
 
-    def find(self, person: TransformedPerson) -> BaseModel | None:
+    def find(self, person: Person) -> HashableBaseModel | None:
         found_person = self._table.find_one({"references": { person["source"]: person }}, {"_id": 1})
 
         if not found_person:
@@ -51,7 +51,7 @@ class PersonProcessor(DatabaseProcessor):
         
         return found_person
 
-    def post_process(self, person: TransformedPerson, db_id: PyObjectId) -> None:
+    def post_process(self, person: Person, db_id: PyObjectId) -> None:
         if person.race_id:
             client.handykapp.races.update_one(
                 {"_id": person.race_id, "runners.horse": person.horse_id},

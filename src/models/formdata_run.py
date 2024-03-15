@@ -3,10 +3,10 @@ from typing import Annotated, Literal
 
 from pydantic import Field, StringConstraints
 
-from .transformed_base_model import TransformedBaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class TransformedFormdataRun(TransformedBaseModel):
+class FormdataRun(HashableBaseModel):
     date: datetime
     race_type: str
     win_prize: int

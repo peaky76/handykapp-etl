@@ -1,9 +1,9 @@
 from datetime import date
 from typing import Optional
 
-from .transformed_base_model import TransformedBaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class Operation(TransformedBaseModel):
+class Operation(HashableBaseModel):
     operation_type: str
     date: Optional[date] = None

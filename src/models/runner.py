@@ -1,10 +1,10 @@
 from typing import Optional
 
 from .py_object_id import PyObjectId
-from .transformed_horse import TransformedHorse
+from .horse import Horse
 
 
-class TransformedRunner(TransformedHorse):
+class Runner(Horse):
     race_id: PyObjectId
     jockey: Optional[str] = None
     trainer: Optional[str] = None    

@@ -4,11 +4,11 @@ from typing import Optional
 from .py_object_id import PyObjectId
 from .race_restriction import RaceRestriction
 from .source import Source
-from .transformed_base_model import TransformedBaseModel
-from .transformed_horse import TransformedHorse
+from .hashable_base_model import HashableBaseModel
+from .horse import Horse
 
 
-class TransformedRace(TransformedBaseModel):
+class Race(HashableBaseModel):
     racecourse_id: PyObjectId
     datetime: datetime
     title: str
@@ -21,6 +21,6 @@ class TransformedRace(TransformedBaseModel):
     rating_restriction: Optional[RaceRestriction] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
-    runners: list[TransformedHorse]
+    runners: list[Horse]
     rapid_id: Optional[str] = None
     source: Source

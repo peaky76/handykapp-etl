@@ -5,10 +5,10 @@ from pydantic import Field
 import models.racecourse_fields as rf
 
 from .source import Source
-from .transformed_base_model import TransformedBaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class TransformedRacecourse(TransformedBaseModel):
+class Racecourse(HashableBaseModel):
     name: str
     formal_name: Optional[str] = None
     abbr: Optional[str] = None

@@ -2,7 +2,7 @@ from functools import cache
 from typing import ClassVar
 
 from clients import mongo_client as client
-from models import TransformedRacecourse
+from models import Racecourse
 from pymongo.collection import Collection
 
 from .database_processor import DatabaseProcessor
@@ -15,11 +15,11 @@ class RacecourseProcessor(DatabaseProcessor):
     _search_keys: ClassVar[str] = ["name", "country", "obstacle", "surface"]
 
     @cache
-    def _update_dictionary(self, racecourse: TransformedRacecourse) -> dict:  
+    def _update_dictionary(self, racecourse: Racecourse) -> dict:  
         return self._insert_dictionary(racecourse)
 
     @cache
-    def _insert_dictionary(self, racecourse: TransformedRacecourse) -> dict:
+    def _insert_dictionary(self, racecourse: Racecourse) -> dict:
         return compact({"references": { f"{racecourse.source}": racecourse.abbr } }  |  racecourse.model_dump(exclude=["abbr", "source"]))
 
 racecourse_processor = RacecourseProcessor().process

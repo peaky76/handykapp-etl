@@ -12,7 +12,7 @@ import petl  # type: ignore
 import tomllib
 from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
-from models.mongo_horse import MongoHorse
+from models.horse import Horse
 from prefect import get_run_logger, task
 
 with open("settings.toml", "rb") as f:
@@ -328,7 +328,7 @@ def formdata_horse_processor():
 
 
 @task(tags=["Racing Research"])
-def transform_horse_data(data: dict) -> list[MongoHorse]:
+def transform_horse_data(data: dict) -> list[Horse]:
     used_fields = ("name", "country", "year", "trainer", "prize_money")
     return (
         petl.fromdicts(data)

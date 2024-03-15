@@ -19,7 +19,7 @@ from horsetalk import (  # type: ignore
     RaceDistance,
     Surface,
 )
-from models.transformed_racecourse import TransformedRacecourse
+from models.racecourse import Racecourse
 from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
 
@@ -40,7 +40,7 @@ def read_csvs():
 
 
 @task(tags=["Core"])
-def transform_racecourses_data(data) -> List[TransformedRacecourse]:
+def transform_racecourses_data(data) -> List[Racecourse]:
     used_fields = (
         "Name",
         "Formal Name",
@@ -67,7 +67,7 @@ def transform_racecourses_data(data) -> List[TransformedRacecourse]:
         .replace("handedness", "Straight", "Neither")
         .dicts()
     )
-    return [TransformedRacecourse(**racecourse) for racecourse in racecourse_dicts]
+    return [Racecourse(**racecourse) for racecourse in racecourse_dicts]
 
 
 @task(tags=["Core"])
@@ -145,7 +145,7 @@ def validate_racecourses_data(data: Any) -> bool:
 
 
 @flow
-def core_transformer() -> List[TransformedRacecourse]:
+def core_transformer() -> List[Racecourse]:
     racecourses = []
     for csv in read_csvs():
         problems = validate_racecourses_data(csv)

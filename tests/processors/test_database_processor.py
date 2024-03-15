@@ -26,7 +26,7 @@
 #     processor.update = mock_update
 #     processor.insert = mock_insert
 
-#     generator = processor.process_wrapper()
+#     generator = processor
 #     next(generator)
 
 #     generator.send("item")
@@ -48,7 +48,7 @@
 #     processor.update = mock_update
 #     processor.insert = mock_insert
 
-#     generator = processor.process_wrapper()
+#     generator = processor
 #     next(generator)
 
 #     generator.send("item")

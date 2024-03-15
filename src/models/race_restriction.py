@@ -1,8 +1,8 @@
 from typing import Optional
 
-from .transformed_base_model import TransformedBaseModel
+from .hashable_base_model import HashableBaseModel
 
 
-class RaceRestriction(TransformedBaseModel):
+class RaceRestriction(HashableBaseModel):
     minimum: Optional[int] = None
     maximum: Optional[int] = None

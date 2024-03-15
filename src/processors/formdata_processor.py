@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from clients import mongo_client as client
-from models import PyObjectId, TransformedFormdataEntry
+from models import PyObjectId, FormdataEntry
 from pymongo.collection import Collection
 
 from .database_processor import DatabaseProcessor
@@ -12,7 +12,7 @@ class FormdataProcessor(DatabaseProcessor):
     _table: ClassVar[Collection] = client.handykapp.formdata
     _search_keys: ClassVar[list[str]] = ["name", "country", "year"]
 
-    def update(self, entry: TransformedFormdataEntry, db_id: PyObjectId) -> None:
+    def update(self, entry: FormdataEntry, db_id: PyObjectId) -> None:
         runs = self._table.find_one({"_id": db_id})["runs"]
 
         for new_run in entry.runs:

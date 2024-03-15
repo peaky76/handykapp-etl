@@ -1,7 +1,7 @@
 from functools import cache
 from typing import ClassVar, List, Optional
 
-from models import PyObjectId, TransformedBaseModel
+from models import PyObjectId, HashableBaseModel
 from peak_utility.listish import compact
 from prefect import get_run_logger
 from pydantic import BaseModel
@@ -24,26 +24,26 @@ class DatabaseProcessor(Processor):
         self.updated = 0
         self.skipped = 0
 
-    def _search_dictionary(self, item: TransformedBaseModel) -> dict: 
+    def _search_dictionary(self, item: HashableBaseModel) -> dict: 
         return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
-    def _update_dictionary(self, item: TransformedBaseModel) -> dict:
+    def _update_dictionary(self, item: HashableBaseModel) -> dict:
         return compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
 
-    def _insert_dictionary(self, item: TransformedBaseModel) -> dict:
+    def _insert_dictionary(self, item: HashableBaseModel) -> dict:
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: TransformedBaseModel) -> BaseModel | None:
+    def find(self, item: HashableBaseModel) -> HashableBaseModel | None:
         return self._table.find_one(self._search_dictionary(item))
 
-    def update(self, item: TransformedBaseModel, db_id: PyObjectId) -> None:
+    def update(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
         self._table.update_one(
             {"_id": db_id},
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: TransformedBaseModel) -> PyObjectId:
+    def insert(self, item: HashableBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
     def process(self, *, find_first: bool = True):
@@ -59,7 +59,7 @@ class DatabaseProcessor(Processor):
                 item = yield
                 db_id = None
 
-                def update_if_needed(item: TransformedBaseModel, db_item: BaseModel):
+                def update_if_needed(item: HashableBaseModel, db_item: HashableBaseModel):
                     d = self._update_dictionary(item)
                     if any(db_item[k] != d[k] for k in d):
                         self.update(item, db_item["_id"])
@@ -96,5 +96,5 @@ class DatabaseProcessor(Processor):
                 f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
             )
 
-    def post_process(self, item: TransformedBaseModel, db_id: PyObjectId) -> None:
+    def post_process(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
         pass

@@ -2,7 +2,7 @@ from functools import cache
 from typing import ClassVar, List
 
 from clients import mongo_client as client
-from models import PyObjectId, TransformedHorse, TransformedHorseCore, TransformedRunner
+from models import PyObjectId, Horse, HorseCore, Runner
 from pymongo.collection import Collection
 
 from processors.person_processor import person_processor
@@ -19,8 +19,8 @@ class HorseProcessor(DatabaseProcessor):
     _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 
     @cache
-    def _update_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
-        if isinstance(horse, TransformedHorseCore):
+    def _update_dictionary(self, horse: Horse | HorseCore) -> dict:
+        if isinstance(horse, HorseCore):
             return {}
 
         return compact({
@@ -30,11 +30,11 @@ class HorseProcessor(DatabaseProcessor):
         })
 
     @cache
-    def _insert_dictionary(self, horse: TransformedHorse | TransformedHorseCore) -> dict:
+    def _insert_dictionary(self, horse: Horse | HorseCore) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
-    def post_process(self, horse: TransformedHorse | TransformedHorseCore, db_id: PyObjectId):
-        if isinstance(horse, TransformedRunner) and horse.race_id:
+    def post_process(self, horse: Horse | HorseCore, db_id: PyObjectId):
+        if isinstance(horse, Runner) and horse.race_id:
             client.handykapp.races.update_one(
                 {"_id": horse.race_id},
                 {
