@@ -12,7 +12,7 @@ import petl  # type: ignore
 import tomllib
 from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
-from models.horse import Horse
+from models import FormdataEntry, FormdataRun, Horse
 from prefect import get_run_logger, task
 
 with open("settings.toml", "rb") as f:
@@ -29,7 +29,7 @@ Run = namedtuple(
     "Run",
     [
         "date",
-        "type",
+        "race_type",
         "win_prize",
         "course",
         "number_of_runners",
@@ -92,7 +92,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
         logger.error(f"Error creating horse from {words}: {e}")
         horse = None
 
-    return horse
+    return FormdataEntry(**horse._asdict())
 
 
 def create_run(words: list[str]) -> Run:
@@ -168,7 +168,7 @@ def create_run(words: list[str]) -> Run:
         logger.error(f"Error creating run from {words}: {e}")
         run = None
 
-    return run
+    return FormdataRun(**run._asdict()) if run else None
 
 
 def extract_dist_going(string: str) -> tuple[str] | None:

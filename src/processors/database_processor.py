@@ -1,7 +1,8 @@
 from functools import cache
 from typing import ClassVar, List, Optional
 
-from models import PyObjectId, HashableBaseModel
+from clients import mongo_client as client
+from models import HashableBaseModel, PyObjectId
 from peak_utility.listish import compact
 from prefect import get_run_logger
 from pydantic import BaseModel
@@ -12,9 +13,6 @@ from .processor import Processor
 
 
 class DatabaseProcessor(Processor):
-    _descriptor: ClassVar[Optional[str]] = None
-    _next_processor: ClassVar[Optional["DatabaseProcessor"]] = None
-    _table: ClassVar[Optional[Collection]] = None
     _search_keys: ClassVar[Optional[List[str]]] = None
     _update_keys: ClassVar[Optional[List[str]]] = None
     _insert_keys: ClassVar[Optional[List[str]]] = None
@@ -24,7 +22,19 @@ class DatabaseProcessor(Processor):
         self.updated = 0
         self.skipped = 0
 
-    def _search_dictionary(self, item: HashableBaseModel) -> dict: 
+    @property
+    def _exit_message(self) -> str:
+        return f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
+
+    @property
+    def _table(self) -> Collection:
+        return client.handykapp[self._table_name]
+
+    @property
+    def _table_name(self) -> str:
+        return f"{self._descriptor}s" 
+
+    def _search_dictionary(self, item: BaseModel) -> dict: 
         return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
     def _update_dictionary(self, item: HashableBaseModel) -> dict:
@@ -46,55 +56,41 @@ class DatabaseProcessor(Processor):
     def insert(self, item: HashableBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self, *, find_first: bool = True):
+    def process(self, item: BaseModel, running_processors: List[Processor], *, find_first: bool = True):
         logger = get_run_logger()
-        logger.info(f"Starting {self._descriptor} processor")
-                
-        if self._next_processor:
-            n = self._next_processor()
-            next(n)
+        db_id = None
+
+        def update_if_needed(item: BaseModel, db_item: BaseModel):
+            d = self._update_dictionary(item)
+            if any(db_item[k] != d[k] for k in d):
+                self.update(item, db_item["_id"])
+                logger.debug(f"{item} updated")
+                self.updated += 1
+            else:
+                logger.debug(f"{item} unchanged")
+                self.skipped += 1
 
         try:
-            while True:
-                item = yield
-                db_id = None
+            if find_first and (db_item := self.find(item)):
+                update_if_needed(item, db_item)
+            else:
+                db_id = self.insert(item)
+                logger.debug(f"{item} added to db")
+                self.added += 1
+        except DuplicateKeyError:
+            if not find_first:
+                db_item = self.find(item)
+                update_if_needed(item, db_item)
+                db_id = db_item["_id"]
+        except ValueError as e:
+            logger.warning(e)
+            self.skipped += 1
+            
+        total = self.updated + self.added + self.skipped
+        if total % 250 == 0:
+            logger.info(f"Processed {total} {self._descriptor} records")
 
-                def update_if_needed(item: HashableBaseModel, db_item: HashableBaseModel):
-                    d = self._update_dictionary(item)
-                    if any(db_item[k] != d[k] for k in d):
-                        self.update(item, db_item["_id"])
-                        logger.debug(f"{item} updated")
-                        self.updated += 1
-                    else:
-                        logger.debug(f"{item} unchanged")
-                        self.skipped += 1
+        self.post_process(item, db_id, running_processors)   
 
-                try:
-                    if find_first and (db_item := self.find(item)):
-                        update_if_needed(item, db_item)
-                    else:
-                        db_id = self.insert(item)
-                        logger.debug(f"{item} added to db")
-                        self.added += 1
-                except DuplicateKeyError:
-                    if not find_first:
-                        db_item = self.find(item)
-                        update_if_needed(item, db_item)
-                        db_id = db_item["_id"]
-                except ValueError as e:
-                    logger.warning(e)
-                    self.skipped += 1
-                    
-                total = self.updated + self.added + self.skipped
-                if total % 250 == 0:
-                    logger.info(f"Processed {total} {self._descriptor}s.")
-
-                self.post_process(item, db_id)
-
-        except GeneratorExit:
-            logger.info(
-                f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
-            )
-
-    def post_process(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
+    def post_process(self, item: HashableBaseModel, db_id: PyObjectId, running_processors: List[Processor]) -> None:
         pass

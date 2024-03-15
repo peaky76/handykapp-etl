@@ -9,7 +9,7 @@ import tomllib
 from clients import mongo_client as client
 from helpers import get_files, read_file
 from prefect import flow, get_run_logger
-from processors.record_processor import record_processor
+from processors.record_processor import RecordProcessor
 from transformers.theracingapi_transformer import transform_races, validate_races
 
 with open("settings.toml", "rb") as f:
@@ -40,7 +40,7 @@ def load_theracingapi_data(*, from_date=None):
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
-    r = record_processor()
+    r = RecordProcessor()
     next(r)
     for file in get_files(f"{SOURCE}racecards"):
         if from_date:

@@ -1,3 +1,3 @@
 from typing import Literal
 
-Source = Literal["bha", "rapid", "racing_research", "theracingapi"]
+Source = Literal["bha", "core", "rapid", "racing_research", "theracingapi"]

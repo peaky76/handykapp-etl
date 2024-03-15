@@ -1,34 +1,22 @@
 from typing import ClassVar
 
-from clients import mongo_client as client
-from models import PyObjectId, FormdataEntry
-from pymongo.collection import Collection
+from models import FormdataEntry, PyObjectId
 
 from .database_processor import DatabaseProcessor
 
 
 class FormdataProcessor(DatabaseProcessor):
-    _descriptor: ClassVar[str] = "formdata"
-    _table: ClassVar[Collection] = client.handykapp.formdata
+    _table_name = "formdata"
     _search_keys: ClassVar[list[str]] = ["name", "country", "year"]
 
     def update(self, entry: FormdataEntry, db_id: PyObjectId) -> None:
-        runs = self._table.find_one({"_id": db_id})["runs"]
+        existing_entry = self._table.find_one({"_id": db_id})
+        existing_runs = existing_entry["runs"]
+        incoming_runs = [r.model_dump() for r in entry.runs]
+        merged_runs = {d["date"]: d for d in existing_runs + incoming_runs}
 
-        for new_run in entry.runs:
-
-            matched_run = next(
-                (r for r in runs if r["date"] == new_run["date"]),
-                None,
-            )
-            if matched_run:
-                runs.remove(matched_run)
-            runs.append(new_run)
-
-        update_dict = {"runs": runs} | entry.model_dump(include=["prize_money", "trainer", "trainer_form"])
+        update_dict = {"runs": list(merged_runs.values())} | entry.model_dump(include=["prize_money", "trainer", "trainer_form"])
         self._table.update_one(
             {"_id": db_id},
             {"$set": update_dict},
         )
-   
-formdata_processor = FormdataProcessor().process

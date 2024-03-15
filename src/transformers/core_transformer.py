@@ -40,7 +40,7 @@ def read_csvs():
 
 
 @task(tags=["Core"])
-def transform_racecourses_data(data) -> List[Racecourse]:
+def transform_racecourses_data(data: petl.Table) -> List[Racecourse]:
     used_fields = (
         "Name",
         "Formal Name",
@@ -58,7 +58,7 @@ def transform_racecourses_data(data) -> List[Racecourse]:
         .rename({x: snake(x.lower()) for x in used_fields})
         .rename({"speed": "style", "direction": "handedness", "rr_abbr": "abbr"})
         .addfield("code", lambda rec: "NH" if rec["obstacle"] else "Flat", index=2)
-        .addfield("source", "racing_research")
+        .addfield("source", "core")
         .convert("formal_name", lambda x, rec: x if x else rec["name"], pass_row=True)
         .convert("obstacle", lambda x: x.replace("Steeple", "") if x else x)
         .convert(
@@ -71,7 +71,7 @@ def transform_racecourses_data(data) -> List[Racecourse]:
 
 
 @task(tags=["Core"])
-def validate_racecourses_data(data: Any) -> bool:
+def validate_racecourses_data(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "Name",
         "Formal Name",

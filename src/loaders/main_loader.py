@@ -46,7 +46,10 @@ def spec_database():
     db.racecourses.create_index("name")
     db.races.create_index([("racecourse", ASC), ("datetime", ASC)], unique=True)
     db.races.create_index("result.horse")
-
+    db.formdata.create_index(
+        [("name", ASC), ("country", ASC), ("year", ASC)],
+        unique=True
+    )
 
 @flow
 def load_database_afresh():
@@ -55,9 +58,9 @@ def load_database_afresh():
     load_racecourses()
     load_bha()
     load_formdata_only()
-    load_theracingapi_data()
-    load_rapid_horseracing_data()
-    load_jockey_ratings()
+    # load_theracingapi_data()
+    # load_rapid_horseracing_data()
+    # load_jockey_ratings()
     # load_formdata_horses()
 
 

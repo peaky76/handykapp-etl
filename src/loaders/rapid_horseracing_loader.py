@@ -9,7 +9,7 @@ import tomllib
 from clients import mongo_client as client
 from helpers import get_files, read_file
 from prefect import flow, get_run_logger
-from processors.record_processor import record_processor
+from processors.record_processor import RecordProcessor
 from transformers.rapid_horseracing_transformer import (
     transform_results,
     validate_results,
@@ -28,7 +28,7 @@ def load_rapid_horseracing_data():
     logger = get_run_logger()
     logger.info("Starting rapid_horseracing loader")
 
-    r = record_processor()
+    r = RecordProcessor()
     next(r)
 
     files = get_files(f"{SOURCE}results")

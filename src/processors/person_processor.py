@@ -1,61 +1,47 @@
-from typing import ClassVar
+from typing import List
 
 from clients import mongo_client as client
-from models import PyObjectId, Person
+from models import Person, PyObjectId
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
-from pymongo.collection import Collection
 
 from .database_processor import DatabaseProcessor
+from .processor import Processor
 
 
 class PersonProcessor(DatabaseProcessor):
-    _descriptor: ClassVar[str] = "person"
-    _table: ClassVar[Collection]= client.handykapp.people
+    _descriptor = "person"
+    _table_name = "people" 
 
-    def _update_dictionary(self, person) ->  dict:
+    def _update_dictionary(self, person: Person) ->  dict:
         ratings = {} # TODO: Get ratings  
-        return (
-            {f"references.{person['source']}": person["name"]} | {"ratings": ratings}
-            if ratings
-            else {}
-        )
+        r = {"ratings": ratings} if ratings else {}
+        return {"references": {person.source: person.name}} | r
 
-    def _insert_dictionary(self, person) -> dict:
-        name_parts = HumanName(person["name"])
-        ratings = {} # TODO: Get ratings
+    def _insert_dictionary(self, person: Person) -> dict:
+        return HumanName(person.name).as_dict() | self._update_dictionary(person)
 
-        return (
-            name_parts.as_dict()
-            | {f"references.{person['source']}": person["name"]}
-            | {"ratings": ratings}
-            if ratings
-            else {}
-        )
+    def find(self, person: Person) -> BaseModel | None:
+        found_person = self._table.find_one({"references": { person.source: person.name }})
 
-    def find(self, person: Person) -> HashableBaseModel | None:
-        found_person = self._table.find_one({"references": { person["source"]: person }}, {"_id": 1})
-
-        if not found_person:
-            name_parts = HumanName(person["name"])       
-            possibilities = self._table.find({"last": name_parts.last})
-            for possibility in possibilities:
-                if name_parts.first == possibility["first"] or (
-                    name_parts.first
-                    and possibility["first"]
-                    and name_parts.first[0] == possibility["first"][0]
-                    and name_parts.title == possibility["title"]
-                ):
-                    found_person = possibility
-                    break
+        # if not found_person:
+        #     name_parts = HumanName(person.name)       
+        #     possibilities = self._table.find({"last": name_parts.last})
+        #     for possibility in possibilities:
+        #         if name_parts.first == possibility["first"] or (
+        #             name_parts.first
+        #             and possibility["first"]
+        #             and name_parts.first[0] == possibility["first"][0]
+        #             and name_parts.title == possibility["title"]
+        #         ):
+        #             found_person = possibility
+        #             break
         
         return found_person
 
-    def post_process(self, person: Person, db_id: PyObjectId) -> None:
+    def post_process(self, person: Person, db_id: PyObjectId, _running_processors: List[Processor]) -> None:
         if person.race_id:
             client.handykapp.races.update_one(
                 {"_id": person.race_id, "runners.horse": person.horse_id},
                 {"$set": {f"runners.$.{person.role}": db_id}},
             )
-
-person_processor = PersonProcessor().process

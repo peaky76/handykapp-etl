@@ -1,21 +1,18 @@
 from functools import cache
 from typing import ClassVar, List
 
-from clients import mongo_client as client
-from models import PyObjectId, Horse, HorseCore, Runner
-from pymongo.collection import Collection
+from models import PyObjectId, Horse, HorseCore, Person
 
-from processors.person_processor import person_processor
+from processors.person_processor import PersonProcessor
 
 from .database_processor import DatabaseProcessor
 from .processor import Processor
 from .utils import compact
 
+InputType = Horse | HorseCore
 
 class HorseProcessor(DatabaseProcessor):
-    _descriptor: ClassVar[str] = "horse"
-    _next_processors: ClassVar[List[Processor]] = [person_processor]
-    _table: ClassVar[Collection] = client.handykapp.horses
+    _next_processors: ClassVar[List[Processor]] = [PersonProcessor]
     _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 
     @cache
@@ -30,54 +27,48 @@ class HorseProcessor(DatabaseProcessor):
         })
 
     @cache
-    def _insert_dictionary(self, horse: Horse | HorseCore) -> dict:
+    def _insert_dictionary(self, horse: InputType) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
-    def post_process(self, horse: Horse | HorseCore, db_id: PyObjectId):
-        if isinstance(horse, Runner) and horse.race_id:
-            client.handykapp.races.update_one(
-                {"_id": horse.race_id},
-                {
-                    "$push": {
-                        "runners": {"horse": horse.db_id } | 
-                            compact(horse.model_dump(include=[
-                                "owner",
-                                "allowance",
-                                "saddlecloth",
-                                "draw",
-                                "headgear",
-                                "lbs_carried",
-                                "official_rating",
-                                "position",
-                                "distance_beaten",
-                                "sp",
-                        ]))
-                    }
-                },
-            )
+    def post_process(self, horse: InputType, db_id: PyObjectId, running_processors: List[Processor]):
+        p = running_processors[0]
+        
+        if isinstance(horse, Horse) and horse.current_trainer:    
+            name = horse.current_trainer
+            source = horse.source
+            person = Person(**{"name": name, "role": "trainer", "source": horse.source})
+            p.send(person)
 
-            if horse.trainer:
-                person_processor.send((
-                    {
-                        "name": horse["trainer"],
-                        "role": "trainer",
-                        "race_id": horse.race_id,
-                        "horse_id": db_id,
-                    },
-                    horse["source"],
-                    # {},
-                ))
+        # if isinstance(horse, Runner) and horse.race_id:
+        #     client.handykapp.races.update_one(
+        #         {"_id": horse.race_id},
+        #         {
+        #             "$push": {
+        #                 "runners": {"horse": horse.db_id } | 
+        #                     compact(horse.model_dump(include=[
+        #                         "owner",
+        #                         "allowance",
+        #                         "saddlecloth",
+        #                         "draw",
+        #                         "headgear",
+        #                         "lbs_carried",
+        #                         "official_rating",
+        #                         "position",
+        #                         "distance_beaten",
+        #                         "sp",
+        #                 ]))
+        #             }
+        #         },
+        #     )
 
-            if horse.jockey:
-                person_processor.send((
-                    {
-                        "name": horse["jockey"],
-                        "role": "jockey",
-                        "race_id": horse.race_id,
-                        "horse_id": db_id,
-                    },
-                    horse["source"],
-                    # {},
-                ))
-
-horse_processor = HorseProcessor().process
+        #     if horse.jockey:
+        #         PersonProcessor.send((
+        #             {
+        #                 "name": horse["jockey"],
+        #                 "role": "jockey",
+        #                 "race_id": horse.race_id,
+        #                 "horse_id": db_id,
+        #             },
+        #             horse["source"],
+        #             # {},
+        #         ))

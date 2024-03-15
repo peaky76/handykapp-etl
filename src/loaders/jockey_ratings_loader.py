@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, get_run_logger
-from processors.person_processor import person_processor
+from processors.person_processor import PersonProcessor
 from transformers.jockey_ratings_transformer import transform_jockey_ratings
 
 
@@ -14,7 +14,7 @@ def load_jockey_ratings():
     logger = get_run_logger()
     logger.info("Starting jockey rating loader")
 
-    p = person_processor()
+    p = PersonProcessor()
     next(p)
 
     for jockey, rating in transform_jockey_ratings().items():

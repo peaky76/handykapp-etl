@@ -5,23 +5,19 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
-from prefect import flow, get_run_logger
-from processors.racecourse_processor import racecourse_processor
+from prefect import flow
+from processors.racecourse_processor import RacecourseProcessor
 from transformers.core_transformer import core_transformer
 
 db = client.handykapp
 
 @flow
 def load_racecourses():
-    logger = get_run_logger()
-    logger.info("Starting racecourse loader")
-
-    racecourses = core_transformer()
-
-    r = racecourse_processor()
+    data = core_transformer()
+    r = RacecourseProcessor()()
     next(r)
 
-    for racecourse in racecourses:
+    for racecourse in data:
         r.send(racecourse)
     
     r.close()
