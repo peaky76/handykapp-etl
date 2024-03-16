@@ -17,7 +17,8 @@ class DatabaseProcessor(Processor):
     _update_keys: ClassVar[Optional[List[str]]] = None
     _insert_keys: ClassVar[Optional[List[str]]] = None
     
-    def __init__(self):
+    def __init__(self, *, find_first: bool = True):
+        self.find_first = find_first
         self.added = 0
         self.updated = 0
         self.unchanged = 0
@@ -57,7 +58,7 @@ class DatabaseProcessor(Processor):
     def insert(self, item: HashableBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self, item: BaseModel, running_processors: List[Processor], *, find_first: bool = True):
+    def process(self, item: BaseModel, running_processors: List[Processor]):
         logger = get_run_logger()
         db_id = None
 
@@ -72,14 +73,14 @@ class DatabaseProcessor(Processor):
                 self.unchanged += 1
 
         try:
-            if find_first and (db_item := self.find(item)):
+            if self.find_first and (db_item := self.find(item)):
                 update_if_needed(item, db_item)
             else:
                 db_id = self.insert(item)
                 logger.debug(f"{item} added to db")
                 self.added += 1
         except DuplicateKeyError:
-            if not find_first:
+            if not self.find_first:
                 db_item = self.find(item)
                 update_if_needed(item, db_item)
                 db_id = db_item["_id"]
