@@ -91,7 +91,7 @@ class DatabaseProcessor(Processor):
             logger.warning(e)
             self.skipped += 1
             
-        total = self.updated + self.added + self.skipped
+        total = self.updated + self.added + self.skipped + self.unchanged
         if total % 250 == 0:
             logger.info(f"Processed {total} {self._descriptor} records")
 
