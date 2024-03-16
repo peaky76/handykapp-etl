@@ -45,7 +45,7 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_data(data: Any) -> List[Horse]:
+def transform_ratings_data(data: petl.Table) -> List[Horse]:
     used_fields = (
         "Name",
         "Year",
@@ -95,7 +95,7 @@ def transform_ratings_data(data: Any) -> List[Horse]:
 
 
 @task(tags=["BHA"])
-def validate_ratings_data(data: Any) -> bool:
+def validate_ratings_data(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "Name",
         "Year",
