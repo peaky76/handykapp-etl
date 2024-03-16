@@ -26,7 +26,7 @@ def get_racecourse_id(course, surface, code, obstacle) -> str:
     return racecourse["_id"] if racecourse else None
 
 class RecordProcessor(Processor):
-    _next_processors: ClassVar[List[Processor]] = [RaceProcessor]
+    _forward_processors: ClassVar[List[Processor]] = [RaceProcessor]
 
     def __init__(self):
         self.reject_count = 0

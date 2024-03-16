@@ -4,7 +4,7 @@ from prefect import get_run_logger
 
 
 class Processor:
-    _next_processors: ClassVar[List["Processor"]] = []
+    _forward_processors: ClassVar[List["Processor"]] = []
 
     def __init__(self):
         self.running_processors = []
@@ -13,7 +13,7 @@ class Processor:
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
-        for processor in self._next_processors:
+        for processor in self._forward_processors:
             p = processor()()
             next(p)
             self.running_processors.append(p)

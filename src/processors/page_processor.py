@@ -5,7 +5,7 @@ from .word_processor import WordProcessor
 
 
 class PageProcessor(Processor):
-    _next_processors: ClassVar[List["Processor"]] = [WordProcessor]
+    _forward_processors: ClassVar[List["Processor"]] = [WordProcessor]
 
     def __init__(self):
         super().__init__()

@@ -14,7 +14,7 @@ from .processor import Processor
 
 class WordProcessor(Processor):
     _descriptor: ClassVar[str] = "word"
-    _next_processors: ClassVar[List[Processor]] = [FormdataProcessor]
+    _forward_processors: ClassVar[List[Processor]] = [FormdataProcessor]
 
     def __init__(self):
         super().__init__()

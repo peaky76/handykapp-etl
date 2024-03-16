@@ -9,7 +9,7 @@ from .processor import Processor
 
 
 class FileProcessor(Processor):
-    _next_processors: ClassVar[List["Processor"]] = [PageProcessor]
+    _forward_processors: ClassVar[List["Processor"]] = [PageProcessor]
 
     def __init__(self):
         super().__init__()
