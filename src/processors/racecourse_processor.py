@@ -1,5 +1,4 @@
 from functools import cache
-from typing import ClassVar
 
 from models import Racecourse
 
@@ -8,7 +7,15 @@ from .utils import compact
 
 
 class RacecourseProcessor(DatabaseProcessor):
-    _search_keys: ClassVar[str] = ["name", "country", "obstacle", "surface"]
+
+    @cache
+    def _search_dictionary(self, racecourse: Racecourse) -> dict:
+        return compact({ 
+            "name": racecourse.name.title(), 
+            "country": racecourse.country, 
+            "obstacle": racecourse.obstacle, 
+            "surface": {"$in": ["Tapeta", "Polytrack"]} if racecourse.surface == "AW" else racecourse.surface 
+         })
 
     @cache
     def _update_dictionary(self, racecourse: Racecourse) -> dict:  
