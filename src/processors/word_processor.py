@@ -17,6 +17,7 @@ class WordProcessor(Processor):
     _next_processors: ClassVar[List[Processor]] = [FormdataProcessor]
 
     def __init__(self):
+        super().__init__()
         self.horse = None
         self.horse_args = []
         self.run_args = []

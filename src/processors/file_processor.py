@@ -12,12 +12,13 @@ class FileProcessor(Processor):
     _next_processors: ClassVar[List["Processor"]] = [PageProcessor]
 
     def __init__(self):
+        super().__init__()
         self.page_count = 0
 
-    def process(self, file: str, running_processors: List[Processor]):
+    def process(self, file: str):
         date = get_formdata_date(file)
         doc = fitz.open("pdf", stream_file(file))
-        p = running_processors[0]
+        p = self.running_processors[0]
 
         for page in doc:
             p.send((page, date))

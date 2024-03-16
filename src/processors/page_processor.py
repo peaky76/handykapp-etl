@@ -8,6 +8,7 @@ class PageProcessor(Processor):
     _next_processors: ClassVar[List["Processor"]] = [WordProcessor]
 
     def __init__(self):
+        super().__init__()
         self.page_count = 0
 
     def process(self, item: Any):
