@@ -20,5 +20,5 @@ class Horse(HashableBaseModel):
     dam: Optional[HorseCore] = None
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
-    current_trainer: Optional[str] = None
+    trainer: Optional[str] = None
     source: Source

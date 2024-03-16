@@ -99,7 +99,7 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "chase": None,
             "hurdle": None,
         },
-        "current_trainer": "Ollie Pears",
+        "trainer": "Ollie Pears",
         "source": "bha"
     }
     actual = compact(transform_ratings_data.fn(mock_data)[0].model_dump())

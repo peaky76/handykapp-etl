@@ -62,7 +62,7 @@ def transform_ratings_data(data: Any) -> List[Horse]:
     horse_dicts = ( 
         petl.cut(data, used_fields)
         .rename({x: x.replace(" rating", "").lower() for x in used_fields})
-        .rename({"awt": "aw", "trainer": "current_trainer"})
+        .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
         .addfield("name_and_country", lambda rec: parse_horse(rec["name"], "GB"))
         .addfield("sire_name_and_country", lambda rec: parse_horse(rec["sire"], "GB"))

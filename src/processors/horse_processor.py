@@ -33,8 +33,8 @@ class HorseProcessor(DatabaseProcessor):
     def post_process(self, horse: InputType):
         p = self.running_processors[0]
         
-        if isinstance(horse, Horse) and horse.current_trainer:    
-            name = horse.current_trainer
+        if isinstance(horse, Horse) and horse.trainer:    
+            name = horse.trainer
             source = horse.source
             person = Person(**{"name": name, "role": "trainer", "source": horse.source})
             p.send(person)
