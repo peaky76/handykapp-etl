@@ -16,10 +16,11 @@ class DatabaseProcessor(Processor):
     _search_keys: ClassVar[Optional[List[str]]] = None
     _update_keys: ClassVar[Optional[List[str]]] = None
     _insert_keys: ClassVar[Optional[List[str]]] = None
-    
-    def __init__(self, *, find_first: bool = True):
+        
+    def __init__(self, *, find_first: bool = True, prevent_update: bool = False):
         super().__init__()
         self.find_first = find_first
+        self.prevent_update = prevent_update
         self.added = 0
         self.updated = 0
         self.unchanged = 0
@@ -64,14 +65,15 @@ class DatabaseProcessor(Processor):
         db_id = None
 
         def update_if_needed(item: BaseModel, db_item: BaseModel):
-            d = self._update_dictionary(item)
-            if any(db_item[k] != d[k] for k in d):
-                self.update(item, db_item["_id"])
-                logger.debug(f"{item} updated")
-                self.updated += 1
-            else:
-                logger.debug(f"{item} left unchanged")
-                self.unchanged += 1
+            if not self.prevent_update:
+                d = self._update_dictionary(item)
+                if any(db_item[k] != d[k] for k in d):
+                    self.update(item, db_item["_id"])
+                    logger.debug(f"{item} updated")
+                    self.updated += 1
+                else:
+                    logger.debug(f"{item} left unchanged")
+                    self.unchanged += 1
 
         try:
             if self.find_first and (db_item := self.find(item)):
