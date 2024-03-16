@@ -21,6 +21,7 @@ class DatabaseProcessor(Processor):
         super().__init__()
         self.find_first = find_first
         self.prevent_update = prevent_update
+        self.current_id = None
         self.added = 0
         self.updated = 0
         self.unchanged = 0
@@ -51,9 +52,9 @@ class DatabaseProcessor(Processor):
     def find(self, item: HashableBaseModel) -> HashableBaseModel | None:
         return self._table.find_one(self._search_dictionary(item))
 
-    def update(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
+    def update(self, item: HashableBaseModel) -> None:
         self._table.update_one(
-            {"_id": db_id},
+            {"_id": self.current_id},
             {"$set": self._update_dictionary(item)},
         )
 
@@ -62,13 +63,12 @@ class DatabaseProcessor(Processor):
 
     def process(self, item: HashableBaseModel):
         logger = get_run_logger()
-        db_id = None
 
         def update_if_needed(item: HashableBaseModel, db_item: Any):
             if not self.prevent_update:
                 d = self._update_dictionary(item)
                 if any(db_item[k] != d[k] for k in d):
-                    self.update(item, db_item["_id"])
+                    self.update(item)
                     logger.debug(f"{item} updated")
                     self.updated += 1
                 else:
@@ -77,16 +77,17 @@ class DatabaseProcessor(Processor):
 
         try:
             if self.find_first and (db_item := self.find(item)):
+                self.current_id = db_item["_id"]
                 update_if_needed(item, db_item)
             else:
-                db_id = self.insert(item)
+                self.current_id = self.insert(item)
                 logger.debug(f"{item} added to db")
                 self.added += 1
         except DuplicateKeyError:
             if not self.find_first:
                 db_item = self.find(item)
+                self.current_id = db_item["_id"]
                 update_if_needed(item, db_item)
-                db_id = db_item["_id"]
         except ValueError as e:
             logger.warning(e)
             self.skipped += 1
@@ -95,7 +96,7 @@ class DatabaseProcessor(Processor):
         if total % 250 == 0:
             logger.info(f"Processed {total} {self._descriptor} records")
 
-        self.post_process(item, db_id)   
+        self.post_process(item)   
 
-    def post_process(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
+    def post_process(self, item: HashableBaseModel) -> None:
         pass

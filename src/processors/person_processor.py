@@ -39,9 +39,9 @@ class PersonProcessor(DatabaseProcessor):
         
         return found_person
 
-    def post_process(self, person: Person, db_id: PyObjectId) -> None:
+    def post_process(self, person: Person) -> None:
         if person.race_id:
             client.handykapp.races.update_one(
                 {"_id": person.race_id, "runners.horse": person.horse_id},
-                {"$set": {f"runners.$.{person.role}": db_id}},
+                {"$set": {f"runners.$.{person.role}": self.current_id}},
             )

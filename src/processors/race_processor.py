@@ -14,7 +14,7 @@ class RaceProcessor(DatabaseProcessor):
     _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
     _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]
     
-    def post_process(self, race: Race, race_id: PyObjectId) -> None:
+    def post_process(self, race: Race) -> None:
         try:
             for horse in race["runners"]:
                 HorseProcessor().send((
@@ -39,10 +39,10 @@ class RaceProcessor(DatabaseProcessor):
                     race["source"],
                 ))
                 
-                if race_id:
-                    creation_dict = horse | { "race_id": race_id }
+                if self.current_id:
+                    creation_dict = horse | { "race_id": self.current_id }
                     HorseProcessor().send((creation_dict, race["source"]))
 
         except Exception as e:
             logger = get_run_logger()
-            logger.error(f"Error processing {race_id}: {e}")
+            logger.error(f"Error processing {self.current_id}: {e}")
