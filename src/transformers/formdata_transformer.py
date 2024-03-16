@@ -276,15 +276,16 @@ def get_formdatas(
             return files
 
         selected_files = []
-        next_date = get_formdata_date(files[0])
-        current_file = files[0]
-        for file in files:
-            if get_formdata_date(file) > next_date:
-                selected_files.append(current_file)
-                next_date = get_formdata_date(current_file).add(years=1)
-            current_file = file
-        if files[-1] not in selected_files:
-            selected_files.append(files[-1])
+        if len(files):
+            next_date = get_formdata_date(files[0])
+            current_file = files[0]
+            for file in files:
+                if get_formdata_date(file) > next_date:
+                    selected_files.append(current_file)
+                    next_date = get_formdata_date(current_file).add(years=1)
+                current_file = file
+            if files[-1] not in selected_files:
+                selected_files.append(files[-1])
 
         return selected_files
 
