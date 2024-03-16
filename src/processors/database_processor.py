@@ -18,6 +18,7 @@ class DatabaseProcessor(Processor):
     _insert_keys: ClassVar[Optional[List[str]]] = None
     
     def __init__(self, *, find_first: bool = True):
+        super().__init__()
         self.find_first = find_first
         self.added = 0
         self.updated = 0
@@ -58,7 +59,7 @@ class DatabaseProcessor(Processor):
     def insert(self, item: HashableBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self, item: BaseModel, running_processors: List[Processor]):
+    def process(self, item: BaseModel):
         logger = get_run_logger()
         db_id = None
 
@@ -92,7 +93,7 @@ class DatabaseProcessor(Processor):
         if total % 250 == 0:
             logger.info(f"Processed {total} {self._descriptor} records")
 
-        self.post_process(item, db_id, running_processors)   
+        self.post_process(item, db_id)   
 
-    def post_process(self, item: HashableBaseModel, db_id: PyObjectId, running_processors: List[Processor]) -> None:
+    def post_process(self, item: HashableBaseModel, db_id: PyObjectId) -> None:
         pass

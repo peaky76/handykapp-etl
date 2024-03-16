@@ -30,8 +30,8 @@ class HorseProcessor(DatabaseProcessor):
     def _insert_dictionary(self, horse: InputType) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
-    def post_process(self, horse: InputType, db_id: PyObjectId, running_processors: List[Processor]):
-        p = running_processors[0]
+    def post_process(self, horse: InputType, db_id: PyObjectId):
+        p = self.running_processors[0]
         
         if isinstance(horse, Horse) and horse.current_trainer:    
             name = horse.current_trainer

@@ -26,9 +26,9 @@ class WordProcessor(Processor):
         self.adding_runs = False
         self.skip_count = 0
 
-    def process(self, item: Any, running_processors: List[Processor]):
+    def process(self, item: Any):
         logger = get_run_logger()
-        f = running_processors[0]
+        f = self.running_processors[0]
 
         word, date = item
         if "FORMDATA" in word:

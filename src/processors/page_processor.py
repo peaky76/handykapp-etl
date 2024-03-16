@@ -10,11 +10,11 @@ class PageProcessor(Processor):
     def __init__(self):
         self.page_count = 0
 
-    def process(self, item: Any, running_processors: List[Processor]):
+    def process(self, item: Any):
         page, date = item
         text = page.get_text()
         
-        w = running_processors[0]
+        w = self.running_processors[0]
         # Replace non-ascii characters with apostrophes
         words = (
             text.replace(f"{chr(10)}{chr(25)}", "'")  # Newline + apostrophe

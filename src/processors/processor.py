@@ -6,27 +6,30 @@ from prefect import get_run_logger
 class Processor:
     _next_processors: ClassVar[List["Processor"]] = []
 
+    def __init__(self):
+        self.running_processors = []
+
     def __call__(self):
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
-
-        running_processors = []        
+      
         for processor in self._next_processors:
             p = processor()()
             next(p)
-            running_processors.append(p)
+            self.running_processors.append(p)
             
         try:
             while True:
                 item = yield
-                self.process(item, running_processors)  
+                self.process(item)  
 
         except GeneratorExit:
             logger.info(self._exit_message)
-            for processor in running_processors:
+            for processor in self.running_processors:
                 processor.close()
+            self.running_processors = []
 
-    def process(self, item: Any, running_processors: List["Processor"]):    
+    def process(self, item: Any):    
         raise NotImplementedError
 
     @property
