@@ -14,7 +14,8 @@ def load_jockey_ratings():
     logger = get_run_logger()
     logger.info("Starting jockey rating loader")
 
-    p = PersonProcessor()
+    pp = PersonProcessor()
+    p = pp.start()
     next(p)
 
     for jockey, rating in transform_jockey_ratings().items():

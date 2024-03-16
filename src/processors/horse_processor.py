@@ -12,7 +12,7 @@ from .utils import compact
 InputType = Horse | HorseCore
 
 class HorseProcessor(DatabaseProcessor):
-    _forward_processors: ClassVar[List[Processor]] = [PersonProcessor]
+    _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
     _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 
     @cache

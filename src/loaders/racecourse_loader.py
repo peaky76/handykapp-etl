@@ -14,7 +14,8 @@ db = client.handykapp
 @flow
 def load_racecourses():
     data = core_transformer()
-    r = RacecourseProcessor()()
+    p = RacecourseProcessor()
+    r = p.start()
     next(r)
 
     for racecourse in data:

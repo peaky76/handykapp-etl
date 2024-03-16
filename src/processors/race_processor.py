@@ -10,7 +10,7 @@ from .processor import Processor
 
 
 class RaceProcessor(DatabaseProcessor):
-    _forward_processors: ClassVar[List[Processor]] = [HorseProcessor]
+    _forward_processors: ClassVar[List[Processor]] = [HorseProcessor()]
     _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
     _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]
     

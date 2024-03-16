@@ -9,12 +9,12 @@ class Processor:
     def __init__(self):
         self.running_processors = []
 
-    def __call__(self):
+    def start(self):
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
         for processor in self._forward_processors:
-            p = processor()()
+            p = processor.start()
             next(p)
             self.running_processors.append(p)
             

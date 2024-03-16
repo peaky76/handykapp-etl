@@ -28,7 +28,8 @@ def load_rapid_horseracing_data():
     logger = get_run_logger()
     logger.info("Starting rapid_horseracing loader")
 
-    r = RecordProcessor()
+    p = RecordProcessor()
+    r = p.start()
     next(r)
 
     files = get_files(f"{SOURCE}results")

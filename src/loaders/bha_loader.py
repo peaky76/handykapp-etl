@@ -14,7 +14,8 @@ db = client.handykapp
 @flow
 def load_bha():
     data = bha_transformer()
-    h = HorseProcessor()()
+    p = HorseProcessor()
+    h = p.start()
     next(h)
 
     sires = list({horse.sire for horse in data if horse.sire})

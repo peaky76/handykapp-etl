@@ -48,11 +48,12 @@ def load_formdata_only():
     db.formdata.drop()
     logger.info("Dropped formdata collection")
 
-    files = get_formdatas(after_year=20, for_refresh=True)
+    files = get_formdatas(after_year=23, for_refresh=True)
     for file in files:
 
         logger.info(f"Processing formdata {file}")
-        f = FileProcessor()()
+        p = FileProcessor()
+        f = p.start()
         next(f)
 
         f.send(file)
