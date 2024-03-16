@@ -48,15 +48,17 @@ def load_formdata_only():
     db.formdata.drop()
     logger.info("Dropped formdata collection")
 
-    f = FileProcessor()()
-    next(f)
-
     files = get_formdatas(after_year=20, for_refresh=True)
     for file in files:
+
+        logger.info(f"Processing formdata {file}")
+        f = FileProcessor()()
+        next(f)
+
         f.send(file)
 
-    f.close()
-    logger.info("Loaded formdata collection")
+        f.close()
+        logger.info(f"Loaded formdata entries for {file}")
 
 
 if __name__ == "__main__":
