@@ -24,5 +24,6 @@ class FileProcessor(Processor):
             p.send((page, date))
             self.page_count += 1
 
+    @property
     def _exit_message(self):
         return f"Finished file processing. Processed {self.page_count} pages."
