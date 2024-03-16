@@ -20,11 +20,12 @@ class DatabaseProcessor(Processor):
     def __init__(self):
         self.added = 0
         self.updated = 0
+        self.unchanged = 0
         self.skipped = 0
 
     @property
     def _exit_message(self) -> str:
-        return f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}."
+        return f"Finished {self._descriptor} processing. Updated {self.updated}, added {self.added}, skipped {self.skipped}, left {self.unchanged} unchanged."
 
     @property
     def _table(self) -> Collection:
@@ -67,8 +68,8 @@ class DatabaseProcessor(Processor):
                 logger.debug(f"{item} updated")
                 self.updated += 1
             else:
-                logger.debug(f"{item} unchanged")
-                self.skipped += 1
+                logger.debug(f"{item} left unchanged")
+                self.unchanged += 1
 
         try:
             if find_first and (db_item := self.find(item)):
