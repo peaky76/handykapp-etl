@@ -1,5 +1,5 @@
 from functools import cache
-from typing import ClassVar, List, Optional
+from typing import Any, ClassVar, List, Optional
 
 from clients import mongo_client as client
 from models import HashableBaseModel, PyObjectId
@@ -38,7 +38,7 @@ class DatabaseProcessor(Processor):
     def _table_name(self) -> str:
         return f"{self._descriptor}s" 
 
-    def _search_dictionary(self, item: BaseModel) -> dict: 
+    def _search_dictionary(self, item: HashableBaseModel) -> dict: 
         return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
     def _update_dictionary(self, item: HashableBaseModel) -> dict:
@@ -60,11 +60,11 @@ class DatabaseProcessor(Processor):
     def insert(self, item: HashableBaseModel) -> PyObjectId:
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self, item: BaseModel):
+    def process(self, item: HashableBaseModel):
         logger = get_run_logger()
         db_id = None
 
-        def update_if_needed(item: BaseModel, db_item: BaseModel):
+        def update_if_needed(item: HashableBaseModel, db_item: Any):
             if not self.prevent_update:
                 d = self._update_dictionary(item)
                 if any(db_item[k] != d[k] for k in d):
