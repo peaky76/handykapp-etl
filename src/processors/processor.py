@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import ClassVar, Generic, List, TypeVar
+from typing import ClassVar, Generator, Generic, List, Optional, TypeVar
 
 from prefect import get_run_logger
 
@@ -11,12 +11,12 @@ class Processor(Generic[T], ABC):
     def __init__(self):
         self.running_processors = []
 
-    def start(self) -> None:
+    def start(self) -> Generator:
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
-        for processor in self._forward_processors:
-            p = processor.start()
+        for fp in self._forward_processors:
+            p = fp.start()
             next(p)
             self.running_processors.append(p)
             
@@ -27,15 +27,15 @@ class Processor(Generic[T], ABC):
 
         except GeneratorExit:
             logger.info(self._exit_message)
-            for processor in self.running_processors:
-                processor.close()
+            for rp in self.running_processors:
+                rp.close()
             self.running_processors = []
 
     def process(self, item: T) -> None:    
         raise NotImplementedError
 
     @property
-    def _descriptor(self) -> str:
+    def _descriptor(self) -> Optional[str]:
         name = self.__class__.__name__
         return name.replace("Processor", "").lower() if "Processor" in name else None 
 
