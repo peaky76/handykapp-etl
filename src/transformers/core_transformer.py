@@ -5,12 +5,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import re
-from typing import Any, List
+from typing import List
 
 import petl  # type: ignore
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
-from horsetalk import (  # type: ignore
+from horsetalk import (
     Handedness,
     JumpCategory,
     RacecourseContour,

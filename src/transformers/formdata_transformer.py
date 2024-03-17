@@ -47,7 +47,7 @@ Run = namedtuple(
 )
 
 
-def create_horse(words: list[str], year: int) -> Horse | None:
+def create_horse(words: list[str], year: int) -> FormdataEntry | None:
     logger = get_run_logger()
     words = [w for w in words if w]  # Occasional lines have empty strings at end
 
@@ -92,10 +92,10 @@ def create_horse(words: list[str], year: int) -> Horse | None:
         logger.error(f"Error creating horse from {words}: {e}")
         horse = None
 
-    return FormdataEntry(**horse._asdict())
+    return FormdataEntry(**horse._asdict()) if horse else None
 
 
-def create_run(words: list[str]) -> Run:
+def create_run(words: list[str]) -> FormdataRun:
     logger = get_run_logger()
     try:
         # Handle extra empty string at end of some lines
@@ -310,34 +310,6 @@ def is_horse(string: str) -> bool:
 def is_race_date(string: str) -> bool:
     date_regex = r"\d{1,2}[A-Z][a-z]{2}\d{2}"
     return bool(re.match(date_regex, string))
-
-
-def formdata_horse_processor():
-    try:
-        while True:
-            horse, date = yield
-            logger = get_run_logger()
-            logger.info(f"Processing {horse.name}")
-
-            # try:
-            #     db.horses.insert_one(horse.dict())
-            # except DuplicateKeyError:
-            #     logger.info(f"Duplicate key for {horse.name}")
-
-    except GeneratorExit:
-        logger.info("Finished processing")
-
-
-@task(tags=["Racing Research"])
-def transform_horse_data(data: dict) -> list[Horse]:
-    used_fields = ("name", "country", "year", "trainer", "prize_money")
-    return (
-        petl.fromdicts(data)
-        .cut(used_fields)
-        .convert("name", lambda x, row: f"{x} ({row.country})", pass_row=True)
-        .cutout("country")
-        .dicts()
-    )
 
 
 if __name__ == "__main__":

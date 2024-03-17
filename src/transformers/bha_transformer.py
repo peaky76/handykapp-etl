@@ -3,13 +3,13 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from typing import Any, List
+from typing import List
 
 import petl  # type: ignore
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
-from horsetalk import Gender  # type: ignore
-from models.horse import Horse
+from horsetalk import Gender
+from models import Horse
 from prefect import flow, task
 
 from transformers.parsers import parse_horse
