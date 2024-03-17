@@ -49,7 +49,7 @@ class DatabaseProcessor(Processor[T]):
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: T) -> T | None:
+    def find(self, item: T) -> Any | None:
         return self._table.find_one(self._search_dictionary(item))
 
     def update(self, item: T) -> None:

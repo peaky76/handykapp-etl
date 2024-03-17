@@ -1,9 +1,8 @@
-from typing import Dict
+from functools import cache
+from typing import Any, Dict
 
-from clients import mongo_client as client
 from models import Person
 from nameparser import HumanName  # type: ignore
-from pydantic import BaseModel
 
 from .database_processor import DatabaseProcessor
 
@@ -15,13 +14,14 @@ class PersonProcessor(DatabaseProcessor[Person]):
     def _update_dictionary(self, person: Person) ->  dict:
         ratings: Dict[str, str] = {} # TODO: Get ratings  
         r = {"ratings": ratings} if ratings else {}
-        return {"references": {person.source: person.name}} | r
+        return {"references": person.references} | r
 
     def _insert_dictionary(self, person: Person) -> dict:
         return HumanName(person.name).as_dict() | self._update_dictionary(person)
 
-    def find(self, person: Person) -> BaseModel | None:
-        found_person = self._table.find_one({"references": { person.source: person.name }})
+    @cache
+    def find(self, person: Person) -> Any | None:
+        found_person = self._table.find_one({"references": person.references})
 
         # if not found_person:
         #     name_parts = HumanName(person.name)       
@@ -39,8 +39,9 @@ class PersonProcessor(DatabaseProcessor[Person]):
         return found_person
 
     def post_process(self, person: Person) -> None:
-        if person.race_id:
-            client.handykapp.races.update_one(
-                {"_id": person.race_id, "runners.horse": person.horse_id},
-                {"$set": {f"runners.$.{person.role}": self.current_id}},
-            )
+        pass
+        # if person.race_id:
+        #     client.handykapp.races.update_one(
+        #         {"_id": person.race_id, "runners.horse": person.horse_id},
+        #         {"$set": {f"runners.$.{person.role}": self.current_id}},
+        #     )
