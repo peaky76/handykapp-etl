@@ -36,7 +36,7 @@ class HorseProcessor(DatabaseProcessor[InputType]):
         if isinstance(horse, Horse) and horse.trainer:    
             name = horse.trainer
             source = horse.source
-            person = Person(**{"name": name, "role": "trainer", "source": horse.source})
+            person = Person(name=name, role="trainer", references={source: name})
             p.send(person)
 
         # if isinstance(horse, Runner) and horse.race_id:
