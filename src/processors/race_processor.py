@@ -1,6 +1,7 @@
 from typing import ClassVar, List
 
 from models import Race
+from models.horse_core import HorseCore
 from prefect import get_run_logger
 
 from processors.horse_processor import HorseProcessor
@@ -15,33 +16,29 @@ class RaceProcessor(DatabaseProcessor[Race]):
     _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]
     
     def post_process(self, race: Race) -> None:
+        h = self.running_processors[0]
         try:
-            for horse in race["runners"]:
-                HorseProcessor().send((
-                    {"name": horse["sire"], "sex": "M", "race_id": None},
-                    race["source"],
+            for horse in race.runners:
+                h.send(HorseCore(**
+                    {"name": horse.sire, "sex": "M", "source": race.source},
+
                 ))
 
-                damsire = horse.get("damsire")
-                if damsire:
-                    HorseProcessor().send((
-                        {"name": damsire, "sex": "M", "race_id": None},
-                        race["source"],
+                if horse.damsire:
+                    h.send(HorseCore(**
+                        {"name": horse.damsire, "sex": "M", "source": race.source}
                     ))
                     
-                HorseProcessor().send((
+                h.send(HorseCore(**
                     {
-                        "name": horse["dam"],
+                        "name": horse.dam,
                         "sex": "F",
-                        "sire": damsire,
-                        "race_id": None,
-                    },
-                    race["source"],
-                ))
-                
-                if self.current_id:
-                    creation_dict = horse | { "race_id": self.current_id }
-                    HorseProcessor().send((creation_dict, race["source"]))
+                        # "sire": horse.damsire,
+                        "source": race.source
+                        
+                    }
+                ))                
+                h.send(horse)
 
         except Exception as e:
             logger = get_run_logger()
