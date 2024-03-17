@@ -4,6 +4,8 @@ from .formdata_run import FormdataRun
 from .hashable_base_model import HashableBaseModel
 from .horse import Horse
 from .horse_core import HorseCore
+from .jockey_rating import JockeyRating
+from .jockey_ratings import JockeyRatings
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .person import Person
@@ -12,6 +14,7 @@ from .racecourse import Racecourse
 from .references import References
 from .runner import Runner
 from .source import Source
+from .year import Year
 
 __all__ = [
     "Declaration",
@@ -20,6 +23,8 @@ __all__ = [
     "HashableBaseModel",
     "Horse",
     "HorseCore",
+    "JockeyRating",
+    "JockeyRatings",
     "OfficialRatings",
     "Operation",
     "Person",
@@ -28,4 +33,5 @@ __all__ = [
     "References",
     "Runner",
     "Source",
+    "Year",
 ]
