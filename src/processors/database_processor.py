@@ -1,4 +1,3 @@
-from functools import cache
 from typing import Any, ClassVar, Generic, Optional, Set, Type, TypeVar
 
 from bson import ObjectId
@@ -51,7 +50,6 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
     def _insert_dictionary(self, item: T) -> dict:
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
-    @cache
     def find(self, item: T) -> M | None:
         db_item = self._table.find_one(self._search_dictionary(item))
         return self._db_model(**db_item) if db_item else None

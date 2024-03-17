@@ -1,4 +1,3 @@
-from functools import cache
 from typing import Any, ClassVar, List
 
 import petl  # type: ignore
@@ -11,7 +10,6 @@ from processors.race_processor import RaceProcessor
 
 db = client.handykapp
 
-@cache
 def get_racecourse_id(course, surface, code, obstacle) -> str:
     surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(

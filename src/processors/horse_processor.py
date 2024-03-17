@@ -1,4 +1,3 @@
-from functools import cache
 from typing import ClassVar, List, Set
 
 from models import Horse, HorseCore, MongoHorse, Person
@@ -16,7 +15,6 @@ class HorseProcessor(DatabaseProcessor[InputType, MongoHorse]):
     _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
     _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
 
-    @cache
     def _update_dictionary(self, horse: Horse | HorseCore) -> dict:
         if isinstance(horse, HorseCore):
             return {}
@@ -27,7 +25,6 @@ class HorseProcessor(DatabaseProcessor[InputType, MongoHorse]):
             "dam": self.find(horse.dam) if horse.dam else None
         })
 
-    @cache
     def _insert_dictionary(self, horse: InputType) -> dict:
         return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             

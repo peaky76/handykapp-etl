@@ -1,4 +1,3 @@
-from functools import cache
 from typing import Any, Dict
 
 from models import MongoPerson, Person
@@ -20,7 +19,6 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     def _insert_dictionary(self, person: Person) -> dict:
         return HumanName(person.name).as_dict() | self._update_dictionary(person)
 
-    @cache
     def find(self, person: Person) -> Any | None:
         found_person = self._table.find_one({"references": person.references})
 
