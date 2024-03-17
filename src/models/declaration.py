@@ -6,6 +6,7 @@ from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
 from .references import References
 from .runner import Runner
+from .source import Source
 
 
 class Declaration(HashableBaseModel):
@@ -23,3 +24,4 @@ class Declaration(HashableBaseModel):
     number_of_runners: int
     runners: list[Runner]
     references: Optional[References] = None
+    source: Source

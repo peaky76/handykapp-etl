@@ -18,6 +18,7 @@ class Horse(HashableBaseModel):
     colour: Optional[str] = None
     sire: Optional[HorseCore] = None
     dam: Optional[HorseCore] = None
+    damsire: Optional[HorseCore] = None
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     trainer: Optional[str] = None
