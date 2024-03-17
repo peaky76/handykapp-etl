@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import re
-from typing import List
+from typing import Generator, List, Optional
 
 import petl  # type: ignore
 import tomllib
@@ -32,7 +32,7 @@ SOURCE = settings["core"]["spaces_dir"]
 
 
 @task(tags=["Core"], name="get_racecourses_csvs")
-def read_csvs():
+def read_csvs() -> Generator[Optional[petl.Table], None, None]:
     for csv in list(get_files(SOURCE)):
         if "edited" in csv:
             source = petl.MemorySource(stream_file(csv))
@@ -148,9 +148,9 @@ def validate_racecourses_data(data: petl.Table) -> petl.transform.validation.Pro
 def core_transformer() -> List[Racecourse]:
     racecourses = []
     for csv in read_csvs():
-        problems = validate_racecourses_data(csv)
-        for problem in problems.dicts():
-            log_validation_problem(problem)
+        if (problems := validate_racecourses_data(csv)):
+            for problem in problems.dicts():
+                log_validation_problem(problem)
         racecourses += transform_racecourses_data(csv)
     return racecourses
 

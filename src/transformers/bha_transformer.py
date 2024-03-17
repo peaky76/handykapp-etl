@@ -140,9 +140,9 @@ def validate_ratings_data(data: petl.Table) -> petl.transform.validation.Problem
 def bha_transformer() -> List[Horse]:
     csv = get_csv()
     data = read_csv(csv)
-    problems = validate_ratings_data(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
+    if (problems := validate_ratings_data(data)):
+        for problem in problems.dicts():
+            log_validation_problem(problem)
     return transform_ratings_data(data)
 
 
