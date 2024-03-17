@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import ClassVar, Set
 
 from models import FormdataEntry
 
@@ -7,7 +7,7 @@ from .database_processor import DatabaseProcessor
 
 class FormdataProcessor(DatabaseProcessor[FormdataEntry]):
     _table_name = "formdata"
-    _search_keys: ClassVar[list[str]] = ["name", "country", "year"]
+    _search_keys: ClassVar[Set[str]] = {"name", "country", "year"}
 
     def update(self, entry: FormdataEntry) -> None:
         existing_entry = self._table.find_one({"_id": self.current_id})

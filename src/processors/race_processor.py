@@ -1,4 +1,4 @@
-from typing import ClassVar, List
+from typing import ClassVar, List, Set
 
 from models import Race
 from models.horse_core import HorseCore
@@ -12,8 +12,8 @@ from .processor import Processor
 
 class RaceProcessor(DatabaseProcessor[Race]):
     _forward_processors: ClassVar[List[Processor]] = [HorseProcessor()]
-    _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
-    _update_keys: ClassVar[List[str]] = ["rapid_id", "going_description"]
+    _search_keys: ClassVar[Set[str]] = {"racecourse_id", "datetime"}
+    _update_keys: ClassVar[Set[str]] = {"rapid_id", "going_description"}
     
     def post_process(self, race: Race) -> None:
         h = self.running_processors[0]

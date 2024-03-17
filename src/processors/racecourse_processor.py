@@ -23,4 +23,4 @@ class RacecourseProcessor(DatabaseProcessor[Racecourse]):
 
     @cache
     def _insert_dictionary(self, racecourse: Racecourse) -> dict:
-        return compact({"references": { f"{racecourse.source}": racecourse.abbr } }  |  racecourse.model_dump(exclude=["abbr", "source"]))
+        return compact({"references": { f"{racecourse.source}": racecourse.abbr } }  |  racecourse.model_dump(exclude={"abbr", "source"}))

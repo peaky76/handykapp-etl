@@ -1,5 +1,5 @@
 from functools import cache
-from typing import Any, ClassVar, List, Optional, TypeVar
+from typing import Any, ClassVar, List, Optional, Set, TypeVar
 
 from bson import ObjectId
 from clients import mongo_client as client
@@ -14,9 +14,9 @@ from .processor import Processor
 T = TypeVar("T", bound=HashableBaseModel)
 
 class DatabaseProcessor(Processor[T]):
-    _search_keys: ClassVar[Optional[List[str]]] = None
-    _update_keys: ClassVar[Optional[List[str]]] = None
-    _insert_keys: ClassVar[Optional[List[str]]] = None
+    _search_keys: ClassVar[Optional[Set[str]]] = None
+    _update_keys: ClassVar[Optional[Set[str]]] = None
+    _insert_keys: ClassVar[Optional[Set[str]]] = None
         
     def __init__(self, *, find_first: bool = True, prevent_update: bool = False):
         super().__init__()

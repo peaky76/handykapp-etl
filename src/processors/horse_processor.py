@@ -1,5 +1,5 @@
 from functools import cache
-from typing import ClassVar, List
+from typing import ClassVar, List, Set
 
 from models import Horse, HorseCore, Person
 
@@ -13,7 +13,7 @@ InputType = Horse | HorseCore
 
 class HorseProcessor(DatabaseProcessor[InputType]):
     _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
-    _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
+    _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
 
     @cache
     def _update_dictionary(self, horse: Horse | HorseCore) -> dict:
