@@ -1,13 +1,13 @@
 from functools import cache
 from typing import Any, Dict
 
-from models import Person
+from models import MongoPerson, Person
 from nameparser import HumanName  # type: ignore
 
 from .database_processor import DatabaseProcessor
 
 
-class PersonProcessor(DatabaseProcessor[Person]):
+class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     _descriptor = "person"
     _table_name = "people" 
 
