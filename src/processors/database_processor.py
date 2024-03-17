@@ -1,6 +1,7 @@
 from functools import cache
 from typing import Any, ClassVar, List, Optional, TypeVar
 
+from bson import ObjectId
 from clients import mongo_client as client
 from models import HashableBaseModel
 from peak_utility.listish import compact
@@ -19,13 +20,13 @@ class DatabaseProcessor(Processor[T]):
         
     def __init__(self, *, find_first: bool = True, prevent_update: bool = False):
         super().__init__()
-        self.find_first = find_first
-        self.prevent_update = prevent_update
-        self.current_id = None
-        self.added = 0
-        self.updated = 0
-        self.unchanged = 0
-        self.skipped = 0
+        self.find_first: bool = find_first
+        self.prevent_update: bool = prevent_update
+        self.current_id: Optional[ObjectId] = None
+        self.added: int = 0
+        self.updated: int = 0
+        self.unchanged: int = 0
+        self.skipped: int = 0
 
     @property
     def _exit_message(self) -> str:
@@ -49,8 +50,8 @@ class DatabaseProcessor(Processor[T]):
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: T) -> Any | None:
-        return self._table.find_one(self._search_dictionary(item))
+    def find(self, item: T) -> ObjectId | None:
+        return self._table.find_one(self._search_dictionary(item))["_id"]
 
     def update(self, item: T) -> None:
         self._table.update_one(
@@ -58,10 +59,10 @@ class DatabaseProcessor(Processor[T]):
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: T):
-        return self._table.insert_one(self._insert_dictionary(item))
+    def insert(self, item: T) -> ObjectId:
+        return self._table.insert_one(self._insert_dictionary(item))["inserted_id"]
 
-    def process(self, item: T):
+    def process(self, item: T) -> None:
         logger = get_run_logger()
 
         def update_if_needed(item: T, db_item: Any):
