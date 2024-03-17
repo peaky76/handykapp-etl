@@ -6,6 +6,7 @@ from .horse import Horse
 from .horse_core import HorseCore
 from .jockey_rating import JockeyRating
 from .jockey_ratings import JockeyRatings
+from .mongo_base_model import MongoBaseModel
 from .mongo_formdata_entry import MongoFormdataEntry
 from .mongo_horse import MongoHorse
 from .mongo_person import MongoPerson
@@ -31,6 +32,7 @@ __all__ = [
     "HorseCore",
     "JockeyRating",
     "JockeyRatings",
+    "MongoBaseModel",
     "MongoFormdataEntry",
     "MongoHorse",
     "MongoPerson",

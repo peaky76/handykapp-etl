@@ -1,9 +1,9 @@
 from functools import cache
-from typing import Any, ClassVar, Generic, Optional, Set, TypeVar
+from typing import Any, ClassVar, Generic, Optional, Set, Type, TypeVar
 
 from bson import ObjectId
 from clients import mongo_client as client
-from models import HashableBaseModel
+from models import HashableBaseModel, MongoBaseModel
 from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo.collection import Collection
@@ -12,9 +12,10 @@ from pymongo.errors import DuplicateKeyError
 from .processor import Processor
 
 T = TypeVar("T", bound=HashableBaseModel)
-M = TypeVar("M")
+M = TypeVar("M", bound=MongoBaseModel)
 
 class DatabaseProcessor(Processor[T], Generic[T, M]):
+    _db_model: Type[M]
     _search_keys: ClassVar[Optional[Set[str]]] = None
     _update_keys: ClassVar[Optional[Set[str]]] = None
     _insert_keys: ClassVar[Optional[Set[str]]] = None
@@ -52,7 +53,8 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
 
     @cache
     def find(self, item: T) -> M | None:
-        return self._table.find_one(self._search_dictionary(item))
+        db_item = self._table.find_one(self._search_dictionary(item))
+        return self._db_model(**db_item) if db_item else None
         
     def update(self, item: T) -> None:
         self._table.update_one(
@@ -79,7 +81,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
 
         try:
             if self.find_first and (db_item := self.find(item)):
-                self.current_id = db_item["_id"]
+                self.current_id = ObjectId(db_item._id)
                 update_if_needed(item, db_item)
             else:
                 self.current_id = self.insert(item)
@@ -89,7 +91,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
             if not self.find_first:
                 db_item = self.find(item)
                 if db_item:
-                    self.current_id = db_item["_id"]
+                    self.current_id = ObjectId(db_item._id)
                     update_if_needed(item, db_item)
                 else:
                     raise ValueError(f"Duplicate key error but no item found on db for {item}")

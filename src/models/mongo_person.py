@@ -1,6 +1,6 @@
+from .mongo_base_model import MongoBaseModel
 from .person import Person
-from .py_object_id import PyObjectId
 
 
-class MongoPerson(Person):
-    _id: PyObjectId
+class MongoPerson(MongoBaseModel, Person):
+    pass

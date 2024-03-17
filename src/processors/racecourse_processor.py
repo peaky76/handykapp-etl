@@ -7,6 +7,7 @@ from .utils import compact
 
 
 class RacecourseProcessor(DatabaseProcessor[Racecourse, MongoRacecourse]):
+    _db_model = MongoRacecourse
 
     @cache
     def _search_dictionary(self, racecourse: Racecourse) -> dict:

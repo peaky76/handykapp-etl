@@ -1,6 +1,6 @@
-from .py_object_id import PyObjectId
+from .mongo_base_model import MongoBaseModel
 from .racecourse import Racecourse
 
 
-class MongoRacecourse(Racecourse):
-    _id: PyObjectId
+class MongoRacecourse(MongoBaseModel, Racecourse):
+    pass

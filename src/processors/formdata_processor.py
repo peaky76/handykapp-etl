@@ -7,6 +7,7 @@ from .database_processor import DatabaseProcessor
 
 class FormdataProcessor(DatabaseProcessor[FormdataEntry, MongoFormdataEntry]):
     _table_name = "formdata"
+    _db_model = MongoFormdataEntry
     _search_keys: ClassVar[Set[str]] = {"name", "country", "year"}
 
     def update(self, entry: FormdataEntry) -> None:

@@ -1,6 +1,6 @@
 from .formdata_entry import FormdataEntry
-from .py_object_id import PyObjectId
+from .mongo_base_model import MongoBaseModel
 
 
-class MongoFormdataEntry(FormdataEntry):
-    _id: PyObjectId
+class MongoFormdataEntry(MongoBaseModel, FormdataEntry):
+    pass

@@ -9,7 +9,8 @@ from .database_processor import DatabaseProcessor
 
 class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     _descriptor = "person"
-    _table_name = "people" 
+    _table_name = "people"
+    _db_model = MongoPerson 
 
     def _update_dictionary(self, person: Person) ->  dict:
         ratings: Dict[str, str] = {} # TODO: Get ratings  

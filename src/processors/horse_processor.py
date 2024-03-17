@@ -12,6 +12,7 @@ from .utils import compact
 InputType = Horse | HorseCore
 
 class HorseProcessor(DatabaseProcessor[InputType, MongoHorse]):
+    _db_model = MongoHorse
     _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
     _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
 

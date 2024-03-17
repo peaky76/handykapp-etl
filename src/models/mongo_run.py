@@ -1,12 +1,10 @@
 from typing import Optional
 
-from pydantic import BaseModel
-
+from .mongo_base_model import MongoBaseModel
 from .py_object_id import PyObjectId
 
 
-class MongoRun(BaseModel):
-    _id: PyObjectId
+class MongoRun(MongoBaseModel):
     jockey: Optional[PyObjectId] = None
     trainer: Optional[PyObjectId] = None
     owner: Optional[str] = None

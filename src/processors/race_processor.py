@@ -10,6 +10,7 @@ from .processor import Processor
 
 
 class RaceProcessor(DatabaseProcessor[Declaration, MongoRace]):
+    _db_model = MongoRace
     _forward_processors: ClassVar[List[Processor]] = [HorseProcessor()]
     _search_keys: ClassVar[Set[str]] = {"racecourse_id", "datetime"}
     _update_keys: ClassVar[Set[str]] = {"rapid_id", "going_description"}

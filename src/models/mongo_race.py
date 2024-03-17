@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
-
+from .mongo_base_model import MongoBaseModel
 from .mongo_run import MongoRun
 from .py_object_id import PyObjectId
 from .race_restriction import RaceRestriction
@@ -10,8 +9,7 @@ from .references import References
 from .source import Source
 
 
-class MongoRace(BaseModel):
-    _id: PyObjectId
+class MongoRace(MongoBaseModel):
     racecourse: PyObjectId
     datetime: datetime
     title: str
