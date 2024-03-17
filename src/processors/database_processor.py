@@ -12,8 +12,9 @@ from pymongo.errors import DuplicateKeyError
 from .processor import Processor
 
 T = TypeVar("T", bound=HashableBaseModel)
+M = TypeVar("M")
 
-class DatabaseProcessor(Processor[T]):
+class DatabaseProcessor(Processor[T, M]):
     _search_keys: ClassVar[Optional[Set[str]]] = None
     _update_keys: ClassVar[Optional[Set[str]]] = None
     _insert_keys: ClassVar[Optional[Set[str]]] = None
@@ -50,7 +51,7 @@ class DatabaseProcessor(Processor[T]):
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: T) -> Any | None:
+    def find(self, item: T) -> M | None:
         return self._table.find_one(self._search_dictionary(item))
         
     def update(self, item: T) -> None:

@@ -1,12 +1,12 @@
 from functools import cache
 
-from models import Racecourse
+from models import MongoRacecourse, Racecourse
 
 from .database_processor import DatabaseProcessor
 from .utils import compact
 
 
-class RacecourseProcessor(DatabaseProcessor[Racecourse]):
+class RacecourseProcessor(DatabaseProcessor[Racecourse, MongoRacecourse]):
 
     @cache
     def _search_dictionary(self, racecourse: Racecourse) -> dict:

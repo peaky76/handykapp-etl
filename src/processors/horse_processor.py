@@ -1,7 +1,7 @@
 from functools import cache
 from typing import ClassVar, List, Set
 
-from models import Horse, HorseCore, Person
+from models import Horse, HorseCore, MongoHorse, Person
 
 from processors.person_processor import PersonProcessor
 
@@ -11,7 +11,7 @@ from .utils import compact
 
 InputType = Horse | HorseCore
 
-class HorseProcessor(DatabaseProcessor[InputType]):
+class HorseProcessor(DatabaseProcessor[InputType, MongoHorse]):
     _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
     _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
 

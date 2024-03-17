@@ -1,11 +1,11 @@
 from typing import ClassVar, Set
 
-from models import FormdataEntry
+from models import FormdataEntry, MongoFormdataEntry
 
 from .database_processor import DatabaseProcessor
 
 
-class FormdataProcessor(DatabaseProcessor[FormdataEntry]):
+class FormdataProcessor(DatabaseProcessor[FormdataEntry, MongoFormdataEntry]):
     _table_name = "formdata"
     _search_keys: ClassVar[Set[str]] = {"name", "country", "year"}
 

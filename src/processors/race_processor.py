@@ -1,6 +1,6 @@
 from typing import ClassVar, List, Set
 
-from models import Declaration, HorseCore
+from models import Declaration, MongoRace
 from prefect import get_run_logger
 
 from processors.horse_processor import HorseProcessor
@@ -9,7 +9,7 @@ from .database_processor import DatabaseProcessor
 from .processor import Processor
 
 
-class RaceProcessor(DatabaseProcessor[Declaration]):
+class RaceProcessor(DatabaseProcessor[Declaration, MongoRace]):
     _forward_processors: ClassVar[List[Processor]] = [HorseProcessor()]
     _search_keys: ClassVar[Set[str]] = {"racecourse_id", "datetime"}
     _update_keys: ClassVar[Set[str]] = {"rapid_id", "going_description"}
