@@ -26,13 +26,14 @@ def get_racecourse_id(course, surface, code, obstacle) -> str:
     return racecourse["_id"] if racecourse else None
 
 class RecordProcessor(Processor):
-    _forward_processors: ClassVar[List[Processor]] = [RaceProcessor]
+    _forward_processors: ClassVar[List[Processor]] = [RaceProcessor()]
 
     def __init__(self):
         self.reject_count = 0
         self.transform_count = 0
 
     def process(self, item: Any):
+        r = self.running_processors[0]
         logger = get_run_logger()
         record, validator, transformer, filename, source = item
         data = petl.fromdicts([record])
@@ -59,7 +60,7 @@ class RecordProcessor(Processor):
                     race["course"], race["surface"], race["code"], race["obstacle"]
                 )
                 creation_dict = race | { "racecourse_id": racecourse_id }
-                RaceProcessor.send((creation_dict, source))
+                r.send((creation_dict, source))
                 self.transform_count += 1
 
             if self.transform_count % 25 == 0:
