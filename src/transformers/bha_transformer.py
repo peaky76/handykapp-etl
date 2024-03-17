@@ -72,12 +72,14 @@ def transform_ratings_data(data: petl.Table) -> List[Horse]:
         .addfield("sire", lambda rec: {
             "name": rec["sire_name_and_country"][0],
             "country": rec["sire_name_and_country"][1],
-            "sex": "M"
+            "sex": "M",
+            "source": "bha"
         })
         .addfield("dam", lambda rec: {
             "name": rec["dam_name_and_country"][0],
             "country": rec["dam_name_and_country"][1],
-            "sex": "F"
+            "sex": "F",
+            "source": "bha"
         })
         .addfield(
             "operations",

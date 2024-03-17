@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Dict
 
 from models import MongoPerson, Person
 from nameparser import HumanName  # type: ignore
@@ -7,11 +7,10 @@ from .database_processor import DatabaseProcessor
 
 
 class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
-    _descriptor = "person"
     _table_name = "people"
     _db_model = MongoPerson 
 
-    def _update_dictionary(self, person: Person) ->  dict:
+    def _update_dictionary(self, person: Person) -> dict:
         ratings: Dict[str, str] = {} # TODO: Get ratings  
         r = {"ratings": ratings} if ratings else {}
         return {"references": person.references} | r
@@ -19,7 +18,7 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     def _insert_dictionary(self, person: Person) -> dict:
         return HumanName(person.name).as_dict() | self._update_dictionary(person)
 
-    def find(self, person: Person) -> Any | None:
+    def find(self, person: Person) -> MongoPerson | None:
         found_person = self._table.find_one({"references": person.references})
 
         # if not found_person:
@@ -35,7 +34,7 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
         #             found_person = possibility
         #             break
         
-        return found_person
+        return MongoPerson(**(found_person | {"db_id": found_person["_id"]})) if found_person else None
 
     def post_process(self, person: Person) -> None:
         pass

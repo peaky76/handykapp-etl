@@ -52,7 +52,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
 
     def find(self, item: T) -> M | None:
         db_item = self._table.find_one(self._search_dictionary(item))
-        return self._db_model(**db_item) if db_item else None
+        return self._db_model(**dict(db_item | {"db_id": db_item["_id"]})) if db_item else None
         
     def update(self, item: T) -> None:
         self._table.update_one(
@@ -69,7 +69,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
         def update_if_needed(item: T, db_item: Any):
             if not self.prevent_update:
                 d = self._update_dictionary(item)
-                if any(db_item[k] != d[k] for k in d):
+                if any(db_item.model_dump()[k] != d[k] for k in d):
                     self.update(item)
                     logger.debug(f"{item} updated")
                     self.updated += 1
@@ -79,7 +79,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
 
         try:
             if self.find_first and (db_item := self.find(item)):
-                self.current_id = ObjectId(db_item._id)
+                self.current_id = ObjectId(db_item.db_id)
                 update_if_needed(item, db_item)
             else:
                 self.current_id = self.insert(item)
@@ -89,7 +89,7 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
             if not self.find_first:
                 db_item = self.find(item)
                 if db_item:
-                    self.current_id = ObjectId(db_item._id)
+                    self.current_id = ObjectId(db_item.db_id)
                     update_if_needed(item, db_item)
                 else:
                     raise ValueError(f"Duplicate key error but no item found on db for {item}")

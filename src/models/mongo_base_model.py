@@ -4,4 +4,4 @@ from .py_object_id import PyObjectId
 
 
 class MongoBaseModel(BaseModel):
-    _id: PyObjectId
+    db_id: PyObjectId

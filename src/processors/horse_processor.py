@@ -24,9 +24,6 @@ class HorseProcessor(DatabaseProcessor[InputType, MongoHorse]):
             "sire": self.find(horse.sire) if horse.sire else None,
             "dam": self.find(horse.dam) if horse.dam else None
         })
-
-    def _insert_dictionary(self, horse: InputType) -> dict:
-        return compact(self._search_dictionary(horse) | self._update_dictionary(horse))
             
     def post_process(self, horse: InputType):
         p = self.running_processors[0]
