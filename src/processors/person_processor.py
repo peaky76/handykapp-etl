@@ -1,3 +1,5 @@
+from typing import Dict
+
 from clients import mongo_client as client
 from models import Person
 from nameparser import HumanName  # type: ignore
@@ -6,12 +8,12 @@ from pydantic import BaseModel
 from .database_processor import DatabaseProcessor
 
 
-class PersonProcessor(DatabaseProcessor):
+class PersonProcessor(DatabaseProcessor[Person]):
     _descriptor = "person"
     _table_name = "people" 
 
     def _update_dictionary(self, person: Person) ->  dict:
-        ratings = {} # TODO: Get ratings  
+        ratings: Dict[str, str] = {} # TODO: Get ratings  
         r = {"ratings": ratings} if ratings else {}
         return {"references": {person.source: person.name}} | r
 

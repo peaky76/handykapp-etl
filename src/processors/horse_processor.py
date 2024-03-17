@@ -11,7 +11,7 @@ from .utils import compact
 
 InputType = Horse | HorseCore
 
-class HorseProcessor(DatabaseProcessor):
+class HorseProcessor(DatabaseProcessor[InputType]):
     _forward_processors: ClassVar[List[Processor]] = [PersonProcessor()]
     _search_keys: ClassVar[List[str]] = ["name", "country", "sex", "year"]
 

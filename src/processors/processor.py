@@ -1,15 +1,17 @@
-from typing import Any, ClassVar, List
+from abc import ABC
+from typing import ClassVar, Generic, List, TypeVar
 
 from prefect import get_run_logger
 
+T = TypeVar("T")
 
-class Processor:
+class Processor(Generic[T], ABC):
     _forward_processors: ClassVar[List["Processor"]] = []
 
     def __init__(self):
         self.running_processors = []
 
-    def start(self):
+    def start(self) -> None:
         logger = get_run_logger()
         logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
@@ -29,14 +31,14 @@ class Processor:
                 processor.close()
             self.running_processors = []
 
-    def process(self, item: Any):    
+    def process(self, item: T) -> None:    
         raise NotImplementedError
 
     @property
-    def _descriptor(self):
+    def _descriptor(self) -> str:
         name = self.__class__.__name__
         return name.replace("Processor", "").lower() if "Processor" in name else None 
 
     @property
-    def _exit_message(self):
+    def _exit_message(self) -> str:
         return f"Finished {self._descriptor or 'item'} processing."

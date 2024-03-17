@@ -1,5 +1,5 @@
 from functools import cache
-from typing import Any, ClassVar, List, Optional
+from typing import Any, ClassVar, List, Optional, TypeVar
 
 from clients import mongo_client as client
 from models import HashableBaseModel
@@ -10,8 +10,9 @@ from pymongo.errors import DuplicateKeyError
 
 from .processor import Processor
 
+T = TypeVar("T", bound=HashableBaseModel)
 
-class DatabaseProcessor(Processor):
+class DatabaseProcessor(Processor[T]):
     _search_keys: ClassVar[Optional[List[str]]] = None
     _update_keys: ClassVar[Optional[List[str]]] = None
     _insert_keys: ClassVar[Optional[List[str]]] = None
@@ -38,32 +39,32 @@ class DatabaseProcessor(Processor):
     def _table_name(self) -> str:
         return f"{self._descriptor}s" 
 
-    def _search_dictionary(self, item: HashableBaseModel) -> dict: 
+    def _search_dictionary(self, item: T) -> dict: 
         return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
-    def _update_dictionary(self, item: HashableBaseModel) -> dict:
+    def _update_dictionary(self, item: T) -> dict:
         return compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
 
-    def _insert_dictionary(self, item: HashableBaseModel) -> dict:
+    def _insert_dictionary(self, item: T) -> dict:
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: HashableBaseModel) -> HashableBaseModel | None:
+    def find(self, item: T) -> T | None:
         return self._table.find_one(self._search_dictionary(item))
 
-    def update(self, item: HashableBaseModel) -> None:
+    def update(self, item: T) -> None:
         self._table.update_one(
             {"_id": self.current_id},
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: HashableBaseModel):
+    def insert(self, item: T):
         return self._table.insert_one(self._insert_dictionary(item))
 
-    def process(self, item: HashableBaseModel):
+    def process(self, item: T):
         logger = get_run_logger()
 
-        def update_if_needed(item: HashableBaseModel, db_item: Any):
+        def update_if_needed(item: T, db_item: Any):
             if not self.prevent_update:
                 d = self._update_dictionary(item)
                 if any(db_item[k] != d[k] for k in d):
@@ -97,5 +98,5 @@ class DatabaseProcessor(Processor):
 
         self.post_process(item)   
 
-    def post_process(self, item: HashableBaseModel) -> None:
+    def post_process(self, item: T) -> None:
         pass

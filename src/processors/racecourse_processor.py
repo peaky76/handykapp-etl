@@ -6,7 +6,7 @@ from .database_processor import DatabaseProcessor
 from .utils import compact
 
 
-class RacecourseProcessor(DatabaseProcessor):
+class RacecourseProcessor(DatabaseProcessor[Racecourse]):
 
     @cache
     def _search_dictionary(self, racecourse: Racecourse) -> dict:

@@ -5,7 +5,7 @@ from models import FormdataEntry
 from .database_processor import DatabaseProcessor
 
 
-class FormdataProcessor(DatabaseProcessor):
+class FormdataProcessor(DatabaseProcessor[FormdataEntry]):
     _table_name = "formdata"
     _search_keys: ClassVar[list[str]] = ["name", "country", "year"]
 
