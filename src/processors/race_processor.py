@@ -18,25 +18,10 @@ class RaceProcessor(DatabaseProcessor[Declaration]):
         h = self.running_processors[0]
         try:
             for horse in race.runners:
-                h.send(HorseCore(**
-                    {"name": horse.sire, "sex": "M", "source": race.source},
-
-                ))
-
+                h.send(horse.sire)
                 if horse.damsire:
-                    h.send(HorseCore(**
-                        {"name": horse.damsire, "sex": "M", "source": race.source}
-                    ))
-                    
-                h.send(HorseCore(**
-                    {
-                        "name": horse.dam,
-                        "sex": "F",
-                        # "sire": horse.damsire,
-                        "source": race.source
-                        
-                    }
-                ))                
+                    h.send(horse.damsire)
+                h.send(horse.dam) 
                 h.send(horse)
 
         except Exception as e:
