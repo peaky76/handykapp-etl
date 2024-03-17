@@ -31,7 +31,7 @@ Run = namedtuple(
         "date",
         "race_type",
         "win_prize",
-        "course",
+        "racecourse",
         "number_of_runners",
         "weight",
         "headgear",

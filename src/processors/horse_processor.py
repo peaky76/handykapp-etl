@@ -1,7 +1,7 @@
 from functools import cache
 from typing import ClassVar, List
 
-from models import PyObjectId, Horse, HorseCore, Person
+from models import Horse, HorseCore, Person
 
 from processors.person_processor import PersonProcessor
 

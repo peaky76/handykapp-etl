@@ -2,10 +2,9 @@ from functools import cache
 from typing import Any, ClassVar, List, Optional
 
 from clients import mongo_client as client
-from models import HashableBaseModel, PyObjectId
+from models import HashableBaseModel
 from peak_utility.listish import compact
 from prefect import get_run_logger
-from pydantic import BaseModel
 from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
@@ -58,7 +57,7 @@ class DatabaseProcessor(Processor):
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: HashableBaseModel) -> PyObjectId:
+    def insert(self, item: HashableBaseModel):
         return self._table.insert_one(self._insert_dictionary(item))
 
     def process(self, item: HashableBaseModel):

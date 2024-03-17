@@ -1,8 +1,5 @@
-from typing import Optional
+from typing import Dict
 
-from .hashable_base_model import HashableBaseModel
+from .source import Source
 
-
-class References(HashableBaseModel):
-    bha: Optional[str] = None
-    racing_research: Optional[str] = None
+References = Dict[Source, str]

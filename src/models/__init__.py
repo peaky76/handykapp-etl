@@ -6,7 +6,6 @@ from .horse_core import HorseCore
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .person import Person
-from .py_object_id import PyObjectId
 from .race import Race
 from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
@@ -23,7 +22,6 @@ __all__ = [
     "OfficialRatings",
     "Operation",
     "Person",
-    "PyObjectId",
     "Race",
     "RaceRestriction",
     "Racecourse",

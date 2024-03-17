@@ -1,6 +1,6 @@
 from typing import ClassVar, List
 
-from models import PyObjectId, Race
+from models import Race
 from prefect import get_run_logger
 
 from processors.horse_processor import HorseProcessor

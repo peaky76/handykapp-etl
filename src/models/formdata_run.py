@@ -10,7 +10,7 @@ class FormdataRun(HashableBaseModel):
     date: datetime
     race_type: str
     win_prize: str
-    course: str = Field(..., min_length=2, max_length=3)
+    racecourse: str = Field(..., min_length=2, max_length=3)
     number_of_runners: int
     weight: Annotated[str, StringConstraints(pattern=r'^(7|8|9|10|11|12)-([0-9]|10|11|12|13)$')]
     headgear: Optional[str] = None

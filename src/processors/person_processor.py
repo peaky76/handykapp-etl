@@ -1,12 +1,9 @@
-from typing import List
-
 from clients import mongo_client as client
-from models import Person, PyObjectId
+from models import Person
 from nameparser import HumanName  # type: ignore
 from pydantic import BaseModel
 
 from .database_processor import DatabaseProcessor
-from .processor import Processor
 
 
 class PersonProcessor(DatabaseProcessor):
