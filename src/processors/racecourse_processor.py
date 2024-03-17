@@ -17,11 +17,3 @@ class RacecourseProcessor(DatabaseProcessor[Racecourse, MongoRacecourse]):
             "obstacle": racecourse.obstacle, 
             "surface": {"$in": ["Tapeta", "Polytrack"]} if racecourse.surface == "AW" else racecourse.surface 
          })
-
-    @cache
-    def _update_dictionary(self, racecourse: Racecourse) -> dict:  
-        return self._insert_dictionary(racecourse)
-
-    @cache
-    def _insert_dictionary(self, racecourse: Racecourse) -> dict:
-        return compact({"references": { f"{racecourse.source}": racecourse.abbr } }  |  racecourse.model_dump(exclude={"abbr", "source"}))

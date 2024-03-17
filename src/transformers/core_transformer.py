@@ -19,7 +19,7 @@ from horsetalk import (
     RaceDistance,
     Surface,
 )
-from models.racecourse import Racecourse
+from models import Racecourse, References
 from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
 
@@ -56,8 +56,9 @@ def transform_racecourses_data(data: petl.Table) -> List[Racecourse]:
     racecourse_dicts = (
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
-        .rename({"speed": "style", "direction": "handedness", "rr_abbr": "abbr"})
+        .rename({"speed": "style", "direction": "handedness"})
         .addfield("code", lambda rec: "NH" if rec["obstacle"] else "Flat", index=2)
+        .addfield("references", lambda rec: {"racing_research": rec["rr_abbr"]})
         .addfield("source", "core")
         .convert("formal_name", lambda x, rec: x if x else rec["name"], pass_row=True)
         .convert("obstacle", lambda x: x.replace("Steeple", "") if x else x)
@@ -65,6 +66,7 @@ def transform_racecourses_data(data: petl.Table) -> List[Racecourse]:
             ("obstacle", "surface", "shape", "style", "handedness", "contour"), lambda x: x.title() if x else None
         )
         .replace("handedness", "Straight", "Neither")
+        .cutout("rr_abbr")
         .dicts()
     )
     return [Racecourse(**racecourse) for racecourse in racecourse_dicts]
