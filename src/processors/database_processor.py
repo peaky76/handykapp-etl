@@ -1,5 +1,5 @@
 from functools import cache
-from typing import Any, ClassVar, List, Optional, Set, TypeVar
+from typing import Any, ClassVar, Optional, Set, TypeVar
 
 from bson import ObjectId
 from clients import mongo_client as client
@@ -50,9 +50,9 @@ class DatabaseProcessor(Processor[T]):
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
     @cache
-    def find(self, item: T) -> ObjectId | None:
-        return self._table.find_one(self._search_dictionary(item))["_id"]
-
+    def find(self, item: T) -> Any | None:
+        return self._table.find_one(self._search_dictionary(item))
+        
     def update(self, item: T) -> None:
         self._table.update_one(
             {"_id": self.current_id},
@@ -60,8 +60,8 @@ class DatabaseProcessor(Processor[T]):
         )
 
     def insert(self, item: T) -> ObjectId:
-        return self._table.insert_one(self._insert_dictionary(item))["inserted_id"]
-
+        return self._table.insert_one(self._insert_dictionary(item)).inserted_id
+        
     def process(self, item: T) -> None:
         logger = get_run_logger()
 
@@ -87,8 +87,11 @@ class DatabaseProcessor(Processor[T]):
         except DuplicateKeyError:
             if not self.find_first:
                 db_item = self.find(item)
-                self.current_id = db_item["_id"]
-                update_if_needed(item, db_item)
+                if db_item:
+                    self.current_id = db_item["_id"]
+                    update_if_needed(item, db_item)
+                else:
+                    raise ValueError(f"Duplicate key error but no item found on db for {item}")
         except ValueError as e:
             logger.warning(e)
             self.skipped += 1
