@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Generic, Optional, Set, Type, TypeVar
+from typing import Any, Callable, ClassVar, Generic, Optional, Set, Type, TypeVar
 
 from bson import ObjectId
 from clients import mongo_client as client
@@ -10,10 +10,12 @@ from pymongo.errors import DuplicateKeyError
 
 from .processor import Processor
 
-T = TypeVar("T", bound=HashableBaseModel)
+
+B = TypeVar("B", bound=HashableBaseModel)
 M = TypeVar("M", bound=MongoBaseModel)
 
-class DatabaseProcessor(Processor[T], Generic[T, M]):
+class DatabaseProcessor(Processor[B], Generic[B, M]):
+    _business_model: Type[B]
     _db_model: Type[M]
     _search_keys: ClassVar[Optional[Set[str]]] = None
     _update_keys: ClassVar[Optional[Set[str]]] = None
@@ -41,32 +43,37 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
     def _table_name(self) -> str:
         return f"{self._descriptor}s" 
 
-    def _search_dictionary(self, item: T) -> dict: 
+    def _search_dictionary(self, item: M) -> dict: 
         return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
 
-    def _update_dictionary(self, item: T) -> dict:
+    def _update_dictionary(self, item: M) -> dict:
         return compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
 
-    def _insert_dictionary(self, item: T) -> dict:
+    def _insert_dictionary(self, item: M) -> dict:
         return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
 
-    def find(self, item: T) -> M | None:
+    def find(self, item: M) -> M | None:
         db_item = self._table.find_one(self._search_dictionary(item))
         return self._db_model(**dict(db_item | {"db_id": db_item["_id"]})) if db_item else None
         
-    def update(self, item: T) -> None:
+    def update(self, item: M) -> None:
         self._table.update_one(
             {"_id": self.current_id},
             {"$set": self._update_dictionary(item)},
         )
 
-    def insert(self, item: T) -> ObjectId:
+    def insert(self, item: M) -> ObjectId:
         return self._table.insert_one(self._insert_dictionary(item)).inserted_id
-        
-    def process(self, item: T) -> None:
+    
+    def pre_process(self, business_object: B) -> M:
+        return self._db_model(**business_object.model_dump())
+
+    def process(self, business_object: B, callback: Callable) -> None:
         logger = get_run_logger()
 
-        def update_if_needed(item: T, db_item: Any):
+        item = self.pre_process(business_object)
+
+        def update_if_needed(item: M, db_item: Any):
             if not self.prevent_update:
                 d = self._update_dictionary(item)
                 if any(db_item.model_dump()[k] != d[k] for k in d):
@@ -101,7 +108,5 @@ class DatabaseProcessor(Processor[T], Generic[T, M]):
         if total % 250 == 0:
             logger.info(f"Processed {total} {self._descriptor} records")
 
-        self.post_process(item)   
+        callback(self.current_id)
 
-    def post_process(self, item: T) -> None:
-        pass
