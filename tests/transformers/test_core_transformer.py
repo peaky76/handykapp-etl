@@ -1,11 +1,10 @@
 import petl
 import pytest
-from models import Racecourse
 from transformers.core_transformer import (
-    core_transformer,
     transform_racecourses_data,
     validate_racecourses_data,
 )
+
 
 @pytest.fixture()
 def valid_racecourses():
@@ -91,7 +90,9 @@ def transformed_data():
             "style": "Stiff",
             "contour": "Flat",
             "country": "GB",
-            "abbr": "Pea",
+            "references": {
+                "racing_research": "Pea"
+            },
             "source": "core"
         },
         {
@@ -105,7 +106,9 @@ def transformed_data():
             "style": "Sharp",
             "contour": "Undulating",
             "country": "IRE",
-            "abbr": "Rob",
+            "references": {
+                "racing_research": "Rob"
+            },
             "source": "core"
         }
     ]
