@@ -17,15 +17,6 @@ def load_bha():
     p = HorseProcessor()
     h = p.start()
     next(h)
-
-    sires = list({horse.sire for horse in data if horse.sire})
-    dams = list({horse.dam for horse in data if horse.dam})
-
-    for sire in sires:
-        h.send(sire)
-
-    for dam in dams:
-        h.send(dam)
     
     for horse in data:
         h.send(horse)

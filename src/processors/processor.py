@@ -23,7 +23,7 @@ class Processor(Generic[T], ABC):
         try:
             while True:
                 incoming = yield
-                item, callback = incoming if isinstance(incoming, tuple) else (incoming, lambda: None)
+                item, callback = incoming if isinstance(incoming, tuple) else (incoming, lambda x: None)
                 self.process(item, callback)  
 
         except GeneratorExit:

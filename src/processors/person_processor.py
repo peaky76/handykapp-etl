@@ -18,6 +18,7 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     def _insert_dictionary(self, person: Person) -> dict:
         return HumanName(person.name).as_dict() | self._update_dictionary(person)
 
+
     def find(self, person: Person) -> MongoPerson | None:
         found_person = self._table.find_one({"references": person.references})
 
@@ -35,11 +36,3 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
         #             break
         
         return MongoPerson(**(found_person | {"db_id": found_person["_id"]})) if found_person else None
-
-    def post_process(self, person: Person) -> None:
-        pass
-        # if person.race_id:
-        #     client.handykapp.races.update_one(
-        #         {"_id": person.race_id, "runners.horse": person.horse_id},
-        #         {"$set": {f"runners.$.{person.role}": self.current_id}},
-        #     )
