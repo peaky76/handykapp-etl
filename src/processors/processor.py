@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import ClassVar, Generator, Generic, List, Optional, TypeVar
+from typing import Callable, ClassVar, Generator, Generic, List, Optional, TypeVar
 
-from prefect import get_run_logger
+# from prefect import get_run_logger
 
 T = TypeVar("T")
 
@@ -12,8 +12,8 @@ class Processor(Generic[T], ABC):
         self.running_processors = []
 
     def start(self) -> Generator:
-        logger = get_run_logger()
-        logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
+        # logger = get_run_logger()
+        # logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
         for fp in self._forward_processors:
             p = fp.start()
@@ -22,16 +22,17 @@ class Processor(Generic[T], ABC):
             
         try:
             while True:
-                item = yield
-                self.process(item)  
+                incoming = yield
+                item, callback = incoming if isinstance(incoming, tuple) else (incoming, lambda: None)
+                self.process(item, callback)  
 
         except GeneratorExit:
-            logger.info(self._exit_message)
+            # logger.info(self._exit_message)
             for rp in self.running_processors:
                 rp.close()
             self.running_processors = []
 
-    def process(self, item: T) -> None:    
+    def process(self, item: T, callback: Callable) -> None:      # noqa: F821
         raise NotImplementedError
 
     @property
