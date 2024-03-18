@@ -84,13 +84,15 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "name": "ADAAY",
             "country": "IRE",
             "sex": "M",
-            "year": None
+            "year": None,
+            "source": "bha"
         },
         "dam": {
             "name": "TARA TOO",
             "country": "IRE",
             "sex": "F",
-            "year": None
+            "year": None,
+            "source": "bha"
         },
         "operations": [{"operation_type": "gelding", "date": None}],
         "ratings": {
