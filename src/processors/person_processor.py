@@ -8,18 +8,10 @@ from .database_processor import DatabaseProcessor
 
 class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     _table_name = "people"
+    _business_model = Person
     _db_model = MongoPerson 
 
-    def _update_dictionary(self, person: Person) -> dict:
-        ratings: Dict[str, str] = {} # TODO: Get ratings  
-        r = {"ratings": ratings} if ratings else {}
-        return {"references": person.references} | r
-
-    def _insert_dictionary(self, person: Person) -> dict:
-        return HumanName(person.name).as_dict() | self._update_dictionary(person)
-
-
-    def find(self, person: Person) -> MongoPerson | None:
+    def find(self, person: MongoPerson) -> MongoPerson | None:
         found_person = self._table.find_one({"references": person.references})
 
         # if not found_person:
@@ -36,3 +28,6 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
         #             break
         
         return MongoPerson(**(found_person | {"db_id": found_person["_id"]})) if found_person else None
+
+    def pre_process(self, person: Person) -> MongoPerson:
+        return MongoPerson(**(person.model_dump(exclude={"name"}) | HumanName(person.name).as_dict()))

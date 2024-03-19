@@ -6,6 +6,7 @@ from .hashable_base_model import HashableBaseModel
 from .horse_core import HorseCore
 from .official_ratings import OfficialRatings
 from .operation import Operation
+from .person import Person
 from .source import Source
 
 
@@ -21,5 +22,5 @@ class Horse(HashableBaseModel):
     damsire: Optional[HorseCore] = None
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
-    trainer: Optional[str] = None
+    trainer: Optional[Person] = None
     source: Source

@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Callable, ClassVar, Generator, Generic, List, Optional, TypeVar
 
-# from prefect import get_run_logger
+from prefect import get_run_logger
 
 T = TypeVar("T")
 
@@ -12,8 +12,8 @@ class Processor(Generic[T], ABC):
         self.running_processors = []
 
     def start(self) -> Generator:
-        # logger = get_run_logger()
-        # logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
+        logger = get_run_logger()
+        logger.info(f"Starting {self._descriptor or 'anonymous'} processor")
       
         for fp in self._forward_processors:
             p = fp.start()
@@ -27,7 +27,7 @@ class Processor(Generic[T], ABC):
                 self.process(item, callback)  
 
         except GeneratorExit:
-            # logger.info(self._exit_message)
+            logger.info(self._exit_message)
             for rp in self.running_processors:
                 rp.close()
             self.running_processors = []
