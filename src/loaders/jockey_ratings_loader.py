@@ -4,29 +4,17 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from prefect import flow, get_run_logger
+from prefect import flow
 from processors.database_processors import PersonProcessor
-from transformers.jockey_ratings_transformer import transform_jockey_ratings
+from transformers.jockey_ratings_transformer import jockey_ratings_transformer
+
+from loaders.loader import Loader
 
 
 @flow
 def load_jockey_ratings():
-    logger = get_run_logger()
-    logger.info("Starting jockey rating loader")
-
-    pp = PersonProcessor()
-    p = pp.start()
-    next(p)
-
-    for jockey, rating in transform_jockey_ratings().items():
-        p.send((
-            {"name": jockey, "role": "jockey"},
-            "rr",
-            {k: v for k, v in rating.items() if v},
-        ))
-
-    p.close()
-
+    loader = Loader(jockey_ratings_transformer(), PersonProcessor())
+    loader.load()
 
 if __name__ == "__main__":
     load_jockey_ratings()
