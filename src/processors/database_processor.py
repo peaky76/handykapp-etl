@@ -10,7 +10,6 @@ from pymongo.errors import DuplicateKeyError
 
 from .processor import Processor
 
-
 B = TypeVar("B", bound=HashableBaseModel)
 M = TypeVar("M", bound=MongoBaseModel)
 
@@ -19,7 +18,6 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
     _db_model: Type[M]
     _search_keys: ClassVar[Optional[Set[str]]] = None
     _update_keys: ClassVar[Optional[Set[str]]] = None
-    _insert_keys: ClassVar[Optional[Set[str]]] = None
         
     def __init__(self, *, find_first: bool = True, prevent_update: bool = False):
         super().__init__()
@@ -42,28 +40,18 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
     @property
     def _table_name(self) -> str:
         return f"{self._descriptor}s" 
-
-    def _search_dictionary(self, item: M) -> dict: 
-        return compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
-
-    def _update_dictionary(self, item: M) -> dict:
-        return compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
-
-    def _insert_dictionary(self, item: M) -> dict:
-        return compact(item.model_dump(include=self._insert_keys) if self._insert_keys else item.model_dump())
-
+    
     def find(self, item: M) -> M | None:
-        db_item = self._table.find_one(self._search_dictionary(item))
+        search_dictionary = compact(item.model_dump(include=self._search_keys) if self._search_keys else item.model_dump())
+        db_item = self._table.find_one(search_dictionary)
         return self._db_model(**dict(db_item | {"db_id": db_item["_id"]})) if db_item else None
         
     def update(self, item: M) -> None:
-        self._table.update_one(
-            {"_id": self.current_id},
-            {"$set": self._update_dictionary(item)},
-        )
+        update_dictionary = compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
+        self._table.update_one({"_id": self.current_id}, {"$set": update_dictionary})
 
     def insert(self, item: M) -> ObjectId:
-        return self._table.insert_one(self._insert_dictionary(item)).inserted_id
+        return self._table.insert_one(item).inserted_id
     
     def pre_process(self, business_object: B) -> M:
         return self._db_model(**business_object.model_dump())

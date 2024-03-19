@@ -7,6 +7,7 @@ from processors.horse_core_processor import HorseCoreProcessor
 from processors.person_processor import PersonProcessor
 
 from .database_processor import DatabaseProcessor
+from .id_hook import IdHook
 from .processor import Processor
 from .utils import compact
 
@@ -15,13 +16,6 @@ class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):
     _db_model = MongoHorse
     _forward_processors: ClassVar[List[Processor]] = [HorseCoreProcessor(), PersonProcessor()]
     _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
-
-    def __init__(self):
-        super().__init__()
-        self.sire_ids = {}
-        self.dam_ids = {}
-        self.trainer_id = None
-        # self.person_ids = {}
 
     def _update_dictionary(self, horse: Horse) -> dict:
         return compact({
@@ -34,27 +28,12 @@ class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):
         h = self.running_processors[0]
         p = self.running_processors[1]  
 
-        def sire_callback(x):
-            self.sire_ids[horse.sire] = x
+        sire_id = IdHook()
+        dam_id = IdHook()
+        trainer_id = IdHook()
 
-        def dam_callback(x):
-            self.dam_ids[horse.dam] = x
+        h.send((horse.sire, sire_id))
+        h.send((horse.dam, dam_id))
+        p.send((horse.trainer, trainer_id))
 
-        def person_callback(x):
-            # self.person_ids[horse.trainer] = x
-            self.trainer_id = x
-
-        if not (sire_id := self.sire_ids.get(horse.sire)):
-            h.send((horse.sire, sire_callback))
-            sire_id = self.sire_ids[horse.sire]
-
-        if not (dam_id := self.dam_ids.get(horse.dam)):
-            h.send((horse.dam, dam_callback))
-            dam_id = self.dam_ids[horse.dam]
-
-        # if not (trainer_id := self.person_ids.get(horse.trainer)):
-        p.send((horse.trainer, person_callback))
-        trainer_id = self.trainer_id
-            # trainer_id = self.person_ids[horse.trainer]
-
-        return MongoHorse(**(horse.model_dump() | {"sire": ObjectId(sire_id), "dam": ObjectId(dam_id), "trainer": ObjectId(trainer_id)}))   
+        return MongoHorse(**(horse.model_dump() | {"sire": ObjectId(sire_id.val), "dam": ObjectId(dam_id.val), "trainer": ObjectId(trainer_id.val)}))   
