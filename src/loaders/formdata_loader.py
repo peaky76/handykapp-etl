@@ -12,6 +12,8 @@ from prefect import flow, get_run_logger
 from processors.pdf_file_processor import PdfFileProcessor
 from transformers.formdata_transformer import get_formdatas
 
+from loaders.loader import Loader
+
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
@@ -50,16 +52,8 @@ def load_formdata_only():
 
     files = get_formdatas(after_year=23, for_refresh=True)
     for file in files:
-
-        logger.info(f"Processing formdata {file}")
-        p = PdfFileProcessor()
-        f = p.start()
-        next(f)
-
-        f.send(file)
-
-        f.close()
-        logger.info(f"Loaded formdata entries for {file}")
+        loader = Loader(file, PdfFileProcessor())
+        loader.load()
 
 
 if __name__ == "__main__":
