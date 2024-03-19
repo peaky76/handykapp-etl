@@ -1,6 +1,6 @@
 import petl
 import pytest
-from transformers.core_transformer import (
+from transformers.core_racecourses_transformer import (
     transform_racecourses_data,
     validate_racecourses_data,
 )

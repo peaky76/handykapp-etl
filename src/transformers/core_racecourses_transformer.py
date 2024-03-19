@@ -147,7 +147,7 @@ def validate_racecourses_data(data: petl.Table) -> petl.transform.validation.Pro
 
 
 @flow
-def core_transformer() -> List[Racecourse]:
+def core_racecourses_transformer() -> List[Racecourse]:
     racecourses = []
     for csv in read_csvs():
         if (problems := validate_racecourses_data(csv)):
@@ -158,5 +158,5 @@ def core_transformer() -> List[Racecourse]:
 
 
 if __name__ == "__main__":
-    data = core_transformer()  # type: ignore
+    data = core_racecourses_transformer()  # type: ignore
     print(data)

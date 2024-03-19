@@ -5,8 +5,8 @@ from clients import mongo_client as client
 from helpers import log_validation_problem
 from prefect import get_run_logger
 
+from processors.database_processors.race_processor import RaceProcessor
 from processors.processor import Processor
-from processors.race_processor import RaceProcessor
 
 db = client.handykapp
 

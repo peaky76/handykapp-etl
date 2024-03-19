@@ -20,6 +20,16 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["core"]["spaces_dir"]
 
 
+# @flow
+# def core_transformer() -> List[Racecourse]:
+#     racecourses = []
+#     for csv in read_csvs():
+#         if (problems := validate_racecourses_data(csv)):
+#             for problem in problems.dicts():
+#                 log_validation_problem(problem)
+#         racecourses += transform_racecourses_data(csv)
+#     return racecourses
+
 @task(tags=["Core"])
 def transform_jockey_ratings() -> List[JockeyRatings]:
     filename = f"{SOURCE}jockeys/jockey_ratings_historic.csv"
