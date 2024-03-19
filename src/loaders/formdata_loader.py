@@ -9,7 +9,7 @@ import tomllib
 from clients import mongo_client as client
 from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger
-from processors.file_processor import FileProcessor
+from processors.pdf_file_processor import PdfFileProcessor
 from transformers.formdata_transformer import get_formdatas
 
 with open("settings.toml", "rb") as f:
@@ -52,7 +52,7 @@ def load_formdata_only():
     for file in files:
 
         logger.info(f"Processing formdata {file}")
-        p = FileProcessor()
+        p = PdfFileProcessor()
         f = p.start()
         next(f)
 

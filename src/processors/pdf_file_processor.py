@@ -8,7 +8,7 @@ from .page_processor import PageProcessor
 from .processor import Processor
 
 
-class FileProcessor(Processor):
+class PdfFileProcessor(Processor):
     _forward_processors: ClassVar[List["Processor"]] = [PageProcessor()]
 
     def __init__(self):
