@@ -8,7 +8,8 @@ from transformers.formdata_transformer import (
     is_race_date,
 )
 
-from .formdata_processor import FormdataProcessor
+from processors.database_processors.formdata_processor import FormdataProcessor
+
 from .processor import Processor
 
 

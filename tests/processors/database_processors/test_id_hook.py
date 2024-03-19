@@ -1,4 +1,4 @@
-from processors.id_hook import IdHook
+from processors.database_processors.id_hook import IdHook
 
 
 def test_id_hook_is_empty_str_by_default():

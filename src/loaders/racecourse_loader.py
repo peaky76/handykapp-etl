@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
 from prefect import flow
-from processors.racecourse_processor import RacecourseProcessor
+from processors.database_processors import RacecourseProcessor
 from transformers.core_transformer import core_transformer
 
 from .loader import Loader

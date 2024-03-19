@@ -3,10 +3,10 @@ from typing import ClassVar, List, Set
 from models import Declaration, MongoRace
 from prefect import get_run_logger
 
-from processors.horse_processor import HorseProcessor
+from processors.processor import Processor
 
 from .database_processor import DatabaseProcessor
-from .processor import Processor
+from .horse_processor import HorseProcessor
 
 
 class RaceProcessor(DatabaseProcessor[Declaration, MongoRace]):

@@ -4,12 +4,12 @@ from bson import ObjectId
 from models import Horse, MongoHorse
 from peak_utility.listish import compact
 
-from processors.horse_core_processor import HorseCoreProcessor
-from processors.person_processor import PersonProcessor
+from processors.processor import Processor
 
 from .database_processor import DatabaseProcessor
+from .horse_core_processor import HorseCoreProcessor
 from .id_hook import IdHook
-from .processor import Processor
+from .person_processor import PersonProcessor
 
 
 class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):

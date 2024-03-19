@@ -8,7 +8,7 @@ from prefect import get_run_logger
 from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
-from .processor import Processor
+from processors.processor import Processor
 
 B = TypeVar("B", bound=HashableBaseModel)
 M = TypeVar("M", bound=MongoBaseModel)
