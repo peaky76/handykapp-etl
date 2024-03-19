@@ -9,19 +9,14 @@ from prefect import flow
 from processors.racecourse_processor import RacecourseProcessor
 from transformers.core_transformer import core_transformer
 
+from .loader import Loader
+
 db = client.handykapp
 
 @flow
 def load_racecourses():
-    data = core_transformer()
-    p = RacecourseProcessor()
-    r = p.start()
-    next(r)
-
-    for racecourse in data:
-        r.send(racecourse)
-    
-    r.close()
+    loader = Loader(core_transformer(), RacecourseProcessor())
+    loader.load()
 
 @flow
 def load_racecourses_afresh():

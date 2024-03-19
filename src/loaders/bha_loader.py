@@ -9,19 +9,14 @@ from prefect import flow
 from processors.horse_processor import HorseProcessor
 from transformers.bha_transformer import bha_transformer
 
+from .loader import Loader
+
 db = client.handykapp
 
 @flow
 def load_bha():
-    data = bha_transformer()
-    p = HorseProcessor()
-    h = p.start()
-    next(h)
-    
-    for horse in data:
-        h.send(horse)
-
-    h.close()
+    loader = Loader(bha_transformer(), HorseProcessor())
+    loader.load()
 
 @flow
 def load_bha_afresh():

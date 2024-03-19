@@ -63,7 +63,7 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
 
         def update_if_needed(item: M, db_item: Any):
             if not self.prevent_update:
-                d = self._update_dictionary(item)
+                d = compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
                 if any(db_item.model_dump()[k] != d[k] for k in d):
                     self.update(item)
                     logger.debug(f"{item} updated")
