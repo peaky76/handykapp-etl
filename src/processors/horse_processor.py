@@ -57,4 +57,4 @@ class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):
         trainer_id = self.trainer_id
             # trainer_id = self.person_ids[horse.trainer]
 
-        return MongoHorse(**(horse.model_dump(exclude={"sire", "dam"}) | {"sire": ObjectId(sire_id), "dam": ObjectId(dam_id), "trainer": ObjectId(trainer_id)}))   
+        return MongoHorse(**(horse.model_dump() | {"sire": ObjectId(sire_id), "dam": ObjectId(dam_id), "trainer": ObjectId(trainer_id)}))   
