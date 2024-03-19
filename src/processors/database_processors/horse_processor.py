@@ -15,16 +15,10 @@ from .person_processor import PersonProcessor
 class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):
     _db_model = MongoHorse
     _forward_processors: ClassVar[List[Processor]] = [HorseCoreProcessor(), PersonProcessor()]
+    _update_keys: ClassVar[Set[str]] = {"colour", "sire", "dam"}
     _search_keys: ClassVar[Set[str]] = {"name", "country", "sex", "year"}
 
-    def _update_dictionary(self, horse: Horse) -> dict:
-        return compact({
-            "colour": horse.colour,
-            "sire": self.find(horse.sire) if horse.sire else None,
-            "dam": self.find(horse.dam) if horse.dam else None
-        })
-
-    def pre_process(self, horse: Horse) -> None:
+    def pre_process(self, horse: Horse) -> MongoHorse:
         h = self.running_processors[0]
         p = self.running_processors[1]  
 
