@@ -2,6 +2,7 @@ from typing import ClassVar, List, Set
 
 from bson import ObjectId
 from models import Horse, MongoHorse
+from peak_utility.listish import compact
 
 from processors.horse_core_processor import HorseCoreProcessor
 from processors.person_processor import PersonProcessor
@@ -9,7 +10,6 @@ from processors.person_processor import PersonProcessor
 from .database_processor import DatabaseProcessor
 from .id_hook import IdHook
 from .processor import Processor
-from .utils import compact
 
 
 class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):

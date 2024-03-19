@@ -1,7 +1,7 @@
 from models import MongoRacecourse, Racecourse
+from peak_utility.listish import compact
 
 from .database_processor import DatabaseProcessor
-from .utils import compact
 
 
 class RacecourseProcessor(DatabaseProcessor[Racecourse, MongoRacecourse]):
