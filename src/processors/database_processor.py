@@ -51,7 +51,7 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
         self._table.update_one({"_id": self.current_id}, {"$set": update_dictionary})
 
     def insert(self, item: M) -> ObjectId:
-        return self._table.insert_one(item).inserted_id
+        return self._table.insert_one(item.model_dump()).inserted_id
     
     def pre_process(self, business_object: B) -> M:
         return self._db_model(**business_object.model_dump())
