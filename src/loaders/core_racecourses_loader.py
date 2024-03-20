@@ -18,9 +18,9 @@ db = client.handykapp
 
 @flow
 def load_racecourses():
-    source_data = list(read_csvs())
-    for item in source_data:
-        loader = Loader(CoreRacecoursesTransformer(item), RacecourseProcessor())
+    for csv in read_csvs():
+        data = CoreRacecoursesTransformer(csv).transform()
+        loader = Loader(data, RacecourseProcessor())
         loader.load()
 
 @flow

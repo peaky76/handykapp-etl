@@ -13,7 +13,8 @@ from loaders.loader import Loader
 
 @flow
 def load_jockey_ratings():
-    loader = Loader(JockeyRatingsTransformer(), PersonProcessor())
+    data = JockeyRatingsTransformer().transform()
+    loader = Loader(data, PersonProcessor())
     loader.load()
 
 if __name__ == "__main__":

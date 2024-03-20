@@ -15,7 +15,8 @@ db = client.handykapp
 
 @flow
 def load_bha():
-    loader = Loader(BHATransformer(), HorseProcessor())
+    data = BHATransformer().transform()
+    loader = Loader(data, HorseProcessor())
     loader.load()
 
 @flow
