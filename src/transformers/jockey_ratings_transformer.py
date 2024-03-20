@@ -33,10 +33,11 @@ def transform_jockey_ratings_data(data: petl.Table) -> List[RatedJockey]:
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
         .convert("name", lambda x: str(HumanName(normal(" ".join([*x.split(" ")[1:], x.split(" ")[0]])).title())))
+        .addfield("sex", lambda rec: "F" if "Ms" in rec["name"] else "M")
         .addfield("role", "jockey")
         .addfield("ratings", lambda rec: compact({ str(y): rec[y] or None for y in YEARS }))
         .addfield("references", lambda rec: {"racing_research": rec["name"]})
-        .cut("name", "role", "ratings", "references")
+        .cut("name", "sex", "role", "ratings", "references")
         .dicts()
     )
     return [RatedJockey(**rtgs) for rtgs in rtgs_dicts]
