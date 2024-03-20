@@ -6,14 +6,14 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow
 from processors.database_processors import PersonProcessor
-from transformers.jockey_ratings_transformer import jockey_ratings_transformer
+from transformers.jockey_ratings_transformer import JockeyRatingsTransformer
 
 from loaders.loader import Loader
 
 
 @flow
 def load_jockey_ratings():
-    loader = Loader(jockey_ratings_transformer(), PersonProcessor())
+    loader = Loader(JockeyRatingsTransformer(), PersonProcessor())
     loader.load()
 
 if __name__ == "__main__":

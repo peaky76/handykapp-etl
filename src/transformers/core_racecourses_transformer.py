@@ -9,7 +9,7 @@ from typing import Generator, List, Optional
 
 import petl  # type: ignore
 import tomllib
-from helpers import get_files, log_validation_problem, stream_file
+from helpers import get_files, stream_file
 from horsetalk import (
     Handedness,
     JumpCategory,
@@ -19,10 +19,11 @@ from horsetalk import (
     RaceDistance,
     Surface,
 )
-from models import Racecourse, References
+from models import Racecourse
 from peak_utility.text.case import snake  # type: ignore
-from prefect import flow, task
+from prefect import task
 
+from transformers.transformer import Transformer
 from transformers.validators import validate_in_enum
 
 with open("settings.toml", "rb") as f:
@@ -146,17 +147,15 @@ def validate_racecourses_data(data: petl.Table) -> petl.transform.validation.Pro
     return petl.validate(data, **validator)
 
 
-@flow
-def core_racecourses_transformer() -> List[Racecourse]:
-    racecourses = []
-    for csv in read_csvs():
-        if (problems := validate_racecourses_data(csv)):
-            for problem in problems.dicts():
-                log_validation_problem(problem)
-        racecourses += transform_racecourses_data(csv)
-    return racecourses
+class CoreRacecoursesTransformer(Transformer[Racecourse]):
+    def __init__(self, source_data: petl.Table):
+        super().__init__(
+            source_data=source_data,
+            validator=validate_racecourses_data,
+            transformer=transform_racecourses_data,
+        )
 
 
 if __name__ == "__main__":
-    data = core_racecourses_transformer()  # type: ignore
+    data = CoreRacecoursesTransformer().transform()  # type: ignore
     print(data)

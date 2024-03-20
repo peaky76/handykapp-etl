@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from prefect import flow
 from processors.database_processors import HorseProcessor
-from transformers.bha_transformer import bha_transformer
+from transformers.bha_transformer import BHATransformer
 
 from .loader import Loader
 
@@ -15,7 +15,7 @@ db = client.handykapp
 
 @flow
 def load_bha():
-    loader = Loader(bha_transformer(), HorseProcessor())
+    loader = Loader(BHATransformer(), HorseProcessor())
     loader.load()
 
 @flow

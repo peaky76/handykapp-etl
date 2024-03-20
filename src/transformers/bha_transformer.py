@@ -7,12 +7,13 @@ from typing import List
 
 import petl  # type: ignore
 import tomllib
-from helpers import get_files, log_validation_problem, stream_file
+from helpers import get_files, stream_file
 from horsetalk import Gender
 from models import Horse
-from prefect import flow, task
+from prefect import task
 
 from transformers.parsers import parse_horse
+from transformers.transformer import Transformer
 from transformers.validators import (
     validate_horse,
     validate_rating,
@@ -139,16 +140,14 @@ def validate_ratings_data(data: petl.Table) -> petl.transform.validation.Problem
     return petl.validate(data, **validator)
 
 
-@flow
-def bha_transformer() -> List[Horse]:
-    csv = get_csv()
-    data = read_csv(csv)
-    if (problems := validate_ratings_data(data)):
-        for problem in problems.dicts():
-            log_validation_problem(problem)
-    return transform_ratings_data(data)
-
+class BHATransformer(Transformer[Horse]):
+    def __init__(self):
+        super().__init__(
+            source_data=read_csv(get_csv()),
+            validator=validate_ratings_data,
+            transformer=transform_ratings_data,
+        )
 
 if __name__ == "__main__":
-    data = bha_transformer()  # type: ignore
+    data = BHATransformer().transform()  # type: ignore
     print(data)

@@ -7,7 +7,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from clients import mongo_client as client
 from prefect import flow
 from processors.database_processors import RacecourseProcessor
-from transformers.core_racecourses_transformer import core_racecourses_transformer
+from transformers.core_racecourses_transformer import (
+    CoreRacecoursesTransformer,
+    read_csvs,
+)
 
 from .loader import Loader
 
@@ -15,8 +18,10 @@ db = client.handykapp
 
 @flow
 def load_racecourses():
-    loader = Loader(core_racecourses_transformer(), RacecourseProcessor())
-    loader.load()
+    source_data = list(read_csvs())
+    for item in source_data:
+        loader = Loader(CoreRacecoursesTransformer(item), RacecourseProcessor())
+        loader.load()
 
 @flow
 def load_racecourses_afresh():

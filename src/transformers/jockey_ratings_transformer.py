@@ -9,12 +9,14 @@ from typing import List
 
 import petl  # type: ignore
 import tomllib
-from helpers import log_validation_problem, stream_file
+from helpers import stream_file
 from models import RatedJockey
 from nameparser import HumanName  # type: ignore
 from peak_utility.listish import compact  # type: ignore
 from peak_utility.text.case import normal, snake  # type: ignore
-from prefect import flow, task
+from prefect import task
+
+from transformers.transformer import Transformer
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -54,17 +56,14 @@ def validate_jockey_ratings_data(data: petl.Table) -> petl.transform.validation.
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
-
-@flow
-def jockey_ratings_transformer() -> List[RatedJockey]:
-    data = read_csv(f"{SOURCE}jockeys/jockey_ratings_historic.csv")
-
-    if (problems := validate_jockey_ratings_data(data)):
-        for problem in problems.dicts():
-            log_validation_problem(problem)
-    return transform_jockey_ratings_data(data)
-
+class JockeyRatingsTransformer(Transformer[RatedJockey]):
+    def __init__(self):
+        super().__init__(
+            source_data=read_csv(f"{SOURCE}jockeys/jockey_ratings_historic.csv"),
+            validator=validate_jockey_ratings_data,
+            transformer=transform_jockey_ratings_data,
+        )
 
 if __name__ == "__main__":
-    data = jockey_ratings_transformer()
+    data = JockeyRatingsTransformer().transform()
     print(data)
