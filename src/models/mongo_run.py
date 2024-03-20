@@ -1,10 +1,12 @@
-from typing import Optional
+from typing import Literal, Optional
 
-from .mongo_base_model import MongoBaseModel
+from pydantic import BaseModel
+
 from .py_object_id import PyObjectId
 
 
-class MongoRun(MongoBaseModel):
+class MongoRun(BaseModel):
+    horse: PyObjectId
     jockey: Optional[PyObjectId] = None
     trainer: Optional[PyObjectId] = None
     owner: Optional[str] = None
@@ -13,7 +15,7 @@ class MongoRun(MongoBaseModel):
     draw: Optional[int] = None
     headgear: Optional[str] = None
     lbs_carried: Optional[int] = None 
-    official_rating: Optional[int] = None
+    official_rating: Optional[int | Literal['-']] = None
     position: Optional[int | str] = None
     distance_beaten: Optional[int | str] = None
     sp: Optional[str] = None
