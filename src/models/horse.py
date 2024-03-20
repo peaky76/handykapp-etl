@@ -24,4 +24,5 @@ class Horse(HashableBaseModel):
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     trainer: Optional[Person] = None
+    owner: Optional[str] = None
     source: Source
