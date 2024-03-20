@@ -3,10 +3,10 @@ import re
 
 def parse_code(obstacle, title):
     if obstacle:
-        return "National Hunt"
+        return "NH"
 
     if "National Hunt" in title or "NH" in title:
-        return "National Hunt"
+        return "NH"
 
     return "Flat"
 
@@ -32,5 +32,5 @@ def parse_obstacle(race_title):
 
     for regex, obstacle in obstacle_types.items():
         if re.compile(regex).search(race_title.upper()):
-            return obstacle
+            return obstacle.title()
     return None
