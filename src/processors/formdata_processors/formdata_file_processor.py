@@ -2,14 +2,14 @@ from typing import ClassVar, List
 
 import fitz  # type: ignore
 from helpers import stream_file
+from processors.processor import Processor
 from transformers.formdata_transformer import get_formdata_date
 
-from .page_processor import PageProcessor
-from .processor import Processor
+from .formdata_page_processor import FormdataPageProcessor
 
 
-class PdfFileProcessor(Processor):
-    _forward_processors: ClassVar[List["Processor"]] = [PageProcessor()]
+class FormdataFileProcessor(Processor):
+    _forward_processors: ClassVar[List["Processor"]] = [FormdataPageProcessor()]
 
     def __init__(self):
         super().__init__()

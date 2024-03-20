@@ -1,6 +1,8 @@
 from typing import Any, ClassVar, List
 
 from prefect import get_run_logger
+from processors.database_processors import FormdataProcessor
+from processors.processor import Processor
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
@@ -8,12 +10,8 @@ from transformers.formdata_transformer import (
     is_race_date,
 )
 
-from processors.database_processors.formdata_processor import FormdataProcessor
 
-from .processor import Processor
-
-
-class WordProcessor(Processor):
+class FormdataWordProcessor(Processor):
     _descriptor: ClassVar[str] = "word"
     _forward_processors: ClassVar[List[Processor]] = [FormdataProcessor()]
 

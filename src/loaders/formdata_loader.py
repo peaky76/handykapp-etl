@@ -9,7 +9,7 @@ import tomllib
 from clients import mongo_client as client
 from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger
-from processors.pdf_file_processor import PdfFileProcessor
+from processors.formdata_processors.formdata_file_processor import FormdataFileProcessor
 from transformers.formdata_transformer import get_formdatas
 
 from loaders.loader import Loader
@@ -52,7 +52,7 @@ def load_formdata_only():
 
     files = get_formdatas(after_year=23, for_refresh=True)
     for file in files:
-        loader = Loader(file, PdfFileProcessor())
+        loader = Loader(file, FormdataFileProcessor())
         loader.load()
 
 

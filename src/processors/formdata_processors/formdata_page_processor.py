@@ -1,11 +1,12 @@
 from typing import Any, ClassVar, List
 
-from .processor import Processor
-from .word_processor import WordProcessor
+from processors.processor import Processor
+
+from .formdata_word_processor import FormdataWordProcessor
 
 
-class PageProcessor(Processor):
-    _forward_processors: ClassVar[List["Processor"]] = [WordProcessor()]
+class FormdataPageProcessor(Processor):
+    _forward_processors: ClassVar[List["Processor"]] = [FormdataWordProcessor()]
 
     def __init__(self):
         super().__init__()
