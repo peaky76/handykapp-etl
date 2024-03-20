@@ -7,13 +7,14 @@ from .horse_core import HorseCore
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .person import Person
+from .sex import Sex
 from .source import Source
 
 
 class Horse(HashableBaseModel):
     name: str = Field(..., min_length=3, max_length=21)
     country: str = Field(..., min_length=2, max_length=3)
-    sex: Optional[Literal["M", "F"]] = None
+    sex: Optional[Sex] = None
     year: int
     breed: Optional[str] = None
     colour: Optional[str] = None
