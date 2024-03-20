@@ -1,7 +1,7 @@
 from typing import List
 
-from processors.database_processors.database_processor import DatabaseProcessor
 from models.hashable_base_model import HashableBaseModel
+from processors.database_processors.database_processor import DatabaseProcessor
 
 
 class Loader:

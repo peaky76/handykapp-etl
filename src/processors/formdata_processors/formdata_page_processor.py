@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, List
+from typing import Any, Callable, ClassVar, List
 
 from processors.processor import Processor
 
@@ -6,14 +6,15 @@ from .formdata_word_processor import FormdataWordProcessor
 
 
 class FormdataPageProcessor(Processor):
+    _descriptor: ClassVar[str] = "page"
     _forward_processors: ClassVar[List["Processor"]] = [FormdataWordProcessor()]
 
     def __init__(self):
         super().__init__()
         self.page_count = 0
 
-    def process(self, item: Any):
-        page, date = item
+    def process(self, item: Any, _callback: Callable):
+        page = item
         text = page.get_text()
         
         w = self.running_processors[0]
@@ -26,4 +27,4 @@ class FormdataPageProcessor(Processor):
             .split("\n")
         )
         for word in words:
-            w.send((word, date))
+            w.send(word)

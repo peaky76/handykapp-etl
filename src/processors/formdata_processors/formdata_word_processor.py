@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, List
+from typing import Any, Callable, ClassVar, List
 
 from prefect import get_run_logger
 from processors.database_processors import FormdataProcessor
@@ -9,6 +9,8 @@ from transformers.formdata_transformer import (
     is_horse,
     is_race_date,
 )
+
+from .formdata_context import formdata_year
 
 
 class FormdataWordProcessor(Processor):
@@ -26,11 +28,12 @@ class FormdataWordProcessor(Processor):
         self.adding_runs = False
         self.skip_count = 0
 
-    def process(self, item: Any):
+    def process(self, item: Any, _callback: Callable):
         logger = get_run_logger()
+        year = formdata_year.get()
         f = self.running_processors[0]
 
-        word, date = item
+        word = item
         if "FORMDATA" in word:
             self.skip_count = 3
             return
@@ -55,7 +58,7 @@ class FormdataWordProcessor(Processor):
 
         # Create horses/runs
         if self.run_switch and len(self.horse_args):
-            self.horse = create_horse(self.horse_args, date.year)
+            self.horse = create_horse(self.horse_args, year)
             self.horse_args = []
 
         if (self.horse_switch or self.run_switch) and len(self.run_args):
