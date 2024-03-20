@@ -2,7 +2,6 @@ from typing import ClassVar, List, Set
 
 from bson import ObjectId
 from models import Horse, MongoHorse
-from peak_utility.listish import compact
 
 from processors.processor import Processor
 

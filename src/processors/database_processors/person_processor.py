@@ -1,5 +1,3 @@
-from typing import Dict
-
 from models import MongoPerson, Person
 from nameparser import HumanName  # type: ignore
 
