@@ -12,20 +12,20 @@ class PersonProcessor(DatabaseProcessor[Person, MongoPerson]):
     _db_model = MongoPerson 
 
     def find(self, person: MongoPerson) -> MongoPerson | None:
-        found_person = self._table.find_one({"references": person.references})
+        found_person = self._table.find_one({"references": person.references}) if person.references else None
 
-        # if not found_person:
-        #     name_parts = HumanName(person.name)       
-        #     possibilities = self._table.find({"last": name_parts.last})
-        #     for possibility in possibilities:
-        #         if name_parts.first == possibility["first"] or (
-        #             name_parts.first
-        #             and possibility["first"]
-        #             and name_parts.first[0] == possibility["first"][0]
-        #             and name_parts.title == possibility["title"]
-        #         ):
-        #             found_person = possibility
-        #             break
+        if not found_person:    
+            possibilities = self._table.find({"last": person.last})
+            for possibility in possibilities:
+                if person.first == possibility["first"] and person.middle == possibility["middle"]:
+                # or (
+                #     person.first
+                #     and possibility["first"]
+                #     and person.first[0] == possibility["first"][0]
+                #     and person.title == possibility["title"]
+                # ):
+                    found_person = possibility
+                    break
         
         return MongoPerson(**(found_person | {"db_id": found_person["_id"]})) if found_person else None
 

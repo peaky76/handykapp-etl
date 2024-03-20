@@ -1,5 +1,5 @@
 from typing import Annotated
 
-from pydantic import Field
+from pydantic import Field, StringConstraints
 
-Year = Annotated[int, Field(gte=1600, lte=2100)]
+Year = Annotated[str, Field(StringConstraints(pattern=r'^[12]\d{3}$'))]

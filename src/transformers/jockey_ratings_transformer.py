@@ -10,10 +10,10 @@ from typing import List
 import petl  # type: ignore
 import tomllib
 from helpers import log_validation_problem, stream_file
-from models import JockeyRatings
+from models import RatedJockey
 from nameparser import HumanName  # type: ignore
 from peak_utility.listish import compact  # type: ignore
-from peak_utility.text.case import snake  # type: ignore
+from peak_utility.text.case import normal, snake  # type: ignore
 from prefect import flow, task
 
 with open("settings.toml", "rb") as f:
@@ -27,19 +27,19 @@ def read_csv(csv):
     return petl.fromcsv(source)
 
 @task(tags=["Core"])
-def transform_jockey_ratings_data(data: petl.Table) -> List[JockeyRatings]:
+def transform_jockey_ratings_data(data: petl.Table) -> List[RatedJockey]:
     used_fields = ("Name", *YEARS)
     rtgs_dicts = ( 
         petl.cut(data, used_fields)
         .rename({x: snake(x.lower()) for x in used_fields})
-        .convert("name", lambda x: str(HumanName(" ".join([*x.split(" ")[1:], x.split(" ")[0]]))))
+        .convert("name", lambda x: str(HumanName(normal(" ".join([*x.split(" ")[1:], x.split(" ")[0]])).title())))
         .addfield("role", "jockey")
+        .addfield("ratings", lambda rec: compact({ str(y): rec[y] or None for y in YEARS }))
         .addfield("references", lambda rec: {"racing_research": rec["name"]})
-        .addfield("ratings", lambda rec: compact({ y: rec[y] or None for y in YEARS }))
-        .cut("name", "role", "ratings")
+        .cut("name", "role", "ratings", "references")
         .dicts()
     )
-    return [JockeyRatings(**rtgs) for rtgs in rtgs_dicts]
+    return [RatedJockey(**rtgs) for rtgs in rtgs_dicts]
 
 
 @task(tags=["Core"])
@@ -54,7 +54,7 @@ def validate_jockey_ratings_data(data: petl.Table) -> petl.transform.validation.
 
 
 @flow
-def jockey_ratings_transformer() -> List[JockeyRatings]:
+def jockey_ratings_transformer() -> List[RatedJockey]:
     data = read_csv(f"{SOURCE}jockeys/jockey_ratings_historic.csv")
 
     if (problems := validate_jockey_ratings_data(data)):

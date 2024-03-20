@@ -5,5 +5,5 @@ from .person import Person
 from .year import Year
 
 
-class JockeyRatings(Person):
+class RatedJockey(Person):
     ratings: Dict[Year, JockeyRating]

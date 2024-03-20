@@ -5,7 +5,6 @@ from .hashable_base_model import HashableBaseModel
 from .horse import Horse
 from .horse_core import HorseCore
 from .jockey_rating import JockeyRating
-from .jockey_ratings import JockeyRatings
 from .mongo_base_model import MongoBaseModel
 from .mongo_formdata_entry import MongoFormdataEntry
 from .mongo_horse import MongoHorse
@@ -18,6 +17,7 @@ from .operation import Operation
 from .person import Person
 from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
+from .rated_jockey import RatedJockey
 from .references import References
 from .runner import Runner
 from .source import Source
@@ -31,7 +31,6 @@ __all__ = [
     "Horse",
     "HorseCore",
     "JockeyRating",
-    "JockeyRatings",
     "MongoBaseModel",
     "MongoFormdataEntry",
     "MongoHorse",
@@ -44,6 +43,7 @@ __all__ = [
     "Person",
     "RaceRestriction",
     "Racecourse",
+    "RatedJockey",
     "References",
     "Runner",
     "Source",
