@@ -5,12 +5,14 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
+from typing import Any, List, Literal
+
 import pendulum
 import petl  # type: ignore
 import tomllib
-
-# from helpers import get_files, log_validation_problem, read_file
+from helpers import log_validation_problem
 from horsetalk import (  # type: ignore
+    AgeRestriction,
     CoatColour,
     Gender,
     Headgear,
@@ -19,10 +21,11 @@ from horsetalk import (  # type: ignore
     RaceDistance,
     RaceGrade,
 )
+from models import Declaration, Runner
+from prefect import flow, get_run_logger
 
-# from loaders.theracingapi_loader import declaration_processor
-# from prefect import flow, get_run_logger, task
 from transformers.parsers import parse_code, parse_obstacle
+from transformers.transformer import Transformer
 from transformers.validators import (
     validate_date,
     validate_pattern,
@@ -41,9 +44,27 @@ def build_datetime(date_str: str, time_str: str) -> str:
     hour = str(h + 12 if (h := int(hour)) < 11 else h)
     return pendulum.parse(f"{date_str} {hour}:{minute}").isoformat()  # type: ignore
 
+def generate_rating_object(figure: int, obstacle: str | None, surface='Turf'):
+    key = obstacle.lower() if obstacle else 'aw' if surface.lower() != "turf" else "flat"
+    return { key: figure }
 
-def transform_horse(data, race_date=pendulum.now()):
-    return (
+def generate_min_max(restriction_value: str, restriction_type: Literal["age", "rating"]) -> dict:
+    if restriction_type == 'rating':
+        (the_min, the_max) = restriction_value.split("-")
+    else: 
+        restriction = AgeRestriction(restriction_value)
+        the_min = restriction.minimum
+        the_max = restriction.maximum
+
+    return {
+        "min": the_min,
+        "max": the_max,
+    }
+
+
+# @task(tags=["RapidAPI"])
+def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendulum.now(), obstacle: str | None = None, surface: str ="Turf") -> Runner:
+    horse_dict = (
         petl.rename(
             data,
             {
@@ -59,14 +80,14 @@ def transform_horse(data, race_date=pendulum.now()):
             "sex": lambda x: Gender[x].sex.name[0],
             "age": int,
             "colour": lambda x: CoatColour[x].name.title(),
-            "sire": lambda x: x.upper(),
-            "dam": lambda x: x.upper(),
-            "damsire": lambda x: x.upper(),
+            # Not enough info available for Horse Core objects
+            # "sire": lambda x: {"name": x.upper()},
+            # "dam": lambda x: {"name": x.upper()},
+            # "damsire": lambda x: {"name": x.upper()},
             "saddlecloth": int,
             "draw": int,
             "lbs_carried": int,
             "headgear": lambda x: Headgear[x].name.title() if x else None,
-            "official_rating": int,
         })
         .addfield(
             "year",
@@ -79,14 +100,18 @@ def transform_horse(data, race_date=pendulum.now()):
             if "(" in rec["jockey"]
             else 0,
         )
-        .convert("jockey", lambda x: x.split("(")[0].strip())
-        .cutout("sex_code", "last_run", "form", "age")
+        .addfield("source", "theracingapi")
+        .convert("jockey", lambda x: {"name": x.split("(")[0].strip(), "role": "jockey", "references": {"theracingapi": x.split("(")[0].strip()}})
+        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"theracingapi": x}})
+        .convert("official_rating", lambda x: int(x) if x and x != "-" else None)
+        .cutout("sex_code", "last_run", "form", "age", "sire", "dam", "damsire")
         .dicts()[0]
     )
+    return Runner(**horse_dict)
 
-
-def transform_races(data):
-    return (
+# @task(tags=["RapidAPI"])
+def transform_races_data(data: petl.Table) -> List[Declaration]:
+    race_dicts = (
         petl.rename(
             data,
             {
@@ -96,6 +121,7 @@ def transform_races(data):
                 "going": "going_description",
                 "pattern": "race_grade",
                 "distance_f": "distance_description",
+                "field_size": "number_of_runners",
             },
         )
         .addfield(
@@ -117,31 +143,42 @@ def transform_races(data):
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
+        .addfield("source", "rapid")
         .convert({
             "course": lambda x: x.replace(" (AW)", ""),
             "prize": lambda x: x.replace(",", ""),
             "race_grade": lambda x: str(RaceGrade(x)) if x else None,
             "race_class": lambda x: int(RaceClass(x)),
-            "age_restriction": lambda x: x or None,
-            "rating_restriction": lambda x: x or None,
+            "age_restriction": lambda x: generate_min_max(x, "age") if x else None,
+            "rating_restriction": lambda x: generate_min_max(x, "rating") if x else None,
             "distance_description": lambda x: str(
                 RaceDistance(f"{int(float(x) // 1)}f {int((float(x) % 1) * 220)}y")
             ),
         })
+        .addfield("racecourse", lambda rec: {
+            "name": rec["course"], 
+            "country": rec["region"],
+            "surface": rec["surface"], 
+            "code": rec["code"], 
+            "obstacle": rec["obstacle"],
+            "source": "rapid"
+        })
         .convert(
             "runners",
             lambda x, rec: [
-                transform_horse(petl.fromdicts([h]), pendulum.parse(rec["datetime"]))
+                # 
+                transform_horse_data(petl.fromdicts([h]), pendulum.parse(rec["datetime"]), rec["obstacle"], rec["surface"])
                 for h in x
             ],
             pass_row=True,
         )
-        .cutout("field_size", "region", "type", "date", "off_time")
+        .cutout("course", "surface", "code", "obstacle", "region", "type", "date", "off_time")
         .dicts()
     )
+    return [Declaration(**race) for race in race_dicts]
 
-
-def validate_horse(data):
+# @task(tags=["RapidAPI"])
+def validate_horse_data(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "horse",
         "age",
@@ -186,7 +223,8 @@ def validate_horse(data):
     return petl.validate(data, **validator)
 
 
-def validate_races(data):
+# @task(tags=["RapidAPI"])
+def validate_races_data(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "course",
         "date",
@@ -238,12 +276,21 @@ def validate_races(data):
         {
             "name": "runners_list",
             "field": "runners",
-            "assertion": lambda x: all(validate_horse(h) for h in x),
+            "assertion": lambda x: all(validate_horse_data(h) for h in x),
         },
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
 
+class TheRacingApiTransformer(Transformer[Declaration]):
+    def __init__(self, source_data: petl.Table):
+        super().__init__(
+            source_data=source_data,
+            validator=validate_races_data,
+            transformer=transform_races_data,
+        )  
+
 if __name__ == "__main__":
-    print("Cannot run theracingapi_transformer.py as a script.")
+    data = TheRacingApiTransformer().transform()  # type: ignore
+    print(data)

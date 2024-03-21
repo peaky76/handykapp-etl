@@ -23,10 +23,24 @@ class HorseProcessor(DatabaseProcessor[Horse, MongoHorse]):
 
         sire_id = IdHook()
         dam_id = IdHook()
+        jockey_id = IdHook()
         trainer_id = IdHook()
 
-        h.send((horse.sire, sire_id))
-        h.send((horse.dam, dam_id))
-        p.send((horse.trainer, trainer_id))
+        if horse.sire:
+            h.send((horse.sire, sire_id))
+        
+        if horse.dam:
+            h.send((horse.dam, dam_id))
 
-        return MongoHorse(**(horse.model_dump() | {"sire": ObjectId(sire_id.val), "dam": ObjectId(dam_id.val), "trainer": ObjectId(trainer_id.val)}))   
+        # if horse.jockey:
+        #     p.send((horse.jockey, jockey_id))
+        
+        if horse.trainer:
+            p.send((horse.trainer, trainer_id))
+
+        return MongoHorse(**(horse.model_dump() | {
+            "sire": ObjectId(sire_id.val) if horse.sire else None, 
+            "dam": ObjectId(dam_id.val) if horse.dam else None, 
+            # "jockey": ObjectId(jockey_id.val) if horse.jockey else None, 
+            "trainer": ObjectId(trainer_id.val) if horse.trainer else None
+        }))   

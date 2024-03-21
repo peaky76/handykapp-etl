@@ -12,7 +12,7 @@ from loaders.bha_loader import load_bha
 from loaders.core_racecourses_loader import load_racecourses
 from loaders.formdata_loader import load_formdata_only
 from loaders.jockey_ratings_loader import load_jockey_ratings
-from loaders.rapid_horseracing_loader import load_rapid_horseracing_data
+# from loaders.rapid_horseracing_loader import load_rapid_horseracing_data
 from loaders.theracingapi_loader import load_theracingapi_data
 
 db = client.handykapp
@@ -58,8 +58,8 @@ def load_database_afresh():
     # load_racecourses()
     # load_bha()
     # load_jockey_ratings()
-    load_formdata_only()
-    # load_theracingapi_data()
+    # load_formdata_only()
+    load_theracingapi_data()
     # load_rapid_horseracing_data()
 
 if __name__ == "__main__":

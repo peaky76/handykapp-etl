@@ -3,6 +3,7 @@ from typing import Callable, Generic, List, TypeVar
 
 import petl
 from helpers import log_validation_problem
+from prefect import get_run_logger
 
 T = TypeVar("T")
 
@@ -13,7 +14,13 @@ class Transformer(Generic[T], ABC):
         self.transformer = transformer
 
     def transform(self) -> List[T]:
+        logger = get_run_logger()
+
         if (problems := self.validator(self.source_data)):
-            for problem in problems.dicts():
-                log_validation_problem(problem)
+            if len(problems.dicts()) > 10:
+                logger.warning("More than 10 validation problems with this file")
+            elif len(problems.dicts()) > 0:
+                for problem in problems.dicts():
+                    log_validation_problem(problem)
+                    
         return self.transformer(self.source_data)
