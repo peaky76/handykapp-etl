@@ -55,7 +55,7 @@ def spec_database():
 def load_database_afresh():
     drop_database()
     spec_database()
-    # load_racecourses()
+    load_racecourses()
     # load_bha()
     # load_jockey_ratings()
     # load_formdata_only()

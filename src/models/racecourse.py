@@ -22,7 +22,7 @@ class Racecourse(HashableBaseModel):
     country: str = Field(..., min_length=2, max_length=3)
     code: Optional[CodeType] = None
     surface: Optional[SurfaceType] = None
-    obstacle: ObstacleType | None
+    obstacle: Optional[ObstacleType] = None
     shape: Optional[ShapeType] = None
     handedness: Optional[Handedness] = None
     style: Optional[StyleType] = None

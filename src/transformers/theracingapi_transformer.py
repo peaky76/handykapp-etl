@@ -143,7 +143,7 @@ def transform_races_data(data: petl.Table) -> List[Declaration]:
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
-        .addfield("source", "rapid")
+        .addfield("source", "theracingapi")
         .convert({
             "course": lambda x: x.replace(" (AW)", ""),
             "prize": lambda x: x.replace(",", ""),
@@ -161,7 +161,8 @@ def transform_races_data(data: petl.Table) -> List[Declaration]:
             "surface": rec["surface"], 
             "code": rec["code"], 
             "obstacle": rec["obstacle"],
-            "source": "rapid"
+            "references": {"theracingapi": rec["course"]},
+            "source": "theracingapi"
         })
         .convert(
             "runners",

@@ -48,16 +48,13 @@ def filter_files(* , from_date: pendulum.DateTime = None):
 
 
 @flow
-def load_theracingapi_data(*, from_date=None): 
-    decs = petl.fromdicts([
-        {k: v for k, v in dec.items() if k != "off_dt"} 
-        for file in filter_files(from_date=from_date) 
-        for dec in read_file(file)["racecards"]
-    ]) 
-        
-    data = TheRacingApiTransformer(decs).transform()
-    loader = Loader(data, DeclarationProcessor())
-    loader.load()
+def load_theracingapi_data(*, from_date=None):
+    for file in filter_files(from_date=from_date):
+        contents = read_file(file)
+        decs = petl.fromdicts([{k: v for k, v in dec.items() if k != "off_dt"} for dec in contents["racecards"]]) 
+        data = TheRacingApiTransformer(decs).transform()
+        loader = Loader(data, DeclarationProcessor())
+        loader.load()
 
 
 if __name__ == "__main__":
