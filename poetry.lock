@@ -1647,13 +1647,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.16.4"
+version = "2.16.6"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prefect-2.16.4-py3-none-any.whl", hash = "sha256:c168cd80b08f8087179afd8e4780d6e39a59a08768a01cf12990f5907b5659cb"},
-    {file = "prefect-2.16.4.tar.gz", hash = "sha256:56ad23eca376b326abeb632a13dc9dde32b59fd1cc680b72fd774d7449c1067c"},
+    {file = "prefect-2.16.6-py3-none-any.whl", hash = "sha256:345d9bcff112a7b710601e1f7344b5a6c4e2b5d301a72e88b8b35cb0c5ec8b16"},
+    {file = "prefect-2.16.6.tar.gz", hash = "sha256:a85fc62a78bace64f51af64d58f0bed482319d1c1e616d1a059f7199df8d3da5"},
 ]
 
 [package.dependencies]
@@ -1706,7 +1706,7 @@ uvicorn = ">=0.14.0"
 websockets = ">=10.4,<13.0"
 
 [package.extras]
-dev = ["cairosvg", "codespell (>=2.2.6)", "ddtrace", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto (>=5)", "mypy", "numpy", "pillow", "pluggy (>=1.4.0)", "pre-commit", "pytest (>7,<8)", "pytest-asyncio (>=0.18.2,!=0.22.0,<0.23.0)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist (<3.4.0)", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
+dev = ["cairosvg", "codespell (>=2.2.6)", "ddtrace", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto (>=5)", "mypy", "numpy", "pillow", "pluggy (>=1.4.0)", "pre-commit", "pytest (>7,<8)", "pytest-asyncio (>=0.18.2,!=0.22.0,<0.23.0)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist (<3.4.0)", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "vermin", "virtualenv", "watchfiles"]
 
 [[package]]
 name = "pyasn1"
@@ -3162,4 +3162,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "7c38364b453e650b0098e2942707ee24cac1f4e08fb3eede49be2a3784bdbc4b"
+content-hash = "7c187618cd65956db0ef99cdbda3d2efd35f463bc972c96fb243ca9220793080"
