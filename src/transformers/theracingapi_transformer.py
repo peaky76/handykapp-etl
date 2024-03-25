@@ -5,12 +5,11 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
-from typing import Any, List, Literal
+from typing import List, Literal
 
 import pendulum
 import petl  # type: ignore
 import tomllib
-from helpers import log_validation_problem
 from horsetalk import (  # type: ignore
     AgeRestriction,
     CoatColour,
@@ -22,7 +21,6 @@ from horsetalk import (  # type: ignore
     RaceGrade,
 )
 from models import Declaration, Runner
-from prefect import flow, get_run_logger
 
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.transformer import Transformer
