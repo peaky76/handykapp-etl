@@ -3,8 +3,8 @@ import petl
 import pytest
 from transformers.theracingapi_transformer import (
     build_datetime,
-    transform_horse,
-    transform_races,
+    transform_horse_data,
+    transform_races_data,
 )
 
 
@@ -99,7 +99,7 @@ def test_build_datetime_with_minutes_below_ten():
     assert build_datetime("2023-10-03", "3:05") == "2023-10-03T15:05:00+00:00"
 
 
-def test_transform_horse_returns_correct_output_when_professional_jockey(
+def test_transform_horse_data_returns_correct_output_when_professional_jockey(
     horse_1_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
@@ -122,13 +122,13 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
         "lbs_carried": 141,
         "official_rating": 76,
     }
-    actual = transform_horse(
+    actual = transform_horse_data(
         petl.fromdicts([horse_1_data]), pendulum.parse("2023-10-03")
     )
     assert actual == expected
 
 
-def test_transform_horse_returns_correct_output_when_apprentice_jockey(
+def test_transform_horse_data_returns_correct_output_when_apprentice_jockey(
     horse_2_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
@@ -151,13 +151,13 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
         "lbs_carried": 141,
         "official_rating": 76,
     }
-    actual = transform_horse(
+    actual = transform_horse_data(
         petl.fromdicts([horse_2_data]), pendulum.parse("2023-10-03")
     )
     assert actual == expected
 
 
-def test_transform_races_returns_correct_output(racecard_data):
+def test_transform_races_data_returns_correct_output(racecard_data):
     expected = {
         "course": "Wolverhampton",
         "surface": "AW",
@@ -175,7 +175,7 @@ def test_transform_races_returns_correct_output(racecard_data):
         "prize": "£4187",
     }
 
-    actual = transform_races(petl.fromdicts([racecard_data]))[0]
+    actual = transform_races_data(petl.fromdicts([racecard_data]))[0]
 
     assert len(actual["runners"]) == 2
     actual.pop("runners")
