@@ -10,7 +10,7 @@ import pendulum
 import petl  # type: ignore
 import tomllib
 from horsetalk import AWGoingDescription, HorseAge, RaceWeight  # type: ignore
-from models import Result, Runner
+from models import Result, Run
 
 from transformers.parsers import (
     parse_code,
@@ -34,7 +34,7 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
-def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_time=None) -> Runner:
+def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_time=None) -> Run:
     horse = (
         petl.rename(
             data,
@@ -83,7 +83,7 @@ def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_t
         .cutout("horse", "age")
         .dicts()[0]
     )
-    return Runner(**horse)
+    return Run(**horse)
 
 
 def transform_results_data(data: petl.Table) -> List[Result]:
