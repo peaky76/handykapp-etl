@@ -2,10 +2,15 @@ from abc import ABC
 from typing import Callable, Generic, List, TypeVar
 
 import petl
-from helpers import log_validation_problem
 from prefect import get_run_logger
 
 T = TypeVar("T")
+
+
+def log_validation_problem(problem):
+    msg = f"{problem['error']} in row {problem['row']} for {problem['field']}: {problem['value']}"
+    logger = get_run_logger()
+    logger.warning(msg)
 
 class Transformer(Generic[T], ABC):
     def __init__(self, source_data: petl.Table, validator: Callable, transformer: Callable):
