@@ -1,26 +1,21 @@
 # To allow running as a script
-# import sys
-# from pathlib import Path
+import sys
+from pathlib import Path
 
-# sys.path.append(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
-# import tomllib
-# from clients import mongo_client as client
-# from helpers import get_files, read_file
-# from prefect import flow, get_run_logger
-# from processors.record_processor import RecordProcessor
-# from transformers.rapid_horseracing_transformer import (
-#     transform_results,
-#     validate_results,
-# )
+import tomllib
+from helpers import get_files
+from prefect import flow
+from processors.rapid_file_processor import RapidFileProcessor
 
-# with open("settings.toml", "rb") as f:
-#     settings = tomllib.load(f)
+from .loader import Loader
 
-# SOURCE = settings["rapid_horseracing"]["spaces_dir"]
+with open("settings.toml", "rb") as f:
+    settings = tomllib.load(f)
 
-# db = client.handykapp
+SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
 # @flow
@@ -44,3 +39,13 @@
 
 # if __name__ == "__main__":
 #     load_rapid_horseracing_data()
+
+@flow
+def load_rapid_horseracing_data(*, from_date=None):
+    files = [f for f in get_files(f"{SOURCE}results") if f != "results_to_do_list.json"]
+    loader = Loader(files, RapidFileProcessor())
+    loader.load()
+
+
+if __name__ == "__main__":
+    load_rapid_horseracing_data()

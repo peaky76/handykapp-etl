@@ -4,16 +4,21 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from typing import List
+
 import pendulum
 import petl  # type: ignore
 import tomllib
 from horsetalk import AWGoingDescription, HorseAge, RaceWeight  # type: ignore
+from models import Result, Runner
 
 from transformers.parsers import (
     parse_code,
     parse_horse,
     parse_obstacle,
 )
+from transformers.theracingapi_transformer import generate_min_max
+from transformers.transformer import Transformer
 from transformers.validators import (
     validate_class,
     validate_date,
@@ -29,8 +34,8 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
-def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
-    return (
+def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_time=None) -> Runner:
+    horse = (
         petl.rename(
             data,
             {
@@ -46,7 +51,7 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
             "days_since_prev_run": int,
             "official_rating": int,
             "non_runner": lambda x: bool(int(x)),
-            "lbs_carried": lambda x: RaceWeight(x).lb,
+            "lbs_carried": lambda x: int(RaceWeight(x).lb),
         })
         .addfield(
             "year",
@@ -54,29 +59,38 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
             index=1,
         )
         .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1], index=1)
-        .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
-        .addfield(
-            "sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1], index=-4
-        )
-        .convert("sire", lambda x: parse_horse(x)[0])
-        .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
-        .convert("dam", lambda x: parse_horse(x)[0])
+        .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)        
+        .convert("sire", lambda x: {
+            "name": parse_horse(x)[0],
+            "country": parse_horse(x, "GB")[1],
+            "sex": "M",
+            "source": "rapid"
+        } if x else None)
+        .convert("dam", lambda x: {
+            "name": parse_horse(x)[0],
+            "country": parse_horse(x, "GB")[1],
+            "sex": "F",
+            "source": "rapid"
+        } if x else None)
+        .convert("jockey", lambda x: {"name": x, "role": "jockey", "references": {"theracingapi": x}})
+        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"rapid": x}})
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["position"] == 1 else None,
             index=-1,
         )
+        .addfield("source", "rapid")
         .cutout("horse", "age")
         .dicts()[0]
     )
+    return Runner(**horse)
 
 
-def transform_results(data):
-    return (
+def transform_results_data(data: petl.Table) -> List[Result]:
+    results_dicts = (
         petl.rename(
             data,
             {
-                "id_race": "rapid_id",
                 "date": "datetime",
                 "age": "age_restriction",
                 "canceled": "cancelled",
@@ -84,9 +98,12 @@ def transform_results(data):
                 "going": "going_description",
             },
         )
-        .convert("datetime", lambda x: pendulum.parse(x).isoformat())
-        .convert("finished", lambda x: bool(int(x)))
-        .convert("cancelled", lambda x: bool(int(x)))
+        .convert({
+            "datetime": lambda x: pendulum.parse(x).isoformat(),
+            "finished": lambda x: bool(int(x)),
+            "cancelled": lambda x: bool(int(x)),
+            "age_restriction": lambda x: generate_min_max(x, "age") if x else None,
+        })
         .addfield(
             "is_handicap",
             lambda rec: "HANDICAP" in rec["title"].upper()
@@ -114,10 +131,19 @@ def transform_results(data):
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
+        .addfield("racecourse", lambda rec: {
+            "name": rec["course"],
+            "country": "GB" if "£" in rec["prize"] else "IRE",
+            "surface": rec["surface"],
+            "code": rec["code"],
+            "obstacle": rec["obstacle"],
+            "references": {"rapid": rec["course"]},
+            "source": "rapid"
+        })
         .addfield(
             "runners",
             lambda rec: [
-                transform_horse(
+                transform_horse_data(
                     petl.fromdicts([h]),
                     race_date=pendulum.parse(rec["datetime"]),
                     finishing_time=rec["finish_time"],
@@ -125,12 +151,15 @@ def transform_results(data):
                 for h in rec["horses"]
             ],
         )
-        .cutout("horses", "finish_time")
+        .addfield("references", lambda rec: {"rapid": rec["id_race"]})
+        .addfield("source", "rapid")
+        .cutout("surface", "code", "obstacle", "course", "horses", "finish_time", "id_race")
         .dicts()
     )
+    return [Result(**res) for res in results_dicts]
 
 
-def validate_horse(data):
+def validate_horse(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "horse",
         "id_horse",
@@ -175,7 +204,7 @@ def validate_horse(data):
     return petl.validate(data, **validator)
 
 
-def validate_results(data):
+def validate_results_data(data: petl.Table) -> petl.transform.validation.ProblemsView:
     header = (
         "id_race",
         "course",
@@ -215,6 +244,14 @@ def validate_results(data):
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
 
+class RapidHorseracingTransformer(Transformer[Result]):
+    def __init__(self, source_data: petl.Table):
+        super().__init__(
+            source_data=source_data,
+            validator=validate_results_data,
+            transformer=transform_results_data,
+        )  
 
 if __name__ == "__main__":
-    print("Cannot run rapid_horseracing_transformer.py as a script.")
+    data = RapidHorseracingTransformer().transform()  # type: ignore
+    print(data)

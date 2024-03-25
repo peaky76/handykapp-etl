@@ -9,7 +9,7 @@ from processors.database_processors import DeclarationProcessor
 from processors.processor import Processor
 
 
-class TheRacingApiFileProcessor(Processor):
+class TheRacingApiFileProcessor(Processor[str]):
     _descriptor: ClassVar[str] = "theracingapi file"
     _forward_processors: ClassVar[List["Processor"]] = [DeclarationProcessor()]
 
@@ -29,7 +29,7 @@ class TheRacingApiFileProcessor(Processor):
 
         for item in data:
             d.send(item)
-            
+
         self.file_count += 1
 
     @property

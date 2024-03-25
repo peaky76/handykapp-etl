@@ -21,7 +21,7 @@ class MongoRace(MongoBaseModel):
     rating_restriction: Optional[RaceRestriction] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
-    number_of_runners: int
+    number_of_runners: Optional[int] = None
     runners: list[MongoRun]
     references: Optional[References] = None
     source: Source

@@ -14,6 +14,7 @@ from .racecourse_processor import RacecourseProcessor
 
 
 class ResultProcessor(DatabaseProcessor[Result, MongoRace]):
+    _db_model = MongoRace
     _table_name: ClassVar[str] = 'races'
     _forward_processors: ClassVar[List[Processor]] = [RacecourseProcessor(), HorseProcessor(), PersonProcessor()]
     _search_keys: ClassVar[List[str]] = ["racecourse_id", "datetime"]
