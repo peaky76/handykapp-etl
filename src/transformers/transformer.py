@@ -22,5 +22,9 @@ class Transformer(Generic[T], ABC):
             elif len(problems.dicts()) > 0:
                 for problem in problems.dicts():
                     log_validation_problem(problem)
-                    
-        return self.transformer(self.source_data)
+
+        try:
+            return self.transformer(self.source_data)
+        except Exception as e:
+            logger.error(f"Error transforming data: {e}")
+            return []
