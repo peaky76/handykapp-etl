@@ -19,6 +19,7 @@ from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
 from .rated_jockey import RatedJockey
 from .references import References
+from .result import Result
 from .runner import Runner
 from .source import Source
 from .year import Year
@@ -45,6 +46,7 @@ __all__ = [
     "Racecourse",
     "RatedJockey",
     "References",
+    "Result",
     "Runner",
     "Source",
     "Year",
