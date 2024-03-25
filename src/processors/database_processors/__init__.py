@@ -4,6 +4,7 @@ from .horse_core_processor import HorseCoreProcessor
 from .horse_processor import HorseProcessor
 from .person_processor import PersonProcessor
 from .racecourse_processor import RacecourseProcessor
+from .result_processor import ResultProcessor
 
 __all__ = [
     "DeclarationProcessor",
@@ -12,4 +13,5 @@ __all__ = [
     "HorseProcessor",
     "PersonProcessor",
     "RacecourseProcessor",
+    "ResultProcessor",
 ]
