@@ -4,17 +4,13 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import json
-from typing import Generator, Optional
 
 import pendulum
-import petl
 import tomllib
 from clients import mongo_client as client
-from helpers import get_files, read_file, stream_file
-from prefect import flow, get_run_logger
-from processors.database_processors import DeclarationProcessor
-from transformers.theracingapi_transformer import TheRacingApiTransformer
+from helpers import get_files
+from prefect import flow
+from processors.theracingapi_file_processor import TheRacingApiFileProcessor
 
 from .loader import Loader
 
@@ -49,12 +45,9 @@ def filter_files(* , from_date: pendulum.DateTime = None):
 
 @flow
 def load_theracingapi_data(*, from_date=None):
-    for file in filter_files(from_date=from_date):
-        contents = read_file(file)
-        decs = petl.fromdicts([{k: v for k, v in dec.items() if k != "off_dt"} for dec in contents["racecards"]]) 
-        data = TheRacingApiTransformer(decs).transform()
-        loader = Loader(data, DeclarationProcessor())
-        loader.load()
+    files = filter_files(from_date=from_date)
+    loader = Loader(files, TheRacingApiFileProcessor())
+    loader.load()
 
 
 if __name__ == "__main__":
