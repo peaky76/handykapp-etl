@@ -94,6 +94,7 @@ def transform_results_data(data: petl.Table) -> List[Result]:
                 "date": "datetime",
                 "age": "age_restriction",
                 "canceled": "cancelled",
+                "class": "race_class",
                 "distance": "distance_description",
                 "going": "going_description",
             },
