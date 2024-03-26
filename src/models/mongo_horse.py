@@ -6,6 +6,7 @@ from .mongo_base_model import MongoBaseModel
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .py_object_id import PyObjectId
+from .references import References
 from .sex import Sex
 from .source import Source
 
@@ -22,4 +23,5 @@ class MongoHorse(MongoBaseModel):
     operations: Optional[List[Operation]] = None
     ratings: Optional[OfficialRatings] = None
     trainer: Optional[PyObjectId] = None
+    references: Optional[References] = None
     source: Source
