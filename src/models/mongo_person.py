@@ -2,9 +2,7 @@ from typing import Dict, Optional
 
 from .jockey_rating import JockeyRating
 from .mongo_base_model import MongoBaseModel
-from .references import References
 from .sex import Sex
-from .source import Source
 from .year import Year
 
 
@@ -18,5 +16,3 @@ class MongoPerson(MongoBaseModel):
     sex: Optional[Sex] = None
     role: Optional[str] = None
     ratings: Optional[Dict[Year, JockeyRating]] = None
-    references: Optional[References] = None
-    source: Source = None

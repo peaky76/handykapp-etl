@@ -12,8 +12,6 @@ from .racecourse_fields import (
     StyleType,
     SurfaceType,
 )
-from .references import References
-from .source import Source
 
 
 class MongoRacecourse(MongoBaseModel):
@@ -27,5 +25,3 @@ class MongoRacecourse(MongoBaseModel):
     handedness: Optional[Handedness] = None
     style: Optional[StyleType] = None
     contour: Optional[ContourType] = None
-    references: Optional[References] = None
-    source: Source
