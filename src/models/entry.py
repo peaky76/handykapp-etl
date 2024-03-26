@@ -7,6 +7,7 @@ from .person import Person
 
 class Entry(Horse):
     prev_run: Optional[datetime] = None
+    prev_form: Optional[str] = None
     jockey: Optional[Person] = None
     allowance: Optional[int] = None
     saddlecloth: Optional[int] = None

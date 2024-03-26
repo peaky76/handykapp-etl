@@ -71,6 +71,7 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
                 "number": "saddlecloth",
                 "lbs": "lbs_carried",
                 "ofr": "official_rating",
+                "form": "prev_form"
             },
         )
         .convert({
@@ -102,7 +103,7 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
         .convert("jockey", lambda x: {"name": x.split("(")[0].strip(), "role": "jockey", "references": {"theracingapi": x.split("(")[0].strip()}})
         .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"theracingapi": x}})
         .convert("official_rating", lambda x: int(x) if x and x != "-" else None)
-        .cutout("sex_code", "last_run", "form", "age", "sire", "dam", "damsire")
+        .cutout("sex_code", "last_run", "age", "sire", "dam", "damsire")
         .dicts()[0]
     )
     return Entry(**horse_dict)
