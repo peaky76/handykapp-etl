@@ -16,6 +16,7 @@ from transformers.parsers import (
     parse_code,
     parse_horse,
     parse_obstacle,
+    parse_variant,
 )
 from transformers.theracingapi_transformer import generate_min_max
 from transformers.transformer import Transformer
@@ -133,9 +134,12 @@ def transform_results_data(data: petl.Table) -> List[Result]:
         .addfield(
             "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
         )
+        .addfield("variant", lambda rec: rec["distance_description"].split("(")[-1].split(")")[0] if "(" in rec["distance_description"] else None)
+        .convert("distance_description", lambda x: x.split("(")[0].strip())
         .addfield("racecourse", lambda rec: {
             "name": rec["course"],
             "country": "GB" if "£" in rec["prize"] else "IRE",
+            "variant": parse_variant(rec["variant"]) if rec["variant"] else None,
             "surface": rec["surface"],
             "code": rec["code"],
             "obstacle": rec["obstacle"],
@@ -155,7 +159,7 @@ def transform_results_data(data: petl.Table) -> List[Result]:
         )
         .addfield("references", lambda rec: {"rapid": rec["id_race"]})
         .addfield("source", "rapid")
-        .cutout("surface", "code", "obstacle", "course", "horses", "finish_time", "id_race")
+        .cutout("surface", "code", "obstacle", "course", "variant", "horses", "finish_time", "id_race")
         .dicts()
     )
     return [Result(**res) for res in results_dicts]

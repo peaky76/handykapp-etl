@@ -119,6 +119,7 @@ def test_transform_results_data_returns_correct_output(result_data):
             "obstacle": None,
             "surface": "Turf",
             "code": "Flat",
+            "variant": None,
             "handedness": None,
             "contour": None,
             "shape": None,

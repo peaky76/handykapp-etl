@@ -202,6 +202,7 @@ def test_transform_races_data_returns_correct_output(racecard_data):
             "handedness": None,
             "shape": None,
             "style": None,
+            "variant": None,
             "references": {
                 "theracingapi": "Wolverhampton",
             },

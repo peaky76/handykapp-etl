@@ -23,6 +23,7 @@ class Racecourse(HashableBaseModel):
     code: Optional[CodeType] = None
     surface: Optional[SurfaceType] = None
     obstacle: Optional[ObstacleType] = None
+    variant: Optional[str] = None
     shape: Optional[ShapeType] = None
     handedness: Optional[Handedness] = None
     style: Optional[StyleType] = None
