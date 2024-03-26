@@ -101,11 +101,18 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "chase": None,
             "hurdle": None,
         },
-        "trainer": "Ollie Pears",
+        "trainer": {
+            "name": "Ollie Pears",
+            "role": "trainer",
+            "sex": None,
+            "references": {
+                "bha": "Ollie Pears"
+            }
+        },
         "source": "bha"
     }
     actual = compact(transform_ratings_data.fn(mock_data)[0].model_dump())
-    assert expected == actual
+    assert actual == expected
 
 
 def test_validate_ratings_data_returns_no_problems_for_correct_data(mock_data):
