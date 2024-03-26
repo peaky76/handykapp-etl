@@ -10,4 +10,5 @@ class Person(HashableBaseModel):
     sex: Optional[Sex] = None
     role: Literal['jockey', 'owner', 'trainer']
     references: Optional[References] = None
+    source: str
     
