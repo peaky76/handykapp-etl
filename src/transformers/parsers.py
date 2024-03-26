@@ -34,3 +34,12 @@ def parse_obstacle(race_title):
         if re.compile(regex).search(race_title.upper()):
             return obstacle.title()
     return None
+
+
+def parse_variant(variant):
+    conversions = {
+        "rnd": "Round",
+        "str": "Straight",
+    }
+
+    return conversions.get(variant.lower(), variant.title())

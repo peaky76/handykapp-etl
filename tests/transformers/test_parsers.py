@@ -2,6 +2,7 @@ from transformers.parsers import (
     parse_code,
     parse_horse,
     parse_obstacle,
+    parse_variant,
 )
 
 
@@ -87,3 +88,11 @@ def test_parse_obstacle_returns_correct_value_for_flat_race():
 
 def test_parse_obstacle_is_case_insensitive():
     assert parse_obstacle("a chase") == "Chase"
+
+
+def test_parse_variant_with_uppercase_variant():
+    assert parse_variant("STR") == "Straight"
+
+
+def test_parse_variant_if_not_present_in_converter():
+    assert parse_variant("new") == "New"
