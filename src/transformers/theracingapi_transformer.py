@@ -22,7 +22,7 @@ from horsetalk import (  # type: ignore
 )
 from models import Declaration, Entry
 
-from transformers.parsers import parse_code, parse_obstacle
+from transformers.parsers import parse_code, parse_days_since_run, parse_obstacle
 from transformers.transformer import Transformer
 from transformers.validators import (
     validate_date,
@@ -83,7 +83,6 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
             # "sire": lambda x: {"name": x.upper()},
             # "dam": lambda x: {"name": x.upper()},
             # "damsire": lambda x: {"name": x.upper()},
-            "last_run": int,
             "saddlecloth": int,
             "draw": int,
             "lbs_carried": int,
@@ -100,7 +99,7 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
             if "(" in rec["jockey"]
             else 0,
         )
-        .addfield("prev_run", lambda rec: race_date.subtract(days=rec["last_run"]) if rec["last_run"] else None)
+        .addfield("prev_run", lambda rec: parse_days_since_run(race_date, rec["last_run"]))
         .addfield("source", "theracingapi")
         .convert("jockey", lambda x: {"name": x.split("(")[0].strip(), "role": "jockey", "references": {"theracingapi": x.split("(")[0].strip()}, "source": "theracingapi"})
         .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"theracingapi": x}, "source": "theracingapi"})

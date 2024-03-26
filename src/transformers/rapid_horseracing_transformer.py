@@ -14,6 +14,7 @@ from models import Result, Run
 
 from transformers.parsers import (
     parse_code,
+    parse_days_since_run,
     parse_horse,
     parse_obstacle,
     parse_variant,
@@ -49,7 +50,6 @@ def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_t
         )
         .convert({
             "age": int,
-            "last_ran_days_ago": int,
             "official_rating": int,
             "non_runner": lambda x: bool(int(x)),
             "lbs_carried": lambda x: int(RaceWeight(x).lb),
@@ -75,7 +75,7 @@ def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_t
         } if x else None)
         .convert("jockey", lambda x: {"name": x, "role": "jockey", "references": {"rapid": x}, "source": "rapid"})
         .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"rapid": x}, "source": "rapid"})
-        .addfield("prev_run", lambda rec: race_date.subtract(days=rec["last_ran_days_ago"]) if rec["last_ran_days_ago"] else None)
+        .addfield("prev_run", lambda rec: parse_days_since_run(race_date, rec["last_ran_days_ago"]))
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["position"] == 1 else None,
