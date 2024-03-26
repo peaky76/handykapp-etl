@@ -14,3 +14,4 @@ class FormdataEntry(HashableBaseModel):
     trainer_form: Annotated[str, StringConstraints(pattern=r'^F[1-5]|F-$')]
     prize_money: Annotated[str, StringConstraints(pattern=r'^£[1-9][0-9]*|£-$')]
     runs: List[FormdataRun]
+    source: str = "racing_research"
