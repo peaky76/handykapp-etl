@@ -1,5 +1,7 @@
 import re
 
+from pendulum import datetime
+
 
 def parse_code(obstacle, title):
     if obstacle:
@@ -9,6 +11,15 @@ def parse_code(obstacle, title):
         return "NH"
 
     return "Flat"
+
+
+def parse_days_since_run(race_date: datetime, days_ago_str: str) -> int | None:
+    if not days_ago_str:
+        return None
+
+    days_ago = min(int(x) for x in re.sub(r'[a-zA-Z]', '', days_ago_str).replace(")", "").split(" ("))
+
+    return race_date.subtract(days=days_ago)
 
 
 def parse_horse(horse, default_country=None):

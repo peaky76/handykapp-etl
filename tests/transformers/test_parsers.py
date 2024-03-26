@@ -1,5 +1,7 @@
+import pendulum
 from transformers.parsers import (
     parse_code,
+    parse_days_since_run,
     parse_horse,
     parse_obstacle,
     parse_variant,
@@ -20,6 +22,18 @@ def test_parse_code_returns_correct_value_for_nh_in_title():
 
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
     assert parse_code(False, "Big Handicap") == "Flat"
+
+
+def test_parse_days_since_run_returns_correct_value_for_none():
+    assert parse_days_since_run(None, None) is None
+
+
+def test_parse_days_since_run_returns_correct_value_when_same_code():
+    assert parse_days_since_run(pendulum.parse("2022-05-30"), "5") == pendulum.parse("2022-05-25")
+
+
+def test_parse_days_since_run_returns_correct_value_when_different_code():
+    assert parse_days_since_run(pendulum.parse("2022-05-30"), "105 (20F)") == pendulum.parse("2022-05-10")
 
 
 def test_parse_horse_returns_correct_tuple_when_none():
