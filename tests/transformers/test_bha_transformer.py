@@ -107,7 +107,8 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "sex": None,
             "references": {
                 "bha": "Ollie Pears"
-            }
+            },
+            "source": "bha",
         },
         "source": "bha"
     }

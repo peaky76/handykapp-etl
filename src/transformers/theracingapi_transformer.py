@@ -102,8 +102,8 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
         )
         .addfield("prev_run", lambda rec: race_date.subtract(days=rec["last_run"]) if rec["last_run"] else None)
         .addfield("source", "theracingapi")
-        .convert("jockey", lambda x: {"name": x.split("(")[0].strip(), "role": "jockey", "references": {"theracingapi": x.split("(")[0].strip()}})
-        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"theracingapi": x}})
+        .convert("jockey", lambda x: {"name": x.split("(")[0].strip(), "role": "jockey", "references": {"theracingapi": x.split("(")[0].strip()}, "source": "theracingapi"})
+        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"theracingapi": x}, "source": "theracingapi"})
         .convert("official_rating", lambda x: int(x) if x and x != "-" else None)
         .cutout("sex_code", "last_run", "age", "sire", "dam", "damsire")
         .dicts()[0]

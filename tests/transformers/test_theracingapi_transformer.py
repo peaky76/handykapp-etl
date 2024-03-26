@@ -119,6 +119,7 @@ def test_transform_horse_data_returns_correct_output_when_professional_jockey(
             "role": "trainer",
             "sex": None,
             "references": {"theracingapi": "David Omeara"},
+            "source": "theracingapi",
         },
         "owner": "Akela Thoroughbreds Limited",
         "jockey": {
@@ -126,6 +127,7 @@ def test_transform_horse_data_returns_correct_output_when_professional_jockey(
             "role": "jockey",
             "sex": None,
             "references": {"theracingapi": "Mark Winn"},
+            "source": "theracingapi",    
         },
         "allowance": 0,
         "saddlecloth": 1,
@@ -164,6 +166,7 @@ def test_transform_horse_data_returns_correct_output_when_apprentice_jockey(
             "role": "trainer",
             "sex": None,
             "references": {"theracingapi": "K R Burke"},
+            "source": "theracingapi",
         },
         "owner": "John Kenny",
         "jockey": {
@@ -171,6 +174,7 @@ def test_transform_horse_data_returns_correct_output_when_apprentice_jockey(
             "role": "jockey",
             "sex": None,
             "references": {"theracingapi": "Brandon Wilkie"},
+            "source": "theracingapi",
         },
         "allowance": 5,
         "saddlecloth": 2,

@@ -73,8 +73,8 @@ def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_t
             "sex": "F",
             "source": "rapid"
         } if x else None)
-        .convert("jockey", lambda x: {"name": x, "role": "jockey", "references": {"rapid": x}})
-        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"rapid": x}})
+        .convert("jockey", lambda x: {"name": x, "role": "jockey", "references": {"rapid": x}, "source": "rapid"})
+        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"rapid": x}, "source": "rapid"})
         .addfield("prev_run", lambda rec: race_date.subtract(days=rec["last_ran_days_ago"]) if rec["last_ran_days_ago"] else None)
         .addfield(
             "finishing_time",

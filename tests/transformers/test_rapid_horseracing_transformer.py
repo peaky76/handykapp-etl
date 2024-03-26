@@ -66,7 +66,8 @@ def test_transform_horse_data_returns_correct_output(horse_data):
             "sex": None,
             "references": {
                 "rapid": "A Jockey"
-            }
+            },
+            "source": "rapid",
         },
         "trainer": {
             "name": "A Trainer",
@@ -74,7 +75,8 @@ def test_transform_horse_data_returns_correct_output(horse_data):
             "sex": None,
             "references": {
                 "rapid": "A Trainer"
-            }
+            },
+            "source": "rapid",
         },
         "lbs_carried": 140,
         "saddlecloth": 1,
