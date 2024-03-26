@@ -6,15 +6,15 @@ from transformers.parsers import (
 
 
 def test_parse_code_returns_correct_value_for_obstacle():
-    assert parse_code(True, None) == "National Hunt"
+    assert parse_code(True, None) == "NH"
 
 
 def test_parse_code_returns_correct_value_for_national_hunt_in_title():
-    assert parse_code(False, "Big National Hunt Flat Race") == "National Hunt"
+    assert parse_code(False, "Big National Hunt Flat Race") == "NH"
 
 
 def test_parse_code_returns_correct_value_for_nh_in_title():
-    assert parse_code(False, "Big NHF Race") == "National Hunt"
+    assert parse_code(False, "Big NHF Race") == "NH"
 
 
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
@@ -50,11 +50,11 @@ def test_parse_obstacle_returns_correct_value_for_none():
 
 
 def test_parse_obstacle_returns_correct_value_for_chase():
-    assert parse_obstacle("A CHASE") == "CHASE"
+    assert parse_obstacle("A CHASE") == "Chase"
 
 
 def test_parse_obstacle_returns_correct_value_for_steeplechase():
-    assert parse_obstacle("A STEEPLECHASE") == "CHASE"
+    assert parse_obstacle("A STEEPLECHASE") == "Chase"
 
 
 def test_parse_obstacle_returns_correct_value_for_embedded_use_of_chase():
@@ -66,15 +66,15 @@ def test_parse_obstacle_returns_none_if_name_is_none():
 
 
 def test_parse_obstacle_returns_correct_value_for_hurdle():
-    assert parse_obstacle("A HURDLE") == "HURDLE"
+    assert parse_obstacle("A HURDLE") == "Hurdle"
 
 
 def test_parse_obstacle_returns_correct_value_for_cross_country():
-    assert parse_obstacle("A CROSS COUNTRY") == "CROSS-COUNTRY"
+    assert parse_obstacle("A CROSS COUNTRY") == "Cross-Country"
 
 
 def test_parse_obstacle_returns_correct_value_for_cross_country_chase():
-    assert parse_obstacle("A CROSS COUNTRY CHASE") == "CROSS-COUNTRY"
+    assert parse_obstacle("A CROSS COUNTRY CHASE") == "Cross-Country"
 
 
 def test_parse_obstacle_returns_correct_value_for_national_hunt_flat():
@@ -86,4 +86,4 @@ def test_parse_obstacle_returns_correct_value_for_flat_race():
 
 
 def test_parse_obstacle_is_case_insensitive():
-    assert parse_obstacle("a chase") == "CHASE"
+    assert parse_obstacle("a chase") == "Chase"
