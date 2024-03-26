@@ -99,6 +99,7 @@ def test_transform_horse_data_returns_correct_output(horse_data):
         "allowance": None,
         "damsire": None,
         "headgear": None,
+        "prev_run": pendulum.parse("2023-03-07"),
         "official_rating": None,
         "ratings": None,
         "source": "rapid",

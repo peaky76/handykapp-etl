@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from .horse import Horse
@@ -5,6 +6,7 @@ from .person import Person
 
 
 class Entry(Horse):
+    prev_run: Optional[datetime] = None
     jockey: Optional[Person] = None
     allowance: Optional[int] = None
     saddlecloth: Optional[int] = None
