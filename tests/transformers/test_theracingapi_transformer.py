@@ -73,7 +73,7 @@ def racecard_data(horse_1_data, horse_2_data):
         "age_band": "3yo+",
         "rating_band": "0-75",
         "prize": "£4,187",
-        "field_size": "7",
+        "field_size": "2",
         "going": "Soft",
         "surface": "AW",
         "runners": [
@@ -108,24 +108,38 @@ def test_transform_horse_data_returns_correct_output_when_professional_jockey(
         "sex": "M",
         "country": "GB",
         "year": 2015,
+        "breed": None,
         "colour": "Bay",
-        "sire": "SEPOY",
-        "dam": "CLOUDS OF MAGELLAN",
-        "damsire": "DYNAFORMER",
-        "trainer": "David Omeara",
+        "operations": None,
+        "sire": None,
+        "dam": None,
+        "damsire": None,
+        "trainer": {
+            "name": "David Omeara",
+            "role": "trainer",
+            "sex": None,
+            "references": {"theracingapi": "David Omeara"},
+        },
         "owner": "Akela Thoroughbreds Limited",
-        "jockey": "Mark Winn",
+        "jockey": {
+            "name": "Mark Winn",
+            "role": "jockey",
+            "sex": None,
+            "references": {"theracingapi": "Mark Winn"},
+        },
         "allowance": 0,
         "saddlecloth": 1,
         "draw": 4,
         "headgear": None,
         "lbs_carried": 141,
         "official_rating": 76,
+        "ratings": None,
+        "source": "theracingapi",
     }
     actual = transform_horse_data(
         petl.fromdicts([horse_1_data]), pendulum.parse("2023-10-03")
     )
-    assert actual == expected
+    assert actual.model_dump() == expected
 
 
 def test_transform_horse_data_returns_correct_output_when_apprentice_jockey(
@@ -137,50 +151,86 @@ def test_transform_horse_data_returns_correct_output_when_apprentice_jockey(
         "sex": "F",
         "country": "GB",
         "year": 2017,
+        "breed": None,
         "colour": "Bay",
-        "sire": "TELESCOPE",
-        "dam": "HARDY BLUE",
-        "damsire": "RED CLUBS",
-        "trainer": "K R Burke",
+        "operations": None,    
+        "sire": None,
+        "dam": None,
+        "damsire": None,
+        "trainer": {
+            "name": "K R Burke",
+            "role": "trainer",
+            "sex": None,
+            "references": {"theracingapi": "K R Burke"},
+        },
         "owner": "John Kenny",
-        "jockey": "Brandon Wilkie",
+        "jockey": {
+            "name": "Brandon Wilkie",
+            "role": "jockey",
+            "sex": None,
+            "references": {"theracingapi": "Brandon Wilkie"},
+        },
         "allowance": 5,
         "saddlecloth": 2,
         "draw": 7,
         "headgear": "Blinkers",
         "lbs_carried": 141,
         "official_rating": 76,
+        "ratings": None,
+        "source": "theracingapi",
     }
     actual = transform_horse_data(
         petl.fromdicts([horse_2_data]), pendulum.parse("2023-10-03")
     )
-    assert actual == expected
+    assert actual.model_dump() == expected
 
 
 def test_transform_races_data_returns_correct_output(racecard_data):
     expected = {
-        "course": "Wolverhampton",
-        "surface": "AW",
-        "code": "Flat",
-        "datetime": "2023-10-03T13:42:00+00:00",
+        "racecourse": {
+            "name": "Wolverhampton",
+            "formal_name": None,
+            "country": "GB",
+            "surface": "AW",
+            "code": "Flat",
+            "obstacle": None,
+            "contour": None,
+            "handedness": None,
+            "shape": None,
+            "style": None,
+            "references": {
+                "theracingapi": "Wolverhampton",
+            },
+            "source": "theracingapi",
+        },
+        "datetime": pendulum.parse("2023-10-03 13:42"),
         "title": "Virgin Bet Apprentice Handicap",
         "is_handicap": True,
-        "obstacle": None,
         "distance_description": "1m",
         "race_grade": None,
         "race_class": 5,
-        "age_restriction": "3yo+",
-        "rating_restriction": "0-75",
+        "age_restriction": {
+            "minimum": None,
+            "maximum": None,
+        },
+        "rating_restriction": {
+            "minimum": None,
+            "maximum": None,
+        },
+        "number_of_runners": 2,
         "going_description": "Soft",
         "prize": "£4187",
+        "references": None,
+        "source": "theracingapi",
     }
 
     actual = transform_races_data(petl.fromdicts([racecard_data]))[0]
+    actual_dump = actual.model_dump()
 
-    assert len(actual["runners"]) == 2
-    actual.pop("runners")
+    assert len(actual_dump["runners"]) == 2
+    actual_dump.pop("runners")
 
-    assert actual == expected
+    assert actual_dump == expected
 
 
 # def test_validate_racecard_returns_no_problems_for_correct_data(racecard_data):
