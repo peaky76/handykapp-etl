@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import Optional
+from typing import Annotated, Optional
+
+from pydantic import StringConstraints
 
 from .horse import Horse
 from .person import Person
@@ -7,7 +9,7 @@ from .person import Person
 
 class Entry(Horse):
     prev_run: Optional[datetime] = None
-    prev_form: Optional[str] = None
+    prev_form: Optional[Annotated[str, StringConstraints(pattern=r'^[A-Z0-9/-]*$')]] = None
     jockey: Optional[Person] = None
     allowance: Optional[int] = None
     saddlecloth: Optional[int] = None
