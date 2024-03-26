@@ -88,7 +88,7 @@ def transform_ratings_data(data: petl.Table) -> List[Horse]:
             if rec["sex"] == "GELDING"
             else None,
         )
-        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"bha": x}})
+        .convert("trainer", lambda x: {"name": x, "role": "trainer", "references": {"bha": x}, "source": "bha"})
         .convert({"sex": lambda x: Gender[x].sex.name[0]})  # type: ignore
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types, "sire_name_and_country", "dam_name_and_country")
