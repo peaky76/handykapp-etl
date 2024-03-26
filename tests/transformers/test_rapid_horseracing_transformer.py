@@ -129,6 +129,7 @@ def test_transform_results_data_returns_correct_output(result_data):
         "datetime": pendulum.parse("2020-01-01 16:00"),
         "title": "LUCKSIN HANDICAP (5)",
         "is_handicap": True,
+        "is_cancelled": False,
         "distance_description": "1m2f",
         "age_restriction": None,
         "rating_restriction": None,

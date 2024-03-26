@@ -93,7 +93,7 @@ def transform_results_data(data: petl.Table) -> List[Result]:
             {
                 "date": "datetime",
                 "age": "age_restriction",
-                "canceled": "cancelled",
+                "canceled": "is_cancelled",
                 "class": "race_class",
                 "distance": "distance_description",
                 "going": "going_description",
@@ -102,7 +102,7 @@ def transform_results_data(data: petl.Table) -> List[Result]:
         .convert({
             "datetime": lambda x: pendulum.parse(x).isoformat(),
             "finished": lambda x: bool(int(x)),
-            "cancelled": lambda x: bool(int(x)),
+            "is_cancelled": lambda x: bool(int(x)),
             "age_restriction": lambda x: generate_min_max(x, "age") if x else None,
         })
         .addfield(

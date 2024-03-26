@@ -14,6 +14,7 @@ class Race(HashableBaseModel):
     datetime: datetime
     title: str
     is_handicap: Optional[bool] = None
+    is_cancelled: bool = False
     distance_description: str
     race_grade: Optional[str] = None
     race_class: Optional[int] = None

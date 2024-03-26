@@ -206,6 +206,7 @@ def test_transform_races_data_returns_correct_output(racecard_data):
         "datetime": pendulum.parse("2023-10-03 13:42"),
         "title": "Virgin Bet Apprentice Handicap",
         "is_handicap": True,
+        "is_cancelled": False,
         "distance_description": "1m",
         "race_grade": None,
         "race_class": 5,
