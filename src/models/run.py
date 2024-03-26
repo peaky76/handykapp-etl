@@ -1,9 +1,9 @@
 from typing import Optional
 
-from .runner import Runner
+from .entry import Entry
 
 
-class Run(Runner):
+class Run(Entry):
     position: Optional[int | str] = None
     distance_beaten: Optional[int | str] = None
     sp: Optional[str] = None

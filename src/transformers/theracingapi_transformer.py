@@ -20,7 +20,7 @@ from horsetalk import (  # type: ignore
     RaceDistance,
     RaceGrade,
 )
-from models import Declaration, Runner
+from models import Declaration, Entry
 
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.transformer import Transformer
@@ -61,7 +61,7 @@ def generate_min_max(restriction_value: str, restriction_type: Literal["age", "r
 
 
 # @task(tags=["RapidAPI"])
-def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendulum.now(), obstacle: str | None = None, surface: str ="Turf") -> Runner:
+def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendulum.now(), obstacle: str | None = None, surface: str ="Turf") -> Entry:
     horse_dict = (
         petl.rename(
             data,
@@ -105,7 +105,7 @@ def transform_horse_data(data: petl.Table, race_date: pendulum.datetime = pendul
         .cutout("sex_code", "last_run", "form", "age", "sire", "dam", "damsire")
         .dicts()[0]
     )
-    return Runner(**horse_dict)
+    return Entry(**horse_dict)
 
 # @task(tags=["RapidAPI"])
 def transform_races_data(data: petl.Table) -> List[Declaration]:

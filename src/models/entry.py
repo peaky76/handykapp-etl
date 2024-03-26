@@ -4,7 +4,7 @@ from .horse import Horse
 from .person import Person
 
 
-class Runner(Horse):
+class Entry(Horse):
     jockey: Optional[Person] = None
     allowance: Optional[int] = None
     saddlecloth: Optional[int] = None

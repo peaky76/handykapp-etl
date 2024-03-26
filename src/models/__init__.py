@@ -21,7 +21,7 @@ from .rated_jockey import RatedJockey
 from .references import References
 from .result import Result
 from .run import Run
-from .runner import Runner
+from .entry import Entry
 from .source import Source
 from .year import Year
 
@@ -49,7 +49,7 @@ __all__ = [
     "References",
     "Result",
     "Run",
-    "Runner",
+    "Entry",
     "Source",
     "Year",
 ]

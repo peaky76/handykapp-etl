@@ -1,6 +1,6 @@
 from .race import Race
-from .runner import Runner
+from .entry import Entry
 
 
 class Declaration(Race):
-    runners: list[Runner]
+    runners: list[Entry]
