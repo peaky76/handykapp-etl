@@ -215,12 +215,12 @@ def test_transform_races_data_returns_correct_output(racecard_data):
         "race_grade": None,
         "race_class": 5,
         "age_restriction": {
-            "minimum": None,
+            "minimum": 3,
             "maximum": None,
         },
         "rating_restriction": {
-            "minimum": None,
-            "maximum": None,
+            "minimum": 0,
+            "maximum": 75,
         },
         "number_of_runners": 2,
         "going_description": "Soft",

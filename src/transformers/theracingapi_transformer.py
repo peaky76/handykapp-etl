@@ -55,8 +55,8 @@ def generate_min_max(restriction_value: str, restriction_type: Literal["age", "r
         the_max = restriction.maximum
 
     return {
-        "min": the_min,
-        "max": the_max,
+        "minimum": the_min,
+        "maximum": the_max,
     }
 
 
