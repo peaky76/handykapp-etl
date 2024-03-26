@@ -28,11 +28,15 @@ def test_parse_days_since_run_returns_correct_value_for_none():
     assert parse_days_since_run(None, None) is None
 
 
-def test_parse_days_since_run_returns_correct_value_when_same_code():
+def test_parse_days_since_run_returns_correct_value_when_same_code_int():
+    assert parse_days_since_run(pendulum.parse("2022-05-30"), 5) == pendulum.parse("2022-05-25")
+
+
+def test_parse_days_since_run_returns_correct_value_when_same_code_str():
     assert parse_days_since_run(pendulum.parse("2022-05-30"), "5") == pendulum.parse("2022-05-25")
 
 
-def test_parse_days_since_run_returns_correct_value_when_different_code():
+def test_parse_days_since_run_returns_correct_value_when_different_code_str():
     assert parse_days_since_run(pendulum.parse("2022-05-30"), "105 (20F)") == pendulum.parse("2022-05-10")
 
 
