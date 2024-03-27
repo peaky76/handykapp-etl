@@ -1,8 +1,11 @@
 import pendulum
+import pytest
 from horsetalk import RacingCode
+from models import FormdataRun
 from transformers.formdata_transformer import (
     extract_dist_going,
     extract_middle_details,
+    extract_obstacle_from_formdata_run,
     extract_prize,
     extract_rating,
     extract_weight,
@@ -30,6 +33,41 @@ FORMDATA_FILENAMES = [
     "formdata_nh_230625.pdf",
     "formdata_nh_230702.pdf",
 ]
+
+@pytest.fixture()
+def partial_run():
+    return {
+        "date": pendulum.parse("2020-01-01"), 
+        "race_type": "3H", 
+        "win_prize": "10", 
+        "racecourse": "Asc", 
+        "number_of_runners": 10, 
+        "weight": "9-13", 
+        "jockey": "AGambler", 
+        "position": "3", 
+        "distance": 5, 
+        "going": "G",
+    }
+    
+
+def test_extract_obstacle_type_from_formdata_run_when_flat(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3F", "racecourse": "Asc", "distance": 5 }))
+    assert extract_obstacle_from_formdata_run(run) is None
+
+
+def test_extract_obstacle_type_from_formdata_run_when_hurdle(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "Hh", "racecourse": "Chm", "distance": 24 })) 
+    assert extract_obstacle_from_formdata_run(run) == "Hurdle"
+
+
+def test_extract_obstacle_type_from_formdata_run_when_chase(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "Hc", "racecourse": "Chm", "distance": 24 })) 
+    assert extract_obstacle_from_formdata_run(run) == "Chase"
+
+
+def test_extract_obstacle_type_from_formdata_run_when_cross_country(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "Hc", "racecourse": "Chm", "distance": 29 })) 
+    assert extract_obstacle_from_formdata_run(run) == "Cross-Country"
 
 
 def test_extract_dist_going_for_turf_going():

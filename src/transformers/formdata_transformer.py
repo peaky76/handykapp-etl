@@ -11,7 +11,8 @@ import pendulum
 import tomllib
 from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
-from models import FormdataEntry, FormdataRun
+from models import FormdataEntry, FormdataRun, Race
+from models.racecourse_fields import ObstacleType
 from prefect import get_run_logger
 
 with open("settings.toml", "rb") as f:
@@ -44,6 +45,55 @@ Run = namedtuple(
         "form_rating",
     ],
 )
+
+def extract_obstacle_from_formdata_run(run: FormdataRun) -> ObstacleType | None: 
+    if "h" in run.race_type:
+        return "Hurdle"
+        
+    if "c" in run.race_type:
+        if run.racecourse == "Chm" and str(int(run.distance)) == "29":
+            return "Cross-Country"
+        return "Chase"
+
+    return None
+
+def extract_race_from_formdata_run(run: FormdataRun) -> Race:
+    # class FormdataRun(HashableBaseModel):
+#     date: datetime
+#     race_type: str
+#     win_prize: str
+#     racecourse: str = Field(..., min_length=2, max_length=3)
+#     number_of_runners: int
+#     weight: Annotated[str, StringConstraints(pattern=r'^(7|8|9|10|11|12)-([0-9]|10|11|12|13)$')]
+#     headgear: Optional[str] = None
+#     allowance: Optional[int] = None
+#     jockey: str
+#     position: str
+#     beaten_distance: Optional[float] = None
+#     time_rating: Optional[int | str]
+#     distance: float | str
+#     going: Literal["H", "F", "M", "G", "D", "S", "V", "f", "m", "g", "d", "s"]
+#     form_rating: Optional[int | str]
+
+# class Race(HashableBaseModel):
+#     racecourse: Racecourse
+#     datetime: datetime
+#     title: str
+#     is_handicap: Optional[bool] = None
+#     is_cancelled: bool = False
+#     distance_description: str
+#     race_grade: Optional[str] = None
+#     race_class: Optional[int] = None
+#     age_restriction: Optional[RaceRestriction] = None
+#     rating_restriction: Optional[RaceRestriction] = None
+#     prize: Optional[str] = None
+#     going_description: Optional[str] = None
+#     number_of_runners: Optional[int] = None
+#     runners: list[Run]
+#     references: Optional[References] = None
+#     source: Source
+
+    return {}
 
 
 def create_horse(words: list[str], year: int) -> FormdataEntry | None:
