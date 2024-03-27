@@ -5,7 +5,6 @@ from .hashable_base_model import HashableBaseModel
 from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
 from .references import References
-from .entry import Entry
 from .source import Source
 
 
@@ -23,6 +22,5 @@ class Race(HashableBaseModel):
     prize: Optional[str] = None
     going_description: Optional[str] = None
     number_of_runners: Optional[int] = None
-    runners: list[Entry]
     references: Optional[References] = None
     source: Source
