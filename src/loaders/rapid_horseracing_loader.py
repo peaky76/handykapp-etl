@@ -7,7 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import tomllib
 from helpers import get_files
-from prefect import flow
+from prefect import flow, get_run_logger
 from processors.rapid_file_processor import RapidFileProcessor
 
 from .loader import Loader
@@ -42,8 +42,7 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 @flow
 def load_rapid_horseracing_data(*, from_date=None):
-    files = [f for f in get_files(f"{SOURCE}results") if f != "results_to_do_list.json"]
-    loader = Loader(files, RapidFileProcessor())
+    loader = Loader(get_files(f"{SOURCE}results"), RapidFileProcessor())
     loader.load()
 
 
