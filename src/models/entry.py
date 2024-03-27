@@ -9,7 +9,7 @@ from .person import Person
 
 class Entry(Horse):
     prev_run: Optional[datetime] = None
-    prev_form: Optional[Annotated[str, StringConstraints(pattern=r'^[A-Z0-9/-]*$')]] = None
+    prev_form: Optional[Annotated[str, StringConstraints(pattern=r'^[A-Zd0-9/-]*$')]] = None
     jockey: Optional[Person] = None
     allowance: Optional[int] = None
     saddlecloth: Optional[int] = None
