@@ -8,12 +8,11 @@ import re
 from collections import namedtuple
 
 import pendulum
-import petl  # type: ignore
 import tomllib
 from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
-from models import FormdataEntry, FormdataRun, Horse
-from prefect import get_run_logger, task
+from models import FormdataEntry, FormdataRun
+from prefect import get_run_logger
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

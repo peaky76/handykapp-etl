@@ -72,7 +72,6 @@ class FormdataWordProcessor(Processor):
         # Add horses/runs to db
         if self.horse_switch and self.horse:
             f.send(self.horse)
-            # horse_loader.send((horse, date))
             self.horse = None
 
         # Add words to horses/runs
