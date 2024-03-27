@@ -1,4 +1,5 @@
 from .declaration import Declaration
+from .entry import Entry
 from .formdata_entry import FormdataEntry
 from .formdata_run import FormdataRun
 from .hashable_base_model import HashableBaseModel
@@ -15,13 +16,13 @@ from .mongo_run import MongoRun
 from .official_ratings import OfficialRatings
 from .operation import Operation
 from .person import Person
+from .race import Race
 from .race_restriction import RaceRestriction
 from .racecourse import Racecourse
 from .rated_jockey import RatedJockey
 from .references import References
 from .result import Result
 from .run import Run
-from .entry import Entry
 from .source import Source
 from .year import Year
 
@@ -43,6 +44,7 @@ __all__ = [
     "OfficialRatings",
     "Operation",
     "Person",
+    "Race",
     "RaceRestriction",
     "Racecourse",
     "RatedJockey",

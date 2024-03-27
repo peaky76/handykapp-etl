@@ -1,5 +1,5 @@
-from .race import Race
 from .entry import Entry
+from .race import Race
 
 
 class Declaration(Race):
