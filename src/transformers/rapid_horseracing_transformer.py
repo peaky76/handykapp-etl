@@ -106,6 +106,7 @@ def transform_results_data(data: petl.Table) -> List[Result]:
             "finished": lambda x: bool(int(x)),
             "is_cancelled": lambda x: bool(int(x)),
             "age_restriction": lambda x: generate_min_max(x, "age") if x else None,
+            "race_class": lambda x: x or None
         })
         .addfield(
             "is_handicap",
