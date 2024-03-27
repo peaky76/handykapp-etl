@@ -5,13 +5,16 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from clients import mongo_client as client
+from models import Person
 from prefect import flow, task
+from processors.database_processors import PersonProcessor
 from pymongo import ASCENDING as ASC
 
 from loaders.bha_loader import load_bha
 from loaders.core_racecourses_loader import load_racecourses
 from loaders.formdata_loader import load_formdata_only
 from loaders.jockey_ratings_loader import load_jockey_ratings
+from loaders.loader import Loader
 from loaders.rapid_horseracing_loader import load_rapid_horseracing_data
 from loaders.theracingapi_loader import load_theracingapi_data
 
@@ -53,14 +56,14 @@ def spec_database():
 
 @flow
 def load_database_afresh():
-    drop_database()
-    spec_database()
+    # drop_database()
+    # spec_database()
     # load_racecourses()
     # load_bha()
     # load_jockey_ratings()
     # load_formdata_only()
     # load_theracingapi_data()
-    load_rapid_horseracing_data()
+    # load_rapid_horseracing_data()
 
 if __name__ == "__main__":
     load_database_afresh()  # type: ignore
