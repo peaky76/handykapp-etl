@@ -1,6 +1,22 @@
 # import pytest
 # from processors.database_processor import DatabaseProcessor
+from processors.database_processors.database_processor import dot_flatten_nested
 
+
+def test_dot_flatten_nested_leaves_one_level_dict_unchanged():
+    input_dict = {"a": 1, "b": 2}
+    expected = {"a": 1, "b": 2}
+    assert dot_flatten_nested(input_dict) == expected
+
+def test_dot_flatted_nested_works_on_two_level_dict():
+    input_dict = {"a": {"c": 1}, "b": 2}
+    expected = {"a.c": 1, "b": 2}
+    assert dot_flatten_nested(input_dict) == expected
+
+def test_dot_flatten_nested_works_on_three_level_dict():
+    input_dict = {"a": {"c": {"d": 1} }, "b": 2}
+    expected = {"a.c.d": 1, "b": 2}
+    assert dot_flatten_nested(input_dict) == expected
 
 # @pytest.fixture()
 # def processor(mocker):

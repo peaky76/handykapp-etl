@@ -13,6 +13,17 @@ from processors.processor import Processor
 B = TypeVar("B", bound=HashableBaseModel)
 M = TypeVar("M", bound=MongoBaseModel)
 
+
+def dot_flatten_nested(dictionary: dict, parent_key: str = '') -> dict:
+    new_dictionary = {}
+    for key, val in dictionary.items():
+        new_key = f"{parent_key}.{key}" if parent_key else key
+        if isinstance(val, dict):
+            new_dictionary.update(dot_flatten_nested(val, new_key))
+        else:
+            new_dictionary[new_key] = val
+    return new_dictionary
+
 class DatabaseProcessor(Processor[B], Generic[B, M]):
     _business_model: Type[B]
     _db_model: Type[M]
@@ -48,6 +59,8 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
         
     def update(self, item: M) -> None:
         update_dictionary = compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump())
+        logger = get_run_logger()
+        logger.info(dict(update_dictionary.items()))
         self._table.update_one({"_id": self.current_id}, {"$set": update_dictionary})
 
     def insert(self, item: M) -> ObjectId:
