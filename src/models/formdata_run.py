@@ -18,7 +18,7 @@ class FormdataRun(HashableBaseModel):
     jockey: str
     position: str
     beaten_distance: Optional[float] = None
-    time_rating: Optional[int | str]
+    time_rating: Optional[int | str] = None
     distance: float | str
     going: Literal["H", "F", "M", "G", "D", "S", "V", "f", "m", "g", "d", "s"]
-    form_rating: Optional[int | str]
+    form_rating: Optional[int | str] = None

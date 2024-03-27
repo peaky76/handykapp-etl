@@ -12,7 +12,7 @@ from .formdata_page_processor import FormdataPageProcessor
 
 class FormdataFileProcessor(Processor):
     _descriptor: ClassVar[str] = "file"
-    _forward_processors: ClassVar[List["Processor"]] = [FormdataPageProcessor()]
+    _forward_processors: ClassVar[List[Processor]] = [FormdataPageProcessor()]
 
     def __init__(self):
         super().__init__()

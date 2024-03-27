@@ -57,43 +57,74 @@ def extract_obstacle_from_formdata_run(run: FormdataRun) -> ObstacleType | None:
 
     return None
 
+
+def extract_grade_from_formdata_run(run: FormdataRun) -> str | None:
+    if "G1" in run.race_type:
+        return "G1"
+    if "G2" in run.race_type:
+        return "G2"
+    if "G3" in run.race_type:
+        return "G3"
+
+    return None
+
+
+def extract_age_from_formdata_run(run: FormdataRun) -> int | None:
+    if "2" in run.race_type:
+        return 2
+    if "3" in run.race_type:
+        return 3
+    if "4" in run.race_type:
+        return 4
+    
+    return None
+
+
+def convert_symbol_to_going_description(symbol: str) -> str:
+    return {
+        "H": "Hard",
+        "F": "Firm",
+        "M": "Good to Firm",
+        "G": "Good",
+        "D": "Good to Soft",
+        "S": "Soft",
+        "V": "Heavy",
+        "f": "Fast",
+        "m": "Standard to Fast",
+        "g": "Standard",
+        "d": "Standard to Slow",
+        "s": "Slow",
+    }[symbol]
+
+
 def extract_race_from_formdata_run(run: FormdataRun) -> Race:
-    # class FormdataRun(HashableBaseModel):
-#     date: datetime
-#     race_type: str
-#     win_prize: str
-#     racecourse: str = Field(..., min_length=2, max_length=3)
-#     number_of_runners: int
-#     weight: Annotated[str, StringConstraints(pattern=r'^(7|8|9|10|11|12)-([0-9]|10|11|12|13)$')]
-#     headgear: Optional[str] = None
-#     allowance: Optional[int] = None
-#     jockey: str
-#     position: str
-#     beaten_distance: Optional[float] = None
-#     time_rating: Optional[int | str]
-#     distance: float | str
-#     going: Literal["H", "F", "M", "G", "D", "S", "V", "f", "m", "g", "d", "s"]
-#     form_rating: Optional[int | str]
-
-# class Race(HashableBaseModel):
-#     racecourse: Racecourse
-#     datetime: datetime
-#     title: str
-#     is_handicap: Optional[bool] = None
-#     is_cancelled: bool = False
-#     distance_description: str
-#     race_grade: Optional[str] = None
-#     race_class: Optional[int] = None
-#     age_restriction: Optional[RaceRestriction] = None
-#     rating_restriction: Optional[RaceRestriction] = None
-#     prize: Optional[str] = None
-#     going_description: Optional[str] = None
-#     number_of_runners: Optional[int] = None
-#     runners: list[Run]
-#     references: Optional[References] = None
-#     source: Source
-
-    return {}
+    age = extract_age_from_formdata_run(run)
+    return Race(**{
+        "racecourse": {
+            "name": run.racecourse,
+            "country": "GB",
+            "surface": "Turf" if run.going.upper() == run.going else "AW",
+            "obstacle": extract_obstacle_from_formdata_run(run),
+            "references": {
+                "racing_research": run.racecourse
+            },
+            "source": "racing_research"
+        },
+        "datetime": run.date,
+        "title": "",
+        "is_handicap": "H" in run.race_type,
+        "is_cancelled": False,
+        "distance_description": f"{int(run.distance)!s}f",
+        "race_class": extract_grade_from_formdata_run(run),
+        "age_restriction": {"minimum": age, "maximum": age} if age else None,
+        "prize": f"£{int(run.win_prize) * 1000!s}",
+        "going_description": convert_symbol_to_going_description(run.going),
+        "number_of_runners": run.number_of_runners,
+        "references": {
+            "racing_research": ""
+        },
+        "source": "racing_research"
+    })
 
 
 def create_horse(words: list[str], year: int) -> FormdataEntry | None:

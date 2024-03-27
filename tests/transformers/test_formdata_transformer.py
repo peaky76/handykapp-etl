@@ -1,12 +1,16 @@
 import pendulum
 import pytest
 from horsetalk import RacingCode
-from models import FormdataRun
+from models import FormdataRun, Race
 from transformers.formdata_transformer import (
+    convert_symbol_to_going_description,
+    extract_age_from_formdata_run,
     extract_dist_going,
+    extract_grade_from_formdata_run,
     extract_middle_details,
     extract_obstacle_from_formdata_run,
     extract_prize,
+    extract_race_from_formdata_run,
     extract_rating,
     extract_weight,
     get_formdata_date,
@@ -48,7 +52,7 @@ def partial_run():
         "distance": 5, 
         "going": "G",
     }
-    
+
 
 def test_extract_obstacle_type_from_formdata_run_when_flat(partial_run):
     run = FormdataRun(**(partial_run | {"race_type": "3F", "racecourse": "Asc", "distance": 5 }))
@@ -68,6 +72,85 @@ def test_extract_obstacle_type_from_formdata_run_when_chase(partial_run):
 def test_extract_obstacle_type_from_formdata_run_when_cross_country(partial_run):
     run = FormdataRun(**(partial_run | {"race_type": "Hc", "racecourse": "Chm", "distance": 29 })) 
     assert extract_obstacle_from_formdata_run(run) == "Cross-Country"
+
+
+def test_extract_grade_from_formdata_run_when_g1(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3FG1"}))
+    assert extract_grade_from_formdata_run(run) == "G1"
+
+
+def test_extract_grade_from_formdata_run_when_g2(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3FG2"}))
+    assert extract_grade_from_formdata_run(run) == "G2"
+
+
+def test_extract_grade_from_formdata_run_when_g3(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3FG3"}))
+    assert extract_grade_from_formdata_run(run) == "G3"
+
+
+def test_extract_grade_from_formdata_run_when_not_graded(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3F"}))
+    assert extract_grade_from_formdata_run(run) is None
+
+
+def test_extract_age_from_formdata_run_when_age_2(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "2F"}))
+    assert extract_age_from_formdata_run(run) == 2
+
+
+def test_extract_age_from_formdata_run_when_age_3(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "3F"}))
+    assert extract_age_from_formdata_run(run) == 3
+
+
+def test_extract_age_from_formdata_run_when_age_4(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "4F"}))
+    assert extract_age_from_formdata_run(run) == 4
+
+
+def test_extract_age_from_formdata_run_when_no_age(partial_run):
+    run = FormdataRun(**(partial_run | {"race_type": "F"}))
+    assert extract_age_from_formdata_run(run) is None
+
+
+def test_convert_symbol_to_going_description():
+    assert convert_symbol_to_going_description("H") == "Hard"
+    assert convert_symbol_to_going_description("F") == "Firm"
+    assert convert_symbol_to_going_description("M") == "Good to Firm"
+    assert convert_symbol_to_going_description("G") == "Good"
+    assert convert_symbol_to_going_description("D") == "Good to Soft"
+    assert convert_symbol_to_going_description("S") == "Soft"
+    assert convert_symbol_to_going_description("V") == "Heavy"
+    assert convert_symbol_to_going_description("f") == "Fast"
+    assert convert_symbol_to_going_description("m") == "Standard to Fast"
+    assert convert_symbol_to_going_description("g") == "Standard"
+    assert convert_symbol_to_going_description("d") == "Standard to Slow"
+    assert convert_symbol_to_going_description("s") == "Slow"
+
+
+def test_extract_race_from_formdata_run(partial_run):
+    run = FormdataRun(**partial_run)
+    race = extract_race_from_formdata_run(run)
+    assert isinstance(race, Race)
+    assert race.racecourse.name == "Asc"
+    assert race.racecourse.country == "GB"
+    assert race.racecourse.surface == "Turf"
+    assert race.racecourse.obstacle is None
+    assert race.racecourse.references["racing_research"] == "Asc"
+    assert race.datetime == pendulum.parse("2020-01-01")
+    assert race.title == ""
+    assert race.is_handicap is True
+    assert race.is_cancelled is False
+    assert race.distance_description == "5f"
+    assert race.race_class is None
+    assert race.age_restriction.minimum == 3
+    assert race.age_restriction.maximum == 3
+    assert race.prize == "£10000"
+    assert race.going_description == "Good"
+    assert race.number_of_runners == 10
+    assert race.references["racing_research"] == ""
+    assert race.source == "racing_research"
 
 
 def test_extract_dist_going_for_turf_going():
