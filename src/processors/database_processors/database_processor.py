@@ -59,8 +59,6 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
         
     def update(self, item: M) -> None:
         update_dictionary = dot_flatten_nested(compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump()))
-        logger = get_run_logger()
-        logger.info(dict(update_dictionary.items()))
         self._table.update_one({"_id": self.current_id}, {"$set": update_dictionary})
 
     def insert(self, item: M) -> ObjectId:
