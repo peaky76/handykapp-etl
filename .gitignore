@@ -131,6 +131,7 @@ dmypy.json
 # Custom
 files/
 deployments/
+FLOWCHART.md
 
 # Data
 *.pdf
