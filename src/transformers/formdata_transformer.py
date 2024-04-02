@@ -115,9 +115,9 @@ def extract_race_from_formdata_run(run: FormdataRun) -> Race:
         "is_handicap": "H" in run.race_type,
         "is_cancelled": False,
         "distance_description": f"{int(run.distance)!s}f",
-        "race_class": extract_grade_from_formdata_run(run),
+        "race_grade": extract_grade_from_formdata_run(run),
         "age_restriction": {"minimum": age, "maximum": age} if age else None,
-        "prize": f"£{int(run.win_prize) * 1000!s}",
+        "prize": f"£{int(run.win_prize) * 1000!s}" if run.win_prize != '-' else None,
         "going_description": convert_symbol_to_going_description(run.going),
         "number_of_runners": run.number_of_runners,
         "references": {
@@ -125,7 +125,6 @@ def extract_race_from_formdata_run(run: FormdataRun) -> Race:
         },
         "source": "racing_research"
     })
-
 
 def create_horse(words: list[str], year: int) -> FormdataEntry | None:
     logger = get_run_logger()
