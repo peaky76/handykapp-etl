@@ -2,9 +2,13 @@ import csv
 import json
 
 import pendulum
-from clients import spaces_client as client
-from prefect import get_run_logger
+from bson import ObjectId
 from requests import get
+
+from src.clients import mongo_client
+from src.clients import spaces_client as client
+
+db = mongo_client.handykapp
 
 BUCKET_NAME = "peaky76"
 
@@ -57,3 +61,37 @@ def write_file(content, filename):
 
 def get_last_occurrence_of(weekday):
     return pendulum.now().add(days=1).previous(weekday).date()
+
+
+def get_race(race_id):
+    pipeline = [
+        {"$match": {"_id": ObjectId(race_id)}},
+        {"$lookup": {
+            "from": "racecourses",
+            "localField": "racecourse",
+            "foreignField": "_id",
+            "as": "racecourse"
+        }},
+        {"$unwind": "$racecourse"},
+        {"$addFields": {"racecourse": "$racecourse.name"}},
+        {"$unwind": "$runners"},
+        {"$lookup": {
+            "from": "horses",
+            "localField": "runners.horse",
+            "foreignField": "_id",
+            "as": "runners.horse"
+        }},
+        {"$unwind": "$runners.horse"},
+        {"$addFields": {"runners.horse": "$runners.horse.name"}},
+        {"$group": {
+            "_id": "$_id",
+            "racecourse": {"$first": "$racecourse"},
+            "runners": {"$push": "$runners.horse"}
+        }}
+    ]
+
+    races = db.races.aggregate(pipeline)
+    for race in races:
+        print(race)
+
+
