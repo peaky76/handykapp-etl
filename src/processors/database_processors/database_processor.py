@@ -59,7 +59,9 @@ class DatabaseProcessor(Processor[B], Generic[B, M]):
         
     def update(self, item: M) -> None:
         update_dictionary = dot_flatten_nested(compact(item.model_dump(include=self._update_keys) if self._update_keys else item.model_dump()))
-        self._table.update_one({"_id": self.current_id}, {"$set": update_dictionary})
+        set_dict = {k: v for k, v in update_dictionary.items() if not isinstance(v, list)}
+        add_to_set_dict = {k: {"$each": v} for k, v in update_dictionary.items() if isinstance(v, list)}
+        self._table.update_one({"_id": self.current_id}, {"$set": set_dict, "$addToSet": add_to_set_dict})
 
     def insert(self, item: M) -> ObjectId:
         return self._table.insert_one(compact(item.model_dump(exclude={"db_id"}))).inserted_id
