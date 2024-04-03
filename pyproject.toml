@@ -5,21 +5,22 @@ description = "ETL pipeline to feed the handykapp horse racing analysis app"
 authors = ["Robert Peacock <robertjamespeacock@gmail.com>"]
 
 [tool.poetry.dependencies]
+python = "~3.11"
 boto3 = "^1.34.70"
 horsetalk = "^0.21.0"
+nameparser = "^1.1.3"
 peak-utility = "^0.6.0"
 pendulum = "^2.1.2"
 petl = "^1.7.15"
 prefect = "^2.16.6"
 pymongo = "^4.6.2"
-python = "~3.11"
-python-dotenv = "^1.0.1"
 pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
-nameparser = "^1.1.3"
 pydantic = "^2.6.4"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.4.4"
+mongomock = "^4.1.2"
 mypy = "^1.9.0"
 pytest = "^8.1.1"
 pytest-cov = "^5.0.0"
@@ -27,7 +28,6 @@ pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.3.4"
 types-requests = "^2.31.0.20240311"
-mongomock = "^4.1.2"
 
 [tool.mypy]
 ignore_missing_imports = true
