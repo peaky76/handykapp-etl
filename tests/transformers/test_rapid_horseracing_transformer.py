@@ -136,7 +136,10 @@ def test_transform_results_data_returns_correct_output(result_data):
         "is_handicap": True,
         "is_cancelled": False,
         "distance_description": "1m2f",
-        "age_restriction": None,
+        "age_restriction": {
+            "minimum": None,
+            "maximum": None
+        },
         "rating_restriction": None,
         "race_class": 5,
         "race_grade": None,
