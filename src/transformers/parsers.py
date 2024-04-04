@@ -13,11 +13,11 @@ def parse_code(obstacle, title):
     return "Flat"
 
 
-def parse_days_since_run(race_date: datetime, days_ago_str: str) -> int | None:
+def parse_days_since_run(race_date: datetime, days_ago_str: str | int) -> int | None:
     if not days_ago_str:
         return None
 
-    days_ago_figs = re.sub(r'[a-zA-Z()]', '', days_ago_str)
+    days_ago_figs = re.sub(r'[a-zA-Z()]', '', str(days_ago_str))
     days_ago = min([int(x) for x in days_ago_figs.split()])
 
     return race_date.subtract(days=days_ago)
