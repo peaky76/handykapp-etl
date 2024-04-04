@@ -856,19 +856,19 @@ hyperframe = ">=6.0,<7"
 
 [[package]]
 name = "horsetalk"
-version = "0.21.2"
+version = "0.23.2"
 description = "A library of enums and parsers for common horseracing terminology"
 optional = false
-python-versions = ">=3.11.0,<4.0.0"
+python-versions = "<4.0.0,>=3.11.0"
 files = [
-    {file = "horsetalk-0.21.2-py3-none-any.whl", hash = "sha256:ababe1914c060a444611264b903e303df73e87e6f94c0b6e1034194999d91222"},
-    {file = "horsetalk-0.21.2.tar.gz", hash = "sha256:ee43b6b46c4cb1d0a479f0df3d33110bde528ced581d775778e60861b3b4e3d8"},
+    {file = "horsetalk-0.23.2-py3-none-any.whl", hash = "sha256:2ffefdc779ee4d4020fed33052a91c7b5e66b26631c5666098fa5dfb5cf41a5f"},
+    {file = "horsetalk-0.23.2.tar.gz", hash = "sha256:1ab2af18db867f67f3be97f0df5b08367060b0512cb13ea83f53277b7cb568a0"},
 ]
 
 [package.dependencies]
-measurement = ">=3.2.2,<4.0.0"
 peak-utility = ">=0,<1"
 pendulum = ">=3.0.0,<4.0.0"
+pint = ">=0.23,<0.24"
 
 [[package]]
 name = "hpack"
@@ -1267,24 +1267,6 @@ files = [
 ]
 
 [[package]]
-name = "measurement"
-version = "3.2.2"
-description = "Easily use and manipulate unit-aware measurements in Python."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "measurement-3.2.2-py3-none-any.whl", hash = "sha256:9e51ed130bd077f3bfe563959e1b1d7d5f2f4a51055c94625418db47464ffd78"},
-    {file = "measurement-3.2.2.tar.gz", hash = "sha256:a16fe5a8bd72f3682285e87a0abe880d647bcf6e3bf9cc727eeb261d6163c07e"},
-]
-
-[package.dependencies]
-sympy = "*"
-
-[package.extras]
-docs = ["python-docs-theme", "sphinx"]
-test = ["pytest", "pytest-cov"]
-
-[[package]]
 name = "mongomock"
 version = "4.1.2"
 description = "Fake pymongo stub for testing simple MongoDB-dependent code"
@@ -1298,23 +1280,6 @@ files = [
 [package.dependencies]
 packaging = "*"
 sentinels = "*"
-
-[[package]]
-name = "mpmath"
-version = "1.3.0"
-description = "Python library for arbitrary-precision floating-point arithmetic"
-optional = false
-python-versions = "*"
-files = [
-    {file = "mpmath-1.3.0-py3-none-any.whl", hash = "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"},
-    {file = "mpmath-1.3.0.tar.gz", hash = "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f"},
-]
-
-[package.extras]
-develop = ["codecov", "pycodestyle", "pytest (>=4.6)", "pytest-cov", "wheel"]
-docs = ["sphinx"]
-gmpy = ["gmpy2 (>=2.1.0a4)"]
-tests = ["pytest (>=4.6)"]
 
 [[package]]
 name = "mypy"
@@ -1621,6 +1586,32 @@ whoosh = ["whoosh"]
 xls = ["xlrd (>=2.0.1)", "xlwt (>=1.3.0)"]
 xlsx = ["openpyxl (>=2.6.2)"]
 xpath = ["lxml (>=4.4.0)"]
+
+[[package]]
+name = "pint"
+version = "0.23"
+description = "Physical quantities module"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "Pint-0.23-py3-none-any.whl", hash = "sha256:df79b6b5f1beb7ed0cd55d91a0766fc55f972f757a9364e844958c05e8eb66f9"},
+    {file = "Pint-0.23.tar.gz", hash = "sha256:e1509b91606dbc52527c600a4ef74ffac12fff70688aff20e9072409346ec9b4"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+babel = ["babel (<=2.8)"]
+bench = ["pytest", "pytest-codspeed"]
+dask = ["dask"]
+mip = ["mip (>=1.13)"]
+numpy = ["numpy (>=1.19.5)"]
+pandas = ["pint-pandas (>=0.3)"]
+test = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-mpl", "pytest-subtests"]
+testbase = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-subtests"]
+uncertainties = ["uncertainties (>=3.1.6)"]
+xarray = ["xarray"]
 
 [[package]]
 name = "pluggy"
@@ -2800,20 +2791,6 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
-name = "sympy"
-version = "1.12"
-description = "Computer algebra system (CAS) in Python"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "sympy-1.12-py3-none-any.whl", hash = "sha256:c3588cd4295d0c0f603d0f2ae780587e64e2efeedb3521e46b9bb1d08d184fa5"},
-    {file = "sympy-1.12.tar.gz", hash = "sha256:ebf595c8dac3e0fdc4152c51878b498396ec7f30e7a914d6071e674d49420fb8"},
-]
-
-[package.dependencies]
-mpmath = ">=0.19"
-
-[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -3147,4 +3124,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "f1a01dc413422e4e4babe104fff8cb50df2de80f98f3f443f8f6d08b9e83a6fb"
+content-hash = "b0e06bbe475b04bf339342e02dd9894091052fa6c088cd290a388cffc99ebbd2"
