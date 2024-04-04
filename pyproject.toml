@@ -14,7 +14,7 @@ pendulum = "^3.0.0"
 petl = "^1.7.15"
 prefect = "^2.16.6"
 pymongo = "^4.6.2"
-pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
+pymupdf = "^1.23.0" # 1.23 interprets Irish apostrophe as some sort of file end marker
 pydantic = "^2.6.4"
 python-dotenv = "^1.0.1"
 
@@ -28,6 +28,9 @@ pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.3.4"
 types-requests = "^2.31.0.20240311"
+
+[[tool.poetry.packages]]
+include = "src"
 
 [tool.mypy]
 ignore_missing_imports = true
