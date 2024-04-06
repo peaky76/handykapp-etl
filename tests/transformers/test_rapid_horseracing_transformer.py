@@ -82,7 +82,7 @@ def test_transform_horse_data_returns_correct_output(horse_data):
         "saddlecloth": 1,
         "draw": None,
         "position": "1",
-        "distance_beaten": "1 1/2",
+        "beaten_distance": "1 1/2",
         "owner": "A Owner",
         "sire": {
             "name": "THE SIRE",

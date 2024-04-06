@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -17,5 +17,5 @@ class MongoRun(BaseModel):
     lbs_carried: Optional[int] = None 
     official_rating: Optional[int] = None
     position: Optional[int | str] = None
-    distance_beaten: Optional[int | str] = None
+    beaten_distance: Optional[int | str] = None
     sp: Optional[str] = None

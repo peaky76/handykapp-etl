@@ -45,7 +45,8 @@ def transform_horse_data(data: petl.Table, race_date=pendulum.now(), finishing_t
                 "weight": "lbs_carried",
                 "number": "saddlecloth",
                 "OR": "official_rating",
-                "form": "prev_form"
+                "form": "prev_form",
+                "distance_beaten": "beaten_distance",
             },
         )
         .convert({
