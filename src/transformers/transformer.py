@@ -13,8 +13,8 @@ def log_validation_problem(problem):
     logger.warning(msg)
 
 class Transformer(Generic[T], ABC):
-    def __init__(self, data: petl.Table, validator: Callable, transformer: Callable):
-        self.data = data
+    def __init__(self, source_data: petl.Table, validator: Callable, transformer: Callable):
+        self.source_data = source_data
         self.validator = validator
         self.transformer = transformer
 

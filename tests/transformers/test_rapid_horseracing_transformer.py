@@ -81,7 +81,7 @@ def test_transform_horse_data_returns_correct_output(horse_data):
         "lbs_carried": 140,
         "saddlecloth": 1,
         "draw": None,
-        "position": "1",
+        "finishing_position": "1",
         "beaten_distance": "1 1/2",
         "owner": "A Owner",
         "sire": {

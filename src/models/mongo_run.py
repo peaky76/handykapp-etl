@@ -16,6 +16,7 @@ class MongoRun(BaseModel):
     headgear: Optional[str] = None
     lbs_carried: Optional[int] = None 
     official_rating: Optional[int] = None
-    position: Optional[int | str] = None
+    finishing_position: Optional[int | str] = None
+    official_position: Optional[int | str] = None
     beaten_distance: Optional[int | str] = None
     sp: Optional[str] = None
