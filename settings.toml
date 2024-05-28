@@ -1,3 +1,6 @@
+[betfair]
+spaces_dir = "handykapp/betfair/"
+
 [bha]
 source_dir = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
 spaces_dir = "handykapp/bha/"
