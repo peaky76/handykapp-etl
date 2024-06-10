@@ -7,13 +7,14 @@ from pydantic import BaseModel, Field
 from .py_object_id import PyObjectId
 
 
-class MongoBetfairHorseracePnl(BaseModel):
+class MongoBetfairHorseraceBetHistory(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     racecourse: str
     race_datetime: datetime
     race_description: Optional[str] = None
     horse: str
     bet_type: Literal['BACK', 'LAY']
+    places: Optional[int] = None
     odds: Odds
     stake: float
     profit_loss: float
