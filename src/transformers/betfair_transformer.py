@@ -11,21 +11,21 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import tomllib
 from helpers import get_files, log_validation_problem, stream_file
 from models.mongo_betfair_horserace_pnl import MongoBetfairHorseracePnl
-from prefect import flow, task
+from prefect import flow, get_run_logger, task
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["betfair"]["spaces_dir"]
 
-@task(tags=["BHA"], task_run_name="get_{date}_{csv_type}_csv")
-def get_csv(csv_type="ratings", date="latest"):
+@task(tags=["Betfair"])
+def get_csv(date="latest"):
     idx = -1 if date == "latest" else 0
     search_string = "" if date == "latest" else date
     csvs = [
         csv
         for csv in list(get_files(SOURCE))
-        if csv_type in csv and search_string in csv
+        if "PandL" in csv and search_string in csv
     ]
     return csvs[idx] if csvs else None
 
@@ -52,13 +52,21 @@ def transform_betfair_pnl_data(data: petl.Table) -> List[MongoBetfairHorseracePn
         .addfield("racecourse", lambda rec: re.split(r" (?=\d)", rec["racecourse_and_datetime"])[0].strip())
         .select(lambda rec: rec["sport"] == "Horse Racing")
         .addfield("is_place_market", lambda rec: "TBP" in rec["place_detail"] or "Placed" in rec["place_detail"])
-        .addfield("places", lambda rec: 1 if not rec["is_place_market"] else int(re.search(r"\d+", rec["place_detail"]).group()))
+        .addfield("places", lambda rec: 1 if not rec["is_place_market"] else int(re.search(r"\d+", rec["place_detail"]).group()) if "TBP" in rec["place_detail"] else None)
         .addfield("race_description", lambda rec: rec["place_detail"] if not rec["is_place_market"] else None)
         .convert("race_datetime", lambda x: pendulum.from_format(x, "DD-MMM-YY HH:mm", tz="UTC"))
         .cutout("market", "market_detail", "racecourse_and_datetime", "place_detail", "is_place_market", "settled_date", "sport")
         .dicts()
     )
-    return [MongoBetfairHorseracePnl(**rec) for rec in transformed_data]
+
+    filled_out_data = []
+    for rec in transformed_data:
+        if not rec["race_description"]:    
+            matching_description = next((other_rec["race_description"] for other_rec in transformed_data if other_rec["race_datetime"] == rec["race_datetime"] and other_rec["race_description"]), None)
+            rec["race_description"] = matching_description
+        filled_out_data.append(rec)
+
+    return [MongoBetfairHorseracePnl(**rec) for rec in filled_out_data]
 
 @task(tags=["Betfair"])
 def validate_betfair_pnl_data(data: petl.Table) -> bool:
@@ -75,7 +83,7 @@ def validate_betfair_pnl_data(data: petl.Table) -> bool:
         {"name": "market_str", "field": "\ufeffMarket", "assertion": str},
         {"name": "start_time_valid", "field": "Start time", "assertion": validate_betfair_date},
         {"name": "settled_date_valid", "field": "Settled date", "assertion": validate_betfair_date},
-        {"name": "pnl_float", "field": "Profit/Loss (£)", "assertion": float},
+        {"name": "pnl_float", "field": "Profit/Loss (£)", "assertion": lambda x: x == 0.00 or float(x)},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
@@ -83,6 +91,7 @@ def validate_betfair_pnl_data(data: petl.Table) -> bool:
 
 @flow
 def betfair_transformer():
+    logger = get_run_logger()
     csv = get_csv()
     data = read_csv(csv)
     problems = validate_betfair_pnl_data(data)
