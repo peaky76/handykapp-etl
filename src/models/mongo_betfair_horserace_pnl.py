@@ -10,7 +10,7 @@ class MongoBetfairHorseracePnl(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     racecourse: str
     race_datetime: datetime
+    race_description: Optional[str] = None
     profit_loss: float
     places: Optional[int] = None
-    race_description: Optional[str] = None
     
