@@ -50,13 +50,13 @@ files = [
 
 [[package]]
 name = "anyio"
-version = "3.7.1"
+version = "4.4.0"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "anyio-3.7.1-py3-none-any.whl", hash = "sha256:91dee416e570e92c64041bd18b900d1d6fa78dff7048769ce5ac5ddad004fbb5"},
-    {file = "anyio-3.7.1.tar.gz", hash = "sha256:44a3c9aba0f5defa43261a8b3efb97891f2bd7d804e0e1f56419befa1adfc780"},
+    {file = "anyio-4.4.0-py3-none-any.whl", hash = "sha256:c1b2d8f46a8a812513012e1107cb0e68c17159a7a594208005a57dc776e1bdc7"},
+    {file = "anyio-4.4.0.tar.gz", hash = "sha256:5aadc6a1bbb7cdb0bede386cac5e2940f5e2ff3aa20277e991cf028e0585ce94"},
 ]
 
 [package.dependencies]
@@ -64,19 +64,19 @@ idna = ">=2.8"
 sniffio = ">=1.1"
 
 [package.extras]
-doc = ["Sphinx", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme (>=1.2.2)", "sphinxcontrib-jquery"]
-test = ["anyio[trio]", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=4)", "psutil (>=5.9)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "uvloop (>=0.17)"]
-trio = ["trio (<0.22)"]
+doc = ["Sphinx (>=7)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
+test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypothesis (>=4.0)", "psutil (>=5.9)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "uvloop (>=0.17)"]
+trio = ["trio (>=0.23)"]
 
 [[package]]
 name = "apprise"
-version = "1.7.6"
+version = "1.8.1"
 description = "Push Notifications that work with just about every platform!"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "apprise-1.7.6-py3-none-any.whl", hash = "sha256:a98d815dbf950c92b5d8e7c2a4ec30e86257cece26a38ae62ec8fd8f7c551cb0"},
-    {file = "apprise-1.7.6.tar.gz", hash = "sha256:077f09309cc8a6c9063dbd614b343807d527d546693b7fe8fc5a4433502fea6c"},
+    {file = "apprise-1.8.1-py3-none-any.whl", hash = "sha256:371ea400305bd3bf5e8af8e56f151e131ee6357ae009418f9dc3c279909ba0ee"},
+    {file = "apprise-1.8.1.tar.gz", hash = "sha256:08a20fe72672b7e90f7969d5b879d657c2e2db385a8a8c10f54cba565bf237f2"},
 ]
 
 [package.dependencies]
@@ -702,6 +702,20 @@ files = [
 [package.dependencies]
 dnspython = ">=2.0.0"
 idna = ">=2.0.0"
+
+[[package]]
+name = "exceptiongroup"
+version = "1.2.2"
+description = "Backport of PEP 654 (exception groups)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
+    {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
+]
+
+[package.extras]
+test = ["pytest (>=6)"]
 
 [[package]]
 name = "fsspec"
@@ -1690,20 +1704,20 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.19.8"
+version = "2.20.1"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prefect-2.19.8-py3-none-any.whl", hash = "sha256:36830f9f700e616c9291fc7e6fe8b03df2652f83cfb985d3a5edf7b87ed1af4e"},
-    {file = "prefect-2.19.8.tar.gz", hash = "sha256:09a32292186a3335bd6282c58c4d361ab217fabac22164e1098dc1fcaca43139"},
+    {file = "prefect-2.20.1-py3-none-any.whl", hash = "sha256:64f85af05d8fbb11264e79bb6431e727840d52297041095858b423fdfbb3edd9"},
+    {file = "prefect-2.20.1.tar.gz", hash = "sha256:febb560d42a3585b21db958f2a24122bb5db599274ed614ddceced20cf603065"},
 ]
 
 [package.dependencies]
 aiosqlite = ">=0.17.0"
 alembic = ">=1.7.5,<2.0.0"
-anyio = ">=3.7.1,<4.0.0"
-apprise = ">=1.1.0,<2.0.0"
+anyio = ">=4.4.0,<5.0.0"
+apprise = ">=1.8.0,<2.0.0"
 asgi-lifespan = ">=1.0,<3.0"
 asyncpg = ">=0.23"
 cachetools = ">=5.3,<6.0"
@@ -1714,9 +1728,10 @@ croniter = ">=1.0.12,<3.0.0"
 cryptography = ">=36.0.1"
 dateparser = ">=1.1.1,<2.0.0"
 docker = ">=4.0"
+exceptiongroup = ">=1.2.1"
 fsspec = ">=2022.5.0"
 graphviz = ">=0.20.1"
-griffe = ">=0.20.0"
+griffe = ">=0.20.0,<0.48.0"
 httpcore = ">=1.0.5,<2.0.0"
 httpx = {version = ">=0.23,<0.23.2 || >0.23.2", extras = ["http2"]}
 humanize = ">=4.9.0"
@@ -3182,4 +3197,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "800747e7b30bb260f11fbdacdd4ae2154d67c89bc000abe4130beedbcaf674b0"
+content-hash = "8f3673b5294ed5709666e3bcc92e0ae350bce906cb7a6b18219108acf1a44744"
