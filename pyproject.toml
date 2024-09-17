@@ -27,7 +27,7 @@ pytest-cov = "^5.0.0"
 pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.6.4"
-types-requests = "^2.32.0.20240907"
+types-requests = "^2.32.0.20240914"
 mongomock = "^4.2.0"
 
 [tool.mypy]
