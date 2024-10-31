@@ -1714,22 +1714,22 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.20.10"
+version = "2.20.11"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prefect-2.20.10-py3-none-any.whl", hash = "sha256:d44d9fe276d218a0904bc728cecd3c46b06d8bb239a3f1a3562fad8248491888"},
-    {file = "prefect-2.20.10.tar.gz", hash = "sha256:76bc7000b8aac3aa21bc9a73deab6492232726c8263ffd80b573c9ac9a8966ea"},
+    {file = "prefect-2.20.11-py3-none-any.whl", hash = "sha256:e5e167aaddc77686af38011638e74c4c5a652b05295bfea78683f963b2faa360"},
+    {file = "prefect-2.20.11.tar.gz", hash = "sha256:823fbdc74837193263cf39d72202cfc8bbedd72beb8da191a2de089df5d89758"},
 ]
 
 [package.dependencies]
 aiosqlite = ">=0.17.0,<1.0.0"
 alembic = ">=1.7.5,<2.0.0"
-anyio = ">=4.4.0,<5.0.0"
+anyio = ">=4.4.0,<4.6.1"
 apprise = ">=1.8.0,<2.0.0"
 asgi-lifespan = ">=1.0,<3.0"
-asyncpg = ">=0.23,<1.0.0"
+asyncpg = ">=0.23,<0.30.0"
 cachetools = ">=5.3,<6.0"
 click = ">=8.0,<8.2"
 cloudpickle = ">=2.0,<4.0"
@@ -1768,7 +1768,7 @@ rfc3339-validator = ">=0.1.4,<0.2.0"
 rich = ">=11.0,<14.0"
 "ruamel.yaml" = ">=0.17.0"
 sniffio = ">=1.3.0,<2.0.0"
-sqlalchemy = {version = ">=1.4.22,<1.4.33 || >1.4.33,<3.0.0", extras = ["asyncio"]}
+sqlalchemy = {version = ">=1.4.22,<1.4.33 || >1.4.33,<2.0.36", extras = ["asyncio"]}
 toml = ">=0.10.0"
 typer = ">=0.12.0,<0.12.2 || >0.12.2,<0.13.0"
 typing-extensions = ">=4.5.0,<5.0.0"
@@ -3217,4 +3217,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "20c6fe3883f144a8ba9edd5243b6e834aba4782f2ba36466ca1005768369301e"
+content-hash = "817e6e7b7222f79d57c4426e86d27d95674feb0c4a75d6bbf31c67ad113313e9"
