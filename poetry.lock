@@ -1714,13 +1714,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "2.20.11"
+version = "2.20.12"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "prefect-2.20.11-py3-none-any.whl", hash = "sha256:e5e167aaddc77686af38011638e74c4c5a652b05295bfea78683f963b2faa360"},
-    {file = "prefect-2.20.11.tar.gz", hash = "sha256:823fbdc74837193263cf39d72202cfc8bbedd72beb8da191a2de089df5d89758"},
+    {file = "prefect-2.20.12-py3-none-any.whl", hash = "sha256:1fa739b76138302d46f2434abecbcde65bcc62e578e4a32a3256cbf491fc1bbf"},
+    {file = "prefect-2.20.12.tar.gz", hash = "sha256:7217ada073a4bb81c33013cf13b0169be71988c322ef0663ea0775d6895f316d"},
 ]
 
 [package.dependencies]
@@ -1734,7 +1734,7 @@ cachetools = ">=5.3,<6.0"
 click = ">=8.0,<8.2"
 cloudpickle = ">=2.0,<4.0"
 coolname = ">=1.0.4,<3.0.0"
-croniter = ">=1.0.12,<3.0.0"
+croniter = ">=1.0.12,<6.0.0"
 cryptography = ">=36.0.1"
 dateparser = ">=1.1.1,<2.0.0"
 docker = ">=4.0,<8.0"
@@ -1770,7 +1770,7 @@ rich = ">=11.0,<14.0"
 sniffio = ">=1.3.0,<2.0.0"
 sqlalchemy = {version = ">=1.4.22,<1.4.33 || >1.4.33,<2.0.36", extras = ["asyncio"]}
 toml = ">=0.10.0"
-typer = ">=0.12.0,<0.12.2 || >0.12.2,<0.13.0"
+typer = ">=0.12.0,<0.12.2 || >0.12.2,<0.14.0"
 typing-extensions = ">=4.5.0,<5.0.0"
 ujson = ">=5.8.0,<6.0.0"
 uvicorn = ">=0.14.0,<0.29.0 || >0.29.0"
@@ -3217,4 +3217,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "bb83b55da318080cfa7ec82466d570617fcf9ee58a246cf8f81ae9394016f9c0"
+content-hash = "3481fe447275f0001a2e2e05b6b9d34daca3ecdc6c7608cf2e60a7475545c924"
