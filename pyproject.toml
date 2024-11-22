@@ -28,7 +28,7 @@ pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.6.9"
 types-requests = "^2.32.0.20241016"
-mongomock = "^4.2.0"
+mongomock = "^4.3.0"
 
 [tool.mypy]
 ignore_missing_imports = true
