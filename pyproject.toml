@@ -7,19 +7,20 @@ authors = ["Robert Peacock <robertjamespeacock@gmail.com>"]
 [tool.poetry.dependencies]
 boto3 = "^1.36.12"
 horsetalk = "^0.21.0"
+nameparser = "^1.1.3"
 peak-utility = "^0.6.0"
 pendulum = "^2.1.2"
 petl = "^1.7.15"
 prefect = "^2.20.16"
+pydantic = "^2.10.6"
 pymongo = "^4.10.1"
 python = "~3.11"
 python-dotenv = "^1.0.1"
 pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
-nameparser = "^1.1.3"
-pydantic = "^2.10.6"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.10"
+mongomock = "^4.3.0"
 mypy = "^1.14.1"
 pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
@@ -27,7 +28,6 @@ pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.9.3"
 types-requests = "^2.32.0.20241016"
-mongomock = "^4.3.0"
 
 [tool.mypy]
 ignore_missing_imports = true
