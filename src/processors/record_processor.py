@@ -1,7 +1,7 @@
 import petl  # type: ignore
-from helpers import log_validation_problem
 from prefect import get_run_logger
 
+from helpers import log_validation_problem
 from processors.race_processor import race_processor
 
 

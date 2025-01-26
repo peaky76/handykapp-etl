@@ -9,16 +9,18 @@ import petl
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import tomllib
+from prefect import flow, get_run_logger, task
+from pybet import Odds
+
 from helpers import get_files, log_validation_problem, stream_file
 from models.mongo_betfair_horserace_bet_history import MongoBetfairHorseraceBetHistory
 from models.mongo_betfair_horserace_pnl import MongoBetfairHorseracePnl
-from prefect import flow, get_run_logger, task
-from pybet import Odds
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["betfair"]["spaces_dir"]
+
 
 @task(tags=["Betfair"])
 def get_csv(date="latest"):
@@ -30,6 +32,7 @@ def get_csv(date="latest"):
         if "PandL" in csv and search_string in csv
     ]
     return csvs[idx] if csvs else None
+
 
 @task(tags=["Betfair"])
 def read_csv(csv):
@@ -73,6 +76,7 @@ def transform_betfair_bet_history(data: petl.Table) -> List[MongoBetfairHorserac
 
     return [MongoBetfairHorseraceBetHistory(**rec) for rec in filled_out_data]
 
+
 @task(tags=["Betfair"])
 def validate_betfair_bet_history(data: petl.Table) -> bool:
     header = (
@@ -97,6 +101,7 @@ def validate_betfair_bet_history(data: petl.Table) -> bool:
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
+
 
 @task(tags=["Betfair"])
 def transform_betfair_pnl_data(data: petl.Table) -> List[MongoBetfairHorseracePnl]:
@@ -130,6 +135,7 @@ def transform_betfair_pnl_data(data: petl.Table) -> List[MongoBetfairHorseracePn
         filled_out_data.append(rec)
 
     return [MongoBetfairHorseracePnl(**rec) for rec in filled_out_data]
+
 
 @task(tags=["Betfair"])
 def validate_betfair_pnl_data(data: petl.Table) -> bool:

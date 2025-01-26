@@ -10,10 +10,11 @@ from collections import namedtuple
 import pendulum
 import petl  # type: ignore
 import tomllib
-from helpers import get_files
 from horsetalk import RacingCode  # type: ignore
-from models.mongo_horse import MongoHorse
 from prefect import get_run_logger, task
+
+from helpers import get_files
+from models.mongo_horse import MongoHorse
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

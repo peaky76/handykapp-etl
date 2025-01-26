@@ -7,8 +7,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import petl  # type: ignore
 import tomllib
-from helpers import read_file
 from nameparser import HumanName  # type: ignore
+
+from helpers import read_file
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

@@ -4,10 +4,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from clients import mongo_client as client
 from prefect import flow, task
 from pymongo import ASCENDING as ASC
 
+from clients import mongo_client as client
 from loaders.bha_loader import load_bha
 from loaders.formdata_loader import load_formdata_only
 from loaders.jockey_ratings_loader import load_jockey_ratings

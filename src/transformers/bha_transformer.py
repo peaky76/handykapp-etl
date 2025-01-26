@@ -5,11 +5,11 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import petl  # type: ignore
 import tomllib
-from helpers import get_files, log_validation_problem, stream_file
 from horsetalk import Gender  # type: ignore
-from models.mongo_horse import MongoHorse
 from prefect import flow, task
 
+from helpers import get_files, log_validation_problem, stream_file
+from models.mongo_horse import MongoHorse
 from transformers.validators import (
     validate_horse,
     validate_rating,
