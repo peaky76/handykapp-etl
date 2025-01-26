@@ -1,7 +1,6 @@
 import re
 import sys
 from pathlib import Path
-from typing import List
 
 import pendulum
 import petl
@@ -41,7 +40,7 @@ def read_csv(csv):
 
 
 @task(tags=["Betfair"])
-def transform_betfair_bet_history(data: petl.Table) -> List[MongoBetfairHorseraceBetHistory]:
+def transform_betfair_bet_history(data: petl.Table) -> list[MongoBetfairHorseraceBetHistory]:
     transformed_data = (
         petl.rename(data, {
             "Market": "market",
@@ -104,7 +103,7 @@ def validate_betfair_bet_history(data: petl.Table) -> bool:
 
 
 @task(tags=["Betfair"])
-def transform_betfair_pnl_data(data: petl.Table) -> List[MongoBetfairHorseracePnl]:
+def transform_betfair_pnl_data(data: petl.Table) -> list[MongoBetfairHorseracePnl]:
     transformed_data = (
         petl.rename(data, {
             "\ufeffMarket": "market",
