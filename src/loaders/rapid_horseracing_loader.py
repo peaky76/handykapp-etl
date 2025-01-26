@@ -6,9 +6,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
 import tomllib
+from prefect import flow, get_run_logger
+
 from clients import mongo_client as client
 from helpers import get_files, read_file
-from prefect import flow, get_run_logger
 from processors.record_processor import record_processor
 from transformers.rapid_horseracing_transformer import (
     transform_results,

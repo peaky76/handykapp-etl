@@ -9,9 +9,10 @@ from time import sleep
 
 import pendulum
 import tomllib
-from helpers import fetch_content, get_files, read_file, write_file
 from prefect import flow, task
 from prefect.blocks.system import Secret
+
+from helpers import fetch_content, get_files, read_file, write_file
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

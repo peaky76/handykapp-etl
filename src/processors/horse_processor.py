@@ -1,10 +1,10 @@
 from functools import cache
 
-from clients import mongo_client as client
-from models import MongoHorse, PyObjectId
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
+from clients import mongo_client as client
+from models import MongoHorse, PyObjectId
 from processors.person_processor import person_processor
 
 from .utils import compact

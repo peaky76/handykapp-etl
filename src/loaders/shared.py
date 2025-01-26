@@ -1,4 +1,5 @@
 from nameparser import HumanName  # type: ignore
+
 from transformers.parsers import parse_horse  # type: ignore
 
 

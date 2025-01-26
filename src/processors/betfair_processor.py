@@ -1,6 +1,7 @@
-from clients import mongo_client as client
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
+
+from clients import mongo_client as client
 
 db = client.handykapp
 

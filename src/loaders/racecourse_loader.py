@@ -4,8 +4,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from clients import mongo_client as client
 from prefect import flow
+
+from clients import mongo_client as client
 from transformers.core_transformer import core_transformer
 
 db = client.handykapp

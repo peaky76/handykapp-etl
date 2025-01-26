@@ -6,8 +6,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import tomllib
-from helpers import fetch_content, get_last_occurrence_of, write_file
 from prefect import flow, task
+
+from helpers import fetch_content, get_last_occurrence_of, write_file
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)

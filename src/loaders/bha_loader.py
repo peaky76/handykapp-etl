@@ -4,13 +4,13 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from clients import mongo_client as client
 from prefect import flow, get_run_logger, task
 from pymongo.errors import DuplicateKeyError
+
+from clients import mongo_client as client
+from loaders.shared import convert_person, convert_value_to_id, select_set
 from transformers.bha_transformer import bha_transformer
 from transformers.parsers import parse_horse
-
-from loaders.shared import convert_person, convert_value_to_id, select_set
 
 db = client.handykapp
 
@@ -31,7 +31,7 @@ def load_horses(horses, descriptor="horses"):
 
         try:
             inserted_horse = db.horses.insert_one(horse)
-            ret_val[(horse["name"], horse.get("country"))] = inserted_horse.inserted_id
+            ret_val[horse["name"], horse.get("country")] = inserted_horse.inserted_id
             count += 1
         except DuplicateKeyError:
             logger.warning(f"{horse['name']} ({horse['country']}) already in database")
@@ -109,7 +109,7 @@ def enrich_with_bha_ratings(data=None, lookup={}):
     for horse in data:
         horse["name"], horse["country"] = parse_horse(horse["name"], "GB")
         db.horses.update_one(
-            {"_id": lookup[(horse["name"], horse["country"])]},
+            {"_id": lookup[horse["name"], horse["country"]]},
             {"$set": {"ratings": horse["ratings"]}},
             upsert=False,
         )
