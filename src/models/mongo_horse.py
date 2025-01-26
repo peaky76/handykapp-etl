@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -29,5 +29,5 @@ class MongoHorse(BaseModel):
     sire: Optional[PyObjectId] = None
     dam: Optional[PyObjectId] = None
     trainer: Optional[PyObjectId] = None
-    operations: Optional[List[MongoOperation]] = None
+    operations: Optional[list[MongoOperation]] = None
     ratings: Optional[MongoOfficialRatings] = None
