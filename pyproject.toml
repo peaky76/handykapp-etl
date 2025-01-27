@@ -12,11 +12,13 @@ peak-utility = "^0.6.0"
 pendulum = ">=3.0.0,<4"
 petl = "^1.7.15"
 prefect = "^2.20.16"
+pybet = "^0.8.3"
 pydantic = "^2.10.6"
 pymongo = "^4.10.1"
 python = "~3.12"
 python-dotenv = "^1.0.1"
-pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
+# pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
+
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.10"
