@@ -48,7 +48,7 @@ def validate_horse(horse):
     if not horse:
         return False
 
-    has_country = bool(re.search("\\([A-Z]{2,3}\\)", horse))
+    has_country = bool(re.search(r"\([A-Z]{2,3}\)", horse))
     return len(horse) <= 30 and has_country
 
 
