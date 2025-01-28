@@ -3,6 +3,7 @@ name = "handykapp-etl"
 version = "0.1.0"
 description = "ETL pipeline to feed the handykapp horse racing analysis app"
 authors = ["Robert Peacock <robertjamespeacock@gmail.com>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 boto3 = "^1.36.12"
@@ -17,8 +18,7 @@ pydantic = "^2.10.6"
 pymongo = "^4.10.1"
 python = "~3.12"
 python-dotenv = "^1.0.1"
-# pymupdf = "1.22.5" # 1.23 interprets Irish apostrophe as some sort of file end marker
-
+pymupdf = "^1.22.5" # NB >=1.23 interprets Irish apostrophe as some sort of file end marker
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.10"
