@@ -12,7 +12,7 @@ db = client.handykapp
 
 
 @cache
-def get_racecourse_id(course, surface, code, obstacle) -> str:
+def get_racecourse_id(course, surface, code, obstacle) -> str | None:
     surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
         {
