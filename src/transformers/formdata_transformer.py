@@ -156,6 +156,9 @@ def create_run(words: list[str]) -> Run:
         )
         middle_details = extract_middle_details(joined_middle)
 
+        if not middle_details:
+            raise ValueError(f"Insufficient detail in middle of run: {middle_details}")
+
         run = Run(
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
             *words[1:6],
