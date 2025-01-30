@@ -13,7 +13,7 @@ db = client.handykapp
 
 
 @cache
-def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectId:
+def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectId | None:
     if not name:
         return None
 
@@ -28,16 +28,16 @@ def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectI
 
 
 @cache
-def get_dam_id(name: str | None) -> PyObjectId:
+def get_dam_id(name: str | None) -> PyObjectId | None:
     return get_horse_id_by_name_and_sex(name, "F")
 
 
 @cache
-def get_sire_id(name: str | None) -> PyObjectId:
+def get_sire_id(name: str | None) -> PyObjectId | None:
     return get_horse_id_by_name_and_sex(name, "M")
 
 
-def make_search_dictionary(horse) -> MongoHorse:
+def make_search_dictionary(horse) -> dict[str, str]:
     keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
 
     return {k: horse[k] for k in keys}
