@@ -62,7 +62,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
         if len(words) == 5:
             # Base case
             horse = Horse(
-                name, country, year - int(words[1]), irishise(words[2]), *words[3:], []
+                name, country, year - int(words[1]), irishise(words[2]), words[3], words[4], []
             )
         elif 2 <= len(words) < 5:
             # Handle cases where horse line has been insufficiently split
@@ -72,7 +72,8 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 country,
                 year - int(further_split[0]),
                 irishise(" ".join(further_split[1:-2])),
-                *further_split[-2:],
+                further_split[-2],
+                further_split[-1],
                 [],
             )
         else:
@@ -82,7 +83,8 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 country,
                 year - int(words[1]),
                 irishise("".join(words[2:-2])),
-                *words[-2:],
+                words[-2],
+                words[-1],
                 [],
             )
 
