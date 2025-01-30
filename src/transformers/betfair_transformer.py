@@ -1,12 +1,7 @@
 import re
-import sys
-from pathlib import Path
 
 import pendulum
 import petl
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
 import tomllib
 from prefect import flow, get_run_logger, task
 from pybet import Odds
@@ -19,7 +14,6 @@ with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["betfair"]["spaces_dir"]
-
 
 @task(tags=["Betfair"])
 def get_csv(date="latest"):
@@ -37,6 +31,13 @@ def get_csv(date="latest"):
 def read_csv(csv):
     source = petl.MemorySource(stream_file(csv))
     return petl.fromcsv(source, encoding="utf-8")
+
+
+def get_places_from_place_detail(place_detail: str) -> int | None:
+    if "TBP" in place_detail:
+        found_places = re.search(r"\d+", place_detail) 
+        return int(found_places.group()) if found_places else None
+    return None
 
 
 @task(tags=["Betfair"])

@@ -2,6 +2,7 @@ import pendulum
 import pytest
 
 from src.transformers.betfair_transformer import (
+    get_places_from_place_detail,
     transform_betfair_pnl_data,
     validate_betfair_pnl_data,
 )
@@ -16,6 +17,18 @@ def mock_data():
             "Horse Racing / Brighton 30th Apr : 1m2f Hcap,30-Apr-24 16:10,30-Apr-24 16:13,78.60"
         ]
     ]
+
+def test_get_places_from_place_detail_when_tbp_in_detail():
+    actual = get_places_from_place_detail("3 TBP")
+    assert actual == 3
+
+def test_get_places_from_place_detail_when_tbp_not_in_detail():
+    actual = get_places_from_place_detail("Places")
+    assert actual is None
+
+def test_get_places_from_place_detail_when_tbp_has_no_value():
+    actual = get_places_from_place_detail("TBP")
+    assert actual is None
 
 def test_transform_betfair_pnl_data_returns_correct_output(mock_data):
     actual = transform_betfair_pnl_data.fn(mock_data)[0]
