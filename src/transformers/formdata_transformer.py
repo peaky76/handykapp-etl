@@ -174,7 +174,7 @@ def create_run(words: list[str]) -> Run:
     return run
 
 
-def extract_dist_going(string: str) -> tuple[str] | None:
+def extract_dist_going(string: str) -> tuple[str, str] | None:
     pattern = r"""
         ^                                       # Start of the string
         (?:r)?                                  # Optional r
@@ -214,7 +214,7 @@ def extract_middle_details(details: str) -> dict | None:
     return None
 
 
-def extract_prize(string: str) -> tuple[str] | None:
+def extract_prize(string: str) -> tuple[str, str] | None:
     pattern = r"""
         ^                                   # Start of the string
         (?P<racetype>\d*[A-Za-z]+)?         # Race type
@@ -246,7 +246,7 @@ def extract_rating(string: str) -> str | None:
     return None
 
 
-def extract_weight(string: str) -> tuple[str] | None:
+def extract_weight(string: str) -> tuple[str, str] | None:
     pattern = r"""
         ^                                   # Start of the string
         (?P<weight>\d{1,2}\-\d{2})          # Weight
