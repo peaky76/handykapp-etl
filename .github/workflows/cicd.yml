@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  deployment:
+  testing:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout master branch
