@@ -97,8 +97,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
 
     return horse
 
-
-def create_run(words: list[str]) -> Run:
+def create_run(words: list[str]) -> Run | None:
     logger = get_run_logger()
     try:
         # Handle extra empty string at end of some lines
@@ -159,15 +158,25 @@ def create_run(words: list[str]) -> Run:
         if not middle_details:
             raise ValueError(f"Insufficient detail in middle of run: {middle_details}")
 
+        (dist, going) = extract_dist_going(words[-2]) or (None, None)
+
         run = Run(
             pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
-            *words[1:6],
-            *middle_details.values(),
+            words[1],
+            words[2],
+            words[3],
+            words[4],
+            words[5],
+            middle_details["headgear"],
+            middle_details["allowance"],
+            middle_details["jockey"],
+            middle_details["position"],
             float(words[-4].replace("*", "-"))
             if "." in words[-4] and words[-4] != "w.o."
             else None,
             extract_rating(words[-3]),
-            *extract_dist_going(words[-2]),
+            dist,
+            going,
             extract_rating(words[-1]),
         )
     except Exception as e:
@@ -177,7 +186,7 @@ def create_run(words: list[str]) -> Run:
     return run
 
 
-def extract_dist_going(string: str) -> tuple[str, str] | None:
+def extract_dist_going(string: str) -> tuple[float, str] | None:
     pattern = r"""
         ^                                       # Start of the string
         (?:r)?                                  # Optional r
@@ -234,7 +243,7 @@ def extract_prize(string: str) -> tuple[str, str] | None:
     return None
 
 
-def extract_rating(string: str) -> str | None:
+def extract_rating(string: str) -> int | None:
     pattern = r"""
         ^                                   # Start of the string
         (?P<disaster>[a-z-]?)               # Disaster
