@@ -41,8 +41,8 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      # - name: Run static type checking
-      #   run: poetry run mypy src
+      - name: Run static type checking
+        run: poetry run mypy src
 
       - name: Run linters
         run: poetry run ruff check src --preview
