@@ -1,6 +1,7 @@
 import pytest
-from models.mongo_horse import MongoHorse
 from pydantic import ValidationError
+
+from models.mongo_horse import MongoHorse
 
 
 def test_mongo_horse_init_with_sufficient_fields():

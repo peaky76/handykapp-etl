@@ -1,6 +1,7 @@
 import pytest
-from models.mongo_person import MongoPerson
 from pydantic import ValidationError
+
+from models.mongo_person import MongoPerson
 
 
 def test_mongo_person_init_with_sufficient_fields():
