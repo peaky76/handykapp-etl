@@ -16,4 +16,5 @@ async def create_spaces_client() -> boto3.client:
         aws_secret_access_key=spaces_secret.get(),
     )
 
+
 spaces_client = asyncio.run(create_spaces_client())

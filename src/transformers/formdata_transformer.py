@@ -97,6 +97,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
 
     return horse
 
+
 def create_run(words: list[str]) -> Run | None:
     logger = get_run_logger()
     try:
