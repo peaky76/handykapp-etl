@@ -18,3 +18,6 @@ class MongoBetfairHorseraceBetHistory(BaseModel):
     odds: Odds
     stake: float
     profit_loss: float
+
+    class Config:
+        arbitrary_types_allowed = True
