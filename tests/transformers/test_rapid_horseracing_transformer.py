@@ -8,7 +8,7 @@ from transformers.rapid_horseracing_transformer import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def horse_data():
     return {
         "horse": "Dobbin(IRE)",
@@ -32,7 +32,7 @@ def horse_data():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def result_data():
     return {
         "id_race": "123456",

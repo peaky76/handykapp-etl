@@ -11,7 +11,7 @@ from src.transformers.bha_transformer import (
 GET_FILES_IMPORT = "src.transformers.bha_transformer.get_files"
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_data():
     return [
         row.split(",")
