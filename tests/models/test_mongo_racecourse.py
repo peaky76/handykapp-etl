@@ -1,6 +1,7 @@
 import pytest
-from models.mongo_racecourse import MongoRacecourse
 from pydantic import ValidationError
+
+from models.mongo_racecourse import MongoRacecourse
 
 
 def test_mongo_racecourse_init_with_sufficient_fields():
