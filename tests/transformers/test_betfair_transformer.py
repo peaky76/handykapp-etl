@@ -8,7 +8,7 @@ from src.transformers.betfair_transformer import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_data():
     return [
         row.split(",")
