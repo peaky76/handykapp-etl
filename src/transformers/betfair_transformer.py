@@ -15,6 +15,15 @@ with open("settings.toml", "rb") as f:
 
 SOURCE = settings["betfair"]["spaces_dir"]
 
+MARKET = "\ufeffMarket"
+START_TIME = "Start time"
+SETTLED_DATE = "Settled date"
+PROFIT_LOSS = "Profit/Loss (£)"
+STAKE = "Stake (£)"
+SELECTION = " Selection"
+BID_TYPE = " Bid type"
+AVG_ODDS = " Avg. odds matched"
+
 @task(tags=["Betfair"])
 def get_csv(date="latest"):
     idx = -1 if date == "latest" else 0
@@ -44,12 +53,12 @@ def get_places_from_place_detail(place_detail: str) -> int | None:
 def transform_betfair_bet_history(data: petl.Table) -> list[MongoBetfairHorseraceBetHistory]:
     transformed_data = (
         petl.rename(data, {
-            "Market": "market",
-            "Selection": "horse",
-            "Bid Type": "bet_type",
-            "Avg. odds matched": "odds",
-            "Stake (£)": "stake",
-            "Profit/Loss (£)": "profit_loss"
+            MARKET: "market",
+            SELECTION: "horse",
+            BID_TYPE: "bet_type",
+            AVG_ODDS: "odds",
+            STAKE: "stake",
+            PROFIT_LOSS: "profit_loss"
         })
         .convert("odds", lambda x: Odds(x))
         .convert("stake", float)
@@ -80,24 +89,24 @@ def transform_betfair_bet_history(data: petl.Table) -> list[MongoBetfairHorserac
 @task(tags=["Betfair"])
 def validate_betfair_bet_history(data: petl.Table) -> bool:
     header = (
-        "\ufeffMarket",
-        "Selection",
-        "Bid type",
-        "Avg. odds matched",
-        "Stake (£)",
-        "Profit/Loss (£)"
+        MARKET,
+        SELECTION,
+        BID_TYPE,
+        AVG_ODDS,
+        STAKE,
+        PROFIT_LOSS
     )
 
     validate_betfair_date = lambda x: re.match(r"\d{2}-[A-Za-z]{3}-\d{2} \d{2}:\d{2}", x)
 
     constraints = [
-        {"name": "market_str", "field": "\ufeffMarket", "assertion": str},
-        {"name": "horse_str", "field": "Selection", "assertion": str},
-        {"name": "bid_type_str", "field": "Bid type", "assertion": lambda x: x in ("BACK", "LAY")},
-        {"name": "odds_float", "field": "Avg. odds matched", "assertion": float},
-        {"name": "stake_float", "field": "Stake (£)", "assertion": float},
-        {"name": "start_time_valid", "field": "Start time", "assertion": validate_betfair_date},
-        {"name": "pnl_float", "field": "Profit/Loss (£)", "assertion": lambda x: x == 0.00 or float(x)},
+        {"name": "market_str", "field": MARKET, "assertion": str},
+        {"name": "horse_str", "field": SELECTION, "assertion": str},
+        {"name": "bid_type_str", "field": BID_TYPE, "assertion": lambda x: x in ("BACK", "LAY")},
+        {"name": "odds_float", "field": AVG_ODDS, "assertion": float},
+        {"name": "stake_float", "field": STAKE, "assertion": float},
+        {"name": "start_time_valid", "field": START_TIME, "assertion": validate_betfair_date},
+        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == 0.00 or float(x)},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
@@ -107,10 +116,10 @@ def validate_betfair_bet_history(data: petl.Table) -> bool:
 def transform_betfair_pnl_data(data: petl.Table) -> list[MongoBetfairHorseracePnl]:
     transformed_data = (
         petl.rename(data, {
-            "\ufeffMarket": "market",
-            "Start time": "race_datetime",
-            "Settled date": "settled_date",
-            "Profit/Loss (£)": "profit_loss"
+            MARKET: "market",
+            START_TIME: "race_datetime",
+            SETTLED_DATE: "settled_date",
+            PROFIT_LOSS: "profit_loss"
         })
         .convert("profit_loss", float)
         .addfield("sport", lambda rec: rec["market"].split("/")[0].strip())
@@ -139,20 +148,15 @@ def transform_betfair_pnl_data(data: petl.Table) -> list[MongoBetfairHorseracePn
 
 @task(tags=["Betfair"])
 def validate_betfair_pnl_data(data: petl.Table) -> bool:
-    header = (
-        "\ufeffMarket",
-        "Start time",
-        "Settled date",
-        "Profit/Loss (£)"
-    )
+    header = (MARKET, START_TIME, SETTLED_DATE, PROFIT_LOSS)
 
     validate_betfair_date = lambda x: re.match(r"\d{2}-[A-Za-z]{3}-\d{2} \d{2}:\d{2}", x)
 
     constraints = [
-        {"name": "market_str", "field": "\ufeffMarket", "assertion": str},
-        {"name": "start_time_valid", "field": "Start time", "assertion": validate_betfair_date},
-        {"name": "settled_date_valid", "field": "Settled date", "assertion": validate_betfair_date},
-        {"name": "pnl_float", "field": "Profit/Loss (£)", "assertion": lambda x: x == 0.00 or float(x)},
+        {"name": "market_str", "field": MARKET, "assertion": str},
+        {"name": "start_time_valid", "field": START_TIME, "assertion": validate_betfair_date},
+        {"name": "settled_date_valid", "field": SETTLED_DATE, "assertion": validate_betfair_date},
+        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == 0.00 or float(x)},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
