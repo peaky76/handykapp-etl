@@ -24,6 +24,7 @@ SELECTION = " Selection"
 BID_TYPE = " Bid type"
 AVG_ODDS = " Avg. odds matched"
 
+
 @task(tags=["Betfair"])
 def get_csv(date="latest"):
     idx = -1 if date == "latest" else 0
