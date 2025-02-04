@@ -22,7 +22,7 @@ def betfair_processor():
                     pnl_line.model_dump()
                 )
                 found_id = inserted_pnl_line.inserted_id
-                logger.debug(f"{pnl_line.racecourse} {pnl_line.race_datetime} P&L added to db")
+                logger.debug(f"{pnl_line.racecourse} {pnl_line.race_datetime} P&L added to db. ID: {found_id}")
                 added_count += 1
             except DuplicateKeyError:
                 logger.warning(f"Duplicate P&L line: {pnl_line.racecourse} {pnl_line.race_datetime}")
