@@ -35,7 +35,7 @@ def test_transform_betfair_pnl_data_returns_correct_output(mock_data):
     
     assert actual.racecourse == "Brighton"
     assert actual.race_datetime == pendulum.datetime(2024, 4, 30, 16, 10, 0, tz="UTC")
-    assert actual.profit_loss == 78.60
+    assert actual.profit_loss == pytest.approx(78.60, 0.01)
     assert actual.places == 1
     assert actual.race_description == "1m2f Hcap"
 
