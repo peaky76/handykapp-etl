@@ -3,7 +3,7 @@ import re
 import pendulum
 import petl
 import tomllib
-from prefect import flow, get_run_logger, task
+from prefect import flow, task
 from pybet import Odds
 
 from helpers import get_files, log_validation_problem, stream_file
@@ -165,7 +165,6 @@ def validate_betfair_pnl_data(data: petl.Table) -> bool:
 
 @flow
 def betfair_transformer():
-    logger = get_run_logger()
     csv = get_csv()
     data = read_csv(csv)
     problems = validate_betfair_pnl_data(data)
