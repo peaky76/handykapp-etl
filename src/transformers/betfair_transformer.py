@@ -107,7 +107,7 @@ def validate_betfair_bet_history(data: petl.Table) -> bool:
         {"name": "odds_float", "field": AVG_ODDS, "assertion": float},
         {"name": "stake_float", "field": STAKE, "assertion": float},
         {"name": "start_time_valid", "field": START_TIME, "assertion": validate_betfair_date},
-        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == 0.00 or float(x)},
+        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == '0.00' or float(x)},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
@@ -157,7 +157,7 @@ def validate_betfair_pnl_data(data: petl.Table) -> bool:
         {"name": "market_str", "field": MARKET, "assertion": str},
         {"name": "start_time_valid", "field": START_TIME, "assertion": validate_betfair_date},
         {"name": "settled_date_valid", "field": SETTLED_DATE, "assertion": validate_betfair_date},
-        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == 0.00 or float(x)},
+        {"name": "pnl_float", "field": PROFIT_LOSS, "assertion": lambda x: x == '0.00' or float(x)},
     ]
     validator = {"header": header, "constraints": constraints}
     return petl.validate(data, **validator)
