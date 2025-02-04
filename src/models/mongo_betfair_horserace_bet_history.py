@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal, Optional
 
 from pybet import Odds
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .py_object_id import PyObjectId
 
@@ -19,5 +19,4 @@ class MongoBetfairHorseraceBetHistory(BaseModel):
     stake: float
     profit_loss: float
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
