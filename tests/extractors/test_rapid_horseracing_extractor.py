@@ -63,6 +63,10 @@ def test_get_unfetched_race_ids(mocker):
 
 def test_extract_result(mocker):
     write_file = mocker.patch("src.extractors.rapid_horseracing_extractor.write_file")
+    mocker.patch("src.extractors.rapid_horseracing_extractor.get_headers").return_value = {
+        "x-rapidapi-host": "rapidapi.com",
+        "x-rapidapi-key": "mock_key",
+    }
     mocker.patch(
         "src.extractors.rapid_horseracing_extractor.fetch_content"
     ).return_value = "foobar"
@@ -81,6 +85,10 @@ def test_extract_result(mocker):
 
 def test_extract_racecards(mocker):
     write_file = mocker.patch("src.extractors.rapid_horseracing_extractor.write_file")
+    mocker.patch("src.extractors.rapid_horseracing_extractor.get_headers").return_value = {
+        "x-rapidapi-host": "rapidapi.com",
+        "x-rapidapi-key": "mock_key",
+    }
     mocker.patch(
         "src.extractors.rapid_horseracing_extractor.fetch_content"
     ).return_value = "foobar"
