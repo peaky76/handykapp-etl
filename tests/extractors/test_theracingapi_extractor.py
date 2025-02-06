@@ -29,6 +29,10 @@ def test_get_headers(mocker):
 
 
 def test_extract_countries(mocker):
+    mocker.patch("src.extractors.theracingapi_extractor.get_headers").return_value = {
+        "x-rapidapi-host": "the-racing-api1.p.rapidapi.com",
+        "x-rapidapi-key": "mock_key",
+    }
     mocker.patch("src.extractors.theracingapi_extractor.fetch_content").return_value = {
         "name": "foobaristan"
     }
@@ -37,6 +41,10 @@ def test_extract_countries(mocker):
 
 def test_extract_racecards_for_tomorrow_as_default(mocker):
     write_file = mocker.patch("src.extractors.theracingapi_extractor.write_file")
+    mocker.patch("src.extractors.theracingapi_extractor.get_headers").return_value = {
+        "x-rapidapi-host": "the-racing-api1.p.rapidapi.com",
+        "x-rapidapi-key": "mock_key",
+    }
     mocker.patch("src.extractors.theracingapi_extractor.fetch_content").return_value = [
         {}
     ]
