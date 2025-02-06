@@ -1,7 +1,10 @@
+from unittest.mock import MagicMock
+
 import pendulum
 import pytest
 from pendulum import TUESDAY, parse
 
+from src.clients.spaces_client import SpacesClient
 from src.helpers.helpers import (
     fetch_content,
     get_files,
@@ -14,6 +17,11 @@ from src.helpers.helpers import (
 
 PENDULUM_IMPORT = "src.helpers.helpers.pendulum"
 
+
+@pytest.fixture
+def mock_spaces_client(mocker):
+    mock_client = mocker.patch("src.helpers.helpers.SpacesClient.get")
+    return mock_client.return_value
 
 def test_fetch_content_when_successful(mocker):
     resp = mocker.patch("src.helpers.helpers.get")
@@ -28,18 +36,16 @@ def test_fetch_content_when_unsuccessful(mocker):
         fetch_content("https://example.com")
 
 
-def test_get_files(mocker):
-    client = mocker.patch("src.helpers.helpers.client")
-    client.list_objects_v2.return_value = {
+def test_get_files(mock_spaces_client):
+    mock_spaces_client.list_objects_v2.return_value = {
         "Contents": [{"Key": "foo.csv"}, {"Key": "bar.csv"}],
         "NextContinuationToken": "",
     }
     assert list(get_files("dir")) == ["foo.csv", "bar.csv"]
 
 
-def test_get_files_modified_after(mocker):
-    client = mocker.patch("src.helpers.helpers.client")
-    client.list_objects_v2.return_value = {
+def test_get_files_modified_after(mock_spaces_client):
+    mock_spaces_client.list_objects_v2.return_value = {
         "Contents": [
             {"Key": "foo.csv", "LastModified": pendulum.parse("2019-01-01 00:00")},
             {"Key": "bar.csv", "LastModified": pendulum.parse("2020-01-01 00:00")},
@@ -49,34 +55,26 @@ def test_get_files_modified_after(mocker):
     assert list(get_files("dir", pendulum.parse("2019-07-01 00:00"))) == ["bar.csv"]
 
 
-def test_read_file_for_csv(mocker):
-    mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
-        "foo,bar,baz", "utf-8"
-    )
+def test_read_file_for_csv(mock_spaces_client):
+    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes("foo,bar,baz", "utf-8"))}
     assert read_file("foo.csv") == [["foo", "bar", "baz"]]
 
 
-def test_read_file_for_json(mocker):
-    mocker.patch("src.helpers.helpers.stream_file").return_value = bytes(
-        '{"foo": "bar"}', "utf-8"
-    )
+def test_read_file_for_json(mock_spaces_client):
+    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes('{"foo": "bar"}', "utf-8"))}
     assert read_file("foo.json") == {"foo": "bar"}
 
 
-def test_stream_file(mocker):
-    client = mocker.patch("src.helpers.helpers.client")
-    body = client.get_object.return_value["Body"]
-    body.read = lambda: bytes("foobar", "utf-8")
-
+def test_stream_file(mock_spaces_client):
+    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes("foobar", "utf-8"))}
     actual = stream_file("foo.csv")
     assert isinstance(actual, bytes)
     assert actual.decode("utf-8") == "foobar"
 
 
-def test_write_file(mocker):
-    client = mocker.patch("src.helpers.helpers.client")
+def test_write_file(mock_spaces_client):
     write_file("foobar", "foo.csv")
-    assert client.put_object.called
+    assert mock_spaces_client.put_object.called
 
 
 def test_get_last_occurrence_of_when_day_is_tomorrow(mocker):

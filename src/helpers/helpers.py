@@ -5,7 +5,7 @@ import pendulum
 from prefect import get_run_logger
 from requests import get
 
-from clients import spaces_client as client
+from clients import SpacesClient
 
 BUCKET_NAME = "peaky76"
 
@@ -18,6 +18,7 @@ def fetch_content(url, params=None, headers=None):
 
 def get_files(dirname, modified_after=None):
     continuation_token = ""
+    client = SpacesClient.get()
     while True:
         response = client.list_objects_v2(
             Bucket=BUCKET_NAME, Prefix=dirname, ContinuationToken=continuation_token
@@ -48,11 +49,13 @@ def read_file(file_path):
 
 
 def stream_file(file_path):
+    client = SpacesClient.get()
     obj = client.get_object(Bucket=BUCKET_NAME, Key=file_path)
     return obj["Body"].read()
 
 
 def write_file(content, filename):
+    client = SpacesClient.get()
     client.put_object(Bucket=BUCKET_NAME, Key=filename, Body=content, ACL="private")
 
 

@@ -1,4 +1,4 @@
 from .mongo_client import mongo_client
-from .spaces_client import spaces_client
+from .spaces_client import SpacesClient
 
-__all__ = ["mongo_client", "spaces_client"]
+__all__ = ["SpacesClient", "mongo_client"]
