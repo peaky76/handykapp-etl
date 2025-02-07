@@ -7,6 +7,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import fitz  # type: ignore
 import tomllib
+from peak_utility.names.corrections import scotify  # type: ignore
 from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger, task
 from pymongo.errors import DuplicateKeyError
@@ -54,16 +55,7 @@ RUN_KEYS = [
 def adjust_rr_name(name):
     country = name.split("(")[-1].replace(")", "") if "(" in name else None
     name = name.replace(" (" + country + ")", "") if country else name
-
-    # TODO : Will be in next v0.5 of peak_utility
-    scottishise = (
-        lambda x: re.sub(r"(m(?:a*)c)(\s*)", r"\1 ", x, flags=re.IGNORECASE)
-        .title()
-        .replace("Mac ", "Mac")
-        .replace("Mc ", "Mc")
-    )
-
-    name = scottishise(normal(name))
+    name = scotify(normal(name))
     name = re.sub(
         r"([a-z])'([A-Z])",
         lambda match: match.group(1) + "'" + match.group(2).lower(),
