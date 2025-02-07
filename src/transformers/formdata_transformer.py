@@ -11,6 +11,7 @@ import pendulum
 import petl  # type: ignore
 import tomllib
 from horsetalk import RacingCode  # type: ignore
+from peak_utility.names.corrections import eirify
 from prefect import get_run_logger, task
 
 from helpers import get_files
@@ -55,9 +56,6 @@ def create_horse(words: list[str], year: int) -> Horse | None:
     name = words[0].split("(")[0].strip()
     country = words[0].split("(")[1].split(")")[0] if "(" in words[0] else "GB"
 
-    # TODO : Will be in next v0.5 of peak_utility
-    irishise = lambda x: x.replace("O' ", "O'").replace("O '", "O'")
-
     try:
         if len(words) == 5:
             # Base case
@@ -65,7 +63,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 name,
                 country,
                 year - int(words[1]),
-                irishise(words[2]),
+                eirify(words[2]),
                 words[3],
                 words[4],
                 [],
@@ -77,7 +75,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 name,
                 country,
                 year - int(further_split[0]),
-                irishise(" ".join(further_split[1:-2])),
+                eirify(" ".join(further_split[1:-2])),
                 further_split[-2],
                 further_split[-1],
                 [],
@@ -88,7 +86,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
                 name,
                 country,
                 year - int(words[1]),
-                irishise("".join(words[2:-2])),
+                eirify("".join(words[2:-2])),
                 words[-2],
                 words[-1],
                 [],
