@@ -1,5 +1,4 @@
-import asyncio
-from typing import Optional
+from typing import Any, Optional
 
 import boto3  # type: ignore
 from prefect.blocks.system import Secret
@@ -9,10 +8,10 @@ class SpacesClient:
     _client: Optional[boto3.client] = None
 
     @classmethod
-    async def _create(cls) -> boto3.client:
+    def _create(cls) -> boto3.client:
         session = boto3.session.Session()
-        spaces_key = await Secret.load("spaces-key")
-        spaces_secret = await Secret.load("spaces-secret")
+        spaces_key: Any = Secret.load("spaces-key")
+        spaces_secret: Any = Secret.load("spaces-secret")
         return session.client(
             "s3",
             region_name="ams3",
@@ -24,6 +23,6 @@ class SpacesClient:
     @classmethod
     def get(cls) -> boto3.client:
         if cls._client is None:
-            cls._client = asyncio.run(cls._create())
+            cls._client = cls._create()
         return cls._client
 
