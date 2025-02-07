@@ -12,7 +12,7 @@ from src.extractors.bha_extractor import (
 
 
 def test_bha_source():
-    expected = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
+    expected = "https://api09.horseracing.software/bha/v1/ratings/csv/ratings"
     assert expected == SOURCE
 
 

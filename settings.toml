@@ -2,13 +2,13 @@
 spaces_dir = "handykapp/betfair/"
 
 [bha]
-source_dir = "https://www.britishhorseracing.com/feeds/v4/ratings/csv/"
+source_dir = "https://api09.horseracing.software/bha/v1/ratings/csv/ratings"
 spaces_dir = "handykapp/bha/"
 
 [bha.files]
-ratings = "ratings.csv"
-rating_changes = "ratings.csv?diff"
-perf_figs = "performance-figures.csv"
+ratings = "ratings"
+rating_changes = "ratings?diff"
+perf_figs = "performance-figures"
 
 [core]
 spaces_dir = "handykapp/core/"
