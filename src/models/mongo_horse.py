@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
@@ -8,7 +8,7 @@ from .py_object_id import PyObjectId
 
 class MongoOperation(BaseModel):
     operation_type: str
-    date: Optional[date] = None
+    date: Optional[datetime.date] = None
 
 
 class MongoOfficialRatings(BaseModel):
