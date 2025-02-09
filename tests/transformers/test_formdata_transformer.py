@@ -134,7 +134,7 @@ def test_extract_middle_details_when_position_is_disaster():
     assert extract_middle_details("t3HDaviesp") == expected
 
 
-def test_extract_middle_details_when_position_includes_disqulification():
+def test_extract_middle_details_when_position_includes_disqualification():
     expected = {
         "headgear": "t",
         "allowance": 3,
