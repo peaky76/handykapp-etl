@@ -62,7 +62,13 @@ def create_horse(words: list[str], year: int) -> Horse | None:
         if len(words) == 5:
             # Base case
             horse = Horse(
-                name, country, year - int(words[1]), irishise(words[2]), words[3], words[4], []
+                name,
+                country,
+                year - int(words[1]),
+                irishise(words[2]),
+                words[3],
+                words[4],
+                [],
             )
         elif 2 <= len(words) < 5:
             # Handle cases where horse line has been insufficiently split
@@ -126,7 +132,7 @@ def create_run(words: list[str]) -> Run | None:
             words.insert(6, jockey)
 
         # Split conjoined finishing distance
-        for i, word in enumerate(words[7:9]):
+        for i, word in enumerate(words[7:10]):
             if "p" in word and ("*" in word or "." in word):
                 position, beaten_distance = (
                     word.split("*") if "*" in word else (word[:3], word[3:])
