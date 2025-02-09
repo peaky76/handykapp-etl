@@ -200,11 +200,13 @@ def formdata_loader():
             entry = horse._asdict()
             entry["runs"] = [run._asdict() for run in entry["runs"]]
 
-            existing_entry = db.formdata.find_one({
-                "name": entry["name"],
-                "country": entry["country"],
-                "year": entry["year"],
-            })
+            existing_entry = db.formdata.find_one(
+                {
+                    "name": entry["name"],
+                    "country": entry["country"],
+                    "year": entry["year"],
+                }
+            )
 
             if existing_entry:
                 runs = existing_entry["runs"]
@@ -297,10 +299,12 @@ def word_processor():
 
             if (horse_switch or run_switch) and len(run_args):
                 run = create_run(run_args)
-                if run is None:
+                if horse and run is None:
                     logger.error(f"Missing run for {horse.name}")
-                else:
+                elif horse:
                     horse.runs.append(run)
+                else:
+                    logger.error("Run created but no horse to add it to")
                 run_args = []
 
             # Add horses/runs to db
