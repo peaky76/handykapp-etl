@@ -3,6 +3,8 @@ import re
 import sys
 from pathlib import Path
 
+from processors import horse_processor
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import fitz  # type: ignore
@@ -234,19 +236,10 @@ def formdata_loader():
         pass
 
 
-def horse_loader():
-    try:
-        while True:
-            item = yield
-            horse, date = item
-
-    except GeneratorExit:
-        pass
-
-
 def word_processor():
     logger = get_run_logger()
     logger.info("Starting word processor")
+    source = "racing_research"
     horse = None
     horse_args = []
     run_args = []
@@ -255,8 +248,8 @@ def word_processor():
 
     fl = formdata_loader()
     next(fl)
-    hl = horse_loader()
-    next(hl)
+    hp = horse_processor()
+    next(hp)
 
     try:
         while True:
@@ -302,7 +295,7 @@ def word_processor():
             # Add horses/runs to db
             if horse_switch and horse:
                 fl.send((horse, date))
-                hl.send((horse, date))
+                hp.send((horse, source))
                 horse = None
 
             # Add words to horses/runs
@@ -312,7 +305,7 @@ def word_processor():
                 run_args.append(word)
 
     except GeneratorExit:
-        hl.close()
+        hp.close()
 
 
 def page_processor():
