@@ -2,10 +2,11 @@
 import sys
 from pathlib import Path
 
+from models import FormdataHorse, FormdataRun
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import re
-from collections import namedtuple
 
 import pendulum
 import petl  # type: ignore
@@ -23,33 +24,7 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["formdata"]["spaces_dir"]
 
 
-Horse = namedtuple(
-    "Horse",
-    ["name", "country", "year", "trainer", "trainer_form", "prize_money", "runs"],
-)
-Run = namedtuple(
-    "Run",
-    [
-        "date",
-        "type",
-        "win_prize",
-        "course",
-        "number_of_runners",
-        "weight",
-        "headgear",
-        "allowance",
-        "jockey",
-        "position",
-        "beaten_distance",
-        "time_rating",
-        "distance",
-        "going",
-        "form_rating",
-    ],
-)
-
-
-def create_horse(words: list[str], year: int) -> Horse | None:
+def create_horse(words: list[str], year: int) -> FormdataHorse | None:
     logger = get_run_logger()
     words = [w for w in words if w]  # Occasional lines have empty strings at end
 
@@ -59,37 +34,37 @@ def create_horse(words: list[str], year: int) -> Horse | None:
     try:
         if len(words) == 5:
             # Base case
-            horse = Horse(
-                name,
-                country,
-                year - int(words[1]),
-                eirify(words[2]),
-                words[3],
-                words[4],
-                [],
+            horse = FormdataHorse(
+                name=name,
+                country=country,
+                year=year - int(words[1]),
+                trainer=eirify(words[2]),
+                trainer_form=words[3],
+                prize_money=words[4],
+                runs=[],
             )
         elif 2 <= len(words) < 5:
             # Handle cases where horse line has been insufficiently split
             further_split = ("".join(words[1:])).split(" ")
-            horse = Horse(
-                name,
-                country,
-                year - int(further_split[0]),
-                eirify(" ".join(further_split[1:-2])),
-                further_split[-2],
-                further_split[-1],
-                [],
+            horse = FormdataHorse(
+                name=name,
+                country=country,
+                year=year - int(further_split[0]),
+                trainer=eirify(" ".join(further_split[1:-2])),
+                trainer_form=further_split[-2],
+                prize_money=further_split[-1],
+                runs=[],
             )
         else:
             # Handle cases where trainer name has been split
-            horse = Horse(
-                name,
-                country,
-                year - int(words[1]),
-                eirify("".join(words[2:-2])),
-                words[-2],
-                words[-1],
-                [],
+            horse = FormdataHorse(
+                name=name,
+                country=country,
+                year=year - int(words[1]),
+                trainer=eirify("".join(words[2:-2])),
+                trainer_form=words[-2],
+                prize_money=words[-1],
+                runs=[],
             )
 
         if horse.trainer[0].isdigit():
@@ -102,7 +77,7 @@ def create_horse(words: list[str], year: int) -> Horse | None:
     return horse
 
 
-def create_run(words: list[str]) -> Run | None:
+def create_run(words: list[str]) -> FormdataRun | None:
     logger = get_run_logger()
     try:
         # Handle extra empty string at end of some lines
@@ -169,24 +144,24 @@ def create_run(words: list[str]) -> Run | None:
 
         (dist, going) = extract_dist_going(words[-2]) or (None, None)
 
-        run = Run(
-            pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
-            words[1],
-            words[2],
-            words[3],
-            words[4],
-            words[5],
-            middle_details["headgear"],
-            middle_details["allowance"],
-            middle_details["jockey"],
-            middle_details["position"],
-            float(words[-4].replace("*", "-"))
+        run = FormdataRun(
+            date=pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
+            race_type=words[1],
+            win_prize=words[2],
+            course=words[3],
+            number_of_runners=int(words[4]),
+            weight=words[5],
+            headgear=middle_details["headgear"],
+            allowance=middle_details["allowance"],
+            jockey=middle_details["jockey"],
+            position=middle_details["position"],
+            beaten_distance=float(words[-4].replace("*", "-"))
             if "." in words[-4] and words[-4] != "w.o."
             else None,
-            extract_rating(words[-3]),
-            dist,
-            going,
-            extract_rating(words[-1]),
+            time_rating=extract_rating(words[-3]),
+            distance=dist,
+            going=going,
+            form_rating=extract_rating(words[-1]),
         )
     except Exception as e:
         logger.error(f"Error creating run from {words}: {e}")
