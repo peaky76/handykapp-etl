@@ -3,8 +3,6 @@ import re
 import sys
 from pathlib import Path
 
-from processors import horse_processor
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import fitz  # type: ignore
@@ -16,6 +14,7 @@ from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
 from helpers import stream_file
+from processors.horse_processor import horse_processor
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
