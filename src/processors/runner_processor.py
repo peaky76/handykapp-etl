@@ -56,9 +56,9 @@ def make_update_dictionary(horse):
     return update_dictionary
 
 
-def horse_processor():
+def runner_processor():
     logger = get_run_logger()
-    logger.info("Starting horse processor")
+    logger.info("Starting runner processor")
     added_count = 0
     updated_count = 0
     skipped_count = 0
@@ -161,6 +161,6 @@ def horse_processor():
 
     except GeneratorExit:
         logger.info(
-            f"Finished processing horses. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
+            f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
         )
         p.close()

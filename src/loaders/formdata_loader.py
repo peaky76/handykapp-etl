@@ -14,7 +14,7 @@ from prefect import flow, get_run_logger
 from clients import mongo_client as client
 from helpers import stream_file
 from models.formdata_horse import FormdataHorse
-from processors.horse_processor import horse_processor
+from processors.runner_processor import runner_processor
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
@@ -119,8 +119,8 @@ def word_processor():
 
     fl = formdata_loader()
     next(fl)
-    hp = horse_processor()
-    next(hp)
+    rp = runner_processor()
+    next(rp)
 
     try:
         while True:
@@ -166,7 +166,7 @@ def word_processor():
             # Add horses/runs to db
             if horse_switch and horse:
                 fl.send((horse, date))
-                # hp.send((horse, source))
+                # rp.send((horse, source))
                 horse = None
 
             # Add words to horses/runs
@@ -176,7 +176,7 @@ def word_processor():
                 run_args.append(word)
 
     except GeneratorExit:
-        hp.close()
+        rp.close()
 
 
 def page_processor():
