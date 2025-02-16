@@ -14,6 +14,7 @@ from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
 from helpers import stream_file
+from models.formdata_horse import FormdataHorse
 from processors.horse_processor import horse_processor
 from transformers.formdata_transformer import (
     create_horse,
@@ -190,23 +191,21 @@ def formdata_loader():
             item = yield
             horse, date = item
 
-            entry = horse._asdict()
-            entry["runs"] = [run._asdict() for run in entry["runs"]]
-
             existing_entry = db.formdata.find_one(
                 {
-                    "name": entry["name"],
-                    "country": entry["country"],
-                    "year": entry["year"],
+                    "name": horse.name,
+                    "country": horse.country,
+                    "year": horse.year,
                 }
             )
 
             if existing_entry:
-                runs = existing_entry["runs"]
+                existing_horse = FormdataHorse.model_validate(existing_entry)
+                runs = existing_horse.runs
 
-                for new_run in entry["runs"]:
+                for new_run in horse.runs:
                     matched_run = next(
-                        (r for r in runs if r["date"] == new_run["date"]),
+                        (r for r in runs if r.date == new_run.date),
                         None,
                     )
                     if matched_run:
@@ -215,21 +214,21 @@ def formdata_loader():
 
                 db.formdata.find_one_and_update(
                     {
-                        "name": entry["name"],
-                        "country": entry["country"],
-                        "year": entry["year"],
+                        "name": horse.name,
+                        "country": horse.country,
+                        "year": horse.year,
                     },
                     {
                         "$set": {
-                            "runs": runs,
-                            "prize_money": entry["prize_money"],
-                            "trainer": entry["trainer"],
-                            "trainer_form": entry["trainer_form"],
+                            "runs": [run.model_dump() for run in runs],
+                            "prize_money": horse.prize_money,
+                            "trainer": horse.trainer,
+                            "trainer_form": horse.trainer_form,
                         }
                     },
                 )
             else:
-                db.formdata.insert_one(entry)
+                db.formdata.insert_one(horse.model_dump())
 
     except GeneratorExit:
         pass
@@ -294,7 +293,7 @@ def word_processor():
             # Add horses/runs to db
             if horse_switch and horse:
                 fl.send((horse, date))
-                hp.send((horse, source))
+                # hp.send((horse, source))
                 horse = None
 
             # Add words to horses/runs
