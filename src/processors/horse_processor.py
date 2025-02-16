@@ -13,7 +13,9 @@ db = client.handykapp
 
 
 @cache
-def get_horse_id_by_name_and_sex(name: str | None, sex: str | None) -> PyObjectId | None:
+def get_horse_id_by_name_and_sex(
+    name: str | None, sex: str | None
+) -> PyObjectId | None:
     if not name:
         return None
 
@@ -67,7 +69,7 @@ def horse_processor():
     try:
         while True:
             horse, source = yield
-            race_id = horse["race_id"]
+            race_id = horse.get("race_id")
             name = horse["name"]
 
             found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
@@ -83,15 +85,17 @@ def horse_processor():
             else:
                 try:
                     horse_id = db.horses.insert_one(
-                        compact({
-                            "name": name,
-                            "sex": horse.get("sex"),
-                            "year": horse.get("year"),
-                            "country": horse.get("country"),
-                            "colour": horse.get("colour"),
-                            "sire": get_sire_id(horse.get("sire")),
-                            "dam": get_dam_id(horse.get("dam")),
-                        })
+                        compact(
+                            {
+                                "name": name,
+                                "sex": horse.get("sex"),
+                                "year": horse.get("year"),
+                                "country": horse.get("country"),
+                                "colour": horse.get("colour"),
+                                "sire": get_sire_id(horse.get("sire")),
+                                "dam": get_dam_id(horse.get("dam")),
+                            }
+                        )
                     ).inserted_id
                     logger.debug(f"{name} added to db")
                     added_count += 1
@@ -110,44 +114,50 @@ def horse_processor():
                     {"_id": race_id},
                     {
                         "$push": {
-                            "runners": compact({
-                                "horse": horse_id,
-                                "owner": horse.get("owner"),
-                                "allowance": horse.get("allowance"),
-                                "saddlecloth": horse.get("saddlecloth"),
-                                "draw": horse.get("draw"),
-                                "headgear": horse.get("headgear"),
-                                "lbs_carried": horse.get("lbs_carried"),
-                                "official_rating": horse.get("official_rating"),
-                                "position": horse.get("position"),
-                                "distance_beaten": horse.get("distance_beaten"),
-                                "sp": horse.get("sp"),
-                            })
+                            "runners": compact(
+                                {
+                                    "horse": horse_id,
+                                    "owner": horse.get("owner"),
+                                    "allowance": horse.get("allowance"),
+                                    "saddlecloth": horse.get("saddlecloth"),
+                                    "draw": horse.get("draw"),
+                                    "headgear": horse.get("headgear"),
+                                    "lbs_carried": horse.get("lbs_carried"),
+                                    "official_rating": horse.get("official_rating"),
+                                    "position": horse.get("position"),
+                                    "distance_beaten": horse.get("distance_beaten"),
+                                    "sp": horse.get("sp"),
+                                }
+                            )
                         }
                     },
                 )
                 if horse.get("trainer"):
-                    p.send((
-                        {
-                            "name": horse["trainer"],
-                            "role": "trainer",
-                            "race_id": race_id,
-                            "runner_id": horse_id,
-                        },
-                        source,
-                        {},
-                    ))
+                    p.send(
+                        (
+                            {
+                                "name": horse["trainer"],
+                                "role": "trainer",
+                                "race_id": race_id,
+                                "runner_id": horse_id,
+                            },
+                            source,
+                            {},
+                        )
+                    )
                 if horse.get("jockey"):
-                    p.send((
-                        {
-                            "name": horse["jockey"],
-                            "role": "jockey",
-                            "race_id": race_id,
-                            "runner_id": horse_id,
-                        },
-                        source,
-                        {},
-                    ))
+                    p.send(
+                        (
+                            {
+                                "name": horse["jockey"],
+                                "role": "jockey",
+                                "race_id": race_id,
+                                "runner_id": horse_id,
+                            },
+                            source,
+                            {},
+                        )
+                    )
 
     except GeneratorExit:
         logger.info(
