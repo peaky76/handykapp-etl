@@ -54,7 +54,7 @@ def formdata_loader():
     try:
         while True:
             item = yield
-            horse, date = item
+            horse = item
 
             existing_entry = db.formdata.find_one(
                 {

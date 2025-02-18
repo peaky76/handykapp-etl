@@ -13,7 +13,6 @@ from transformers.formdata_transformer import (
 def word_processor():
     logger = get_run_logger()
     logger.info("Starting word processor")
-    source = "racing_research"
     horse = None
     horse_args = []
     run_args = []
@@ -68,7 +67,7 @@ def word_processor():
 
             # Add horses/runs to db
             if horse_switch and horse:
-                fl.send((horse, date))
+                fl.send(horse)
                 # rp.send((horse, source))
                 horse = None
 
