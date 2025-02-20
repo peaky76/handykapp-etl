@@ -41,7 +41,9 @@ SOURCE = settings["theracingapi"]["spaces_dir"]
 def build_datetime(date_str: str, time_str: str) -> str:
     hour, minute = time_str.split(":")
     hour = str(h + 12 if (h := int(hour)) < 11 else h)
-    return pendulum.parse(f"{date_str} {hour}:{minute}").isoformat()
+    return pendulum.from_format(
+        f"{date_str} {hour}:{minute}", "YYYY-MM-DD HH:mm"
+    ).isoformat()
 
 
 def transform_horse(data, race_date=pendulum.now()):

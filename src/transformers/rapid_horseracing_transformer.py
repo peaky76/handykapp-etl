@@ -88,7 +88,10 @@ def transform_results(data) -> MongoRace:
                 "going": "going_description",
             },
         )
-        .convert("datetime", lambda x: pendulum.parse(x).isoformat())
+        .convert(
+            "datetime",
+            lambda x: pendulum.from_format(x, "YYYY-MM-DD HH:mm:ss").isoformat(),
+        )
         .convert("finished", lambda x: bool(int(x)))
         .convert("cancelled", lambda x: bool(int(x)))
         .addfield(
