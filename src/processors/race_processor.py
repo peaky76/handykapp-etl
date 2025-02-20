@@ -4,6 +4,7 @@ from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
+from models import MongoRace
 from processors.runner_processor import runner_processor
 
 from .utils import compact
@@ -26,7 +27,7 @@ def get_racecourse_id(course, surface, code, obstacle) -> str | None:
     return racecourse["_id"] if racecourse else None
 
 
-def make_update_dictionary(race, racecourse_id):
+def make_update_dictionary(race, racecourse_id) -> MongoRace:
     return compact(
         {
             "racecourse": racecourse_id,
