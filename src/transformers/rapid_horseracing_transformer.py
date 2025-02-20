@@ -1,6 +1,8 @@
 # To allow running as a script
+from enum import Enum
 import sys
 from pathlib import Path
+from typing import cast
 
 from models import MongoRace
 
@@ -107,7 +109,7 @@ def transform_results(data) -> MongoRace:
                 "AW"
                 if any(
                     x.name in rec["going_description"].upper()
-                    for x in AWGoingDescription
+                    for x in cast(type[Enum], AWGoingDescription)
                 )
                 else "Turf"
                 # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
