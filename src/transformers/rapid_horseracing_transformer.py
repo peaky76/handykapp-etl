@@ -2,6 +2,8 @@
 import sys
 from pathlib import Path
 
+from models import MongoRace
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
@@ -41,13 +43,15 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
                 "OR": "official_rating",
             },
         )
-        .convert({
-            "age": int,
-            "days_since_prev_run": int,
-            "official_rating": int,
-            "non_runner": lambda x: bool(int(x)),
-            "lbs_carried": lambda x: RaceWeight(x).lb,
-        })
+        .convert(
+            {
+                "age": int,
+                "days_since_prev_run": int,
+                "official_rating": int,
+                "non_runner": lambda x: bool(int(x)),
+                "lbs_carried": lambda x: RaceWeight(x).lb,
+            }
+        )
         .addfield(
             "year",
             lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
@@ -71,7 +75,7 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
     )
 
 
-def transform_results(data):
+def transform_results(data) -> MongoRace:
     return (
         petl.rename(
             data,
