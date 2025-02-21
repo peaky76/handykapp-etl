@@ -1,10 +1,10 @@
 # To allow running as a script
-from enum import Enum
 import sys
+from enum import Enum
 from pathlib import Path
 from typing import cast
 
-from models import MongoRace
+from models import MongoHorse, MongoRace
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -33,7 +33,7 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
-def transform_horse(data, race_date=pendulum.now(), finishing_time=None):
+def transform_horse(data, race_date=pendulum.now(), finishing_time=None) -> MongoHorse:
     return (
         petl.rename(
             data,
