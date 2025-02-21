@@ -1,5 +1,7 @@
 from .formdata_horse import FormdataHorse
+from .formdata_race import FormdataRace
 from .formdata_run import FormdataRun
+from .formdata_runner import FormdataRunner
 from .mongo_horse import MongoHorse
 from .mongo_person import MongoPerson
 from .mongo_race import MongoRace
@@ -9,7 +11,9 @@ from .py_object_id import PyObjectId
 
 __all__ = [
     "FormdataHorse",
+    "FormdataRace",
     "FormdataRun",
+    "FormdataRunner",
     "MongoHorse",
     "MongoPerson",
     "MongoRace",
