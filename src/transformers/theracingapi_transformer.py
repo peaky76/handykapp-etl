@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from models import MongoRace
+from models import MongoHorse, MongoRace
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -46,7 +46,7 @@ def build_datetime(date_str: str, time_str: str) -> str:
     ).isoformat()
 
 
-def transform_horse(data, race_date=pendulum.now()):
+def transform_horse(data, race_date=pendulum.now()) -> MongoHorse:
     return (
         petl.rename(
             data,
@@ -61,16 +61,16 @@ def transform_horse(data, race_date=pendulum.now()):
         .convert(
             {
                 "name": lambda x: x.upper(),
-                "sex": lambda x: Gender[x].sex.name[0],
+                "sex": lambda x: Gender[x].sex.name[0],  # type: ignore
                 "age": int,
-                "colour": lambda x: CoatColour[x].name.title(),
+                "colour": lambda x: CoatColour[x].name.title(),  # type: ignore
                 "sire": lambda x: x.upper(),
                 "dam": lambda x: x.upper(),
                 "damsire": lambda x: x.upper(),
                 "saddlecloth": int,
                 "draw": int,
                 "lbs_carried": int,
-                "headgear": lambda x: Headgear[x].name.title() if x else None,
+                "headgear": lambda x: Headgear[x].name.title() if x else None,  # type: ignore
                 "official_rating": int,
             }
         )
