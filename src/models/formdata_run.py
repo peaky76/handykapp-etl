@@ -16,6 +16,6 @@ class FormdataRun(BaseModel):
     position: str
     beaten_distance: Optional[float] = None
     time_rating: Optional[int] = None
-    distance: Optional[float] = None
-    going: Optional[str] = None
+    distance: float
+    going: str
     form_rating: Optional[int] = None
