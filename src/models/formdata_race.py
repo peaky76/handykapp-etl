@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -9,5 +7,5 @@ class FormdataRace(BaseModel):
     win_prize: str
     course: str = Field(..., min_length=3, max_length=3)
     number_of_runners: int
-    distance: Optional[float] = None
-    going: Optional[str] = None
+    distance: float
+    going: str
