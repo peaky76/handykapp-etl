@@ -2,8 +2,6 @@
 import sys
 from pathlib import Path
 
-from models import FormdataHorse, FormdataRun
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import re
@@ -16,7 +14,11 @@ from peak_utility.names.corrections import eirify
 from prefect import get_run_logger, task
 
 from helpers import get_files
-from models.mongo_horse import MongoHorse
+from models import (
+    FormdataHorse,
+    FormdataRun,
+    MongoHorse,
+)
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
