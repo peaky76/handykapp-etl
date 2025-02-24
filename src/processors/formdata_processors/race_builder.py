@@ -2,6 +2,7 @@ from itertools import combinations
 from typing import Literal, TypeAlias
 
 from compytition import RankList
+from horsetalk import RaceWeight
 from prefect import get_run_logger
 
 from models import FormdataRace, FormdataRunner
@@ -12,27 +13,41 @@ RaceCompleteCheckResult: TypeAlias = dict[
 ]
 
 
+def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
+    return all(a >= b for a, b in zip(seq, seq[1:]))
+
+
 def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
     unchanged = {"complete": [], "todo": runners}
-    n = race.number_of_runners
 
-    if len(runners) < n:
+    if len(runners) < race.number_of_runners:
         return unchanged
 
     is_finisher = lambda x: x.position.isdigit() or "=" in x.position
 
-    for combo in combinations(runners, n):
+    for combo in combinations(runners, race.number_of_runners):
         try:
-            finishers = [runner for runner in combo if is_finisher(runner)]
+            finishers = sorted(
+                [runner for runner in combo if is_finisher(runner)],
+                key=lambda x: int(x.position.replace("=", "")),
+            )
             RankList(runner.position for runner in finishers)
-            return {
-                "complete": list(combo),
-                "todo": [r for r in runners if r not in combo],
-            }
-        except ValueError:  # noqa: PERF203
+        except ValueError:
             continue
+
+        adjusted_ratings = [
+            runner.form_rating - (RaceWeight(runner.weight).lb + runner.allowance)
+            for runner in finishers
+        ]
+        if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+            continue
+
+        return {
+            "complete": list(combo),
+            "todo": [r for r in runners if r not in combo],
+        }
 
     return unchanged
 
