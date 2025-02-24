@@ -25,7 +25,8 @@ def check_race_complete(
 
     for combo in combinations(runners, n):
         try:
-            RankList(runner.position for runner in combo if is_finisher(runner))
+            finishers = [runner for runner in combo if is_finisher(runner)]
+            RankList(runner.position for runner in finishers)
             return {
                 "complete": list(combo),
                 "todo": [r for r in runners if r not in combo],
