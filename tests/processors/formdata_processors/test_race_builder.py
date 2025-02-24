@@ -10,6 +10,52 @@ def race(mocker):
     return race
 
 
+@pytest.fixture
+def div_one_runners(mocker):
+    # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
+    data = [
+        ["1", -0.2, "9-10", 80],
+        ["2", 0.2, "9-7", 74],
+        ["3", 0.8, "9-12", 77],
+        ["4", 1.5, "8-11", 62],
+        ["5", 1.75, "10-2", 78],
+        ["6", 2.75, "9-8", 71],
+    ]
+    return [
+        mocker.patch(
+            "models.FormdataRunner",
+            position=datum[0],
+            beaten_distance=datum[1],
+            weight=datum[2],
+            form_rating=datum[3],
+        )
+        for datum in data
+    ]
+
+
+@pytest.fixture
+def div_two_runners(mocker):
+    # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/876000
+    data = [
+        ["1", -0.5, "9-7", 78],
+        ["2", 0.5, "9-6", 77],
+        ["3", 1.0, "9-8", 77],
+        ["4", 1.5, "9-2", 72],
+        ["5", 1.75, "9-10", 76],
+        ["6", 3.25, "9-10", 69],
+    ]
+    return [
+        mocker.patch(
+            "models.FormdataRunner",
+            position=datum[0],
+            beaten_distance=datum[1],
+            weight=datum[2],
+            form_rating=datum[3],
+        )
+        for datum in data
+    ]
+
+
 def test_check_race_complete_when_not_enough_runners(race):
     runners = []
     actual = check_race_complete(race, runners)
@@ -116,18 +162,34 @@ def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_n
     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_extra_runners_but_some_form_valid_rank(mocker, race):
-    odd_one_out = mocker.patch("models.FormdataRunner", position="12")
-    from_race = [
-        mocker.patch("models.FormdataRunner", position="5"),
-        mocker.patch("models.FormdataRunner", position="3"),
-        mocker.patch("models.FormdataRunner", position="4"),
-        mocker.patch("models.FormdataRunner", position="1"),
-        mocker.patch("models.FormdataRunner", position="2"),
-        mocker.patch("models.FormdataRunner", position="6"),
-    ]
+def test_check_race_complete_when_exact_number_of_runners_but_mixed_divs(
+    race, div_one_runners, div_two_runners
+):
+    runners = [*div_one_runners[:3], *div_two_runners[3:]]
+    actual = check_race_complete(race, runners)
 
-    actual = check_race_complete(race, [*from_race, odd_one_out])
+    assert len(runners) == 6
+    assert actual["complete"] == []
+    assert actual["todo"] == runners
 
-    assert actual["complete"] == from_race
-    assert actual["todo"] == [odd_one_out]
+
+def test_check_race_complete_when_extra_runners_and_not_enough_from_one_div(
+    race, div_one_runners, div_two_runners
+):
+    runners = [*div_one_runners[:3], *div_two_runners[2:]]
+    actual = check_race_complete(race, runners)
+
+    assert len(runners) == 7
+    assert actual["complete"] == []
+    assert actual["todo"] == runners
+
+
+def test_check_race_complete_when_extra_runners_but_one_complete_div(
+    race, div_one_runners, div_two_runners
+):
+    runners = [div_one_runners[2], *div_two_runners]
+    actual = check_race_complete(race, runners)
+
+    assert len(runners) == 7
+    assert actual["complete"] == div_two_runners
+    assert actual["todo"] == [div_one_runners[2]]
