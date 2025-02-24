@@ -1,20 +1,30 @@
+from typing import Literal, TypeAlias
+
 from compytition import RankList
 from prefect import get_run_logger
 
 from models import FormdataRace, FormdataRunner
 from processors import record_processor
 
+RaceCompleteCheckResult: TypeAlias = dict[
+    Literal["complete", "todo"], list[FormdataRunner]
+]
 
-def check_race_complete(race: FormdataRace, runners: list[FormdataRunner]) -> bool:
+
+def check_race_complete(
+    race: FormdataRace, runners: list[FormdataRunner]
+) -> RaceCompleteCheckResult:
+    unchanged = {"complete": [], "todo": runners}
+
     if len(runners) < race.number_of_runners:
-        return False
+        return unchanged
 
     try:
         is_finisher = lambda x: x.position.isdigit() or "=" in x.position
         RankList(runner.position for runner in runners if is_finisher(runner))
-        return True
+        return {"complete": runners, "todo": []}
     except ValueError:
-        return False
+        return unchanged
 
 
 def race_builder():
