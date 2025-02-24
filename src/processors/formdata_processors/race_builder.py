@@ -28,6 +28,7 @@ def check_race_complete(
     is_finisher = lambda x: x.position.isdigit() or "=" in x.position
 
     for combo in combinations(runners, race.number_of_runners):
+        # Check if this combo form a proper ranking order
         try:
             finishers = sorted(
                 [runner for runner in combo if is_finisher(runner)],
@@ -37,6 +38,7 @@ def check_race_complete(
         except ValueError:
             continue
 
+        # Check if the ratings of this combo would fit
         adjusted_ratings = [
             runner.form_rating - (RaceWeight(runner.weight).lb + runner.allowance)
             for runner in finishers
@@ -91,13 +93,21 @@ def race_builder():
                     ),
                     **horse.model_dump(include={"name", "country", "year"}),
                 )
+
                 if race in race_dict:
                     race_dict[race].append(runner)
                 else:
                     race_dict[race] = [runner]
-                if check_race_complete(race, race_dict[race]):
-                    pass
-                    # r.send()
+
+                check_result = check_race_complete(race, race_dict[race])
+
+                if len(complete := check_result["complete"]):
+                    r.send(complete)
+
+                race_dict[race] = check_result["todo"]
+
+                if len(race_dict) == 0:
+                    del race_dict[race]
 
     except GeneratorExit:
         # logger.info(
