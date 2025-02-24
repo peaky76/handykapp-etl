@@ -14,12 +14,12 @@ def race(mocker):
 def div_one_runners(mocker):
     # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
     data = [
-        ["1", -0.2, "9-10", 80],
-        ["2", 0.2, "9-7", 74],
-        ["3", 0.8, "9-12", 77],
-        ["4", 1.5, "8-11", 62],
-        ["5", 1.75, "10-2", 78],
-        ["6", 2.75, "9-8", 71],
+        ["1", -0.2, "9-10", 0, 80],
+        ["2", 0.2, "9-7", 0, 74],
+        ["3", 0.8, "9-12", 0, 77],
+        ["4", 1.5, "8-11", 3, 62],
+        ["5", 1.75, "10-2", 0, 78],
+        ["6", 2.75, "9-8", 0, 71],
     ]
     return [
         mocker.patch(
@@ -27,7 +27,8 @@ def div_one_runners(mocker):
             position=datum[0],
             beaten_distance=datum[1],
             weight=datum[2],
-            form_rating=datum[3],
+            allowance=datum[3],
+            form_rating=datum[4],
         )
         for datum in data
     ]
@@ -37,12 +38,12 @@ def div_one_runners(mocker):
 def div_two_runners(mocker):
     # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/876000
     data = [
-        ["1", -0.5, "9-7", 78],
-        ["2", 0.5, "9-6", 77],
-        ["3", 1.0, "9-8", 77],
-        ["4", 1.5, "9-2", 72],
-        ["5", 1.75, "9-10", 76],
-        ["6", 3.25, "9-10", 69],
+        ["1", -0.5, "9-7", 0, 78],
+        ["2", 0.5, "9-6", 0, 77],
+        ["3", 1.0, "9-8", 0, 77],
+        ["4", 1.5, "9-2", 3, 72],
+        ["5", 1.75, "9-10", 0, 76],
+        ["6", 3.25, "9-10", 0, 69],
     ]
     return [
         mocker.patch(
@@ -50,7 +51,8 @@ def div_two_runners(mocker):
             position=datum[0],
             beaten_distance=datum[1],
             weight=datum[2],
-            form_rating=datum[3],
+            allowance=datum[3],
+            form_rating=datum[4],
         )
         for datum in data
     ]
