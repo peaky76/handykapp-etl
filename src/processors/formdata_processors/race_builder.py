@@ -1,3 +1,4 @@
+from itertools import combinations
 from typing import Literal, TypeAlias
 
 from compytition import RankList
@@ -15,16 +16,24 @@ def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
     unchanged = {"complete": [], "todo": runners}
+    n = race.number_of_runners
 
-    if len(runners) < race.number_of_runners:
+    if len(runners) < n:
         return unchanged
 
-    try:
-        is_finisher = lambda x: x.position.isdigit() or "=" in x.position
-        RankList(runner.position for runner in runners if is_finisher(runner))
-        return {"complete": runners, "todo": []}
-    except ValueError:
-        return unchanged
+    is_finisher = lambda x: x.position.isdigit() or "=" in x.position
+
+    for combo in combinations(runners, n):
+        try:
+            RankList(runner.position for runner in combo if is_finisher(runner))
+            return {
+                "complete": list(combo),
+                "todo": [r for r in runners if r not in combo],
+            }
+        except ValueError:  # noqa: PERF203
+            continue
+
+    return unchanged
 
 
 def race_builder():
