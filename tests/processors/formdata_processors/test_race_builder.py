@@ -204,3 +204,15 @@ def test_check_race_complete_when_extra_runners_but_one_complete_div(
     assert len(runners) == 7
     assert actual["complete"] == div_two_runners
     assert actual["todo"] == [div_one_runners[3]]
+
+
+def test_check_race_complete_when_indeterminate_non_finisher(
+    race, div_one_runners, div_two_runners
+):
+    div_one_runners[5].position = "P"
+    runners = [*div_two_runners[:5], *div_one_runners[:5], div_one_runners[5]]
+    actual = check_race_complete(race, runners)
+
+    assert len(runners) == 11
+    assert actual["complete"] == []
+    assert actual["todo"] == [div_two_runners, div_one_runners]
