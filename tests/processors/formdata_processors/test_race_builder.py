@@ -66,66 +66,21 @@ def test_check_race_complete_when_not_enough_runners(race):
     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_exact_number_of_runners_in_valid_rank(mocker, race):
-    runners = [
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="5",
-            form_rating=78,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="3",
-            form_rating=84,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="6",
-            form_rating=75,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="1",
-            form_rating=90,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="2",
-            form_rating=87,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="4",
-            form_rating=81,
-        ),
-    ]
+def test_check_race_complete_when_exact_number_of_runners_in_valid_rank(
+    race, div_one_runners
+):
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
     assert actual["todo"] == []
 
 
-def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(mocker, race):
-    runners = [
-        mocker.patch("models.FormdataRunner", position="5"),
-        mocker.patch("models.FormdataRunner", position="3"),
-        mocker.patch("models.FormdataRunner", position="7"),
-        mocker.patch("models.FormdataRunner", position="1"),
-        mocker.patch("models.FormdataRunner", position="2"),
-        mocker.patch("models.FormdataRunner", position="4"),
-    ]
+def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(
+    race, div_one_runners
+):
+    div_one_runners[0].position = "7"
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == []
@@ -133,52 +88,13 @@ def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(mocker
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some_equal(
-    mocker, race
+    race, div_one_runners
 ):
-    runners = [
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="5",
-            form_rating=81,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="=3",
-            form_rating=84,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="=3",
-            form_rating=84,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="1",
-            form_rating=90,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="2",
-            form_rating=87,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="6",
-            form_rating=78,
-        ),
-    ]
+    div_one_runners[3].position = "=4"
+    div_one_runners[4].position = "=4"
+    div_one_runners[4].beaten_distance = 1.5
+
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
@@ -186,16 +102,14 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_and_some_equal(
-    mocker, race
+    race, div_one_runners
 ):
-    runners = [
-        mocker.patch("models.FormdataRunner", position="5"),
-        mocker.patch("models.FormdataRunner", position="=3"),
-        mocker.patch("models.FormdataRunner", position="=3"),
-        mocker.patch("models.FormdataRunner", position="1"),
-        mocker.patch("models.FormdataRunner", position="2"),
-        mocker.patch("models.FormdataRunner", position="7"),
-    ]
+    div_one_runners[0].position = "7"
+    div_one_runners[3].position = "=4"
+    div_one_runners[4].position = "=4"
+    div_one_runners[4].beaten_distance = 1.5
+
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == []
@@ -203,52 +117,10 @@ def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_and_so
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non_completion(
-    mocker, race
+    race, div_one_runners
 ):
-    runners = [
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="5",
-            form_rating=78,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="3",
-            form_rating=84,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="P",
-            form_rating=None,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="1",
-            form_rating=90,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="2",
-            form_rating=87,
-        ),
-        mocker.patch(
-            "models.FormdataRunner",
-            weight="10-0",
-            allowance=0,
-            position="4",
-            form_rating=81,
-        ),
-    ]
+    div_one_runners[5].position = "P"
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
@@ -256,16 +128,10 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_non_completion(
-    mocker, race
+    race, div_one_runners
 ):
-    runners = [
-        mocker.patch("models.FormdataRunner", position="5"),
-        mocker.patch("models.FormdataRunner", position="3"),
-        mocker.patch("models.FormdataRunner", position="6"),
-        mocker.patch("models.FormdataRunner", position="1"),
-        mocker.patch("models.FormdataRunner", position="2"),
-        mocker.patch("models.FormdataRunner", position="P"),
-    ]
+    div_one_runners[3].position = "P"
+    runners = div_one_runners
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == []
