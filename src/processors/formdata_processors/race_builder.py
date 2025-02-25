@@ -28,12 +28,19 @@ def check_race_complete(
     is_finisher = lambda x: x.position.isdigit() or "=" in x.position
 
     for combo in combinations(runners, race.number_of_runners):
+        finishers = sorted(
+            [runner for runner in combo if is_finisher(runner)],
+            key=lambda x: int(x.position.replace("=", "")),
+        )
+
+        # Guard for duplicate non-equal positions which would pass ranklist check
+        positions = [f.position for f in finishers]
+        non_equal_positions = [p for p in positions if "=" not in p]
+        if len(non_equal_positions) != len(set(non_equal_positions)):
+            continue
+
         # Check if this combo form a proper ranking order
         try:
-            finishers = sorted(
-                [runner for runner in combo if is_finisher(runner)],
-                key=lambda x: int(x.position.replace("=", "")),
-            )
             RankList(runner.position for runner in finishers)
         except ValueError:
             continue
