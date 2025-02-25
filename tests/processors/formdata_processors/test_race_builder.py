@@ -38,12 +38,12 @@ def div_one_runners(mocker):
 def div_two_runners(mocker):
     # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/876000
     data = [
-        ["1", -0.5, "9-7", 0, 78],  # 71
-        ["2", 0.5, "9-6", 0, 77],  # 71
-        ["3", 1.0, "9-8", 0, 77],  # 69
-        ["4", 1.5, "9-2", 3, 72],  # 67
-        ["5", 1.75, "9-10", 0, 76],  # 66
-        ["6", 3.25, "9-10", 0, 69],  # 59
+        ["1", -0.5, "9-7", 0, 78],  # -55
+        ["2", 0.5, "9-6", 0, 77],  # -55
+        ["3", 1.0, "9-8", 0, 77],  # -57
+        ["4", 1.5, "9-2", 3, 72],  # -59
+        ["5", 1.75, "9-10", 0, 76],  # -60
+        ["6", 3.25, "9-10", 0, 69],  # -67
     ]
     return [
         mocker.patch(
@@ -153,6 +153,17 @@ def test_check_race_complete_with_mixed_divs_with_potentially_conflicting_non_eq
     race, div_one_runners, div_two_runners
 ):
     runners = [*div_one_runners[:4], div_two_runners[3], div_two_runners[5]]
+    actual = check_race_complete(race, runners)
+
+    assert len(runners) == 6
+    assert actual["complete"] == []
+    assert actual["todo"] == runners
+
+
+def test_check_race_complete_when_exact_number_of_runners_but_mixed_divs_which_would_fit(
+    race, div_one_runners, div_two_runners
+):
+    runners = [*div_one_runners[:3], *div_two_runners[3:]]
     actual = check_race_complete(race, runners)
 
     assert len(runners) == 6
