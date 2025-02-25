@@ -14,12 +14,12 @@ def race(mocker):
 def div_one_runners(mocker):
     # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
     data = [
-        ["1", -0.2, "9-10", 0, 80],  # -56
-        ["2", 0.2, "9-7", 0, 74],  # -59
+        ["1", -0.3, "9-10", 0, 80],  # -56
+        ["2", 0.3, "9-7", 0, 74],  # -59
         ["3", 0.8, "9-12", 0, 77],  # -61
         ["4", 1.5, "8-11", 3, 62],  # -64
         ["5", 1.75, "10-2", 0, 78],  # -64
-        ["6", 2.75, "9-8", 5, 71],  # -63
+        ["6", 2.75, "9-8", 5, 71],  # -68
     ]
     return [
         mocker.patch(
@@ -92,7 +92,8 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some
 ):
     div_one_runners[3].position = "=4"
     div_one_runners[4].position = "=4"
-    div_one_runners[4].beaten_distance = 1.5
+    div_one_runners[4].beaten_distance = div_one_runners[3].beaten_distance
+    div_one_runners[5].form_rating -= 1
 
     runners = div_one_runners
     actual = check_race_complete(race, runners)
@@ -107,7 +108,8 @@ def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_and_so
     div_one_runners[0].position = "7"
     div_one_runners[3].position = "=4"
     div_one_runners[4].position = "=4"
-    div_one_runners[4].beaten_distance = 1.5
+    div_one_runners[4].beaten_distance = div_one_runners[3].beaten_distance
+    div_one_runners[5].form_rating -= 1
 
     runners = div_one_runners
     actual = check_race_complete(race, runners)

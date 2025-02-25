@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import combinations, pairwise
 from typing import Literal, TypeAlias
 
 from compytition import RankList
@@ -51,6 +51,27 @@ def check_race_complete(
             for runner in finishers
         ]
         if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+            continue
+
+        # Check if the implied lbs per length of this combo would fit
+        rtg_dist_pairs = [
+            (r, d)
+            for r, d in zip(
+                adjusted_ratings,
+                [max(0, r.beaten_distance) for r in finishers],
+            )
+            if d is not None
+        ]
+        ratios = [
+            (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
+            for a, b in pairwise(rtg_dist_pairs)
+        ]
+        print(ratios)
+        non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
+        print(non_zero_non_win_ratios)
+        if ratios and not all(
+            abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
+        ):
             continue
 
         return {
