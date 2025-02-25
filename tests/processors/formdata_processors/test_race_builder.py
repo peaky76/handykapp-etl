@@ -160,10 +160,21 @@ def test_check_race_complete_with_mixed_divs_with_potentially_conflicting_non_eq
     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_exact_number_of_runners_but_mixed_divs_which_would_fit(
+def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_but_not_ratings(
     race, div_one_runners, div_two_runners
 ):
     runners = [*div_one_runners[:3], *div_two_runners[3:]]
+    actual = check_race_complete(race, runners)
+
+    assert len(runners) == 6
+    assert actual["complete"] == []
+    assert actual["todo"] == runners
+
+
+def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_and_ratings(
+    race, div_one_runners, div_two_runners
+):
+    runners = [*div_one_runners[:5], div_two_runners[5]]
     actual = check_race_complete(race, runners)
 
     assert len(runners) == 6
