@@ -39,7 +39,7 @@ def check_race_complete(
         if len(non_equal_positions) != len(set(non_equal_positions)):
             continue
 
-        # Check if this combo form a proper ranking order
+        # Check if this combo forms a proper ranking order
         try:
             RankList(runner.position for runner in finishers)
         except ValueError:
