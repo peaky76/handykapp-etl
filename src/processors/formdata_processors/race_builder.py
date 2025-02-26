@@ -88,6 +88,7 @@ def check_race_complete(
 def race_builder():
     logger = get_run_logger()
     race_dict: dict[FormdataRace, list[FormdataRunner]] = {}
+    race_count = 0
 
     r = record_processor()
     next(r)
@@ -134,6 +135,7 @@ def race_builder():
 
                 if len(complete := check_result["complete"]):
                     r.send(complete)
+                    race_count += 1
 
                 race_dict[race] = check_result["todo"]
 
@@ -141,7 +143,10 @@ def race_builder():
                     del race_dict[race]
 
     except GeneratorExit:
-        # logger.info(
-        #     f"Finished transforming {transform_count} races, rejected {reject_count}"
-        # )
+        logger.info(f"Built {race_count} races")
+        for race, runners in race_dict.items():
+            logger.info(f"\nRace: {race.course} {race.date}")
+            logger.info(f"Runners ({len(runners)}/{race.number_of_runners}):")
+            for runner in runners:
+                logger.info(f"  {runner.name} ({runner.position})")
         r.close()
