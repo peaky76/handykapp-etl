@@ -125,10 +125,9 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non
 
 # Multiple races
 def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_non_completion(
-    race, div_one_runners
+    race, div_one_runners, non_finisher
 ):
-    div_one_runners[3].position = "P"
-    runners = div_one_runners
+    runners = [*div_one_runners[:3], non_finisher, *div_one_runners[4:]]
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == []
@@ -202,10 +201,9 @@ def test_check_race_complete_when_extra_runners_but_one_complete_div(
 
 
 def test_check_race_complete_when_indeterminate_non_finisher(
-    race, div_one_runners, div_two_runners
+    race, div_one_runners, div_two_runners, non_finisher
 ):
-    div_one_runners[5].position = "P"
-    runners = [*div_two_runners[:5], *div_one_runners[:5], div_one_runners[5]]
+    runners = [*div_two_runners[:5], *div_one_runners[:5], non_finisher]
     actual = check_race_complete(race, runners)
 
     assert len(runners) == 11
