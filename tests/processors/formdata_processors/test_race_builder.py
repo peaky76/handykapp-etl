@@ -54,9 +54,8 @@ def div_two_runners(mocker):
 
 
 @pytest.fixture
-def runners_with_non_finisher(mocker, div_one_runners):
-    non_finisher = build_mock_runner(mocker, "P", 0, "9-10", 0, 80)
-    return [*div_one_runners[:5], non_finisher]
+def non_finisher(mocker):
+    return build_mock_runner(mocker, "P", 0, "9-10", 0, None)
 
 
 @pytest.fixture
@@ -115,9 +114,9 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non_completion(
-    race, runners_with_invalid_rank
+    race, div_one_runners, non_finisher
 ):
-    runners = runners_with_invalid_rank
+    runners = [*div_one_runners[:5], non_finisher]
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
