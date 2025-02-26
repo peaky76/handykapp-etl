@@ -2,6 +2,26 @@ import pytest
 
 from processors.formdata_processors.race_builder import check_race_complete
 
+# Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
+BEV_DIV_ONE_DATA = [
+    ["1", -0.3, "9-10", 0, 80],  # -56
+    ["2", 0.3, "9-7", 0, 74],  # -59
+    ["3", 0.8, "9-12", 0, 77],  # -61
+    ["4", 1.5, "8-11", 3, 62],  # -64
+    ["5", 1.75, "10-2", 0, 78],  # -64
+    ["6", 2.75, "9-8", 5, 71],  # -68
+]
+
+# Based on https://www.racingpost.com/results/6/beverley/2024-08-31/876000
+BEV_DIV_TWO_DATA = [
+    ["1", -0.5, "9-7", 0, 78],  # -55
+    ["2", 0.5, "9-6", 0, 77],  # -55
+    ["3", 1.0, "9-8", 0, 77],  # -57
+    ["4", 1.5, "9-2", 3, 72],  # -59
+    ["5", 1.75, "9-10", 0, 76],  # -60
+    ["6", 3.25, "9-10", 0, 69],  # -67
+]
+
 
 def build_mock_runner(
     mocker, position, beaten_distance, weight, allowance, form_rating
@@ -25,30 +45,12 @@ def race(mocker):
 
 @pytest.fixture
 def div_one_runners(mocker):
-    # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
-    data = [
-        ["1", -0.3, "9-10", 0, 80],  # -56
-        ["2", 0.3, "9-7", 0, 74],  # -59
-        ["3", 0.8, "9-12", 0, 77],  # -61
-        ["4", 1.5, "8-11", 3, 62],  # -64
-        ["5", 1.75, "10-2", 0, 78],  # -64
-        ["6", 2.75, "9-8", 5, 71],  # -68
-    ]
-    return [build_mock_runner(mocker, *datum) for datum in data]
+    return [build_mock_runner(mocker, *datum) for datum in BEV_DIV_ONE_DATA]
 
 
 @pytest.fixture
 def div_two_runners(mocker):
-    # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/876000
-    data = [
-        ["1", -0.5, "9-7", 0, 78],  # -55
-        ["2", 0.5, "9-6", 0, 77],  # -55
-        ["3", 1.0, "9-8", 0, 77],  # -57
-        ["4", 1.5, "9-2", 3, 72],  # -59
-        ["5", 1.75, "9-10", 0, 76],  # -60
-        ["6", 3.25, "9-10", 0, 69],  # -67
-    ]
-    return [build_mock_runner(mocker, *datum) for datum in data]
+    return [build_mock_runner(mocker, *datum) for datum in BEV_DIV_TWO_DATA]
 
 
 def test_check_race_complete_when_not_enough_runners(race):
