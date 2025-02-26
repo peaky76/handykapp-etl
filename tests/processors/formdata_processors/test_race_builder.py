@@ -208,4 +208,4 @@ def test_check_race_complete_when_indeterminate_non_finisher(
 
     assert len(runners) == 11
     assert actual["complete"] == []
-    assert actual["todo"] == [div_two_runners, div_one_runners]
+    assert actual["todo"] == runners

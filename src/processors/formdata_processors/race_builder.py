@@ -66,12 +66,15 @@ def check_race_complete(
             (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
             for a, b in pairwise(rtg_dist_pairs)
         ]
-        print(ratios)
+
         non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-        print(non_zero_non_win_ratios)
         if ratios and not all(
             abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
         ):
+            continue
+
+        # Check if any non-finishers may possibly be from another race:
+        if len(finishers) != len(combo) and len(runners) != len(combo):
             continue
 
         return {
