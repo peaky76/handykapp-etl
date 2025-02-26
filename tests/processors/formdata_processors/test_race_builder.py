@@ -3,6 +3,19 @@ import pytest
 from processors.formdata_processors.race_builder import check_race_complete
 
 
+def build_mock_runner(
+    mocker, position, beaten_distance, weight, allowance, form_rating
+):
+    return mocker.patch(
+        "models.FormdataRunner",
+        position=position,
+        beaten_distance=beaten_distance,
+        weight=weight,
+        allowance=allowance,
+        form_rating=form_rating,
+    )
+
+
 @pytest.fixture
 def race(mocker):
     race = mocker.patch("models.FormdataRace")
@@ -21,17 +34,7 @@ def div_one_runners(mocker):
         ["5", 1.75, "10-2", 0, 78],  # -64
         ["6", 2.75, "9-8", 5, 71],  # -68
     ]
-    return [
-        mocker.patch(
-            "models.FormdataRunner",
-            position=datum[0],
-            beaten_distance=datum[1],
-            weight=datum[2],
-            allowance=datum[3],
-            form_rating=datum[4],
-        )
-        for datum in data
-    ]
+    return [build_mock_runner(mocker, *datum) for datum in data]
 
 
 @pytest.fixture
@@ -45,17 +48,7 @@ def div_two_runners(mocker):
         ["5", 1.75, "9-10", 0, 76],  # -60
         ["6", 3.25, "9-10", 0, 69],  # -67
     ]
-    return [
-        mocker.patch(
-            "models.FormdataRunner",
-            position=datum[0],
-            beaten_distance=datum[1],
-            weight=datum[2],
-            allowance=datum[3],
-            form_rating=datum[4],
-        )
-        for datum in data
-    ]
+    return [build_mock_runner(mocker, *datum) for datum in data]
 
 
 def test_check_race_complete_when_not_enough_runners(race):
