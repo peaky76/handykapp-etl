@@ -53,6 +53,29 @@ def div_two_runners(mocker):
     return [build_mock_runner(mocker, *datum) for datum in BEV_DIV_TWO_DATA]
 
 
+@pytest.fixture
+def runners_with_non_finisher(mocker, div_one_runners):
+    non_finisher = build_mock_runner(mocker, "P", 0, "9-10", 0, 80)
+    return [*div_one_runners[:5], non_finisher]
+
+
+@pytest.fixture
+def runners_with_equal_positions(mocker, div_one_runners):
+    tied_fourth_one = build_mock_runner(mocker, *BEV_DIV_ONE_DATA[3])
+    tied_fourth_one.position = "=4"
+    tied_fourth_two = build_mock_runner(mocker, "=4", 1.5, "10-2", 0, 78)
+    sixth = build_mock_runner(mocker, *BEV_DIV_ONE_DATA[5])
+    sixth.beaten_distance -= 0.25
+    return [*div_one_runners[:3], tied_fourth_one, tied_fourth_two, sixth]
+
+
+@pytest.fixture
+def runners_with_invalid_rank(mocker, div_one_runners):
+    seventh = build_mock_runner(mocker, "7", 0, "9-10", 0, 80)
+    return [*div_one_runners[:5], seventh]
+
+
+# Single races
 def test_check_race_complete_when_not_enough_runners(race):
     runners = []
     actual = check_race_complete(race, runners)
@@ -72,10 +95,9 @@ def test_check_race_complete_when_exact_number_of_runners_in_valid_rank(
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(
-    race, div_one_runners
+    race, runners_with_invalid_rank
 ):
-    div_one_runners[0].position = "7"
-    runners = div_one_runners
+    runners = runners_with_invalid_rank
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == []
@@ -83,47 +105,26 @@ def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some_equal(
-    race, div_one_runners
+    race, runners_with_equal_positions
 ):
-    div_one_runners[3].position = "=4"
-    div_one_runners[4].position = "=4"
-    div_one_runners[4].beaten_distance = div_one_runners[3].beaten_distance
-    div_one_runners[5].form_rating -= 1
-
-    runners = div_one_runners
+    runners = runners_with_equal_positions
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
     assert actual["todo"] == []
-
-
-def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_and_some_equal(
-    race, div_one_runners
-):
-    div_one_runners[0].position = "7"
-    div_one_runners[3].position = "=4"
-    div_one_runners[4].position = "=4"
-    div_one_runners[4].beaten_distance = div_one_runners[3].beaten_distance
-    div_one_runners[5].form_rating -= 1
-
-    runners = div_one_runners
-    actual = check_race_complete(race, runners)
-
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
 
 
 def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non_completion(
-    race, div_one_runners
+    race, runners_with_invalid_rank
 ):
-    div_one_runners[5].position = "P"
-    runners = div_one_runners
+    runners = runners_with_invalid_rank
     actual = check_race_complete(race, runners)
 
     assert actual["complete"] == runners
     assert actual["todo"] == []
 
 
+# Multiple races
 def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_non_completion(
     race, div_one_runners
 ):
