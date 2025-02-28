@@ -17,6 +17,10 @@ def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
 
 
+def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> dict:
+    return race.model_dump() | {"runners": [runner.model_dump() for runner in runners]}
+
+
 def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
@@ -134,7 +138,16 @@ def race_builder():
                 check_result = check_race_complete(race, race_dict[race])
 
                 if len(complete := check_result["complete"]):
-                    r.send(complete)
+                    record = build_record(race, complete)
+                    r.send(
+                        (
+                            record,
+                            lambda x: True,
+                            lambda x: x,
+                            "formdata",
+                            "racing_research",
+                        )
+                    )
                     race_count += 1
 
                 race_dict[race] = check_result["todo"]
@@ -142,7 +155,16 @@ def race_builder():
                 check_result = check_race_complete(race, race_dict[race])
 
                 if len(complete := check_result["complete"]):
-                    r.send(complete)
+                    record = build_record(race, complete)
+                    r.send(
+                        (
+                            record,
+                            lambda x: True,
+                            lambda x: x,
+                            "formdata",
+                            "racing_research",
+                        )
+                    )
                     race_count += 1
 
                 if len(race_dict) == 0:
