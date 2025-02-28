@@ -1,6 +1,8 @@
 import pendulum
 from horsetalk import RacingCode
+import petl
 
+from models import FormdataRunner
 from transformers.formdata_transformer import (
     extract_dist_going,
     extract_middle_details,
@@ -11,7 +13,7 @@ from transformers.formdata_transformer import (
     get_formdatas,
     is_horse,
     is_race_date,
-    transform_horse_data,
+    transform_horse,
 )
 
 FORMDATA_FETCH = "transformers.formdata_transformer.get_files"
@@ -277,41 +279,23 @@ def test_is_race_date_false_with_non_date():
     assert not is_race_date("JMitchell")
 
 
-def test_transform_horse_data():
-    data = [
-        {
-            "name": "AADDEEY",
-            "country": "GB",
-            "year": 2018,
-            "trainer": "D B O'Meara",
-            "trainer_form": "F2",
-            "prize_money": "£2000",
-            "runs": [
-                {
-                    "date": "2020-06-04",
-                    "type": "3G3",
-                    "win_prize": "21",
-                    "course": "Ncl",
-                    "number_of_runners": "13",
-                    "weight": "9-5",
-                    "headgear": None,
-                    "allowance": 0,
-                    "jockey": "SDeSousa",
-                    "position": "8",
-                    "beaten_distance": 6.5,
-                    "time_rating": 76,
-                    "distance": 6,
-                    "going": "g",
-                    "form_rating": 99,
-                }
-            ],
-        }
-    ]
+def test_transform_horse():
+    data = {
+        "name": "AADDEEY",
+        "country": "GB",
+        "year": 2018,
+        "weight": "10-0",
+        "jockey": "D Tudhope",
+        "position": "3",
+        "beaten_distance": "2",
+        "time_rating": 80,
+        "form_rating": 80,
+    }
     expected = {
-        "name": "AADDEEY (GB)",
-        "prize_money": "£2000",
-        "trainer": "D B O'Meara",
+        "name": "AADDEEY",
+        "country": "GB",
         "year": 2018,
     }
 
-    assert next(iter(transform_horse_data.fn(data))) == expected
+    actual = transform_horse(petl.fromdicts([data]))
+    assert actual == expected

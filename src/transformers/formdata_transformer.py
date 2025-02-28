@@ -11,14 +11,10 @@ import petl  # type: ignore
 import tomllib
 from horsetalk import RacingCode  # type: ignore
 from peak_utility.names.corrections import eirify
-from prefect import get_run_logger, task
+from prefect import get_run_logger
 
 from helpers import get_files
-from models import (
-    FormdataHorse,
-    FormdataRun,
-    MongoHorse,
-)
+from models import FormdataHorse, FormdataRun, FormdataRunner, MongoHorse, MongoRace
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -312,16 +308,8 @@ def is_race_date(string: str) -> bool:
     return bool(re.match(date_regex, string))
 
 
-@task(tags=["Racing Research"])
-def transform_horse_data(data: dict) -> list[MongoHorse]:
-    used_fields = ("name", "country", "year", "trainer", "prize_money")
-    return (
-        petl.fromdicts(data)
-        .cut(used_fields)
-        .convert("name", lambda x, row: f"{x} ({row.country})", pass_row=True)
-        .cutout("country")
-        .dicts()
-    )
+def transform_horse(data) -> MongoHorse:
+    return petl.cut(data, ("name", "country", "year")).dicts()[0]
 
 
 if __name__ == "__main__":
