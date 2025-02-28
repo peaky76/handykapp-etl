@@ -139,6 +139,12 @@ def race_builder():
 
                 race_dict[race] = check_result["todo"]
 
+                check_result = check_race_complete(race, race_dict[race])
+
+                if len(complete := check_result["complete"]):
+                    r.send(complete)
+                    race_count += 1
+
                 if len(race_dict) == 0:
                     del race_dict[race]
 
