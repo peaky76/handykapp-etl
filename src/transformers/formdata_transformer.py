@@ -312,22 +312,6 @@ def is_race_date(string: str) -> bool:
     return bool(re.match(date_regex, string))
 
 
-def formdata_horse_processor():
-    try:
-        while True:
-            horse, date = yield
-            logger = get_run_logger()
-            logger.info(f"Processing {horse.name}")
-
-            # try:
-            #     db.horses.insert_one(horse.dict())
-            # except DuplicateKeyError:
-            #     logger.info(f"Duplicate key for {horse.name}")
-
-    except GeneratorExit:
-        logger.info("Finished processing")
-
-
 @task(tags=["Racing Research"])
 def transform_horse_data(data: dict) -> list[MongoHorse]:
     used_fields = ("name", "country", "year", "trainer", "prize_money")
