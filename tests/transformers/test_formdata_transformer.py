@@ -1,10 +1,10 @@
 import pendulum
-from horsetalk import RacingCode
 import petl
+from horsetalk import RacingCode
 
-from models import FormdataRunner
 from transformers.formdata_transformer import (
     extract_dist_going,
+    extract_grade,
     extract_middle_details,
     extract_prize,
     extract_rating,
@@ -46,6 +46,18 @@ def test_extract_dist_going_for_aw_going():
 
 def test_extract_dist_going_for_decimal_dist():
     assert extract_dist_going("9.1G") == (float("9.1"), "G")
+
+
+def test_extract_grade_with_prefix():
+    assert extract_grade("2CG1") == "G1"
+
+
+def test_extract_grade_with_suffix():
+    assert extract_grade("G1h") == "G1"
+
+
+def test_extract_grade_where_no_grade():
+    assert extract_grade("2C") is None
 
 
 def test_extract_middle_details_when_jockey_and_single_digit_position():

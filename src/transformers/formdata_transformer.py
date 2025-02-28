@@ -9,7 +9,7 @@ import re
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import RacingCode  # type: ignore
+from horsetalk import AgeRestriction, Going, JumpCategory, RaceDistance, RacingCode  # type: ignore
 from peak_utility.names.corrections import eirify
 from prefect import get_run_logger
 
@@ -184,6 +184,17 @@ def extract_dist_going(string: str) -> tuple[float, str] | None:
         return (float(dist), going)
 
     return None
+
+
+def extract_grade(race_type: str) -> str | None:
+    pattern = r"""
+        G           # Literal 'G'
+        [123]       # Single digit 1, 2, or 3
+        (?![0-9])   # Not followed by another digit
+    """
+
+    match = re.search(pattern, race_type, re.VERBOSE)
+    return match.group(0) if match else None
 
 
 def extract_middle_details(details: str) -> dict | None:
