@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from models import MongoHorse
+from models import MongoRunner
 
 from .py_object_id import PyObjectId
 
@@ -27,4 +27,4 @@ class MongoRace(BaseModel):
     rating_restriction: Optional[MongoRaceRestriction] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
-    runners: list[MongoHorse] = []
+    runners: list[MongoRunner] = []
