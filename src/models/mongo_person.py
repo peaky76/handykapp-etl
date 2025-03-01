@@ -2,7 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from models import MongoReferences, PyObjectId
+from .mongo_references import MongoReferences
+from .py_object_id import PyObjectId
 
 
 class MongoPerson(BaseModel):

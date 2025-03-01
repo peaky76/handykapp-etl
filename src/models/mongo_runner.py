@@ -3,7 +3,7 @@ from typing import Optional
 from pendulum import Duration
 from pydantic import BaseModel
 
-from models.py_object_id import PyObjectId
+from .py_object_id import PyObjectId
 
 
 class MongoRunner(BaseModel):

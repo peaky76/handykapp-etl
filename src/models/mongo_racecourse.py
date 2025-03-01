@@ -3,8 +3,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 from models.mongo_references import MongoReferences
-
-from .py_object_id import PyObjectId
+from models.py_object_id import PyObjectId
 
 CodeType = Literal["Flat", "NH"]
 SurfaceType = Literal["Turf", "Dirt", "Fibresand", "Polytrack", "Tapeta"]
