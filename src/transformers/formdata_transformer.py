@@ -348,7 +348,8 @@ def transform_races(data) -> MongoRace:
         .convert(
             {
                 "distance_description": lambda x: RaceDistance(furlong=x),
-                "going_description": lambda x: Going[x],
+                "going_description": lambda x: Going[x],  # type: ignore
+                "age": int,
             }
         )
         .addfield(
@@ -358,9 +359,9 @@ def transform_races(data) -> MongoRace:
         )
         .addfield(
             "obstacle",
-            lambda rec: JumpCategory["h"]
+            lambda rec: JumpCategory["h"]  # type: ignore
             if "h" in rec["race_type"]
-            else JumpCategory["c"]
+            else JumpCategory["c"]  # type: ignore
             if "c" in rec["race_type"]
             else None,
         )
