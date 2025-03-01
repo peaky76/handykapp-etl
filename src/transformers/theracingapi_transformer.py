@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from models import MongoHorse, MongoRace
+from models import MongoRace, MongoRunner
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -46,7 +46,7 @@ def build_datetime(date_str: str, time_str: str) -> str:
     ).isoformat()
 
 
-def transform_horse(data, race_date=pendulum.now()) -> MongoHorse:
+def transform_horse(data, race_date=pendulum.now()) -> MongoRunner:
     return (
         petl.rename(
             data,
