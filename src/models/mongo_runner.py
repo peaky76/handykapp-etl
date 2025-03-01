@@ -1,7 +1,7 @@
 from typing import Optional
 
-from pendulum import Duration
 from pydantic import BaseModel
+from pydantic_extra_types.pendulum_dt import Duration
 
 from .py_object_id import PyObjectId
 
