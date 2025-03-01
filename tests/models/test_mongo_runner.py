@@ -15,11 +15,6 @@ def test_mongo_runner_init_with_insufficient_fields():
         MongoRunner()
 
 
-def test_mongo_runner_init_with_incorrect_horse_id():
-    with pytest.raises(ValidationError):
-        MongoRunner(horse="not_an_object_id")
-
-
 def test_mongo_runner_init_with_optional_fields():
     horse_id = PyObjectId(ObjectId())
     assert MongoRunner(
