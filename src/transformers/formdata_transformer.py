@@ -149,6 +149,9 @@ def create_run(words: list[str]) -> FormdataRun | None:
 
         (dist, going) = extract_dist_going(words[-2]) or (None, None)
 
+        if not dist or not going:
+            raise ValueError("Insufficient detail in distance or going")
+
         run = FormdataRun(
             date=pendulum.from_format(words[0], "DDMMMYY").date().format("YYYY-MM-DD"),
             race_type=words[1],
