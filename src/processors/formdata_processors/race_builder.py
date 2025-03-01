@@ -62,7 +62,10 @@ def check_race_complete(
             (r, d)
             for r, d in zip(
                 adjusted_ratings,
-                [max(0, r.beaten_distance) for r in finishers],
+                [
+                    max(0, r.beaten_distance) if r.beaten_distance else None
+                    for r in finishers
+                ],
             )
             if d is not None
         ]
