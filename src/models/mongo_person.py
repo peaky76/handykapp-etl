@@ -1,11 +1,12 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from models.mongo_references import MongoReferences
+from models import MongoReferences, PyObjectId
 
 
 class MongoPerson(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     title: Optional[str] = None
     first: Optional[str] = None
     middle: Optional[str] = None
