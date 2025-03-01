@@ -7,6 +7,7 @@ from .mongo_person import MongoPerson
 from .mongo_race import MongoRace
 from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
+from .mongo_runner import MongoRunner
 from .py_object_id import PyObjectId
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "MongoRace",
     "MongoRacecourse",
     "MongoReferences",
+    "MongoRunner",
     "PyObjectId",
 ]
