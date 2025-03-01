@@ -3,8 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from models import MongoRunner
-
+from .mongo_runner import MongoRunner
 from .py_object_id import PyObjectId
 
 
