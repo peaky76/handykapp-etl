@@ -9,12 +9,19 @@ import re
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import AgeRestriction, Going, JumpCategory, RaceDistance, RacingCode  # type: ignore
+from horsetalk import (
+    AgeRestriction,
+    Going,
+    JumpCategory,
+    RaceDistance,
+    RaceGrade,
+    RacingCode,
+)  # type: ignore
 from peak_utility.names.corrections import eirify
 from prefect import get_run_logger
 
 from helpers import get_files
-from models import FormdataHorse, FormdataRun, FormdataRunner, MongoHorse, MongoRace
+from models import FormdataHorse, FormdataRun, MongoHorse, MongoRace
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -321,6 +328,58 @@ def is_race_date(string: str) -> bool:
 
 def transform_horse(data) -> MongoHorse:
     return petl.cut(data, ("name", "country", "year")).dicts()[0]
+
+
+def transform_races(data) -> MongoRace:
+    return (
+        petl.rename(
+            data,
+            {
+                "course": "racecourse",
+                "date": "datetime",
+                "distance": "distance_description",
+                "going": "going_description",
+                "win_prize": "prize",
+            },
+        )
+        .convert(
+            {
+                "distance_description": lambda x: RaceDistance(furlong=x),
+                "going_description": lambda x: Going[x],
+            }
+        )
+        .addfield(
+            "is_handicap",
+            lambda rec: "H" in rec["race_type"],
+            index=4,
+        )
+        .addfield(
+            "obstacle",
+            lambda rec: JumpCategory["h"]
+            if "h" in rec["race_type"]
+            else JumpCategory["c"]
+            if "c" in rec["race_type"]
+            else None,
+        )
+        .addfield(
+            "age_restriction",
+            lambda rec: AgeRestriction("2yo")
+            if "2" in rec["race_type"] and "G2" not in rec["race_type"]
+            else AgeRestriction("3yo")
+            if "3" in rec["race_type"] and "G3" not in rec["race_type"]
+            else AgeRestriction("4yo")
+            if "4" in rec["race_type"]
+            else None,
+        )
+        .addfield(
+            "race_grade",
+            lambda rec: str(RaceGrade(extract_grade(rec["race_type"]))),
+            index=5,
+        )
+        .convert("runners", lambda x: [transform_horse(petl.fromdicts([h])) for h in x])
+        .cutout("number_of_runners", "race_type")
+        .dicts()
+    )
 
 
 if __name__ == "__main__":
