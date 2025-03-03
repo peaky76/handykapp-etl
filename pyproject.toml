@@ -30,7 +30,7 @@ pytest-cov = "^6.0.0"
 pytest-mock = "^3.14.0"
 radon = "^6.0.1"
 ruff = "^0.9.9"
-types-requests = "^2.32.0.20241016"
+types-requests = "^2.32.0.20250301"
 
 [tool.mypy]
 ignore_missing_imports = true
