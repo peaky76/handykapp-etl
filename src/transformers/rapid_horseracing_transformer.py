@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import AWGoingDescription, HorseAge, RaceWeight  # type: ignore
+from horsetalk import AWGoingDescription, HorseAge, Horselength, RaceWeight  # type: ignore
 
 from transformers.parsers import (
     parse_code,
@@ -43,6 +43,7 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None) -> Mong
                 "last_ran_days_ago": "days_since_prev_run",
                 "number": "saddlecloth",
                 "OR": "official_rating",
+                "distance_beaten": "beaten_distance",
             },
         )
         .convert(
@@ -67,6 +68,7 @@ def transform_horse(data, race_date=pendulum.now(), finishing_time=None) -> Mong
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
+        .convert("beaten_distance", lambda x: Horselength(x))
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["position"] == 1 else None,
