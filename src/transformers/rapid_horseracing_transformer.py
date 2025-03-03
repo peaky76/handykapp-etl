@@ -4,14 +4,19 @@ from enum import Enum
 from pathlib import Path
 from typing import cast
 
-from models import MongoRace, MongoRunner
+from models import MongoRace, PreMongoRunner
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import AWGoingDescription, HorseAge, Horselength, RaceWeight  # type: ignore
+from horsetalk import (  # type: ignore
+    AWGoingDescription,
+    HorseAge,
+    Horselength,
+    RaceWeight,
+)
 
 from transformers.parsers import (
     parse_code,
@@ -33,7 +38,9 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
-def transform_horse(data, race_date=pendulum.now(), finishing_time=None) -> MongoRunner:
+def transform_horse(
+    data, race_date=pendulum.now(), finishing_time=None
+) -> PreMongoRunner:
     return (
         petl.rename(
             data,
