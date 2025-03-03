@@ -403,5 +403,9 @@ def transform_races(data) -> MongoRace:
     )
 
 
+def validate_races(_data):
+    return True
+
+
 if __name__ == "__main__":
     print("Cannot run formdata_transformer.py as a script.")

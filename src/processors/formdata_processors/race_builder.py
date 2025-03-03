@@ -7,6 +7,7 @@ from prefect import get_run_logger
 
 from models import FormdataRace, FormdataRunner
 from processors import record_processor
+from transformers.formdata_transformer import transform_races, validate_races
 
 RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
@@ -145,8 +146,8 @@ def race_builder():
                     r.send(
                         (
                             record,
-                            lambda x: True,
-                            lambda x: x,
+                            validate_races,
+                            transform_races,
                             "formdata",
                             "racing_research",
                         )
@@ -162,8 +163,8 @@ def race_builder():
                     r.send(
                         (
                             record,
-                            lambda x: True,
-                            lambda x: x,
+                            validate_races,
+                            transform_races,
                             "formdata",
                             "racing_research",
                         )
