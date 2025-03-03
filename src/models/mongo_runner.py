@@ -18,5 +18,5 @@ class MongoRunner(BaseModel):
     trainer: Optional[PyObjectId] = None
     jockey: Optional[PyObjectId] = None
     position: Optional[str] = None
-    beaten_distance: Optional[str] = None
+    beaten_distance: Optional[float] = None
     time: Optional[Duration] = None
