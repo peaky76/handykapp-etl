@@ -9,3 +9,18 @@ class FormdataRace(BaseModel):
     number_of_runners: int
     distance: float
     going: str
+
+    model_config = {"frozen": True}
+
+    def __hash__(self):
+        return hash(
+            (
+                self.date,
+                self.race_type,
+                self.win_prize,
+                self.course,
+                self.number_of_runners,
+                self.distance,
+                self.going,
+            )
+        )
