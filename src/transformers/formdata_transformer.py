@@ -23,7 +23,7 @@ from peak_utility.names.corrections import eirify
 from prefect import get_run_logger
 
 from helpers import get_files
-from models import FormdataHorse, FormdataRun, MongoRace, MongoRunner
+from models import FormdataHorse, FormdataRun, MongoRace, PreMongoRunner
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -331,7 +331,7 @@ def is_race_date(string: str) -> bool:
     return bool(re.match(date_regex, string))
 
 
-def transform_horse(data) -> MongoRunner:
+def transform_horse(data) -> PreMongoRunner:
     return (
         petl.convert(
             data,

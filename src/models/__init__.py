@@ -8,6 +8,7 @@ from .mongo_race import MongoRace
 from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .mongo_runner import MongoRunner
+from .pre_mongo_runner import PreMongoRunner
 from .py_object_id import PyObjectId
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "MongoRacecourse",
     "MongoReferences",
     "MongoRunner",
+    "PreMongoRunner",
     "PyObjectId",
 ]
