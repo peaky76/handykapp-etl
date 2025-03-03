@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -18,5 +19,5 @@ class MongoRunner(BaseModel):
     trainer: Optional[PyObjectId] = None
     jockey: Optional[PyObjectId] = None
     position: Optional[str] = None
-    beaten_distance: Optional[float] = None
+    beaten_distance: Optional[Decimal] = None
     time: Optional[Duration] = None
