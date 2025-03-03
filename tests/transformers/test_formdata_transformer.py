@@ -307,6 +307,10 @@ def test_transform_horse():
         "name": "AADDEEY",
         "country": "GB",
         "year": 2018,
+        "jockey": "D Tudhope",
+        "lbs_carried": 140,
+        "position": "3",
+        "beaten_distance": "2",
     }
 
     actual = transform_horse(petl.fromdicts([data]))
