@@ -15,6 +15,7 @@ from horsetalk import (
     JumpCategory,
     RaceDistance,
     RaceGrade,
+    RaceWeight,
     RacingCode,
 )  # type: ignore
 from peak_utility.names.corrections import eirify
@@ -330,7 +331,21 @@ def is_race_date(string: str) -> bool:
 
 
 def transform_horse(data) -> MongoRunner:
-    return petl.cut(data, ("name", "country", "year")).dicts()[0]
+    return (
+        petl.convert(
+            data,
+            {
+                "weight": lambda x: RaceWeight(x).lb,
+            },
+        )
+        .rename(
+            {
+                "weight": "lbs_carried",
+            }
+        )
+        .cutout("time_rating", "form_rating")
+        .dicts()[0]
+    )
 
 
 def transform_races(data) -> MongoRace:
