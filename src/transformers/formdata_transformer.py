@@ -12,6 +12,7 @@ import tomllib
 from horsetalk import (
     AgeRestriction,
     Going,
+    Horselength,
     JumpCategory,
     RaceDistance,
     RaceGrade,
@@ -336,6 +337,7 @@ def transform_horse(data) -> MongoRunner:
             data,
             {
                 "weight": lambda x: RaceWeight(x).lb,
+                "beaten_distance": lambda x: Horselength(x) if x else None,
             },
         )
         .rename(
