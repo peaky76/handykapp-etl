@@ -13,6 +13,17 @@ db = client.handykapp
 
 
 @cache
+def rr_code_to_course_dict():
+    source = db.racecourses.find(
+        projection={"_id": 2, "references": {"racing_research": 1}}
+    )
+    return {
+        racecourse["references"]["racing_research"]: racecourse["_id"]
+        for racecourse in source
+    }
+
+
+@cache
 def get_racecourse_id(course, surface, code, obstacle) -> str | None:
     surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
@@ -24,7 +35,14 @@ def get_racecourse_id(course, surface, code, obstacle) -> str | None:
         },
         {"_id": 1},
     )
-    return racecourse["_id"] if racecourse else None
+
+    return (
+        racecourse["_id"]
+        if racecourse
+        else rr
+        if (rr := rr_code_to_course_dict()[course])
+        else None
+    )
 
 
 def make_update_dictionary(race, racecourse_id) -> MongoRace:
