@@ -14,6 +14,7 @@ from transformers.formdata_transformer import (
     is_horse,
     is_race_date,
     transform_horse,
+    transform_races,
 )
 
 FORMDATA_FETCH = "transformers.formdata_transformer.get_files"
@@ -291,7 +292,7 @@ def test_is_race_date_false_with_non_date():
     assert not is_race_date("JMitchell")
 
 
-def test_transform_horse():
+def test_transform_horse_returns_correct_output():
     data = {
         "name": "AADDEEY",
         "country": "GB",
@@ -314,4 +315,35 @@ def test_transform_horse():
     }
 
     actual = transform_horse(petl.fromdicts([data]))
+    assert actual == expected
+
+
+def test_transform_races_returns_correct_output(mocker):
+    data = {
+        "date": "2024-06-01",
+        "race_type": "Hc",
+        "win_prize": "5000",
+        "course": "Kel",
+        "number_of_runners": "5",
+        "distance": "24",
+        "going": "G",
+        "runners": [],
+    }
+    expected = {
+        "course": "Kel",
+        "obstacle": "Steeplechase",
+        "surface": "Turf",
+        "code": "National_Hunt",
+        "datetime": pendulum.datetime(2024, 6, 1, 0, 24, 5),
+        "title": "£5000 3m Handicap Steeplechase",
+        "is_handicap": True,
+        "age_restriction": None,
+        "race_grade": None,
+        "distance_description": "3m",
+        "prize": "5000",
+        "going_description": "Good",
+        "runners": [],
+    }
+
+    actual = transform_races(petl.fromdicts([data]))[0]
     assert actual == expected
