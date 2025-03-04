@@ -337,7 +337,7 @@ def transform_horse(data) -> PreMongoRunner:
             data,
             {
                 "weight": lambda x: RaceWeight(x).lb,
-                "beaten_distance": lambda x: Horselength(x) if x else None,
+                "beaten_distance": lambda x: str(Horselength(x)) if x else None,
             },
         )
         .rename(
