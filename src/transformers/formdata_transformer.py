@@ -355,7 +355,6 @@ def transform_races(data) -> MongoRace:
         petl.rename(
             data,
             {
-                "course": "racecourse",
                 "date": "datetime",
                 "distance": "distance_description",
                 "going": "going_description",
