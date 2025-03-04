@@ -66,7 +66,7 @@ def test_transform_horse_returns_correct_output(horse_data):
         "non_runner": False,
         "form": "1-2-3",
         "position": "1",
-        "distance_beaten": "1 1/2",
+        "beaten_distance": "1 1/2",
         "owner": "A Owner",
         "sire": "THE SIRE",
         "sire_country": "GB",

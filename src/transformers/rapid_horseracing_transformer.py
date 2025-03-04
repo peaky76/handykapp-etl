@@ -75,7 +75,7 @@ def transform_horse(
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
-        .convert("beaten_distance", lambda x: Horselength(x))
+        .convert("beaten_distance", lambda x: str(Horselength(x)) if x else None)
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["position"] == 1 else None,
