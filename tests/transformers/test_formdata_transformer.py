@@ -318,7 +318,7 @@ def test_transform_horse_returns_correct_output():
     assert actual == expected
 
 
-def test_transform_races_returns_correct_output(mocker):
+def test_transform_races_returns_correct_output():
     data = {
         "date": "2024-06-01",
         "race_type": "Hc",

@@ -11,13 +11,14 @@ import petl  # type: ignore
 import tomllib
 from horsetalk import (
     AgeRestriction,
-    Going,
+    AWGoingDescription,
     Horselength,
     JumpCategory,
     RaceDistance,
     RaceGrade,
     RaceWeight,
     RacingCode,
+    TurfGoingDescription,
 )  # type: ignore
 from peak_utility.names.corrections import eirify
 from prefect import get_run_logger
@@ -361,10 +362,28 @@ def transform_races(data) -> MongoRace:
                 "win_prize": "prize",
             },
         )
+        .addfield(
+            "surface",
+            lambda rec: "AW"
+            if rec["going_description"] == rec["going_description"].lower()
+            else "Turf",
+        )
         .convert(
             {
-                "distance_description": lambda x: RaceDistance(furlong=x),
-                "going_description": lambda x: Going[x],  # type: ignore
+                "datetime": lambda x, rec: pendulum.from_format(x, "YYYY-MM-DD")
+                + pendulum.duration(minutes=int(rec["distance_description"]))
+                + pendulum.duration(seconds=int(rec["number_of_runners"])),
+                "going_description": lambda x, rec: (
+                    AWGoingDescription[x].name.title()
+                    if rec["surface"] == "AW"
+                    else TurfGoingDescription[x].name.title()
+                ),  # type: ignore
+            },
+            pass_row=True,
+        )
+        .convert(
+            {
+                "distance_description": lambda x: str(RaceDistance(furlong=float(x))),
             }
         )
         .addfield(
@@ -373,24 +392,18 @@ def transform_races(data) -> MongoRace:
             index=4,
         )
         .addfield(
-            "surface",
-            lambda rec: "AW"
-            if (gd := rec["going_description"]) == gd.lower()
-            else "Turf",
-        )
-        .addfield(
             "obstacle",
-            lambda rec: JumpCategory["h"]  # type: ignore
+            lambda rec: JumpCategory["h"].name.title()  # type: ignore
             if "h" in rec["race_type"]
-            else JumpCategory["c"]  # type: ignore
+            else JumpCategory["c"].name.title()  # type: ignore
             if "c" in rec["race_type"]
             else None,
         )
         .addfield(
             "code",
-            lambda rec: RacingCode["NH"]
+            lambda rec: RacingCode["NH"].name.title()
             if rec["obstacle"] or "b" in rec["race_type"]
-            else RacingCode["Flat"],  # type: ignore
+            else RacingCode["Flat"].name.title(),  # type: ignore
         )
         .addfield(
             "age_restriction",
@@ -404,8 +417,13 @@ def transform_races(data) -> MongoRace:
         )
         .addfield(
             "race_grade",
-            lambda rec: str(RaceGrade(extract_grade(rec["race_type"]))),
+            lambda rec: str(RaceGrade(extract_grade(rec["race_type"]))) or None,
             index=5,
+        )
+        .addfield(
+            "title",
+            lambda rec: f"£{rec['prize']} {rec['distance_description']} {'Handicap ' if rec['is_handicap'] else ''}{rec['obstacle']}",
+            index=0,
         )
         .convert("runners", lambda x: [transform_horse(petl.fromdicts([h])) for h in x])
         .cutout("number_of_runners", "race_type")
