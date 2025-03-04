@@ -366,7 +366,6 @@ def transform_races(data) -> MongoRace:
             {
                 "distance_description": lambda x: RaceDistance(furlong=x),
                 "going_description": lambda x: Going[x],  # type: ignore
-                "age": int,
             }
         )
         .addfield(
@@ -403,8 +402,8 @@ def transform_races(data) -> MongoRace:
     )
 
 
-def validate_races(_data):
-    return True
+def validate_races(data):
+    return petl.validate(data, {})
 
 
 if __name__ == "__main__":
