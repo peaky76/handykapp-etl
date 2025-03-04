@@ -1,13 +1,14 @@
 from prefect import get_run_logger
 
-from loaders import formdata_loader
-from processors.formdata_processors import race_builder
+from loaders.formdata_loader import formdata_loader
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
     is_horse,
     is_race_date,
 )
+
+from .race_builder import race_builder
 
 
 def word_processor():
