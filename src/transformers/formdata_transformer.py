@@ -373,12 +373,24 @@ def transform_races(data) -> MongoRace:
             index=4,
         )
         .addfield(
+            "surface",
+            lambda rec: "AW"
+            if (gd := rec["going_description"]) == gd.lower()
+            else "Turf",
+        )
+        .addfield(
             "obstacle",
             lambda rec: JumpCategory["h"]  # type: ignore
             if "h" in rec["race_type"]
             else JumpCategory["c"]  # type: ignore
             if "c" in rec["race_type"]
             else None,
+        )
+        .addfield(
+            "code",
+            lambda rec: RacingCode["NH"]
+            if rec["obstacle"] or "b" in rec["race_type"]
+            else RacingCode["Flat"],  # type: ignore
         )
         .addfield(
             "age_restriction",
