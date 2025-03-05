@@ -50,36 +50,38 @@ def check_race_complete(
         except ValueError:
             continue
 
-        # Check if the ratings of this combo would fit
-        adjusted_ratings = [
-            runner.form_rating - (RaceWeight(runner.weight).lb + runner.allowance)
-            for runner in finishers
-        ]
-        if not is_monotonically_decreasing_or_equal(adjusted_ratings):
-            continue
+        # Skip and rely on positions being correct if race is unrated
+        if all(runner.form_rating for runner in finishers):
+            # Check if the ratings of this combo would fit
+            adjusted_ratings = [
+                runner.form_rating - (RaceWeight(runner.weight).lb + runner.allowance)
+                for runner in finishers
+            ]
+            if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+                continue
 
-        # Check if the implied lbs per length of this combo would fit
-        rtg_dist_pairs = [
-            (r, d)
-            for r, d in zip(
-                adjusted_ratings,
-                [
-                    max(0, r.beaten_distance) if r.beaten_distance else None
-                    for r in finishers
-                ],
-            )
-            if d is not None
-        ]
-        ratios = [
-            (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
-            for a, b in pairwise(rtg_dist_pairs)
-        ]
+            # Check if the implied lbs per length of this combo would fit
+            rtg_dist_pairs = [
+                (r, d)
+                for r, d in zip(
+                    adjusted_ratings,
+                    [
+                        max(0, r.beaten_distance) if r.beaten_distance else None
+                        for r in finishers
+                    ],
+                )
+                if d is not None
+            ]
+            ratios = [
+                (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
+                for a, b in pairwise(rtg_dist_pairs)
+            ]
 
-        non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-        if ratios and not all(
-            abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
-        ):
-            continue
+            non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
+            if ratios and not all(
+                abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
+            ):
+                continue
 
         # Check if any non-finishers may possibly be from another race:
         if len(finishers) != len(combo) and len(runners) != len(combo):

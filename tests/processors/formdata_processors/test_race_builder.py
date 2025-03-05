@@ -209,3 +209,14 @@ def test_check_race_complete_when_indeterminate_non_finisher(
     assert len(runners) == 11
     assert actual["complete"] == []
     assert actual["todo"] == runners
+
+
+def test_check_race_complete_when_no_ratings(race, div_one_runners):
+    runners = div_one_runners
+    for runner in runners:
+        runner.form_rating = None
+
+    actual = check_race_complete(race, runners)
+
+    assert actual["complete"] == runners
+    assert actual["todo"] == []
