@@ -20,7 +20,11 @@ from horsetalk import (
     RacingCode,
     TurfGoingDescription,
 )  # type: ignore
-from peak_utility.names.corrections import eirify
+from peak_utility.names.corrections import (
+    eirify,
+    scotify,  # type: ignore
+)
+from peak_utility.text.case import normal  # type: ignore
 from prefect import get_run_logger
 
 from helpers import get_files
@@ -30,6 +34,19 @@ with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["formdata"]["spaces_dir"]
+
+
+def adjust_rr_name(name):
+    country = name.split("(")[-1].replace(")", "") if "(" in name else None
+    name = name.replace(" (" + country + ")", "") if country else name
+    name = scotify(normal(name))
+    name = re.sub(
+        r"([a-z])'([A-Z])",
+        lambda match: match.group(1) + "'" + match.group(2).lower(),
+        name,
+    )
+
+    return f"{name} ({country})" if country else name
 
 
 def create_horse(words: list[str], year: int) -> FormdataHorse | None:
@@ -339,6 +356,8 @@ def transform_horse(data) -> PreMongoRunner:
             {
                 "weight": lambda x: RaceWeight(x).lb,
                 "beaten_distance": lambda x: str(Horselength(x)) if x else None,
+                "jockey": lambda x: adjust_rr_name(x),
+                "trainer": lambda x: adjust_rr_name(x),
             },
         )
         .rename(

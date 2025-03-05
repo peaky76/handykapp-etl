@@ -3,6 +3,7 @@ import petl
 from horsetalk import RacingCode
 
 from transformers.formdata_transformer import (
+    adjust_rr_name,
     extract_dist_going,
     extract_grade,
     extract_middle_details,
@@ -35,6 +36,34 @@ FORMDATA_FILENAMES = [
     "formdata_nh_230625.pdf",
     "formdata_nh_230702.pdf",
 ]
+
+
+def test_adjust_rr_name_on_basic_name():
+    assert adjust_rr_name("JSmith") == "J Smith"
+
+
+def test_adjust_rr_name_when_first_name_spelt_out():
+    assert adjust_rr_name("JohnSmith") == "John Smith"
+
+
+def test_adjust_rr_name_when_middle_initial_given():
+    assert adjust_rr_name("JFSmith") == "J F Smith"
+
+
+def test_adjust_rr_name_when_country_given():
+    assert adjust_rr_name("JSmith (IRE)") == "J Smith (IRE)"
+
+
+def test_adjust_rr_name_when_title_given():
+    assert adjust_rr_name("MsJSmith") == "Ms J Smith"
+
+
+def test_adjust_rr_name_when_irish():
+    assert adjust_rr_name("JO'Smith") == "J O'Smith"
+
+
+def test_adjust_rr_name_when_scottish():
+    assert adjust_rr_name("JMcSmith") == "J McSmith"
 
 
 def test_extract_dist_going_for_turf_going():

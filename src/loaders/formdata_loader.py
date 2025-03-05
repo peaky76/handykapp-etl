@@ -1,5 +1,4 @@
 # To allow running as a script
-import re
 import sys
 from pathlib import Path
 
@@ -7,8 +6,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 
 import tomllib
-from peak_utility.names.corrections import scotify  # type: ignore
-from peak_utility.text.case import normal  # type: ignore
 from prefect import flow, get_run_logger
 
 from clients import mongo_client as client
@@ -21,19 +18,6 @@ with open("settings.toml", "rb") as f:
 SOURCE = settings["formdata"]["spaces_dir"]
 
 db = client.handykapp
-
-
-def adjust_rr_name(name):
-    country = name.split("(")[-1].replace(")", "") if "(" in name else None
-    name = name.replace(" (" + country + ")", "") if country else name
-    name = scotify(normal(name))
-    name = re.sub(
-        r"([a-z])'([A-Z])",
-        lambda match: match.group(1) + "'" + match.group(2).lower(),
-        name,
-    )
-
-    return f"{name} ({country})" if country else name
 
 
 def create_code_to_course_dict():
