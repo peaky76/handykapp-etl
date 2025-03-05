@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -14,7 +15,7 @@ class FormdataRun(BaseModel):
     allowance: Optional[int] = None
     jockey: str
     position: str
-    beaten_distance: Optional[float] = None
+    beaten_distance: Optional[Decimal] = None
     time_rating: Optional[int] = None
     distance: float
     going: str
