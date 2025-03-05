@@ -122,13 +122,18 @@ def race_processor():
 
                 try:
                     for horse in race["runners"]:
-                        r.send(
-                            (
-                                {"name": horse["sire"], "sex": "M", "race_id": None},
-                                source,
-                            )
-                        )
+                        sire = horse.get("sire")
+                        dam = horse.get("dam")
                         damsire = horse.get("damsire")
+
+                        if sire:
+                            r.send(
+                                (
+                                    {"name": sire, "sex": "M", "race_id": None},
+                                    source,
+                                )
+                            )
+
                         if damsire:
                             r.send(
                                 (
@@ -136,17 +141,19 @@ def race_processor():
                                     source,
                                 )
                             )
-                        r.send(
-                            (
-                                {
-                                    "name": horse["dam"],
-                                    "sex": "F",
-                                    "sire": damsire,
-                                    "race_id": None,
-                                },
-                                source,
+
+                        if dam:
+                            r.send(
+                                (
+                                    {
+                                        "name": dam,
+                                        "sex": "F",
+                                        "sire": damsire,
+                                        "race_id": None,
+                                    },
+                                    source,
+                                )
                             )
-                        )
 
                         if race_id:
                             r.send((horse | {"race_id": race_id}, source))
