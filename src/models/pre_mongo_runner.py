@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -19,5 +18,5 @@ class PreMongoRunner(BaseModel):
     trainer: Optional[str] = None
     jockey: Optional[str] = None
     position: Optional[str] = None
-    beaten_distance: Optional[Decimal] = None
+    beaten_distance: Optional[float] = None
     time: Optional[Duration] = None

@@ -1,5 +1,4 @@
-# To allow running as a script, need path
-from decimal import Decimal
+# To allow running as a scr
 import sys
 from pathlib import Path
 
@@ -167,7 +166,7 @@ def create_run(words: list[str]) -> FormdataRun | None:
             allowance=middle_details["allowance"],
             jockey=middle_details["jockey"],
             position=middle_details["position"],
-            beaten_distance=Decimal(words[-4])
+            beaten_distance=float(words[-4])
             if "." in words[-4] and words[-4] != "w.o." and "*" not in words[-4]
             else None,
             time_rating=extract_rating(words[-3]),
