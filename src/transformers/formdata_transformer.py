@@ -407,11 +407,11 @@ def transform_races(data) -> MongoRace:
         )
         .addfield(
             "age_restriction",
-            lambda rec: AgeRestriction("2yo")
+            lambda rec: str(AgeRestriction("2yo"))
             if "2" in rec["race_type"] and "G2" not in rec["race_type"]
-            else AgeRestriction("3yo")
+            else str(AgeRestriction("3yo"))
             if "3" in rec["race_type"] and "G3" not in rec["race_type"]
-            else AgeRestriction("4yo")
+            else str(AgeRestriction("4yo"))
             if "4" in rec["race_type"]
             else None,
         )
