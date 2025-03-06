@@ -24,14 +24,14 @@ def rr_code_to_course_dict():
 
 
 @cache
-def get_racecourse_id(course, surface, code, obstacle) -> str | None:
-    surface_options = ["Tapeta", "Polytrack"] if surface == "AW" else ["Turf"]
+def get_racecourse_id(race: MongoRace) -> str | None:
+    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
         {
-            "name": course.title(),
+            "name": race.course.title(),
             "surface": {"$in": surface_options},
-            "code": code,
-            "obstacle": obstacle,
+            "code": race.code,
+            "obstacle": race.obstacle,
         },
         {"_id": 1},
     )
@@ -40,7 +40,7 @@ def get_racecourse_id(course, surface, code, obstacle) -> str | None:
         racecourse["_id"]
         if racecourse
         else rr
-        if (rr := rr_code_to_course_dict()[course])
+        if (rr := rr_code_to_course_dict()[race.course])
         else None
     )
 
@@ -49,17 +49,17 @@ def make_update_dictionary(race, racecourse_id) -> MongoRace:
     return compact(
         {
             "racecourse": racecourse_id,
-            "datetime": race.get("datetime"),
-            "title": race.get("title"),
-            "is_handicap": race.get("is_handicap"),
-            "distance_description": race.get("distance_description"),
-            "going_description": race.get("going_description"),
-            "race_grade": race.get("race_grade"),
-            "race_class": race.get("race_class") or race.get("class"),
-            "age_restriction": race.get("age_restriction"),
-            "rating_restriction": race.get("rating_restriction"),
-            "prize": race.get("prize"),
-            "rapid_id": race.get("rapid_id"),
+            "datetime": race.datetime,
+            "title": race.title,
+            "is_handicap": race.is_handicap,
+            "distance_description": race.distance_description,
+            "going_description": race.going_description,
+            "race_grade": race.race_grade,
+            "race_class": race.race_class,
+            "age_restriction": race.age_restriction,
+            "rating_restriction": race.rating_restriction,
+            "prize": race.prize,
+            "rapid_id": race.rapid_id,
         }
     )
 
@@ -77,15 +77,12 @@ def race_processor():
     try:
         while True:
             race, source = yield
-            racecourse_id = get_racecourse_id(
-                race["course"], race["surface"], race["code"], race["obstacle"]
-            )
 
-            if racecourse_id:
+            if racecourse_id := get_racecourse_id(race):
                 found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,
-                        "datetime": race["datetime"],
+                        "datetime": race.datetime,
                     }
                 )
 
@@ -97,58 +94,56 @@ def race_processor():
                         {
                             "$set": compact(
                                 {
-                                    "rapid_id": race.get("rapid_id"),
-                                    "going_description": race.get("going_description"),
+                                    "rapid_id": race.rapid_id,
+                                    "going_description": race.going_description,
                                 }
                             )
                         },
                     )
-                    logger.debug(f"{race['datetime']} at {race['course']} updated")
+                    logger.debug(f"{race.datetime} at {race.course} updated")
                     updated_count += 1
                 else:
                     try:
                         race_id = db.races.insert_one(
                             make_update_dictionary(race, racecourse_id)
                         ).inserted_id
-                        logger.debug(
-                            f"{race.get('datetime')} at {race.get('course')} added to db"
-                        )
+                        logger.debug(f"{race.datetime} at {race.course} added to db")
                         added_count += 1
                     except DuplicateKeyError:
                         logger.warning(
-                            f"Duplicate race for {race['datetime']} at {race['course']}"
+                            f"Duplicate race for {race.datetime} at {race.course}"
                         )
                         skipped_count += 1
 
                 try:
-                    for horse in race["runners"]:
-                        sire = horse.get("sire")
-                        dam = horse.get("dam")
-                        damsire = horse.get("damsire")
-
-                        if sire:
+                    for horse in race.runners:
+                        if horse.sire:
                             r.send(
                                 (
-                                    {"name": sire, "sex": "M", "race_id": None},
+                                    {"name": horse.sire, "sex": "M", "race_id": None},
                                     source,
                                 )
                             )
 
-                        if damsire:
-                            r.send(
-                                (
-                                    {"name": damsire, "sex": "M", "race_id": None},
-                                    source,
-                                )
-                            )
-
-                        if dam:
+                        if horse.damsire:
                             r.send(
                                 (
                                     {
-                                        "name": dam,
+                                        "name": horse.damsire,
+                                        "sex": "M",
+                                        "race_id": None,
+                                    },
+                                    source,
+                                )
+                            )
+
+                        if horse.dam:
+                            r.send(
+                                (
+                                    {
+                                        "name": horse.dam,
                                         "sex": "F",
-                                        "sire": damsire,
+                                        "sire": horse.damsire,
                                         "race_id": None,
                                     },
                                     source,
