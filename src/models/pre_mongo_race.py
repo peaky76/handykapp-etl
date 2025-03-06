@@ -23,3 +23,17 @@ class PreMongoRace(BaseModel):
     prize: Optional[str] = None
     going_description: Optional[str] = None
     runners: list[PreMongoRunner] = []
+
+    model_config = {"frozen": True}
+
+    def __hash__(self):
+        return hash(
+            (
+                self.course,
+                self.obstacle,
+                self.surface,
+                self.code,
+                self.datetime,
+                self.runners,
+            )
+        )
