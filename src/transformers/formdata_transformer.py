@@ -28,7 +28,7 @@ from peak_utility.text.case import normal  # type: ignore
 from prefect import get_run_logger
 
 from helpers import get_files
-from models import FormdataHorse, FormdataRun, MongoRace, PreMongoRunner
+from models import FormdataHorse, FormdataRun, PreMongoRace, PreMongoRunner
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -355,7 +355,7 @@ def transform_horse(data) -> PreMongoRunner:
             data,
             {
                 "weight": lambda x: RaceWeight(x).lb,
-                "beaten_distance": lambda x: str(Horselength(x)) if x else None,
+                "beaten_distance": lambda x: float(Horselength(x)) if x else None,
                 "jockey": lambda x: adjust_rr_name(x),
             },
         )
@@ -369,7 +369,7 @@ def transform_horse(data) -> PreMongoRunner:
     )
 
 
-def transform_races(data) -> MongoRace:
+def transform_races(data) -> PreMongoRace:
     return (
         petl.rename(
             data,
