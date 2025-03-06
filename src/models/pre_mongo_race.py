@@ -7,6 +7,7 @@ from .pre_mongo_runner import PreMongoRunner
 
 
 class PreMongoRace(BaseModel):
+    rapid_id: Optional[str] = None
     course: str
     obstacle: str
     surface: str
@@ -34,6 +35,5 @@ class PreMongoRace(BaseModel):
                 self.surface,
                 self.code,
                 self.datetime,
-                self.runners,
             )
         )
