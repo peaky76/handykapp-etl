@@ -9,6 +9,7 @@ from .py_object_id import PyObjectId
 
 class MongoRace(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    rapid_id: Optional[str] = None
     racecourse: PyObjectId
     datetime: datetime
     title: str
