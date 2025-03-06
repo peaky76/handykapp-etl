@@ -1,7 +1,7 @@
 import petl  # type: ignore
 from prefect import get_run_logger
 
-from helpers import log_validation_problem
+from models import PreMongoRace
 from processors.race_processor import race_processor
 
 
@@ -16,34 +16,30 @@ def record_processor():
 
     try:
         while True:
-            record, validator, transformer, filename, source = yield
+            record, _validator, transformer, filename, source = yield
             data = petl.fromdicts([record])
-            problems = validator(data)
 
-            if len(problems.dicts()) > 0:
-                logger.warning(f"Validation problems in {filename}")
-                if len(problems.dicts()) > 10:
-                    logger.warning("Too many problems to log")
-                else:
-                    for problem in problems.dicts():
-                        log_validation_problem(problem)
+            try:
+                results = transformer(data)
+            except Exception as e:
+                logger.error(f"Error transforming {filename}: {e}")
                 reject_count += 1
-            else:
+                continue
+
+            for race in results:
                 try:
-                    results = transformer(data)
-                except Exception as e:
-                    logger.error(f"Error transforming {filename}: {e}")
+                    validated_race = PreMongoRace(**race)
+                    r.send((validated_race, source))
+                    transform_count += 1
+                except Exception as e:  # noqa: PERF203
+                    logger.error(f"Validation error in {filename}: {e}")
                     reject_count += 1
                     continue
 
-                for race in results:
-                    r.send((race, source))
-                    transform_count += 1
-
-                if transform_count % 25 == 0:
-                    logger.info(
-                        f"Read {transform_count} races. Current: {race['datetime']} at {race['course']}"
-                    )
+            if transform_count % 25 == 0:
+                logger.info(
+                    f"Read {transform_count} races. Current: {race['datetime']} at {race['course']}"
+                )
 
     except GeneratorExit:
         logger.info(

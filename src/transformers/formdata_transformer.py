@@ -1,4 +1,4 @@
-# To allow running as a scr
+# To allow running as a script, need path
 import sys
 from pathlib import Path
 
