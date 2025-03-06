@@ -17,6 +17,9 @@ class PreMongoRunner(BaseModel):
     official_rating: Optional[int] = None
     trainer: Optional[str] = None
     jockey: Optional[str] = None
+    sire: Optional[str] = None
+    dam: Optional[str] = None
+    damsire: Optional[str] = None
     position: Optional[str] = None
     beaten_distance: Optional[float] = None
     time: Optional[Duration] = None
