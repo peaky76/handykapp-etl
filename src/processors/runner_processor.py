@@ -68,9 +68,7 @@ def runner_processor():
 
     try:
         while True:
-            horse, source = yield
-            race_id = horse.get("race_id")
-            name = horse["name"]
+            horse, race_id, source = yield
 
             found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
 
@@ -80,28 +78,28 @@ def runner_processor():
                     {"_id": horse_id},
                     {"$set": make_update_dictionary(horse)},
                 )
-                logger.debug(f"{name} updated")
+                logger.debug(f"{horse.name} updated")
                 updated_count += 1
             else:
                 try:
                     horse_id = db.horses.insert_one(
                         compact(
                             {
-                                "name": name,
-                                "sex": horse.get("sex"),
-                                "year": horse.get("year"),
-                                "country": horse.get("country"),
-                                "colour": horse.get("colour"),
-                                "sire": get_sire_id(horse.get("sire")),
-                                "dam": get_dam_id(horse.get("dam")),
+                                "name": horse.name,
+                                "sex": horse.sex,
+                                "year": horse.year,
+                                "country": horse.country,
+                                "colour": horse.colour,
+                                "sire": get_sire_id(horse.sire),
+                                "dam": get_dam_id(horse.dam),
                             }
                         )
                     ).inserted_id
-                    logger.debug(f"{name} added to db")
+                    logger.debug(f"{horse.name} added to db")
                     added_count += 1
                 except DuplicateKeyError:
                     logger.warning(
-                        f"Duplicate horse: {name} ({horse.get('country')}) {horse.get('year')} ({horse['sex']})"
+                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex})"
                     )
                     skipped_count += 1
                 except ValueError as e:
@@ -117,26 +115,26 @@ def runner_processor():
                             "runners": compact(
                                 {
                                     "horse": horse_id,
-                                    "owner": horse.get("owner"),
-                                    "allowance": horse.get("allowance"),
-                                    "saddlecloth": horse.get("saddlecloth"),
-                                    "draw": horse.get("draw"),
-                                    "headgear": horse.get("headgear"),
-                                    "lbs_carried": horse.get("lbs_carried"),
-                                    "official_rating": horse.get("official_rating"),
-                                    "position": horse.get("position"),
-                                    "distance_beaten": horse.get("distance_beaten"),
-                                    "sp": horse.get("sp"),
+                                    "owner": horse.owner,
+                                    "allowance": horse.allowance,
+                                    "saddlecloth": horse.saddlecloth,
+                                    "draw": horse.draw,
+                                    "headgear": horse.headgear,
+                                    "lbs_carried": horse.lbs_carried,
+                                    "official_rating": horse.official_rating,
+                                    "position": horse.position,
+                                    "distance_beaten": horse.distance_beaten,
+                                    "sp": horse.sp,
                                 }
                             )
                         }
                     },
                 )
-                if horse.get("trainer"):
+                if horse.trainer:
                     p.send(
                         (
                             {
-                                "name": horse["trainer"],
+                                "name": horse.trainer,
                                 "role": "trainer",
                                 "race_id": race_id,
                                 "runner_id": horse_id,
@@ -145,11 +143,11 @@ def runner_processor():
                             {},
                         )
                     )
-                if horse.get("jockey"):
+                if horse.jockey:
                     p.send(
                         (
                             {
-                                "name": horse["jockey"],
+                                "name": horse.jockey,
                                 "role": "jockey",
                                 "race_id": race_id,
                                 "runner_id": horse_id,
