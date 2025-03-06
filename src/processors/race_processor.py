@@ -4,7 +4,7 @@ from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import MongoRace
+from models import PreMongoRace
 from processors.runner_processor import runner_processor
 
 from .utils import compact
@@ -24,7 +24,7 @@ def rr_code_to_course_dict():
 
 
 @cache
-def get_racecourse_id(race: MongoRace) -> str | None:
+def get_racecourse_id(race: PreMongoRace) -> str | None:
     surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
         {
@@ -45,7 +45,7 @@ def get_racecourse_id(race: MongoRace) -> str | None:
     )
 
 
-def make_update_dictionary(race, racecourse_id) -> MongoRace:
+def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
     return compact(
         {
             "racecourse": racecourse_id,

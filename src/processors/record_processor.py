@@ -1,7 +1,7 @@
 import petl  # type: ignore
 from prefect import get_run_logger
 
-from models import PreMongoRace, PreMongoRunner
+from models import PreMongoRace
 from processors.race_processor import race_processor
 
 
