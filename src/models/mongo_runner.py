@@ -17,6 +17,9 @@ class MongoRunner(BaseModel):
     official_rating: Optional[int] = None
     trainer: Optional[PyObjectId] = None
     jockey: Optional[PyObjectId] = None
+    sire: Optional[PyObjectId] = None
+    dam: Optional[PyObjectId] = None
+    damsire: Optional[PyObjectId] = None
     position: Optional[str] = None
     beaten_distance: Optional[float] = None
     time: Optional[Duration] = None
