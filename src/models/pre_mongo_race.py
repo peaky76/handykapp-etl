@@ -3,7 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .mongo_race import MongoRaceRestriction
 from .pre_mongo_runner import PreMongoRunner
 
 
@@ -19,8 +18,8 @@ class PreMongoRace(BaseModel):
     distance_description: str
     race_grade: Optional[str] = None
     race_class: Optional[int] = None
-    age_restriction: Optional[MongoRaceRestriction] = None
-    rating_restriction: Optional[MongoRaceRestriction] = None
+    age_restriction: Optional[str] = None
+    rating_restriction: Optional[str] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
     runners: list[PreMongoRunner] = []
