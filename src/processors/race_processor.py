@@ -121,6 +121,7 @@ def race_processor():
                             r.send(
                                 (
                                     {"name": horse.sire, "sex": "M", "race_id": None},
+                                    None,
                                     source,
                                 )
                             )
@@ -133,6 +134,7 @@ def race_processor():
                                         "sex": "M",
                                         "race_id": None,
                                     },
+                                    None,
                                     source,
                                 )
                             )
@@ -146,12 +148,13 @@ def race_processor():
                                         "sire": horse.damsire,
                                         "race_id": None,
                                     },
+                                    None,
                                     source,
                                 )
                             )
 
                         if race_id:
-                            r.send((horse | {"race_id": race_id}, source))
+                            r.send((horse, race_id, source))
                 except Exception as e:
                     logger.error(f"Error processing {race_id}: {e}")
             else:
