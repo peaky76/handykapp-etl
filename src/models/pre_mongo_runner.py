@@ -20,3 +20,14 @@ class PreMongoRunner(BaseModel):
     position: Optional[str] = None
     beaten_distance: Optional[float] = None
     time: Optional[Duration] = None
+
+    model_config = {"frozen": True}
+
+    def __hash__(self):
+        return hash(
+            (
+                self.name,
+                self.country,
+                self.year,
+            )
+        )
