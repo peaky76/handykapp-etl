@@ -356,7 +356,19 @@ def test_transform_races_returns_correct_output():
         "number_of_runners": "5",
         "distance": "24",
         "going": "G",
-        "runners": [],
+        "runners": [
+            {
+                "name": "AADDEEY",
+                "country": "GB",
+                "year": 2018,
+                "weight": "10-0",
+                "jockey": "D Tudhope",
+                "position": "3",
+                "beaten_distance": "2",
+                "time_rating": 80,
+                "form_rating": 80,
+            }
+        ],
     }
     expected = {
         "course": "Kel",
@@ -371,7 +383,17 @@ def test_transform_races_returns_correct_output():
         "distance_description": "3m",
         "prize": "5000",
         "going_description": "Good",
-        "runners": [],
+        "runners": [
+            {
+                "name": "AADDEEY",
+                "country": "GB",
+                "year": 2018,
+                "jockey": "D Tudhope",
+                "lbs_carried": 140,
+                "position": "3",
+                "beaten_distance": "2",
+            }
+        ],
     }
 
     actual = transform_races(petl.fromdicts([data]))[0]
