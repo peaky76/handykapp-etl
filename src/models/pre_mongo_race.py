@@ -15,7 +15,6 @@ class PreMongoRace(BaseModel):
     datetime: datetime
     title: str
     is_handicap: Optional[bool] = None
-    obstacle: Optional[str] = None
     distance_description: str
     race_grade: Optional[str] = None
     race_class: Optional[int] = None
