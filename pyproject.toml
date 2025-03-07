@@ -25,12 +25,12 @@ pymupdf = "^1.22.5" # NB >=1.23 interprets Irish apostrophe as some sort of file
 coverage = "^7.6.12"
 mongomock = "^4.3.0"
 mypy = "^1.14.1"
-pytest = "^8.3.4"
+pytest = "^8.3.5"
 pytest-cov = "^6.0.0"
 pytest-mock = "^3.14.0"
 radon = "^6.0.1"
-ruff = "^0.9.9"
-types-requests = "^2.32.0.20241016"
+ruff = "^0.9.10"
+types-requests = "^2.32.0.20250306"
 
 [tool.mypy]
 ignore_missing_imports = true
