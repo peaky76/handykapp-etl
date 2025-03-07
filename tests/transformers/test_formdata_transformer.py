@@ -329,7 +329,7 @@ def test_transform_horse_returns_correct_output():
         "weight": "10-0",
         "jockey": "D Tudhope",
         "position": "3",
-        "beaten_distance": "2",
+        "beaten_distance": "2.0",
         "time_rating": 80,
         "form_rating": 80,
     }
@@ -340,7 +340,7 @@ def test_transform_horse_returns_correct_output():
         "jockey": "D Tudhope",
         "lbs_carried": 140,
         "position": "3",
-        "beaten_distance": "2",
+        "beaten_distance": 2.0,
     }
 
     actual = transform_horse(petl.fromdicts([data]))
@@ -364,7 +364,7 @@ def test_transform_races_returns_correct_output():
                 "weight": "10-0",
                 "jockey": "D Tudhope",
                 "position": "3",
-                "beaten_distance": "2",
+                "beaten_distance": "2.0",
                 "time_rating": 80,
                 "form_rating": 80,
             }
@@ -391,7 +391,7 @@ def test_transform_races_returns_correct_output():
                 "jockey": "D Tudhope",
                 "lbs_carried": 140,
                 "position": "3",
-                "beaten_distance": "2",
+                "beaten_distance": 2.0,
             }
         ],
     }
