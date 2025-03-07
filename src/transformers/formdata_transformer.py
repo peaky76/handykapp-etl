@@ -392,10 +392,10 @@ def transform_races(data) -> PreMongoRace:
                 + pendulum.duration(minutes=int(rec["distance_description"]))
                 + pendulum.duration(seconds=int(rec["number_of_runners"])),
                 "going_description": lambda x, rec: (
-                    AWGoingDescription[x].name.title()
+                    AWGoingDescription[x].name.title()  # type: ignore
                     if rec["surface"] == "AW"
-                    else TurfGoingDescription[x].name.title()
-                ),  # type: ignore
+                    else TurfGoingDescription[x].name.title()  # type: ignore
+                ),
             },
             pass_row=True,
         )
@@ -419,7 +419,7 @@ def transform_races(data) -> PreMongoRace:
         )
         .addfield(
             "code",
-            lambda rec: RacingCode["NH"].name.title()
+            lambda rec: RacingCode["NH"].name.title()  # type: ignore
             if rec["obstacle"] or "b" in rec["race_type"]
             else RacingCode["Flat"].name.title(),  # type: ignore
         )
