@@ -40,15 +40,14 @@ def get_sire_id(name: str | None) -> PyObjectId | None:
 
 
 def make_search_dictionary(horse: PreMongoRunner) -> dict[str, str]:
-    search_dict = {"name": horse.name}
-
-    if horse.country:
-        search_dict["country"] = horse.country
-        search_dict["year"] = horse.year
-    else:
-        search_dict["sex"] = horse.sex
-
-    return search_dict
+    return compact(
+        {
+            "name": horse.name,
+            "country": horse.country,
+            "year": horse.year,
+            "sex": horse.sex,
+        }
+    )
 
 
 def make_update_dictionary(horse):
