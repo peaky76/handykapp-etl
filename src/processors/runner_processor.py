@@ -51,14 +51,13 @@ def make_search_dictionary(horse: PreMongoRunner) -> dict[str, str]:
 
 
 def make_update_dictionary(horse):
-    update_dictionary = {}
-    if colour := horse.get("colour"):
-        update_dictionary["colour"] = colour
-    if horse.get("sire"):
-        update_dictionary["sire"] = get_sire_id(horse["sire"])
-    if horse.get("dam"):
-        update_dictionary["dam"] = get_dam_id(horse["dam"])
-    return update_dictionary
+    return compact(
+        {
+            "colour": horse.colour,
+            "sire": get_sire_id(horse.sire),
+            "dam": get_dam_id(horse.dam),
+        }
+    )
 
 
 def runner_processor():
