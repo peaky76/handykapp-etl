@@ -4,7 +4,7 @@ from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import PyObjectId
+from models import PreMongoRunner, PyObjectId
 from processors.person_processor import person_processor
 
 from .utils import compact
@@ -39,10 +39,16 @@ def get_sire_id(name: str | None) -> PyObjectId | None:
     return get_horse_id_by_name_and_sex(name, "M")
 
 
-def make_search_dictionary(horse) -> dict[str, str]:
-    keys = ["name", "country", "year"] if horse.get("country") else ["name", "sex"]
+def make_search_dictionary(horse: PreMongoRunner) -> dict[str, str]:
+    search_dict = {"name": horse.name}
 
-    return {k: horse[k] for k in keys}
+    if horse.country:
+        search_dict["country"] = horse.country
+        search_dict["year"] = horse.year
+    else:
+        search_dict["sex"] = horse.sex
+
+    return search_dict
 
 
 def make_update_dictionary(horse):
