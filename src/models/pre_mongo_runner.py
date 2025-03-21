@@ -9,6 +9,7 @@ class PreMongoRunner(BaseModel):
     country: str = Field(..., min_length=2, max_length=3)
     year: int
     sex: Optional[Literal["M", "F"]] = None
+    colour: Optional[str] = None
     owner: Optional[str] = None
     lbs_carried: Optional[int] = None
     allowance: Optional[int] = None
