@@ -328,7 +328,7 @@ def test_transform_horse_returns_correct_output():
         "year": 2018,
         "weight": "10-0",
         "jockey": "D Tudhope",
-        "position": "3",
+        "position": "2p3",
         "beaten_distance": "2.0",
         "time_rating": 80,
         "form_rating": 80,
@@ -339,7 +339,8 @@ def test_transform_horse_returns_correct_output():
         "year": 2018,
         "jockey": "D Tudhope",
         "lbs_carried": 140,
-        "position": "3",
+        "finishing_position": "2",
+        "official_position": "3",
         "beaten_distance": 2.0,
     }
 
@@ -390,7 +391,8 @@ def test_transform_races_returns_correct_output():
                 "year": 2018,
                 "jockey": "D Tudhope",
                 "lbs_carried": 140,
-                "position": "3",
+                "finishing_position": "3",
+                "official_position": "3",
                 "beaten_distance": 2.0,
             }
         ],

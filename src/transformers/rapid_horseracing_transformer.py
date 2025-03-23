@@ -51,6 +51,7 @@ def transform_horse(
                 "number": "saddlecloth",
                 "OR": "official_rating",
                 "distance_beaten": "beaten_distance",
+                "position": "finishing_position",
             },
         )
         .convert(
@@ -78,9 +79,10 @@ def transform_horse(
         .convert("beaten_distance", lambda x: str(Horselength(x)) if x else None)
         .addfield(
             "finishing_time",
-            lambda rec: finishing_time if rec["position"] == 1 else None,
+            lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
             index=-1,
         )
+        .addfield("official_position", lambda rec: rec["finishing_position"])
         .cutout("horse", "age")
         .dicts()[0]
     )
