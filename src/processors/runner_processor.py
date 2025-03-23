@@ -127,7 +127,7 @@ def runner_processor():
                                     "lbs_carried": horse.lbs_carried,
                                     "official_rating": horse.official_rating,
                                     "position": horse.position,
-                                    "distance_beaten": horse.distance_beaten,
+                                    "beaten_distance": horse.beaten_distance,
                                     "sp": horse.sp,
                                 }
                             )
