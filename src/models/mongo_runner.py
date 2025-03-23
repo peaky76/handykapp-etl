@@ -1,4 +1,5 @@
-from typing import Optional
+from decimal import Decimal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 from pydantic_extra_types.pendulum_dt import Duration
@@ -8,6 +9,8 @@ from .py_object_id import PyObjectId
 
 class MongoRunner(BaseModel):
     horse: PyObjectId
+    sex: Optional[Literal["M", "F"]] = None
+    colour: Optional[str] = None
     owner: Optional[str] = None
     lbs_carried: Optional[int] = None
     allowance: Optional[int] = None
@@ -20,6 +23,8 @@ class MongoRunner(BaseModel):
     sire: Optional[PyObjectId] = None
     dam: Optional[PyObjectId] = None
     damsire: Optional[PyObjectId] = None
-    position: Optional[str] = None
+    finishing_position: Optional[str] = None
+    official_position: Optional[str] = None
     beaten_distance: Optional[float] = None
     time: Optional[Duration] = None
+    sp: Optional[Decimal] = None
