@@ -364,7 +364,14 @@ def transform_horse(data) -> PreMongoRunner:
                 "weight": "lbs_carried",
             }
         )
-        .cutout("time_rating", "form_rating")
+        .addfield("finishing_position", lambda rec: rec["position"].split("p")[0])
+        .addfield(
+            "official_position",
+            lambda rec: rec["position"].split("p")[1]
+            if "p" in rec["position"]
+            else rec["finishing_position"],
+        )
+        .cutout("position", "time_rating", "form_rating")
         .dicts()[0]
     )
 
