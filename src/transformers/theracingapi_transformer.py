@@ -25,12 +25,6 @@ from horsetalk import (  # type: ignore
 # from loaders.theracingapi_loader import declaration_processor
 # from prefect import flow, get_run_logger, task
 from transformers.parsers import parse_code, parse_obstacle
-from transformers.validators import (
-    validate_date,
-    validate_pattern,
-    validate_time,
-    validate_weight,
-)
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
