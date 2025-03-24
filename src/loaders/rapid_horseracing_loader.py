@@ -11,10 +11,7 @@ from prefect import flow, get_run_logger
 from clients import mongo_client as client
 from helpers import get_files, read_file
 from processors.record_processor import record_processor
-from transformers.rapid_horseracing_transformer import (
-    transform_results,
-    validate_results,
-)
+from transformers.rapid_horseracing_transformer import transform_results
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -37,7 +34,7 @@ def load_rapid_horseracing_data():
     for file in files:
         if file != "results_to_do_list.json":
             record = read_file(file)
-            r.send((record, validate_results, transform_results, file, "rapid"))
+            r.send((record, transform_results, file, "rapid"))
 
     r.close()
 
