@@ -23,14 +23,6 @@ from transformers.parsers import (
     parse_horse,
     parse_obstacle,
 )
-from transformers.validators import (
-    validate_class,
-    validate_date,
-    validate_distance,
-    validate_going,
-    validate_prize,
-    validate_weight,
-)
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
