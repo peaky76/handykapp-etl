@@ -456,9 +456,5 @@ def transform_races(data) -> PreMongoRace:
     )
 
 
-def validate_races(data):
-    return petl.validate(data, {})
-
-
 if __name__ == "__main__":
     print("Cannot run formdata_transformer.py as a script.")

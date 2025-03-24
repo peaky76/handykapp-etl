@@ -16,7 +16,7 @@ def record_processor():
 
     try:
         while True:
-            record, _validator, transformer, filename, source = yield
+            record, transformer, filename, source = yield
             data = petl.fromdicts([record])
 
             try:

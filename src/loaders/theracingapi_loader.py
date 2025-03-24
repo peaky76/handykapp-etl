@@ -11,7 +11,7 @@ from prefect import flow, get_run_logger
 from clients import mongo_client as client
 from helpers import get_files, read_file
 from processors.record_processor import record_processor
-from transformers.theracingapi_transformer import transform_races, validate_races
+from transformers.theracingapi_transformer import transform_races
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -53,7 +53,7 @@ def load_theracingapi_data(*, from_date=None):
         contents = read_file(file)
         for dec in contents["racecards"]:
             record = {k: v for k, v in dec.items() if k != "off_dt"}
-            r.send((record, validate_races, transform_races, file, "theracingapi"))
+            r.send((record, transform_races, file, "theracingapi"))
 
     r.close()
 

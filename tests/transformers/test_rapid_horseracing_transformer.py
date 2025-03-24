@@ -5,7 +5,6 @@ import pytest
 from transformers.rapid_horseracing_transformer import (
     transform_horse,
     transform_results,
-    validate_results,
 )
 
 
@@ -103,15 +102,3 @@ def test_transform_results_returns_correct_output(result_data):
     }
     actual = transform_results(petl.fromdicts([result_data]))[0]
     assert actual == expected
-
-
-def test_validate_results_returns_no_problems_for_correct_data(result_data, horse_data):
-    result_data["horses"] = [horse_data]
-    problems = validate_results(petl.fromdicts([result_data]))
-    assert len(problems.dicts()) == 0
-
-
-def test_validate_results_returns_problems_for_incorrect_data(result_data):
-    problems = validate_results(petl.fromdicts([result_data]))
-    assert len(problems.dicts()) == 1
-    assert problems.dicts()[0]["field"] == "horses"

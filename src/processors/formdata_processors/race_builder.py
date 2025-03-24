@@ -7,7 +7,7 @@ from prefect import get_run_logger
 
 from models import FormdataRace, FormdataRunner
 from processors import record_processor
-from transformers.formdata_transformer import transform_races, validate_races
+from transformers.formdata_transformer import transform_races
 
 RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
@@ -35,7 +35,7 @@ def check_race_complete(
     for combo in combinations(runners, race.number_of_runners):
         finishers = sorted(
             [runner for runner in combo if is_finisher(runner)],
-            key=lambda x: int(x.position.replace("=", "")),
+            key=lambda x: int(x.position.split("p")[0].replace("=", "")),
         )
 
         # Guard for duplicate non-equal positions which would pass ranklist check
@@ -148,7 +148,6 @@ def race_builder():
                     r.send(
                         (
                             record,
-                            validate_races,
                             transform_races,
                             "formdata",
                             "racing_research",
@@ -165,7 +164,6 @@ def race_builder():
                     r.send(
                         (
                             record,
-                            validate_races,
                             transform_races,
                             "formdata",
                             "racing_research",

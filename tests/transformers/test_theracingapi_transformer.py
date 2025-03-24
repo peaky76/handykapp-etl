@@ -182,15 +182,3 @@ def test_transform_races_returns_correct_output(racecard_data):
     actual.pop("runners")
 
     assert actual == expected
-
-
-# def test_validate_racecard_returns_no_problems_for_correct_data(racecard_data):
-#     problems = validate_races.fn(petl.fromdicts([racecard_data]))
-#     assert 0 == len(problems.dicts())
-
-
-# def test_validate_racecard_returns_problems_for_incorrect_data(racecard_data):
-#     racecard_data["course"] = 365
-#     problems = validate_races.fn(petl.fromdicts([racecard_data]))
-#     assert 1 == len(problems.dicts())
-#     assert "horses" == problems.dicts()[0]["field"]
