@@ -4,7 +4,7 @@ from enum import Enum
 from pathlib import Path
 from typing import cast
 
-from models import MongoRace, PreMongoRunner
+from models import PreMongoRace, PreMongoRunner
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -80,7 +80,7 @@ def transform_horse(
     )
 
 
-def transform_results(data) -> MongoRace:
+def transform_results(data) -> PreMongoRace:
     return (
         petl.rename(
             data,
