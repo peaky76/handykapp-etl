@@ -12,8 +12,7 @@ def entry_processor():
 
     try:
         while True:
-            item = yield
-            horse = item
+            horse = yield
 
             existing_entry = db.formdata.find_one(
                 {
