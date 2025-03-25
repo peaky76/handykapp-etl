@@ -24,7 +24,10 @@ def rr_code_to_course_dict():
 
 
 @cache
-def get_racecourse_id(race: PreMongoRace) -> str | None:
+def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
+    if source == "racing_research":
+        return rr_code_to_course_dict()[race.course]
+
     surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
         {
@@ -36,13 +39,7 @@ def get_racecourse_id(race: PreMongoRace) -> str | None:
         {"_id": 1},
     )
 
-    return (
-        racecourse["_id"]
-        if racecourse
-        else rr
-        if (rr := rr_code_to_course_dict()[race.course])
-        else None
-    )
+    return racecourse["_id"] if racecourse else None
 
 
 def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
@@ -78,7 +75,7 @@ def race_processor():
         while True:
             race, source = yield
 
-            if racecourse_id := get_racecourse_id(race):
+            if racecourse_id := get_racecourse_id(race, source):
                 found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,
