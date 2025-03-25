@@ -81,7 +81,7 @@ def transform_horse(
     return PreMongoRunner(**transformed_horse)
 
 
-def transform_results(data) -> PreMongoRace:
+def transform_results(data) -> list[PreMongoRace]:
     transformed_races = (
         petl.rename(
             data,
