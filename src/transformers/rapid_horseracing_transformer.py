@@ -33,7 +33,7 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 def transform_horse(
     data, race_date=pendulum.now(), finishing_time=None
 ) -> PreMongoRunner:
-    return (
+    transformed_horse = (
         petl.rename(
             data,
             {
@@ -78,10 +78,11 @@ def transform_horse(
         .cutout("horse", "age")
         .dicts()[0]
     )
+    return PreMongoRunner(**transformed_horse)
 
 
 def transform_results(data) -> PreMongoRace:
-    return (
+    transformed_races = (
         petl.rename(
             data,
             {
@@ -140,6 +141,7 @@ def transform_results(data) -> PreMongoRace:
         .cutout("horses", "finish_time")
         .dicts()
     )
+    return [PreMongoRace(**race) for race in transformed_races]
 
 
 if __name__ == "__main__":

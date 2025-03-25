@@ -41,7 +41,7 @@ def build_datetime(date_str: str, time_str: str) -> str:
 
 
 def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
-    return (
+    transformed_horse = (
         petl.rename(
             data,
             {
@@ -83,10 +83,11 @@ def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]
     )
+    return PreMongoRunner(**transformed_horse)
 
 
 def transform_races(data) -> PreMongoRace:
-    return (
+    transformed_races = (
         petl.rename(
             data,
             {
@@ -141,6 +142,7 @@ def transform_races(data) -> PreMongoRace:
         .cutout("field_size", "region", "type", "date", "off_time")
         .dicts()
     )
+    return [PreMongoRace(**race) for race in transformed_races]
 
 
 if __name__ == "__main__":

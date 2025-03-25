@@ -350,7 +350,7 @@ def is_race_date(string: str) -> bool:
 
 
 def transform_horse(data) -> PreMongoRunner:
-    return (
+    transformed_horse = (
         petl.convert(
             data,
             {
@@ -374,10 +374,11 @@ def transform_horse(data) -> PreMongoRunner:
         .cutout("position", "time_rating", "form_rating")
         .dicts()[0]
     )
+    return PreMongoRunner(**transformed_horse)
 
 
 def transform_races(data) -> PreMongoRace:
-    return (
+    transformed_races = (
         petl.rename(
             data,
             {
@@ -454,6 +455,7 @@ def transform_races(data) -> PreMongoRace:
         .cutout("number_of_runners", "race_type")
         .dicts()
     )
+    return [PreMongoRace(**race) for race in transformed_races]
 
 
 if __name__ == "__main__":
