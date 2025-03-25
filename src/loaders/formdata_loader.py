@@ -20,16 +20,6 @@ SOURCE = settings["formdata"]["spaces_dir"]
 db = client.handykapp
 
 
-def create_code_to_course_dict():
-    source = db.racecourses.find(
-        projection={"_id": 2, "references": {"racing_research": 1}}
-    )
-    return {
-        racecourse["references"]["racing_research"]: racecourse["_id"]
-        for racecourse in source
-    }
-
-
 @flow
 def load_formdata_only():
     logger = get_run_logger()
