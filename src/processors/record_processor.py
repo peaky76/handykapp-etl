@@ -20,7 +20,7 @@ def record_processor():
             data = petl.fromdicts([record])
 
             try:
-                results = transformer(data)
+                results: list[PreMongoRace] = transformer(data)
             except Exception as e:
                 logger.error(f"Error transforming {filename}: {e}")
                 reject_count += 1
@@ -28,11 +28,10 @@ def record_processor():
 
             for race in results:
                 try:
-                    validated_race = PreMongoRace(**race)
-                    r.send((validated_race, source))
+                    r.send((race, source))
                     transform_count += 1
                 except Exception as e:  # noqa: PERF203
-                    logger.error(f"Validation error in {filename}: {e}")
+                    logger.error(f"Error during processing of race in {filename}: {e}")
                     reject_count += 1
                     continue
 
