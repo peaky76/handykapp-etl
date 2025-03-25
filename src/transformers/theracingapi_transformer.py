@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from models import MongoRace, PreMongoRunner
+from models import PreMongoRace, PreMongoRunner
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -85,7 +85,7 @@ def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
     )
 
 
-def transform_races(data) -> MongoRace:
+def transform_races(data) -> PreMongoRace:
     return (
         petl.rename(
             data,
