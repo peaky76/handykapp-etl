@@ -68,7 +68,7 @@ def transform_horse(
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
-        .convert("beaten_distance", lambda x: str(Horselength(x)) if x else None)
+        .convert("beaten_distance", lambda x: float(Horselength(x)) if x else None)
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
@@ -90,6 +90,7 @@ def transform_results(data) -> list[PreMongoRace]:
                 "date": "datetime",
                 "age": "age_restriction",
                 "canceled": "cancelled",
+                "class": "race_class",
                 "distance": "distance_description",
                 "going": "going_description",
             },
