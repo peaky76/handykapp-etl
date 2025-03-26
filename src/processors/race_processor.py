@@ -25,8 +25,10 @@ def rr_code_to_course_dict():
 
 @cache
 def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
+    rr_dict = rr_code_to_course_dict()
+
     if source == "racing_research":
-        return rr_code_to_course_dict()[race.course]
+        return rr_dict[race.course]
 
     surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
     racecourse = db.racecourses.find_one(
