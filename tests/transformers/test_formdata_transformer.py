@@ -2,6 +2,7 @@ import pendulum
 import petl
 from horsetalk import RacingCode
 
+from models import PreMongoRace, PreMongoRunner
 from transformers.formdata_transformer import (
     adjust_rr_name,
     extract_dist_going,
@@ -333,16 +334,16 @@ def test_transform_horse_returns_correct_output():
         "time_rating": 80,
         "form_rating": 80,
     }
-    expected = {
-        "name": "AADDEEY",
-        "country": "GB",
-        "year": 2018,
-        "jockey": "D Tudhope",
-        "lbs_carried": 140,
-        "finishing_position": "2",
-        "official_position": "3",
-        "beaten_distance": 2.0,
-    }
+    expected = PreMongoRunner(
+        name="AADDEEY",
+        country="GB",
+        year=2018,
+        jockey="D Tudhope",
+        lbs_carried=140,
+        finishing_position="2",
+        official_position="3",
+        beaten_distance=2.0,
+    )
 
     actual = transform_horse(petl.fromdicts([data]))
     assert actual == expected
@@ -371,32 +372,32 @@ def test_transform_races_returns_correct_output():
             }
         ],
     }
-    expected = {
-        "course": "Kel",
-        "obstacle": "Steeplechase",
-        "surface": "Turf",
-        "code": "National_Hunt",
-        "datetime": pendulum.datetime(2024, 6, 1, 0, 24, 5),
-        "title": "£5000 3m Handicap Steeplechase",
-        "is_handicap": True,
-        "age_restriction": None,
-        "race_grade": None,
-        "distance_description": "3m",
-        "prize": "5000",
-        "going_description": "Good",
-        "runners": [
-            {
-                "name": "AADDEEY",
-                "country": "GB",
-                "year": 2018,
-                "jockey": "D Tudhope",
-                "lbs_carried": 140,
-                "finishing_position": "3",
-                "official_position": "3",
-                "beaten_distance": 2.0,
-            }
+    expected = PreMongoRace(
+        course="Kel",
+        obstacle="Steeplechase",
+        surface="Turf",
+        code="National_Hunt",
+        datetime=pendulum.datetime(2024, 6, 1, 0, 24, 5),
+        title="£5000 3m Handicap Steeplechase",
+        is_handicap=True,
+        age_restriction=None,
+        race_grade=None,
+        distance_description="3m",
+        prize="5000",
+        going_description="Good",
+        runners=[
+            PreMongoRunner(
+                name="AADDEEY",
+                country="GB",
+                year=2018,
+                jockey="D Tudhope",
+                lbs_carried=140,
+                finishing_position="3",
+                official_position="3",
+                beaten_distance=2.0,
+            )
         ],
-    }
+    )
 
     actual = transform_races(petl.fromdicts([data]))[0]
     assert actual == expected
