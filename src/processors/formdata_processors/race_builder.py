@@ -171,6 +171,8 @@ def race_builder():
                     )
                     race_count += 1
 
+                race_dict[race] = check_result["todo"]
+
                 if len(race_dict) == 0:
                     del race_dict[race]
 
