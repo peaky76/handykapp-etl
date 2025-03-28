@@ -1,15 +1,40 @@
-from functools import cache
+from functools import cache, wraps
 
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import PreMongoRunner, PyObjectId
+from models import PyObjectId
 from processors.person_processor import person_processor
 
 from .utils import compact
 
 db = client.handykapp
+
+
+def cache_if_found(func):
+    cache = {}
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        key = (args, tuple(sorted(kwargs.items())))
+        if key in cache:
+            return cache[key]
+        result = func(*args, **kwargs)
+        if result is not None:  # Only cache when we find something
+            cache[key] = result
+        return result
+
+    return wrapper
+
+
+@cache_if_found
+def get_horse_id(name: str, country: str, year: int, sex: str) -> PyObjectId | None:
+    found_horse = db.horses.find_one(
+        compact({"name": name, "country": country, "year": year, "sex": sex}),
+        {"_id": 1},
+    )
+    return found_horse["_id"] if found_horse else None
 
 
 @cache
@@ -39,17 +64,6 @@ def get_sire_id(name: str | None) -> PyObjectId | None:
     return get_horse_id_by_name_and_sex(name, "M")
 
 
-def make_search_dictionary(horse: PreMongoRunner) -> dict[str, str]:
-    return compact(
-        {
-            "name": horse.name,
-            "country": horse.country,
-            "year": horse.year,
-            "sex": horse.sex,
-        }
-    )
-
-
 def make_update_dictionary(horse):
     return compact(
         {
@@ -74,10 +88,9 @@ def runner_processor():
         while True:
             horse, race_id, source = yield
 
-            found_horse = db.horses.find_one(make_search_dictionary(horse), {"_id": 1})
+            horse_id = get_horse_id(horse.name, horse.country, horse.year, horse.sex)
 
-            if found_horse:
-                horse_id = found_horse["_id"]
+            if horse_id:
                 db.horses.update_one(
                     {"_id": horse_id},
                     {"$set": make_update_dictionary(horse)},
