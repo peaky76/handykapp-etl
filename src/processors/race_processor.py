@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from functools import cache
 
 from prefect import get_run_logger
@@ -63,7 +64,7 @@ def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
     )
 
 
-def race_processor():
+def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
     logger = get_run_logger()
     logger.info("Starting race processor")
     added_count = 0
