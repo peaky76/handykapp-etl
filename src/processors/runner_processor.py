@@ -1,6 +1,7 @@
 from functools import cache, wraps
 
 from prefect import get_run_logger
+from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
@@ -84,6 +85,9 @@ def runner_processor():
     p = person_processor()
     next(p)
 
+    bulk_operations = []
+    bulk_threshold = 100
+
     try:
         while True:
             horse, race_id, source = yield
@@ -91,9 +95,10 @@ def runner_processor():
             horse_id = get_horse_id(horse.name, horse.country, horse.year, horse.sex)
 
             if horse_id:
-                db.horses.update_one(
-                    {"_id": horse_id},
-                    {"$set": make_update_dictionary(horse)},
+                bulk_operations.append(
+                    UpdateOne(
+                        {"_id": horse_id}, {"$set": make_update_dictionary(horse)}
+                    )
                 )
                 logger.debug(f"{horse.name} updated")
                 updated_count += 1
@@ -122,6 +127,12 @@ def runner_processor():
                 except ValueError as e:
                     logger.warning(e)
                     skipped_count += 1
+
+            # Process bulk operations when threshold reached
+            if bulk_operations and len(bulk_operations) >= bulk_threshold:
+                db.horses.bulk_write(bulk_operations)
+                logger.debug(f"Processed {len(bulk_operations)} bulk horse operations")
+                bulk_operations = []
 
             # Add horse to race
             if race_id:
@@ -176,6 +187,11 @@ def runner_processor():
                     )
 
     except GeneratorExit:
+        # Process any remaining bulk operations
+        if bulk_operations:
+            db.horses.bulk_write(bulk_operations)
+            logger.debug(f"Processed {len(bulk_operations)} remaining bulk operations")
+
         logger.info(
             f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
         )
