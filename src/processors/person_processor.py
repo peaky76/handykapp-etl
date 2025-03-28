@@ -8,10 +8,27 @@ from models import PyObjectId
 db = client.handykapp
 
 
+def preload_person_cache(names, source):
+    """Preload cache with people already in database"""
+    cache = {}
+    if not names:
+        return cache
+
+    # Batch query people by names
+    persons = db.people.find({"references." + source: {"$in": list(names)}})
+    for person in persons:
+        source_name = person.get("references", {}).get(source)
+        if source_name:
+            cache[(source_name, source)] = person["_id"]
+    return cache
+
+
 def person_processor():
     logger = get_run_logger()
     logger.info("Starting person processor")
     person_cache: dict[tuple[str, str], PyObjectId] = {}
+    pending_people = set()
+    batch_size = 50
     updated_count = 0
     added_count = 0
     skipped_count = 0
@@ -23,6 +40,15 @@ def person_processor():
             race_id = person.get("race_id")
             runner_id = person.get("runner_id")
             role = person.get("role")
+
+            # Add to pending batch
+            pending_people.add(name)
+
+            # When batch gets large enough, preload cache
+            if len(pending_people) >= batch_size:
+                logger.debug(f"Preloading cache with {len(pending_people)} people")
+                person_cache.update(preload_person_cache(pending_people, source))
+                pending_people = set()
 
             cache_key = (name, source)
             if cache_key in person_cache:
