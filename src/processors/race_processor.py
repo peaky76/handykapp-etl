@@ -25,24 +25,31 @@ def rr_code_to_course_dict():
 
 
 @cache
-def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
-    rr_dict = rr_code_to_course_dict()
-
-    if source == "racing_research":
-        return rr_dict[race.course]
-
-    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
-    racecourse = db.racecourses.find_one(
-        {
-            "name": race.course.title(),
-            "surface": {"$in": surface_options},
-            "code": race.code,
-            "obstacle": race.obstacle,
-        },
-        {"_id": 1},
+def get_all_racecourses():
+    return list(
+        db.racecourses.find(
+            {}, {"name": 1, "surface": 1, "code": 1, "obstacle": 1, "references": 1}
+        )
     )
 
-    return racecourse["_id"] if racecourse else None
+
+def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
+    if source == "racing_research":
+        return rr_code_to_course_dict().get(race.course)
+
+    racecourses = get_all_racecourses()
+    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
+
+    for racecourse in racecourses:
+        if (
+            racecourse["name"] == race.course.title()
+            and racecourse.get("surface") in surface_options
+            and racecourse.get("code") == race.code
+            and racecourse.get("obstacle") == race.obstacle
+        ):
+            return racecourse["_id"]
+
+    return None
 
 
 def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
