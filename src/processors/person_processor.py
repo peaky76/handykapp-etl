@@ -51,7 +51,7 @@ def person_processor():
                 try:
                     inserted_person = db.people.insert_one(
                         name_parts.as_dict()
-                        | {f"references.{source}": name}
+                        | {"references": {source: name}}
                         | ({"ratings": ratings} if ratings else {})
                     )
                     found_id = inserted_person.inserted_id
