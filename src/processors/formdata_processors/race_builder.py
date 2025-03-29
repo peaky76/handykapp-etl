@@ -255,7 +255,7 @@ def race_builder():
 
                 race_dict[race] = check_result["todo"]
 
-                if len(race_dict) == 0:
+                if len(race_dict[race]) == 0:
                     del race_dict[race]
 
     except GeneratorExit:
