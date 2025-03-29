@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cache, lru_cache
 from itertools import combinations, pairwise
 from typing import Literal, TypeAlias
 
@@ -13,6 +13,16 @@ from transformers.formdata_transformer import transform_races
 RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
 ]
+
+
+@cache
+def get_position_num(runner):
+    pos = runner.position
+
+    if "=" not in pos:
+        return int(pos)
+
+    return int(pos.split("p")[0].replace("=", ""))
 
 
 def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
@@ -36,6 +46,7 @@ def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> dict:
 def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
+    logger = get_run_logger()
     unchanged: RaceCompleteCheckResult = {"complete": [], "todo": runners}
 
     if len(runners) < race.number_of_runners:
@@ -43,10 +54,7 @@ def check_race_complete(
 
     # Sort runners first to reduce number of combinations
     is_finisher = lambda x: x.position.isdigit() or "=" in x.position
-    finishers = sorted(
-        [runner for runner in runners if is_finisher(runner)],
-        key=lambda x: int(x.position.split("p")[0].replace("=", "")),
-    )
+    finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
 
     # Fast path: If we have exact number of finishers, check if they form a valid race
     if len(finishers) == race.number_of_runners:
@@ -104,10 +112,7 @@ def check_race_complete(
 
     # Slow path: Check all possible combinations of runners
     for combo in combinations(runners, race.number_of_runners):
-        finishers = sorted(
-            [runner for runner in combo if is_finisher(runner)],
-            key=lambda x: int(x.position.split("p")[0].replace("=", "")),
-        )
+        finishers = sorted([r for r in combo if is_finisher(r)], key=get_position_num)
 
         # Skip combinations with duplicate positions
         positions = [f.position for f in finishers]
