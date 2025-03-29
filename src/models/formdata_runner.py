@@ -15,3 +15,14 @@ class FormdataRunner(BaseModel):
     beaten_distance: Optional[float] = None
     time_rating: Optional[int] = None
     form_rating: Optional[int] = None
+
+    model_config = {"frozen": True}
+
+    def __hash__(self):
+        return hash(
+            (
+                self.name,
+                self.country,
+                self.year,
+            )
+        )
