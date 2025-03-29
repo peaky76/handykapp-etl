@@ -6,6 +6,7 @@ from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
 from models import PreMongoRace
+from models.pre_mongo_runner import PreMongoRunner
 from processors.runner_processor import runner_processor
 
 from .utils import compact
@@ -143,7 +144,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if horse.sire:
                             r.send(
                                 (
-                                    {"name": horse.sire, "sex": "M", "race_id": None},
+                                    PreMongoRunner(**{"name": horse.sire, "sex": "M"}),
                                     None,
                                     source,
                                 )
@@ -152,11 +153,9 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if horse.damsire:
                             r.send(
                                 (
-                                    {
-                                        "name": horse.damsire,
-                                        "sex": "M",
-                                        "race_id": None,
-                                    },
+                                    PreMongoRunner(
+                                        **{"name": horse.damsire, "sex": "M"}
+                                    ),
                                     None,
                                     source,
                                 )
@@ -165,12 +164,13 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if horse.dam:
                             r.send(
                                 (
-                                    {
-                                        "name": horse.dam,
-                                        "sex": "F",
-                                        "sire": horse.damsire,
-                                        "race_id": None,
-                                    },
+                                    PreMongoRunner(
+                                        **{
+                                            "name": horse.dam,
+                                            "sex": "F",
+                                            "sire": horse.damsire,
+                                        }
+                                    ),
                                     None,
                                     source,
                                 )
