@@ -35,6 +35,15 @@ def validate_positions(runners):
         return False
 
 
+def validate_ratings_vs_positions(finishers):
+    adjusted_ratings = calculate_adjusted_ratings(
+        tuple(runner.weight for runner in finishers),
+        tuple(runner.allowance for runner in finishers),
+        tuple(runner.form_rating for runner in finishers),
+    )
+    return is_monotonically_decreasing_or_equal(adjusted_ratings), adjusted_ratings
+
+
 def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
 
@@ -67,43 +76,35 @@ def check_race_complete(
 
     # Fast path: If we have exact number of finishers, check if they form a valid race
     if len(finishers) == race.number_of_runners and validate_positions(finishers):
-        # Skip validation if any runner lacks a form rating
-        if all(runner.form_rating for runner in finishers):
-            # Check if ratings are consistent with finishing order
-            adjusted_ratings = calculate_adjusted_ratings(
-                tuple(runner.weight for runner in finishers),
-                tuple(runner.allowance for runner in finishers),
-                tuple(runner.form_rating for runner in finishers),
+        ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
+        if not ratings_valid:
+            return unchanged
+
+        # Validate consistency of ratings vs beaten distances
+        rtg_dist_pairs = [
+            (r, d)
+            for r, d in zip(
+                adjusted_ratings,
+                [
+                    max(0, r.beaten_distance) if r.beaten_distance else None
+                    for r in finishers
+                ],
             )
+            if d is not None
+        ]
 
-            if not is_monotonically_decreasing_or_equal(adjusted_ratings):
-                return {"complete": [], "todo": runners}
+        # Calculate pounds per length implied by each pair of horses
+        ratios = [
+            (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
+            for a, b in pairwise(rtg_dist_pairs)
+        ]
 
-            # Validate consistency of ratings vs beaten distances
-            rtg_dist_pairs = [
-                (r, d)
-                for r, d in zip(
-                    adjusted_ratings,
-                    [
-                        max(0, r.beaten_distance) if r.beaten_distance else None
-                        for r in finishers
-                    ],
-                )
-                if d is not None
-            ]
-
-            # Calculate pounds per length implied by each pair of horses
-            ratios = [
-                (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
-                for a, b in pairwise(rtg_dist_pairs)
-            ]
-
-            # Validate consistency of pounds-per-length across the race
-            non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-            if ratios and not all(
-                abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
-            ):
-                return {"complete": [], "todo": runners}
+        # Validate consistency of pounds-per-length across the race
+        non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
+        if ratios and not all(
+            abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
+        ):
+            return {"complete": [], "todo": runners}
 
         # All validations passed - this is a complete race
         return {"complete": finishers, "todo": []}
@@ -130,13 +131,8 @@ def check_race_complete(
 
         # Validate ratings if all runners have them
         if all(runner.form_rating for runner in finishers):
-            # Check if ratings match finishing order
-            adjusted_ratings = calculate_adjusted_ratings(
-                tuple(runner.weight for runner in finishers),
-                tuple(runner.allowance for runner in finishers),
-                tuple(runner.form_rating for runner in finishers),
-            )
-            if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+            ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
+            if not ratings_valid:
                 failed_combos_memo.add(combo_key)
                 continue
 
