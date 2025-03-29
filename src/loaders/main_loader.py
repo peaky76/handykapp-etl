@@ -10,12 +10,11 @@ from pymongo import ASCENDING as ASC
 from clients import mongo_client as client
 
 # from loaders.bha_loader import load_bha
-from loaders.formdata_loader import load_formdata_only
-
+# from loaders.formdata_loader import load_formdata_only
 # from loaders.jockey_ratings_loader import load_jockey_ratings
 # from loaders.racecourse_loader import load_racecourses
 # from loaders.rapid_horseracing_loader import load_rapid_horseracing_data
-# from loaders.theracingapi_loader import load_theracingapi_data
+from loaders.theracingapi_loader import load_theracingapi_data
 
 db = client.handykapp
 
@@ -63,11 +62,15 @@ def spec_database():
 @flow
 def load_database_afresh():
     # drop_database()
+    db.races.drop()
+    db.horses.drop()
+    db.people.drop()
+    db.formdata.drop()
     spec_database()
     # load_racecourses()
     # load_bha()
-    load_formdata_only()
-    # load_theracingapi_data()
+    # load_formdata_only()
+    load_theracingapi_data()
     # load_rapid_horseracing_data()
     # load_jockey_ratings()
     # load_formdata_horses()
