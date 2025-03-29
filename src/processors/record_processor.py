@@ -6,11 +6,11 @@ from prefect import get_run_logger
 from processors.race_processor import race_processor
 
 
-def transform_single_record(record, transformer, filename, source):
+def transform_single_record(record, transformer, filename, logger):
     try:
         return transformer(petl.fromdicts([record]))
     except Exception as e:
-        get_run_logger().error(f"Error transforming {filename}: {e}")
+        logger.error(f"Error transforming {filename}: {e}")
         return None
 
 
@@ -31,7 +31,7 @@ def record_processor():
 
                 # Submit transformation to thread pool
                 future = executor.submit(
-                    transform_single_record, record, transformer, filename, source
+                    transform_single_record, record, transformer, filename, logger
                 )
                 results = future.result()
 
