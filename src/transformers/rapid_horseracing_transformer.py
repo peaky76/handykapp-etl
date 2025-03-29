@@ -1,4 +1,5 @@
 # To allow running as a script
+from decimal import Decimal
 import sys
 from enum import Enum
 from pathlib import Path
@@ -53,6 +54,7 @@ def transform_horse(
                 "official_rating": int,
                 "non_runner": lambda x: bool(int(x)),
                 "lbs_carried": lambda x: RaceWeight(x).lb,
+                "sp": lambda x: Decimal(x) if x else None,
             }
         )
         .addfield(
