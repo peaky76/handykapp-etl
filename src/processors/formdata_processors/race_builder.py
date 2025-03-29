@@ -14,6 +14,8 @@ RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
 ]
 
+failed_combos_memo = set()
+
 
 @cache
 def get_position_num(runner):
@@ -101,10 +103,7 @@ def check_race_complete(
                     return {"complete": [], "todo": runners}
 
             # All validations passed - this is a complete race
-            return {
-                "complete": finishers,
-                "todo": [r for r in runners if r not in finishers],
-            }
+            return {"complete": finishers, "todo": []}
 
         except ValueError:
             # Not a valid ranking - fall through to combinatorial check
@@ -112,18 +111,24 @@ def check_race_complete(
 
     # Slow path: Check all possible combinations of runners
     for combo in combinations(runners, race.number_of_runners):
+        combo_key = frozenset(id(r) for r in combo)
+        if combo_key in failed_combos_memo:
+            continue
+
         finishers = sorted([r for r in combo if is_finisher(r)], key=get_position_num)
 
         # Skip combinations with duplicate positions
         positions = [f.position for f in finishers]
         non_equal_positions = [p for p in positions if "=" not in p]
         if len(non_equal_positions) != len(set(non_equal_positions)):
+            failed_combos_memo.add(combo_key)
             continue
 
         # Validate positions form a proper ranking
         try:
             RankList(runner.position for runner in finishers)
         except ValueError:
+            failed_combos_memo.add(combo_key)
             continue
 
         # Validate ratings if all runners have them
@@ -135,6 +140,7 @@ def check_race_complete(
                 tuple(runner.form_rating for runner in finishers),
             )
             if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+                failed_combos_memo.add(combo_key)
                 continue
 
             # Validate consistency of ratings vs beaten distances
@@ -161,10 +167,12 @@ def check_race_complete(
             if ratios and not all(
                 abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
             ):
+                failed_combos_memo.add(combo_key)
                 continue
 
         # Skip if non-finishers in this combo but unprocessed runners remain
         if len(finishers) != len(combo) and len(runners) != len(combo):
+            failed_combos_memo.add(combo_key)
             continue
 
         # Found a valid combination
