@@ -48,7 +48,6 @@ def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> dict:
 def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
-    logger = get_run_logger()
     unchanged: RaceCompleteCheckResult = {"complete": [], "todo": runners}
 
     if len(runners) < race.number_of_runners:
