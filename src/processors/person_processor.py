@@ -19,7 +19,7 @@ def preload_person_cache(names, source):
     for person in persons:
         source_name = person.get("references", {}).get(source)
         if source_name:
-            cache[(source_name, source)] = person["_id"]
+            cache[source_name, source] = person["_id"]
     return cache
 
 

@@ -67,7 +67,7 @@ def entry_processor():
                 bulk_operations = []
 
             if processed_count % 100 == 0:
-                logger.debug(f"Processed {processed_count} horses")
+                logger.info(f"Processed {processed_count} horses")
 
     except GeneratorExit:
         # Process remaining operations
