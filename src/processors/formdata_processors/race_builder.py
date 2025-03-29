@@ -27,6 +27,14 @@ def get_position_num(runner):
     return int(pos.split("p")[0].replace("=", ""))
 
 
+def validate_positions(runners):
+    try:
+        RankList(r.position for r in runners)
+        return True
+    except ValueError:
+        return False
+
+
 def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
 
@@ -58,55 +66,47 @@ def check_race_complete(
     finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
 
     # Fast path: If we have exact number of finishers, check if they form a valid race
-    if len(finishers) == race.number_of_runners:
-        try:
-            # Validate positions form a proper ranking order
-            RankList(runner.position for runner in finishers)
+    if len(finishers) == race.number_of_runners and validate_positions(finishers):
+        # Skip validation if any runner lacks a form rating
+        if all(runner.form_rating for runner in finishers):
+            # Check if ratings are consistent with finishing order
+            adjusted_ratings = calculate_adjusted_ratings(
+                tuple(runner.weight for runner in finishers),
+                tuple(runner.allowance for runner in finishers),
+                tuple(runner.form_rating for runner in finishers),
+            )
 
-            # Skip validation if any runner lacks a form rating
-            if all(runner.form_rating for runner in finishers):
-                # Check if ratings are consistent with finishing order
-                adjusted_ratings = calculate_adjusted_ratings(
-                    tuple(runner.weight for runner in finishers),
-                    tuple(runner.allowance for runner in finishers),
-                    tuple(runner.form_rating for runner in finishers),
+            if not is_monotonically_decreasing_or_equal(adjusted_ratings):
+                return {"complete": [], "todo": runners}
+
+            # Validate consistency of ratings vs beaten distances
+            rtg_dist_pairs = [
+                (r, d)
+                for r, d in zip(
+                    adjusted_ratings,
+                    [
+                        max(0, r.beaten_distance) if r.beaten_distance else None
+                        for r in finishers
+                    ],
                 )
+                if d is not None
+            ]
 
-                if not is_monotonically_decreasing_or_equal(adjusted_ratings):
-                    return {"complete": [], "todo": runners}
+            # Calculate pounds per length implied by each pair of horses
+            ratios = [
+                (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
+                for a, b in pairwise(rtg_dist_pairs)
+            ]
 
-                # Validate consistency of ratings vs beaten distances
-                rtg_dist_pairs = [
-                    (r, d)
-                    for r, d in zip(
-                        adjusted_ratings,
-                        [
-                            max(0, r.beaten_distance) if r.beaten_distance else None
-                            for r in finishers
-                        ],
-                    )
-                    if d is not None
-                ]
+            # Validate consistency of pounds-per-length across the race
+            non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
+            if ratios and not all(
+                abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
+            ):
+                return {"complete": [], "todo": runners}
 
-                # Calculate pounds per length implied by each pair of horses
-                ratios = [
-                    (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
-                    for a, b in pairwise(rtg_dist_pairs)
-                ]
-
-                # Validate consistency of pounds-per-length across the race
-                non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-                if ratios and not all(
-                    abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
-                ):
-                    return {"complete": [], "todo": runners}
-
-            # All validations passed - this is a complete race
-            return {"complete": finishers, "todo": []}
-
-        except ValueError:
-            # Not a valid ranking - fall through to combinatorial check
-            pass
+        # All validations passed - this is a complete race
+        return {"complete": finishers, "todo": []}
 
     # Slow path: Check all possible combinations of runners
     for combo in combinations(runners, race.number_of_runners):
@@ -124,9 +124,7 @@ def check_race_complete(
             continue
 
         # Validate positions form a proper ranking
-        try:
-            RankList(runner.position for runner in finishers)
-        except ValueError:
+        if not validate_positions(finishers):
             failed_combos_memo.add(combo_key)
             continue
 
