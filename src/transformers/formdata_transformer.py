@@ -199,18 +199,21 @@ def create_run(words: list[str]) -> FormdataRun | None:
     return run
 
 
-DIST_GOING_PATTERN = re.compile(r"""
+DIST_GOING_PATTERN = re.compile(
+    r"""
     ^                                       # Start of the string
     (?:r)?                                  # Optional r
     (?P<dist>\d\.?\d?)                      # Distance
     (?P<going>[H|F|M|G|D|S|V|f|m|g|d|s])    # Going
     $                                       # End of the string
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_dist_going(string: str) -> tuple[float, str] | None:
-    match = re.match(DIST_GOING_PATTERN, string, re.VERBOSE)
+    match = re.match(DIST_GOING_PATTERN, string)
     if match:
         dist = match.group("dist")
         going = match.group("going")
@@ -219,32 +222,38 @@ def extract_dist_going(string: str) -> tuple[float, str] | None:
     return None
 
 
-GRADE_PATTERN = re.compile(r"""
+GRADE_PATTERN = re.compile(
+    r"""
     G           # Literal 'G'
     [123]       # Single digit 1, 2, or 3
     (?![0-9])   # Not followed by another digit
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_grade(race_type: str) -> str | None:
-    match = re.search(GRADE_PATTERN, race_type, re.VERBOSE)
+    match = re.search(GRADE_PATTERN, race_type)
     return match.group(0) if match else None
 
 
-MIDDLE_DETAILS_PATTERN = re.compile(r"""
+MIDDLE_DETAILS_PATTERN = re.compile(
+    r"""
     ^                                       # Start of the string
     (?P<headgear>[a-z])?                    # Lowercase letter as the headgear
     (?P<allowance>\d+)?                     # Optional number as the allowance
     (?P<jockey>[a-zA-Z\-\']+)               # Remaining characters as the jockey
     (?P<position>(\=?\d+(?:p\d+|d)?|[a-z])) # Last number or char as the position (With optional = or #p# formatting)
     $                                       # End of the string
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_middle_details(details: str) -> dict | None:
-    match = re.match(MIDDLE_DETAILS_PATTERN, details, re.VERBOSE)
+    match = re.match(MIDDLE_DETAILS_PATTERN, details)
     if match:
         return {
             "headgear": match.group("headgear"),
@@ -256,17 +265,20 @@ def extract_middle_details(details: str) -> dict | None:
     return None
 
 
-PRIZE_PATTERN = re.compile(r"""
+PRIZE_PATTERN = re.compile(
+    r"""
     ^                                   # Start of the string
     (?P<racetype>\d*[A-Za-z]+)?         # Race type
     (?P<prize>\d{3,4})                  # Prize money
     $                                   # End of the string
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_prize(string: str) -> tuple[str, str] | None:
-    match = re.match(PRIZE_PATTERN, string, re.VERBOSE)
+    match = re.match(PRIZE_PATTERN, string)
     if match:
         racetype = match.group("racetype")
         prize = match.group("prize")
@@ -275,35 +287,41 @@ def extract_prize(string: str) -> tuple[str, str] | None:
     return None
 
 
-RATING_PATTERN = re.compile(r"""
+RATING_PATTERN = re.compile(
+    r"""
     ^                                   # Start of the string
     (?P<disaster>[a-z-]?)               # Disaster
     (?P<rating>\d{1,3})                 # Rating
     (?P<jumps_category>([a-z]-?)?)      # Jumps category
     $                                   # End of the string
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_rating(string: str) -> int | None:
-    match = re.match(RATING_PATTERN, string, re.VERBOSE)
+    match = re.match(RATING_PATTERN, string)
     if match:
         return int(match.group("rating")) if not match.group("disaster") else None
 
     return None
 
 
-WEIGHT_PATTERN = re.compile(r"""
+WEIGHT_PATTERN = re.compile(
+    r"""
     ^                                   # Start of the string
     (?P<weight>\d{1,2}\-\d{2})          # Weight
     (?P<jockey>.*)                      # Jockey
     $                                   # End of the string
-""")
+""",
+    re.VERBOSE,
+)
 
 
 @cache
 def extract_weight(string: str) -> tuple[str, str] | None:
-    match = re.match(WEIGHT_PATTERN, string, re.VERBOSE)
+    match = re.match(WEIGHT_PATTERN, string)
     if match:
         weight = match.group("weight")
         jockey = match.group("jockey")
