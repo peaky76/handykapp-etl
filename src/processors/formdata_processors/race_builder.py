@@ -44,6 +44,37 @@ def validate_ratings_vs_positions(finishers):
     return is_monotonically_decreasing_or_equal(adjusted_ratings), adjusted_ratings
 
 
+def validate_ratings_vs_distances(finishers, adjusted_ratings):
+    """Validate consistency between ratings and beaten distances"""
+    rtg_dist_pairs = [
+        (r, d)
+        for r, d in zip(
+            adjusted_ratings,
+            [
+                max(0, r.beaten_distance) if r.beaten_distance else None
+                for r in finishers
+            ],
+        )
+        if d is not None
+    ]
+
+    # Skip validation if not enough pairs
+    if len(rtg_dist_pairs) < 3:
+        return True
+
+    # Calculate ratios
+    ratios = [
+        (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
+        for a, b in pairwise(rtg_dist_pairs)
+    ]
+
+    # Validate consistency
+    non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
+    return not ratios or all(
+        abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
+    )
+
+
 def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
 
@@ -80,31 +111,8 @@ def check_race_complete(
         if not ratings_valid:
             return unchanged
 
-        # Validate consistency of ratings vs beaten distances
-        rtg_dist_pairs = [
-            (r, d)
-            for r, d in zip(
-                adjusted_ratings,
-                [
-                    max(0, r.beaten_distance) if r.beaten_distance else None
-                    for r in finishers
-                ],
-            )
-            if d is not None
-        ]
-
-        # Calculate pounds per length implied by each pair of horses
-        ratios = [
-            (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
-            for a, b in pairwise(rtg_dist_pairs)
-        ]
-
-        # Validate consistency of pounds-per-length across the race
-        non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-        if ratios and not all(
-            abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
-        ):
-            return {"complete": [], "todo": runners}
+        if not validate_ratings_vs_distances(finishers, adjusted_ratings):
+            return unchanged
 
         # All validations passed - this is a complete race
         return {"complete": finishers, "todo": []}
@@ -136,30 +144,7 @@ def check_race_complete(
                 failed_combos_memo.add(combo_key)
                 continue
 
-            # Validate consistency of ratings vs beaten distances
-            rtg_dist_pairs = [
-                (r, d)
-                for r, d in zip(
-                    adjusted_ratings,
-                    [
-                        max(0, r.beaten_distance) if r.beaten_distance else None
-                        for r in finishers
-                    ],
-                )
-                if d is not None
-            ]
-
-            # Calculate pounds per length implied by each pair of horses
-            ratios = [
-                (b[0] - a[0]) / (b[1] - a[1]) if b[1] - a[1] != 0 else 0
-                for a, b in pairwise(rtg_dist_pairs)
-            ]
-
-            # Validate consistency of pounds-per-length across the race
-            non_zero_non_win_ratios = [r for r in ratios if r != 0][1:]
-            if ratios and not all(
-                abs(r1 - r2) <= 1 for r1, r2 in pairwise(non_zero_non_win_ratios)
-            ):
+            if not validate_ratings_vs_distances(finishers, adjusted_ratings):
                 failed_combos_memo.add(combo_key)
                 continue
 
