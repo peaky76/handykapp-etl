@@ -1,5 +1,6 @@
 # To allow running as a script, need path
 import sys
+from functools import cache
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -207,6 +208,7 @@ DIST_GOING_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_dist_going(string: str) -> tuple[float, str] | None:
     match = re.match(DIST_GOING_PATTERN, string, re.VERBOSE)
     if match:
@@ -224,6 +226,7 @@ GRADE_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_grade(race_type: str) -> str | None:
     match = re.search(GRADE_PATTERN, race_type, re.VERBOSE)
     return match.group(0) if match else None
@@ -239,6 +242,7 @@ MIDDLE_DETAILS_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_middle_details(details: str) -> dict | None:
     match = re.match(MIDDLE_DETAILS_PATTERN, details, re.VERBOSE)
     if match:
@@ -260,6 +264,7 @@ PRIZE_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_prize(string: str) -> tuple[str, str] | None:
     match = re.match(PRIZE_PATTERN, string, re.VERBOSE)
     if match:
@@ -279,6 +284,7 @@ RATING_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_rating(string: str) -> int | None:
     match = re.match(RATING_PATTERN, string, re.VERBOSE)
     if match:
@@ -295,6 +301,7 @@ WEIGHT_PATTERN = re.compile(r"""
 """)
 
 
+@cache
 def extract_weight(string: str) -> tuple[str, str] | None:
     match = re.match(WEIGHT_PATTERN, string, re.VERBOSE)
     if match:
