@@ -41,8 +41,9 @@ def record_processor():
 
                 for race in results:
                     try:
-                        r.send((race, source))
-                        transform_count += 1
+                        if race.code == "Flat":
+                            r.send((race, source))
+                            transform_count += 1
                     except Exception as e:  # noqa: PERF203
                         logger.error(
                             f"Error during processing of race in {filename}: {e}"
