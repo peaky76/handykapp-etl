@@ -7,8 +7,8 @@ from pydantic_extra_types.pendulum_dt import Duration
 
 class PreMongoRunner(BaseModel):
     name: str = Field(..., min_length=3, max_length=21)
-    country: str = Field(..., min_length=2, max_length=3)
-    year: int
+    country: Optional[str] = Field(None, min_length=2, max_length=3)
+    year: Optional[int] = None
     sex: Optional[Literal["M", "F"]] = None
     colour: Optional[str] = None
     owner: Optional[str] = None
