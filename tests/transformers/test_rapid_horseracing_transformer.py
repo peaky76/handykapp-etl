@@ -2,6 +2,7 @@ import pendulum
 import petl
 import pytest
 
+from models import PreMongoRace, PreMongoRunner
 from transformers.rapid_horseracing_transformer import (
     transform_horse,
     transform_results,
@@ -52,53 +53,53 @@ def result_data():
 
 
 def test_transform_horse_returns_correct_output(horse_data):
-    expected = {
-        "name": "DOBBIN",
-        "country": "IRE",
-        "year": 2020,
-        "rapid_id": "123456",
-        "jockey": "A Jockey",
-        "trainer": "A Trainer",
-        "lbs_carried": 140,
-        "saddlecloth": "1",
-        "days_since_prev_run": 1,
-        "non_runner": False,
-        "form": "1-2-3",
-        "finishing_position": "1",
-        "official_position": "1",
-        "beaten_distance": "1 1/2",
-        "owner": "A Owner",
-        "sire": "THE SIRE",
-        "sire_country": "GB",
-        "dam": "THE DAM",
-        "dam_country": "FR",
-        "official_rating": None,
-        "sp": "8",
-        "odds": [],
-        "finishing_time": None,
-    }
+    expected = PreMongoRunner(
+        name="DOBBIN",
+        country="IRE",
+        year=2020,
+        rapid_id="123456",
+        jockey="A Jockey",
+        trainer="A Trainer",
+        lbs_carried=140,
+        saddlecloth="1",
+        days_since_prev_run=1,
+        non_runner=False,
+        form="1-2-3",
+        finishing_position="1",
+        official_position="1",
+        beaten_distance=1.5,
+        owner="A Owner",
+        sire="THE SIRE",
+        sire_country="GB",
+        dam="THE DAM",
+        dam_country="FR",
+        official_rating=None,
+        sp="8",
+        odds=[],
+        finishing_time=None,
+    )
     actual = transform_horse(petl.fromdicts([horse_data]), pendulum.parse("2023-03-08"))
     assert actual == expected
 
 
 def test_transform_results_returns_correct_output(result_data):
-    expected = {
-        "rapid_id": "123456",
-        "course": "Lucksin Downs",
-        "datetime": "2020-01-01T16:00:00+00:00",
-        "title": "LUCKSIN HANDICAP (5)",
-        "is_handicap": True,
-        "obstacle": None,
-        "surface": "Turf",
-        "code": "Flat",
-        "distance_description": "1m2f",
-        "age_restriction": "3",
-        "going_description": "Soft (Good to Soft in places)",
-        "finished": True,
-        "cancelled": False,
-        "prize": "£2794",
-        "class": "5",
-        "runners": [],
-    }
+    expected = PreMongoRace(
+        rapid_id="123456",
+        course="Lucksin Downs",
+        datetime="2020-01-01T16:00:00+00:00",
+        title="LUCKSIN HANDICAP (5)",
+        is_handicap=True,
+        obstacle=None,
+        surface="Turf",
+        code="Flat",
+        distance_description="1m2f",
+        age_restriction="3",
+        going_description="Soft (Good to Soft in places)",
+        finished=True,
+        cancelled=False,
+        prize="£2794",
+        race_class="5",
+        runners=[],
+    )
     actual = transform_results(petl.fromdicts([result_data]))[0]
     assert actual == expected

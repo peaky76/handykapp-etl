@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from functools import cache
 
 from prefect import get_run_logger
@@ -24,25 +25,31 @@ def rr_code_to_course_dict():
 
 
 @cache
-def get_racecourse_id(race: PreMongoRace) -> str | None:
-    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
-    racecourse = db.racecourses.find_one(
-        {
-            "name": race.course.title(),
-            "surface": {"$in": surface_options},
-            "code": race.code,
-            "obstacle": race.obstacle,
-        },
-        {"_id": 1},
+def get_all_racecourses():
+    return list(
+        db.racecourses.find(
+            {}, {"name": 1, "surface": 1, "code": 1, "obstacle": 1, "references": 1}
+        )
     )
 
-    return (
-        racecourse["_id"]
-        if racecourse
-        else rr
-        if (rr := rr_code_to_course_dict()[race.course])
-        else None
-    )
+
+def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
+    if source == "racing_research":
+        return rr_code_to_course_dict().get(race.course)
+
+    racecourses = get_all_racecourses()
+    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
+
+    for racecourse in racecourses:
+        if (
+            racecourse["name"] == race.course.title()
+            and racecourse.get("surface") in surface_options
+            and racecourse.get("code") == race.code
+            and racecourse.get("obstacle") == race.obstacle
+        ):
+            return racecourse["_id"]
+
+    return None
 
 
 def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
@@ -64,7 +71,7 @@ def make_update_dictionary(race, racecourse_id) -> PreMongoRace:
     )
 
 
-def race_processor():
+def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
     logger = get_run_logger()
     logger.info("Starting race processor")
     added_count = 0
@@ -78,7 +85,7 @@ def race_processor():
         while True:
             race, source = yield
 
-            if racecourse_id := get_racecourse_id(race):
+            if racecourse_id := get_racecourse_id(race, source):
                 found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,

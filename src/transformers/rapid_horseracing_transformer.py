@@ -4,7 +4,7 @@ from enum import Enum
 from pathlib import Path
 from typing import cast
 
-from models import MongoRace, PreMongoRunner
+from models import PreMongoRace, PreMongoRunner
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -33,7 +33,7 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 def transform_horse(
     data, race_date=pendulum.now(), finishing_time=None
 ) -> PreMongoRunner:
-    return (
+    transformed_horse = (
         petl.rename(
             data,
             {
@@ -68,7 +68,7 @@ def transform_horse(
         .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
         .convert("dam", lambda x: parse_horse(x)[0])
-        .convert("beaten_distance", lambda x: str(Horselength(x)) if x else None)
+        .convert("beaten_distance", lambda x: float(Horselength(x)) if x else None)
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
@@ -78,10 +78,11 @@ def transform_horse(
         .cutout("horse", "age")
         .dicts()[0]
     )
+    return PreMongoRunner(**transformed_horse)
 
 
-def transform_results(data) -> MongoRace:
-    return (
+def transform_results(data) -> list[PreMongoRace]:
+    transformed_races = (
         petl.rename(
             data,
             {
@@ -89,6 +90,7 @@ def transform_results(data) -> MongoRace:
                 "date": "datetime",
                 "age": "age_restriction",
                 "canceled": "cancelled",
+                "class": "race_class",
                 "distance": "distance_description",
                 "going": "going_description",
             },
@@ -140,6 +142,7 @@ def transform_results(data) -> MongoRace:
         .cutout("horses", "finish_time")
         .dicts()
     )
+    return [PreMongoRace(**race) for race in transformed_races]
 
 
 if __name__ == "__main__":
