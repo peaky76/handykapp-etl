@@ -28,7 +28,15 @@ def rr_code_to_course_dict():
 def get_all_racecourses():
     return list(
         db.racecourses.find(
-            {}, {"name": 1, "surface": 1, "code": 1, "obstacle": 1, "references": 1}
+            {},
+            {
+                "name": 1,
+                "formal_name": 1,
+                "surface": 1,
+                "code": 1,
+                "obstacle": 1,
+                "references": 1,
+            },
         )
     )
 
@@ -42,10 +50,16 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
 
     for racecourse in racecourses:
         if (
-            racecourse["name"] == race.course.title()
+            (
+                racecourse["name"].lower() == race.course.lower()
+                or racecourse["formal_name"].lower() == race.course.lower()
+            )
             and racecourse.get("surface") in surface_options
             and racecourse.get("code") == race.code
-            and racecourse.get("obstacle") == race.obstacle
+            and (
+                racecourse.get("obstacle") == race.obstacle
+                or (racecourse.get("obstacle") is None and race.obstacle is None)
+            )
         ):
             return racecourse["_id"]
 
