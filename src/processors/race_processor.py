@@ -166,7 +166,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                     logger.error(f"Error processing {race_id}: {e}")
             else:
                 logger.error(
-                    f"Unable to add race {race_id}: No matching racecourse found"
+                    f"Unable to add {race.datetime} at {race.course} from {source}: No matching racecourse found"
                 )
 
     except GeneratorExit:
