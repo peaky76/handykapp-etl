@@ -98,11 +98,15 @@ def transform_results(data) -> list[PreMongoRace]:
             },
         )
         .convert(
-            "datetime",
-            lambda x: pendulum.from_format(x, "YYYY-MM-DD HH:mm:ss").isoformat(),
+            {
+                "datetime": lambda x: pendulum.from_format(
+                    x, "YYYY-MM-DD HH:mm:ss"
+                ).isoformat(),
+                "finished": lambda x: bool(int(x)),
+                "cancelled": lambda x: bool(int(x)),
+                "race_class": lambda x: x or None,
+            }
         )
-        .convert("finished", lambda x: bool(int(x)))
-        .convert("cancelled", lambda x: bool(int(x)))
         .addfield(
             "is_handicap",
             lambda rec: "HANDICAP" in rec["title"].upper()
