@@ -1,7 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
-import petl  # type: ignore
 from prefect import get_run_logger
 
 from processors.race_processor import race_processor
@@ -9,7 +8,7 @@ from processors.race_processor import race_processor
 
 def transform_single_record(record, transformer, filename, logger):
     try:
-        return transformer(petl.fromdicts([record]))
+        return transformer(record)
     except Exception as e:
         logger.error(f"Error transforming {filename}: {e}")
         return None

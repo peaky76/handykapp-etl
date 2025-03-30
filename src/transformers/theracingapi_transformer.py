@@ -89,7 +89,8 @@ def transform_horse(
     return PreMongoRunner(**transformed_horse)
 
 
-def transform_races(data: list[TheRacingApiRacecard]) -> list[PreMongoRace]:
+def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
+    data = petl.fromdicts([record.model_dump()])
     transformed_races = (
         petl.rename(
             data,

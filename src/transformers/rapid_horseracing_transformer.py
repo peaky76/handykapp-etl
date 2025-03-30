@@ -80,9 +80,10 @@ def transform_horse(
 
 
 def transform_results(record: RapidRecord) -> list[PreMongoRace]:
+    data = petl.fromdicts([record.model_dump()])
     transformed_races = (
         petl.rename(
-            record,
+            data,
             {
                 "id_race": "rapid_id",
                 "date": "datetime",

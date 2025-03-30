@@ -55,7 +55,7 @@ def load_theracingapi_data(*, from_date=None):
         for dec in contents["racecards"]:
             data = {k: v for k, v in dec.items() if k != "off_dt"}
             record = TheRacingApiRacecard(**data)
-            r.send((record.model_dump(), transform_races, file, "theracingapi"))
+            r.send((record, transform_races, file, "theracingapi"))
 
     r.close()
 
