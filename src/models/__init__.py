@@ -13,6 +13,8 @@ from .pre_mongo_runner import PreMongoRunner
 from .py_object_id import PyObjectId
 from .rapid_record import RapidRecord
 from .rapid_runner import RapidRunner
+from .theracingapi_racecard import TheRacingApiRacecard
+from .theracingapi_runner import TheRacingApiRunner
 
 __all__ = [
     "FormdataHorse",
@@ -30,4 +32,6 @@ __all__ = [
     "PyObjectId",
     "RapidRecord",
     "RapidRunner",
+    "TheRacingApiRacecard",
+    "TheRacingApiRunner",
 ]
