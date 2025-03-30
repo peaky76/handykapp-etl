@@ -10,7 +10,7 @@ class RapidRunner(BaseModel):
     trainer: str = Field(..., description="Name of the trainer")
     age: int = Field(..., description="Age of the horse")
     weight: str = Field(..., description="Weight carried by the horse")
-    number: int = Field(..., description="Saddlecloth number")
+    number: Optional[int] = Field(..., description="Saddlecloth number")
     last_ran_days_ago: Optional[int] = Field(
         None, description="Days since the horse last ran"
     )
