@@ -10,6 +10,7 @@ from prefect import flow, get_run_logger
 
 from clients import mongo_client as client
 from helpers import get_files, read_file
+from models import RapidRecord
 from processors.record_processor import record_processor
 from transformers.rapid_horseracing_transformer import transform_results
 
@@ -33,8 +34,9 @@ def load_rapid_horseracing_data():
 
     for file in files:
         if file != "results_to_do_list.json":
-            record = read_file(file)
-            r.send((record, transform_results, file, "rapid"))
+            data = read_file(file)
+            record = RapidRecord(**data)
+            r.send((record.model_dump(), transform_results, file, "rapid"))
 
     r.close()
 
