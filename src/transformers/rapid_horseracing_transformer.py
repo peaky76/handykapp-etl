@@ -55,6 +55,9 @@ def transform_horse(
                 "non_runner": lambda x: bool(int(x)),
                 "lbs_carried": lambda x: RaceWeight(x).lb,
                 "sp": lambda x: x or None,
+                "sire": lambda x: parse_horse(x)[0],
+                "dam": lambda x: parse_horse(x)[0],
+                "beaten_distance": lambda x: float(Horselength(x)) if x else None,
             }
         )
         .addfield(
@@ -67,10 +70,7 @@ def transform_horse(
         .addfield(
             "sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1], index=-4
         )
-        .convert("sire", lambda x: parse_horse(x)[0])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
-        .convert("dam", lambda x: parse_horse(x)[0])
-        .convert("beaten_distance", lambda x: float(Horselength(x)) if x else None)
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
