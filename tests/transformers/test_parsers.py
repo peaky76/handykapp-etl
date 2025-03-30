@@ -21,6 +21,10 @@ def test_parse_code_returns_correct_value_for_nh_in_title():
     assert parse_code(None, "Big NHF Race") == "National Hunt"
 
 
+def test_parse_code_returns_correct_value_for_dot_separated_nh_in_title():
+    assert parse_code(None, "Big N.H.F Race") == "National Hunt"
+
+
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
     assert parse_code(None, "Big Handicap") == "Flat"
 
