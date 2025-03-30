@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 import petl  # type: ignore
 from prefect import get_run_logger
@@ -17,6 +18,8 @@ def transform_single_record(record, transformer, filename, logger):
 def record_processor():
     logger = get_run_logger()
     logger.info("Starting record processor")
+    reject_count_lock = Lock()
+    transform_count_lock = Lock()
     reject_count = 0
     transform_count = 0
 
@@ -36,25 +39,27 @@ def record_processor():
                 results = future.result()
 
                 if not results:
-                    reject_count += 1
+                    with reject_count_lock:
+                        reject_count += 1
                     continue
 
                 for race in results:
                     try:
                         if race.code == "Flat":
                             r.send((race, source))
-                            transform_count += 1
+                            with transform_count_lock:
+                                transform_count += 1
+                                if transform_count % 25 == 0:
+                                    logger.info(
+                                        f"Read {transform_count} races. Current: {race.datetime} at {race.course}"
+                                    )
                     except Exception as e:  # noqa: PERF203
                         logger.error(
                             f"Error during processing of race in {filename}: {e}"
                         )
-                        reject_count += 1
+                        with reject_count_lock:
+                            reject_count += 1
                         continue
-
-                if transform_count and transform_count % 25 == 0:
-                    logger.info(
-                        f"Read {transform_count} races. Current: {race.datetime} at {race.course}"
-                    )
 
         except GeneratorExit:
             logger.info(
