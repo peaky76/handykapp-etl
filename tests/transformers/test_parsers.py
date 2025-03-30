@@ -13,6 +13,10 @@ def test_parse_code_returns_correct_value_for_national_hunt_in_title():
     assert parse_code(None, "Big National Hunt Flat Race") == "National Hunt"
 
 
+def test_parse_code_works_case_insensitively():
+    assert parse_code(None, "BIG NATIONAL HUNT FLAT RACE") == "National Hunt"
+
+
 def test_parse_code_returns_correct_value_for_nh_in_title():
     assert parse_code(None, "Big NHF Race") == "National Hunt"
 

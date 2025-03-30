@@ -5,7 +5,7 @@ def parse_code(obstacle: str | None, title: str) -> str:
     if obstacle:
         return "National Hunt"
 
-    if "National Hunt" in title or "NH" in title:
+    if "national hunt" in title.lower() or "nh" in title.lower():
         return "National Hunt"
 
     return "Flat"
