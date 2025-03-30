@@ -1,7 +1,7 @@
 import re
 
 
-def parse_code(obstacle, title):
+def parse_code(obstacle: str | None, title: str) -> str:
     if obstacle:
         return "National Hunt"
 
