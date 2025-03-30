@@ -47,7 +47,7 @@ def result_data():
         "canceled": "0",
         "finish_time": "",
         "prize": "\u00a32794",
-        "class": "5",
+        "race_class": "5",
         "horses": [],
     }
 
