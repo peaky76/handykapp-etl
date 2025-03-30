@@ -36,7 +36,7 @@ def load_rapid_horseracing_data():
         if file != "results_to_do_list.json":
             data = read_file(file)
             record = RapidRecord(**data)
-            r.send((record.model_dump(), transform_results, file, "rapid"))
+            r.send((record, transform_results, file, "rapid"))
 
     r.close()
 
