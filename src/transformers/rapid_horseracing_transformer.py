@@ -63,18 +63,14 @@ def transform_horse(
         .addfield(
             "year",
             lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
-            index=1,
         )
-        .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1], index=1)
-        .addfield("name", lambda rec: parse_horse(rec["horse"])[0], index=0)
-        .addfield(
-            "sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1], index=-4
-        )
-        .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1], index=-3)
+        .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1])
+        .addfield("name", lambda rec: parse_horse(rec["horse"])[0])
+        .addfield("sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1])
+        .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1])
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
-            index=-1,
         )
         .addfield("official_position", lambda rec: rec["finishing_position"])
         .cutout("horse", "age")
@@ -112,7 +108,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             or "H'CAP" in rec["title"].upper(),
             index=4,
         )
-        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]), index=5)
+        .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]))
         .addfield(
             "surface",
             lambda rec: (
@@ -130,9 +126,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
                 # )
             ),
         )
-        .addfield(
-            "code", lambda rec: parse_code(rec["obstacle"], rec["title"]), index=6
-        )
+        .addfield("code", lambda rec: parse_code(rec["obstacle"], rec["title"]))
         .addfield(
             "runners",
             lambda rec: [
