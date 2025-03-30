@@ -6,19 +6,19 @@ from transformers.parsers import (
 
 
 def test_parse_code_returns_correct_value_for_obstacle():
-    assert parse_code(True, None) == "National Hunt"
+    assert parse_code("CHASE", None) == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_for_national_hunt_in_title():
-    assert parse_code(False, "Big National Hunt Flat Race") == "National Hunt"
+    assert parse_code(None, "Big National Hunt Flat Race") == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_for_nh_in_title():
-    assert parse_code(False, "Big NHF Race") == "National Hunt"
+    assert parse_code(None, "Big NHF Race") == "National Hunt"
 
 
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
-    assert parse_code(False, "Big Handicap") == "Flat"
+    assert parse_code(None, "Big Handicap") == "Flat"
 
 
 def test_parse_horse_returns_correct_tuple_when_none():
