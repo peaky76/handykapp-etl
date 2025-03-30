@@ -10,6 +10,7 @@ from prefect import flow, get_run_logger
 
 from clients import mongo_client as client
 from helpers import get_files, read_file
+from models import TheRacingApiRacecard
 from processors.record_processor import record_processor
 from transformers.theracingapi_transformer import transform_races
 
@@ -52,8 +53,9 @@ def load_theracingapi_data(*, from_date=None):
         logger.info(f"Reading {file}")
         contents = read_file(file)
         for dec in contents["racecards"]:
-            record = {k: v for k, v in dec.items() if k != "off_dt"}
-            r.send((record, transform_races, file, "theracingapi"))
+            data = {k: v for k, v in dec.items() if k != "off_dt"}
+            record = TheRacingApiRacecard(**data)
+            r.send((record.model_dump(), transform_races, file, "theracingapi"))
 
     r.close()
 
