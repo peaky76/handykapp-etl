@@ -4,8 +4,6 @@ from enum import Enum
 from pathlib import Path
 from typing import cast
 
-from models import PreMongoRace, PreMongoRunner
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
@@ -18,6 +16,7 @@ from horsetalk import (  # type: ignore
     RaceWeight,
 )
 
+from models import PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
     parse_code,
     parse_horse,
@@ -31,11 +30,13 @@ SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
 def transform_horse(
-    data, race_date=pendulum.now(), finishing_time=None
+    runner: RapidRunner,
+    race_date: pendulum.DateTime = pendulum.now(),
+    finishing_time: str | None = None,
 ) -> PreMongoRunner:
     transformed_horse = (
         petl.rename(
-            data,
+            runner,
             {
                 "id_horse": "rapid_id",
                 "weight": "lbs_carried",
@@ -82,16 +83,15 @@ def transform_horse(
     return PreMongoRunner(**transformed_horse)
 
 
-def transform_results(data) -> list[PreMongoRace]:
+def transform_results(record: RapidRecord) -> list[PreMongoRace]:
     transformed_races = (
         petl.rename(
-            data,
+            record,
             {
                 "id_race": "rapid_id",
                 "date": "datetime",
                 "age": "age_restriction",
                 "canceled": "cancelled",
-                "class": "race_class",
                 "distance": "distance_description",
                 "going": "going_description",
             },
