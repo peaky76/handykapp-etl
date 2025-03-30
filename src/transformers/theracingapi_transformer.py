@@ -24,6 +24,7 @@ from horsetalk import (  # type: ignore
 
 # from loaders.theracingapi_loader import declaration_processor
 # from prefect import flow, get_run_logger, task
+from models import TheRacingApiRacecard, TheRacingApiRunner
 from transformers.parsers import parse_code, parse_obstacle
 
 with open("settings.toml", "rb") as f:
@@ -40,7 +41,9 @@ def build_datetime(date_str: str, time_str: str) -> str:
     ).isoformat()
 
 
-def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
+def transform_horse(
+    data: TheRacingApiRunner, race_date: pendulum.DateTime = pendulum.now()
+) -> PreMongoRunner:
     transformed_horse = (
         petl.rename(
             data,
@@ -66,6 +69,7 @@ def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
                 "lbs_carried": int,
                 "headgear": lambda x: Headgear[x].name.title() if x else None,  # type: ignore
                 "official_rating": int,
+                "jockey": lambda x: x.split("(")[0].strip(),
             }
         )
         .addfield(
@@ -79,14 +83,13 @@ def transform_horse(data, race_date=pendulum.now()) -> PreMongoRunner:
             if "(" in rec["jockey"]
             else 0,
         )
-        .convert("jockey", lambda x: x.split("(")[0].strip())
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]
     )
     return PreMongoRunner(**transformed_horse)
 
 
-def transform_races(data) -> list[PreMongoRace]:
+def transform_races(data: list[TheRacingApiRacecard]) -> list[PreMongoRace]:
     transformed_races = (
         petl.rename(
             data,
@@ -139,7 +142,7 @@ def transform_races(data) -> list[PreMongoRace]:
             ],
             pass_row=True,
         )
-        .cutout("field_size", "region", "type", "date", "off_time")
+        .cutout("field_size", "region", "race_type", "date", "off_time")
         .dicts()
     )
     return [PreMongoRace(**race) for race in transformed_races]
