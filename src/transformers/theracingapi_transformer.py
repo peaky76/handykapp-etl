@@ -43,8 +43,9 @@ def build_datetime(date_str: str, time_str: str) -> str:
 
 
 def transform_horse(
-    data: TheRacingApiRunner, race_date: pendulum.DateTime = pendulum.now()
+    runner: TheRacingApiRunner, race_date: pendulum.DateTime = pendulum.now()
 ) -> PreMongoRunner:
+    data = petl.fromdicts([runner.model_dump()])
     transformed_horse = (
         petl.rename(
             data,
@@ -55,6 +56,17 @@ def transform_horse(
                 "lbs": "lbs_carried",
                 "ofr": "official_rating",
             },
+        )
+        .addfield(
+            "year",
+            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
+            index=3,
+        )
+        .addfield(
+            "allowance",
+            lambda rec: int(rec["jockey"].split("(")[1].split(")")[0])
+            if "(" in rec["jockey"]
+            else 0,
         )
         .convert(
             {
@@ -72,17 +84,6 @@ def transform_horse(
                 "official_rating": int,
                 "jockey": lambda x: x.split("(")[0].strip(),
             }
-        )
-        .addfield(
-            "year",
-            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
-            index=3,
-        )
-        .addfield(
-            "allowance",
-            lambda rec: int(rec["jockey"].split("(")[1].split(")")[0])
-            if "(" in rec["jockey"]
-            else 0,
         )
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]
@@ -140,7 +141,7 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
             "runners",
             lambda x, rec: [
                 transform_horse(
-                    petl.fromdicts([h]),
+                    h,
                     ensure_datetime(pendulum.parse(rec["datetime"])),  # Ensure DateTime
                 )
                 for h in x
