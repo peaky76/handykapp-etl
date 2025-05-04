@@ -9,6 +9,7 @@ from clients import mongo_client as client
 from models import PreMongoRace
 from models.pre_mongo_runner import PreMongoRunner
 from processors.runner_processor import runner_processor
+from transformers.validators import ensure_datetime
 
 from .utils import compact
 
@@ -101,7 +102,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
         while True:
             race, source = yield
 
-            log_description = f"{pendulum.parse(str(race.datetime)).format('Do MMM YYYY HH:mm')} {race.title} at {race.course} from {source}"
+            log_description = f"{ensure_datetime(pendulum.parse(str(race.datetime))).format('Do MMM YYYY HH:mm')} {race.title} at {race.course} from {source}"
 
             if racecourse_id := get_racecourse_id(race, source):
                 found_race = db.races.find_one(
