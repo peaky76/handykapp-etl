@@ -145,7 +145,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if horse.sire:
                             r.send(
                                 (
-                                    PreMongoRunner(**{"name": horse.sire, "sex": "M"}),
+                                    PreMongoRunner(name=horse.sire, sex="M"),
                                     None,
                                     source,
                                 )
@@ -154,9 +154,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if horse.damsire:
                             r.send(
                                 (
-                                    PreMongoRunner(
-                                        **{"name": horse.damsire, "sex": "M"}
-                                    ),
+                                    PreMongoRunner(name=horse.damsire, sex="M"),
                                     None,
                                     source,
                                 )
@@ -166,11 +164,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                             r.send(
                                 (
                                     PreMongoRunner(
-                                        **{
-                                            "name": horse.dam,
-                                            "sex": "F",
-                                            "sire": horse.damsire,
-                                        }
+                                        name=horse.dam, sex="F", sire=horse.damsire
                                     ),
                                     None,
                                     source,
