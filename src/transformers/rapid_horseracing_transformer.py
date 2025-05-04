@@ -36,9 +36,10 @@ def transform_horse(
     race_date: pendulum.DateTime = pendulum.now(),
     finishing_time: str | None = None,
 ) -> PreMongoRunner:
+    data = petl.fromdicts([runner.model_dump()])
     transformed_horse = (
         petl.rename(
-            runner,
+            data,
             {
                 "id_horse": "rapid_id",
                 "weight": "lbs_carried",
@@ -134,7 +135,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             "runners",
             lambda rec: [
                 transform_horse(
-                    petl.fromdicts([h]),
+                    h,
                     race_date=ensure_datetime(pendulum.parse(rec["datetime"])),
                     finishing_time=rec["finish_time"],
                 )
