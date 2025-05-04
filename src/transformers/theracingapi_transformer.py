@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 from models import PreMongoRace, PreMongoRunner
+from transformers.validators import ensure_datetime
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -138,7 +139,10 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
         .convert(
             "runners",
             lambda x, rec: [
-                transform_horse(petl.fromdicts([h]), pendulum.parse(rec["datetime"]))
+                transform_horse(
+                    petl.fromdicts([h]),
+                    ensure_datetime(pendulum.parse(rec["datetime"])),  # Ensure DateTime
+                )
                 for h in x
             ],
             pass_row=True,

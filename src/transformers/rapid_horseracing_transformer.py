@@ -4,6 +4,8 @@ from enum import Enum
 from pathlib import Path
 from typing import cast
 
+from transformers.validators import ensure_datetime
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
@@ -133,7 +135,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             lambda rec: [
                 transform_horse(
                     petl.fromdicts([h]),
-                    race_date=pendulum.parse(rec["datetime"]),
+                    race_date=ensure_datetime(pendulum.parse(rec["datetime"])),
                     finishing_time=rec["finish_time"],
                 )
                 for h in rec["horses"]
