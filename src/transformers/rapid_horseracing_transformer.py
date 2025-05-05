@@ -135,7 +135,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             "runners",
             lambda rec: [
                 transform_horse(
-                    h,
+                    RapidRunner(**h),
                     race_date=ensure_datetime(pendulum.parse(rec["datetime"])),
                     finishing_time=rec["finish_time"],
                 )
