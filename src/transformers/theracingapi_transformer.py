@@ -46,6 +46,7 @@ def transform_horse(
     runner: TheRacingApiRunner, race_date: pendulum.DateTime = pendulum.now()
 ) -> PreMongoRunner:
     data = petl.fromdicts([runner.model_dump()])
+
     transformed_horse = (
         petl.rename(
             data,
@@ -103,6 +104,7 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
                 "going": "going_description",
                 "pattern": "race_grade",
                 "distance_f": "distance_description",
+                # "runners": "horses",
             },
         )
         .addfield(
@@ -137,16 +139,15 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
                 ),
             }
         )
-        .convert(
+        .addfield(
             "runners",
-            lambda x, rec: [
+            lambda rec: [
                 transform_horse(
-                    h,
-                    ensure_datetime(pendulum.parse(rec["datetime"])),  # Ensure DateTime
+                    TheRacingApiRunner(**h),
+                    ensure_datetime(pendulum.parse(rec["datetime"])),
                 )
-                for h in x
+                for h in rec["runners"]
             ],
-            pass_row=True,
         )
         .cutout("field_size", "region", "race_type", "date", "off_time")
         .dicts()
