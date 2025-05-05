@@ -114,11 +114,11 @@ def create_run(words: list[str]) -> FormdataRun | None:
 
         # Handle odd case of Phoenix Dawn (missing data)
         if len(words) == 10 and words[6:] == ["b", "RHavlin", "p", "p12"]:
-            words = words[:9] + ["", "p12", "16d", "p12"]
+            words = [*words[:9], "", "p12", "16d", "p12"]
 
         # Handle odd case of Arctic Mountain (incorrect data - says placed when dsq)
         if len(words) == 12 and words[7] == "14p940.0":
-            words = words[:7] + ["14d", "40.0"] + words[8:]
+            words = [*words[:7], "14d", "40.0", *words[8:]]
 
         # Split overlong prize money
         if len(words[1]) > 5:
