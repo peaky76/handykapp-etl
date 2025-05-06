@@ -1,5 +1,6 @@
 from .formdata_horse import FormdataHorse
 from .formdata_race import FormdataRace
+from .formdata_record import FormdataRecord  # Assuming this is the correct import
 from .formdata_run import FormdataRun
 from .formdata_runner import FormdataRunner
 from .mongo_horse import MongoHorse
@@ -19,6 +20,7 @@ from .theracingapi_runner import TheRacingApiRunner
 __all__ = [
     "FormdataHorse",
     "FormdataRace",
+    "FormdataRecord",
     "FormdataRun",
     "FormdataRunner",
     "MongoHorse",
