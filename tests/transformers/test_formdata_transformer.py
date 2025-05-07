@@ -1,8 +1,7 @@
 import pendulum
-import petl
 from horsetalk import RacingCode
 
-from models import PreMongoRace, PreMongoRunner
+from models import FormdataRunner, FormdataRecord, PreMongoRace, PreMongoRunner
 from transformers.formdata_transformer import (
     adjust_rr_name,
     extract_dist_going,
@@ -323,17 +322,19 @@ def test_is_race_date_false_with_non_date():
 
 
 def test_transform_horse_returns_correct_output():
-    data = {
-        "name": "AADDEEY",
-        "country": "GB",
-        "year": 2018,
-        "weight": "10-0",
-        "jockey": "D Tudhope",
-        "position": "2p3",
-        "beaten_distance": "2.0",
-        "time_rating": 80,
-        "form_rating": 80,
-    }
+    data = FormdataRunner(
+        **{
+            "name": "AADDEEY",
+            "country": "GB",
+            "year": 2018,
+            "weight": "10-0",
+            "jockey": "D Tudhope",
+            "position": "2p3",
+            "beaten_distance": "2.0",
+            "time_rating": 80,
+            "form_rating": 80,
+        }
+    )
     expected = PreMongoRunner(
         name="AADDEEY",
         country="GB",
@@ -345,33 +346,35 @@ def test_transform_horse_returns_correct_output():
         beaten_distance=2.0,
     )
 
-    actual = transform_horse(petl.fromdicts([data]))
+    actual = transform_horse(data)
     assert actual == expected
 
 
 def test_transform_races_returns_correct_output():
-    data = {
-        "date": "2024-06-01",
-        "race_type": "Hc",
-        "win_prize": "5000",
-        "course": "Kel",
-        "number_of_runners": "5",
-        "distance": "24",
-        "going": "G",
-        "runners": [
-            {
-                "name": "AADDEEY",
-                "country": "GB",
-                "year": 2018,
-                "weight": "10-0",
-                "jockey": "D Tudhope",
-                "position": "3",
-                "beaten_distance": "2.0",
-                "time_rating": 80,
-                "form_rating": 80,
-            }
-        ],
-    }
+    data = FormdataRecord(
+        **{
+            "date": "2024-06-01",
+            "race_type": "Hc",
+            "win_prize": "5000",
+            "course": "Kel",
+            "number_of_runners": "5",
+            "distance": "24",
+            "going": "G",
+            "runners": [
+                {
+                    "name": "AADDEEY",
+                    "country": "GB",
+                    "year": 2018,
+                    "weight": "10-0",
+                    "jockey": "D Tudhope",
+                    "position": "3",
+                    "beaten_distance": "2.0",
+                    "time_rating": 80,
+                    "form_rating": 80,
+                }
+            ],
+        }
+    )
     expected = PreMongoRace(
         course="Kel",
         obstacle="Steeplechase",
@@ -399,5 +402,5 @@ def test_transform_races_returns_correct_output():
         ],
     )
 
-    actual = transform_races(petl.fromdicts([data]))[0]
+    actual = transform_races(data)[0]
     assert actual == expected
