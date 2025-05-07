@@ -6,7 +6,7 @@ from compytition import RankList
 from horsetalk import RaceWeight
 from prefect import get_run_logger
 
-from models import FormdataRace, FormdataRunner
+from models import FormdataRace, FormdataRecord, FormdataRunner
 from processors import record_processor
 from transformers.formdata_transformer import transform_races
 
@@ -89,8 +89,11 @@ def calculate_adjusted_ratings(weights, allowances, form_ratings):
     ]
 
 
-def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> dict:
-    return race.model_dump() | {"runners": [runner.model_dump() for runner in runners]}
+def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> FormdataRecord:
+    record = race.model_dump() | {
+        "runners": [runner.model_dump() for runner in runners]
+    }
+    return FormdataRecord(**record)
 
 
 def check_race_complete(

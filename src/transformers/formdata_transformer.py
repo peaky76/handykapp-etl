@@ -29,7 +29,14 @@ from peak_utility.text.case import normal  # type: ignore
 from prefect import get_run_logger
 
 from helpers import get_files
-from models import FormdataHorse, FormdataRun, PreMongoRace, PreMongoRunner
+from models import (
+    FormdataHorse,
+    FormdataRecord,
+    FormdataRun,
+    FormdataRunner,
+    PreMongoRace,
+    PreMongoRunner,
+)
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -381,7 +388,8 @@ def is_race_date(string: str) -> bool:
     return bool(re.match(date_regex, string))
 
 
-def transform_horse(data) -> PreMongoRunner:
+def transform_horse(runner: FormdataRunner) -> PreMongoRunner:
+    data = petl.fromdicts([runner.model_dump()])
     transformed_horse = (
         petl.convert(
             data,
@@ -409,7 +417,8 @@ def transform_horse(data) -> PreMongoRunner:
     return PreMongoRunner(**transformed_horse)
 
 
-def transform_races(data) -> list[PreMongoRace]:
+def transform_races(record: FormdataRecord) -> list[PreMongoRace]:
+    data = petl.fromdicts([record.model_dump()])
     transformed_races = (
         petl.rename(
             data,
@@ -483,7 +492,7 @@ def transform_races(data) -> list[PreMongoRace]:
             lambda rec: f"£{rec['prize']} {rec['distance_description']} {'Handicap ' if rec['is_handicap'] else ''}{rec['obstacle']}",
             index=0,
         )
-        .convert("runners", lambda x: [transform_horse(petl.fromdicts([h])) for h in x])
+        .convert("runners", lambda x: [transform_horse(FormdataRunner(**h)) for h in x])
         .cutout("number_of_runners", "race_type")
         .dicts()
     )
