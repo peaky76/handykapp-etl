@@ -122,7 +122,7 @@ def check_race_complete(
 
     # Slow path: Check all possible combinations of runners
     for combo in combinations(runners, race.number_of_runners):
-        combo_key = frozenset(id(r) for r in combo)
+        combo_key = (hash(race), frozenset(id(r) for r in combo))
         if combo_key in failed_combos_memo:
             continue
 
@@ -157,6 +157,10 @@ def check_race_complete(
             continue
 
         # Found a valid combination
+        # Remove all combinations for the current race
+        failed_combos_memo.difference_update(
+            {key for key in failed_combos_memo if key[0] == hash(race)}
+        )
         return {
             "complete": list(combo),
             "todo": [r for r in runners if r not in combo],
