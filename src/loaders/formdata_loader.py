@@ -21,7 +21,7 @@ db = client.handykapp
 
 
 @flow
-def load_formdata_only():
+def load_formdata():
     logger = get_run_logger()
     logger.info("Starting formdata loader")
 
@@ -40,4 +40,4 @@ def load_formdata_only():
 
 
 if __name__ == "__main__":
-    load_formdata_only()  # type: ignore
+    load_formdata()  # type: ignore
