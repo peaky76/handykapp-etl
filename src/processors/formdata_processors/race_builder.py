@@ -1,6 +1,8 @@
+import gc
 from functools import cache, lru_cache
 from itertools import combinations, pairwise
 from typing import Literal, TypeAlias
+from collections import Counter
 
 from compytition import RankList
 from horsetalk import RaceWeight
@@ -14,7 +16,7 @@ RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
 ]
 
-failed_combos_memo = set()
+failed_combos_by_race = {}
 
 
 @cache
@@ -27,10 +29,36 @@ def get_position_num(runner):
     return int(pos.split("p")[0].replace("=", ""))
 
 
+def all_duplicate_positions_have_equals(runners):
+    """Check if all duplicate positions have equals in them"""
+    # Get position numbers for all finishers
+    position_nums = [get_position_num(r) for r in runners if is_finisher(r)]
+
+    # Find position numbers that appear multiple times
+    position_counts = Counter(position_nums)
+    duplicate_positions = [pos for pos, count in position_counts.items() if count > 1]
+
+    # If no duplicates, we're good
+    if not duplicate_positions:
+        return True
+
+    # For each duplicate position number, check all matching runners have "=" in position
+    for pos_num in duplicate_positions:
+        matching_runners = [
+            r for r in runners if is_finisher(r) and get_position_num(r) == pos_num
+        ]
+        if not all("=" in r.position for r in matching_runners):
+            return False
+
+    # All duplicates have "=" in their positions
+    return True
+
+
 def validate_positions(runners):
     try:
         RankList(r.position for r in runners)
-        return True
+        return all_duplicate_positions_have_equals(runners)
+
     except ValueError:
         return False
 
@@ -96,6 +124,51 @@ def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> FormdataR
     return FormdataRecord(**record)
 
 
+def is_finisher(runner: FormdataRunner) -> bool:
+    return runner.position.isdigit() or "=" in runner.position
+
+
+def filtered_combinations(runners, race_number_of_runners):
+    """Generate only potentially valid combinations based on race knowledge"""
+    # Sort runners by position first (finishers with position "1" first)
+    finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
+    non_finishers = [r for r in runners if not is_finisher(r)]
+
+    not_enough_runners = len(finishers) + len(non_finishers) < race_number_of_runners
+    no_winner = get_position_num(finishers[0]) != 1 if finishers else True
+    possibly_no_finishers = len(non_finishers) >= race_number_of_runners
+
+    if not_enough_runners or (no_winner and not possibly_no_finishers):
+        return []
+
+    possible_combos = []
+
+    if possibly_no_finishers:
+        possible_combos = combinations(non_finishers, race_number_of_runners)
+
+    possible_combos += [finishers[0]]
+
+    for runner in finishers[1:]:
+        combos_to_keep = []
+        for combo in possible_combos:
+            if len(combo) == race_number_of_runners:
+                combos_to_keep.append(combo)
+                continue
+
+            last_runner = combo[-1]
+            potential_new_combo = [*combo, runner]
+
+            if get_position_num(runner) == get_position_num(last_runner):  # noqa: SIM102
+                if "=" in runner.position and "=" in last_runner.position:
+                    combos_to_keep.append(potential_new_combo)
+                    continue
+
+        if all(len(combo) == race_number_of_runners for combo in possible_combos):
+            break
+
+    return possible_combos
+
+
 def check_race_complete(
     race: FormdataRace, runners: list[FormdataRunner]
 ) -> RaceCompleteCheckResult:
@@ -105,7 +178,6 @@ def check_race_complete(
         return unchanged
 
     # Sort runners first to reduce number of combinations
-    is_finisher = lambda x: x.position.isdigit() or "=" in x.position
     finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
 
     # Fast path: If we have exact number of finishers, check if they form a valid race
@@ -120,10 +192,20 @@ def check_race_complete(
         # All validations passed - this is a complete race
         return {"complete": finishers, "todo": []}
 
-    # Slow path: Check all possible combinations of runners
-    for combo in combinations(runners, race.number_of_runners):
-        combo_key = (hash(race), frozenset(id(r) for r in combo))
-        if combo_key in failed_combos_memo:
+    # Get race hash for memo lookup
+    race_hash = hash(race)
+
+    # Initialize memo for this race if needed
+    if race_hash not in failed_combos_by_race:
+        failed_combos_by_race[race_hash] = set()
+
+    # Get the memo for this specific race
+    race_memo = failed_combos_by_race[race_hash]
+
+    # # Slow path: Check all possible combinations of runners
+    for combo in filtered_combinations(runners, race.number_of_runners):
+        combo_key = frozenset(id(r) for r in combo)
+        if combo_key in race_memo:
             continue
 
         finishers = sorted([r for r in combo if is_finisher(r)], key=get_position_num)
@@ -132,35 +214,34 @@ def check_race_complete(
         positions = [f.position for f in finishers]
         non_equal_positions = [p for p in positions if "=" not in p]
         if len(non_equal_positions) != len(set(non_equal_positions)):
-            failed_combos_memo.add(combo_key)
+            race_memo.add(combo_key)
             continue
 
         # Validate positions form a proper ranking
         if not validate_positions(finishers):
-            failed_combos_memo.add(combo_key)
+            race_memo.add(combo_key)
             continue
 
         # Validate ratings if all runners have them
         if all(runner.form_rating for runner in finishers):
             ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
             if not ratings_valid:
-                failed_combos_memo.add(combo_key)
+                race_memo.add(combo_key)
                 continue
 
             if not validate_ratings_vs_distances(finishers, adjusted_ratings):
-                failed_combos_memo.add(combo_key)
+                race_memo.add(combo_key)
                 continue
 
         # Skip if non-finishers in this combo but unprocessed runners remain
         if len(finishers) != len(combo) and len(runners) != len(combo):
-            failed_combos_memo.add(combo_key)
+            race_memo.add(combo_key)
             continue
 
         # Found a valid combination
-        # Remove all combinations for the current race
-        failed_combos_memo.difference_update(
-            {key for key in failed_combos_memo if key[0] == hash(race)}
-        )
+        # Clear memo for this race since we don't need it anymore
+        failed_combos_by_race.pop(race_hash, None)
+
         return {
             "complete": list(combo),
             "todo": [r for r in runners if r not in combo],
@@ -229,6 +310,11 @@ def race_builder():
                         )
                     )
                     race_count += 1
+                    if race_count and race_count % 100 == 0:
+                        logger.info(
+                            f"Memo sizes: {sum(len(memo) for memo in failed_combos_by_race.values())} combinations across {len(failed_combos_by_race)} races"
+                        )
+                        gc.collect()
 
                 race_dict[race] = check_result["todo"]
 
@@ -245,6 +331,11 @@ def race_builder():
                         )
                     )
                     race_count += 1
+                    if race_count and race_count % 100 == 0:
+                        logger.info(
+                            f"Memo sizes: {sum(len(memo) for memo in failed_combos_by_race.values())} combinations across {len(failed_combos_by_race)} races"
+                        )
+                        gc.collect()
 
                 race_dict[race] = check_result["todo"]
 
