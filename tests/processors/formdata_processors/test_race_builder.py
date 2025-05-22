@@ -1,6 +1,9 @@
 import pytest
 
-from processors.formdata_processors.race_builder import check_race_complete
+from processors.formdata_processors.race_builder import (
+    check_race_complete,
+    validate_positions,
+)
 
 # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
 BEV_DIV_ONE_DATA = [
@@ -72,6 +75,36 @@ def runners_with_equal_positions(mocker, div_one_runners):
 def runners_with_invalid_rank(mocker, div_one_runners):
     seventh = build_mock_runner(mocker, "7", 0, "9-10", 0, 80)
     return [*div_one_runners[:5], seventh]
+
+
+def test_validate_positions_when_clearly_consecutive(mocker):
+    runner_1 = build_mock_runner(mocker, "1", 0, "9-10", 0, 80)
+    runner_2 = build_mock_runner(mocker, "2", 0, "9-7", 0, 74)
+    assert validate_positions([runner_1, runner_2]) is True
+
+
+def test_validate_positions_when_identical_with_equal(mocker):
+    runner_1 = build_mock_runner(mocker, "=1", 0, "9-10", 0, 80)
+    runner_2 = build_mock_runner(mocker, "=1", 0, "9-7", 0, 74)
+    assert validate_positions([runner_1, runner_2]) is True
+
+
+def test_validate_positions_when_identical_without_equal(mocker):
+    runner_1 = build_mock_runner(mocker, "1", 0, "9-10", 0, 80)
+    runner_2 = build_mock_runner(mocker, "1", 0, "9-7", 0, 74)
+    assert validate_positions([runner_1, runner_2]) is True
+
+
+def test_validate_positions_when_identical_with_mixed_equals(mocker):
+    runner_1 = build_mock_runner(mocker, "=1", 0, "9-10", 0, 80)
+    runner_2 = build_mock_runner(mocker, "1", 0, "9-7", 0, 74)
+    assert validate_positions([runner_1, runner_2]) is True
+
+
+def test_validate_positions_when_non_consecutive(mocker):
+    runner_1 = build_mock_runner(mocker, "1", 0, "9-10", 0, 80)
+    runner_2 = build_mock_runner(mocker, "3", 0, "9-7", 0, 74)
+    assert validate_positions([runner_1, runner_2]) is False
 
 
 # Single races
