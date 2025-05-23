@@ -67,10 +67,12 @@ def entry_processor():
                 bulk_operations = []
 
             if processed_count % 100 == 0:
-                logger.info(f"Processed {processed_count} horses")
+                logger.info(f"Processed {processed_count} horses into Formdata table")
 
     except GeneratorExit:
         # Process remaining operations
         if bulk_operations:
             db.formdata.bulk_write(bulk_operations)
-        logger.info(f"Completed processing {processed_count} horses")
+        logger.info(
+            f"Completed processing {processed_count} horses into Formdata table"
+        )
