@@ -9,6 +9,7 @@ from horsetalk import RaceWeight
 from prefect import get_run_logger
 
 from models import FormdataRace, FormdataRecord, FormdataRunner
+from models.formdata_position import FormdataPosition
 from processors import record_processor
 from transformers.formdata_transformer import transform_races
 
@@ -20,23 +21,23 @@ failed_combos_by_race: dict[int, set] = {}
 
 
 @cache
-def get_position_num(runner):
-    pos = runner.position
+def get_position_num(position: FormdataPosition) -> int:
+    if position.isdigit():
+        return int(position)
 
-    if pos.isdigit():
-        return int(pos)
-
-    return int(pos.split("p")[0].replace("=", ""))
+    return int(position.split("p")[0].replace("=", ""))
 
 
 @cache
 def runner_sort_value(runner):
     pos = runner.position
 
-    if pos.isdigit():
-        return int(pos)
+    try:
+        value = get_position_num(pos)
+    except ValueError:
+        value = float("inf")
 
-    return int(pos.split("p")[0].replace("=", ""))
+    return value
 
 
 @cache

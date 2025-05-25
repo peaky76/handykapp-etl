@@ -86,24 +86,20 @@ def runners_with_invalid_rank(mocker, div_one_runners):
 
 
 def test_get_position_num_with_numeric_position(mocker):
-    runner = mocker.Mock(position="3")
-    assert get_position_num(runner) == 3
+    assert get_position_num("3") == 3
 
 
 def test_get_position_num_with_equal_position(mocker):
-    runner = mocker.Mock(position="=2")
-    assert get_position_num(runner) == 2
+    assert get_position_num("=2") == 2
 
 
 def test_get_position_num_with_steward_changed_position(mocker):
-    runner = mocker.Mock(position="2p3")
-    assert get_position_num(runner) == 2
+    assert get_position_num("2p3") == 2
 
 
 def test_get_position_num_with_non_completion(mocker):
-    runner = mocker.Mock(position="P")
     with pytest.raises(ValueError):
-        get_position_num(runner)
+        get_position_num("P")
 
 
 def test_is_finisher_with_numeric_position(mocker):
