@@ -51,16 +51,18 @@ def is_monotonically_decreasing_or_equal(seq: tuple[float]) -> bool:
 
 @cache
 def check_consecutive(
-    position_a: FormdataPosition, position_b: FormdataPosition
+    position_a: FormdataPosition, position_b: FormdataPosition, run_of_ties: int = 0
 ) -> bool:
     """Check if two runners have consecutive positions"""
-    if "=" in position_a and "=" in position_b:
-        return get_position_num(position_a) == get_position_num(position_b)
-
     if "=" in position_a:
-        return get_position_num(position_b) == get_position_num(position_a) + 2
+        if get_position_num(position_a) == get_position_num(position_b):
+            return "=" in position_b
+        if run_of_ties < 2:
+            return False
 
-    return get_position_num(position_b) == get_position_num(position_a) + 1
+    next_position = get_position_num(position_a) + (run_of_ties or 1)
+
+    return get_position_num(position_b) == next_position
 
 
 @cache

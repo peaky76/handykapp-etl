@@ -158,6 +158,18 @@ def test_check_consecutive_with_equal_position_followed_by_unfeasible():
     assert check_consecutive("=1", "2") is False
 
 
+def test_check_consecutive_when_run_of_ties_would_exceeds_next_value():
+    assert check_consecutive("=1", "3", 3) is False
+
+
+def test_check_consecutive_when_run_of_ties_reaches_next_value():
+    assert check_consecutive("=1", "4", 3) is True
+
+
+def test_check_consecutive_when_run_of_ties_does_not_reach_next_value():
+    assert check_consecutive("=1", "5", 3) is False
+
+
 def test_calculate_adjusted_ratings():
     weights = ("9-10", "9-7", "9-2")
     allowances = (0, 3, 5)
