@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from .formdata_position import FormdataPosition
+
 
 class FormdataRun(BaseModel):
     date: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
@@ -13,7 +15,7 @@ class FormdataRun(BaseModel):
     headgear: Optional[str] = None
     allowance: Optional[int] = None
     jockey: str
-    position: str
+    position: FormdataPosition
     beaten_distance: Optional[float] = None
     time_rating: Optional[int] = None
     distance: float

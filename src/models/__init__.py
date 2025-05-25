@@ -1,5 +1,6 @@
 from .bha_ratings_record import BHARatingsRecord
 from .formdata_horse import FormdataHorse
+from .formdata_position import FormdataPosition
 from .formdata_race import FormdataRace
 from .formdata_record import FormdataRecord  # Assuming this is the correct import
 from .formdata_run import FormdataRun
@@ -23,6 +24,7 @@ from .theracingapi_runner import TheRacingApiRunner
 __all__ = [
     "BHARatingsRecord",
     "FormdataHorse",
+    "FormdataPosition",
     "FormdataRace",
     "FormdataRecord",
     "FormdataRun",
