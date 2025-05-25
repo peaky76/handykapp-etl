@@ -1,6 +1,6 @@
 import gc
 from collections import Counter
-from functools import cache, lru_cache
+from functools import cache
 from itertools import combinations, pairwise
 from typing import Literal, TypeAlias
 
@@ -27,6 +27,25 @@ def get_position_num(runner):
         return int(pos)
 
     return int(pos.split("p")[0].replace("=", ""))
+
+
+@cache
+def is_finisher(runner: FormdataRunner) -> bool:
+    return runner.position.isdigit() or "=" in runner.position
+
+
+def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
+    return all(a >= b for a, b in zip(seq, seq[1:]))
+
+
+@cache
+def calculate_adjusted_ratings(weights, allowances, form_ratings):
+    """Cache rating calculations for performance"""
+    return [
+        rating - (RaceWeight(weight).lb + allowance)
+        for weight, allowance, rating in zip(weights, allowances, form_ratings)
+        if rating is not None
+    ]
 
 
 def all_duplicate_positions_have_equals(runners):
@@ -103,29 +122,11 @@ def validate_ratings_vs_distances(finishers, adjusted_ratings):
     )
 
 
-def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
-    return all(a >= b for a, b in zip(seq, seq[1:]))
-
-
-@lru_cache(maxsize=128)
-def calculate_adjusted_ratings(weights, allowances, form_ratings):
-    """Cache rating calculations for performance"""
-    return [
-        rating - (RaceWeight(weight).lb + allowance)
-        for weight, allowance, rating in zip(weights, allowances, form_ratings)
-        if rating is not None
-    ]
-
-
 def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> FormdataRecord:
     record = race.model_dump() | {
         "runners": [runner.model_dump() for runner in runners]
     }
     return FormdataRecord(**record)
-
-
-def is_finisher(runner: FormdataRunner) -> bool:
-    return runner.position.isdigit() or "=" in runner.position
 
 
 def filtered_combinations(runners, race_number_of_runners):
