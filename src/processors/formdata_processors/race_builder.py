@@ -34,7 +34,8 @@ def is_finisher(runner: FormdataRunner) -> bool:
     return runner.position.isdigit() or "=" in runner.position
 
 
-def is_monotonically_decreasing_or_equal(seq: list[float]) -> bool:
+@cache
+def is_monotonically_decreasing_or_equal(seq: tuple[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
 
 
@@ -88,7 +89,9 @@ def validate_ratings_vs_positions(finishers):
         tuple(runner.allowance for runner in finishers),
         tuple(runner.form_rating for runner in finishers),
     )
-    return is_monotonically_decreasing_or_equal(adjusted_ratings), adjusted_ratings
+    return is_monotonically_decreasing_or_equal(
+        tuple(adjusted_ratings)
+    ), adjusted_ratings
 
 
 def validate_ratings_vs_distances(finishers, adjusted_ratings):
