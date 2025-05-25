@@ -8,8 +8,7 @@ from compytition import RankList
 from horsetalk import RaceWeight
 from prefect import get_run_logger
 
-from models import FormdataRace, FormdataRecord, FormdataRunner
-from models.formdata_position import FormdataPosition
+from models import FormdataPosition, FormdataRace, FormdataRecord, FormdataRunner
 from processors import record_processor
 from transformers.formdata_transformer import transform_races
 
@@ -48,6 +47,20 @@ def is_finisher(runner: FormdataRunner) -> bool:
 @cache
 def is_monotonically_decreasing_or_equal(seq: tuple[float]) -> bool:
     return all(a >= b for a, b in zip(seq, seq[1:]))
+
+
+@cache
+def check_consecutive(
+    position_a: FormdataPosition, position_b: FormdataPosition
+) -> bool:
+    """Check if two runners have consecutive positions"""
+    if "=" in position_a and "=" in position_b:
+        return get_position_num(position_a) == get_position_num(position_b)
+
+    if "=" in position_a:
+        return get_position_num(position_b) == get_position_num(position_a) + 2
+
+    return get_position_num(position_b) == get_position_num(position_a) + 1
 
 
 @cache

@@ -4,6 +4,7 @@ from processors.formdata_processors.race_builder import (
     all_duplicate_positions_have_equals,
     build_record,
     calculate_adjusted_ratings,
+    check_consecutive,
     check_race_complete,
     get_position_num,
     is_finisher,
@@ -131,6 +132,30 @@ def test_is_monotonically_decreasing_or_equal_with_increasing_sequence():
 
 def test_is_monotonically_decreasing_or_equal_with_mixed_sequence():
     assert is_monotonically_decreasing_or_equal((5, 4, 6, 3, 2)) is False
+
+
+def test_check_consecutive_with_consecutive_positions():
+    assert check_consecutive("1", "2") is True
+
+
+def test_check_consecutive_with_non_consecutive_positions():
+    assert check_consecutive("1", "3") is False
+
+
+def test_check_consecutive_with_equal_positions():
+    assert check_consecutive("=1", "=1") is True
+
+
+def test_check_consecutive_with_equal_and_numeric_positions():
+    assert check_consecutive("=1", "1") is False
+
+
+def test_check_consecutive_with_subsequent_equal_positions():
+    assert check_consecutive("1", "=2") is True
+
+
+def test_check_consecutive_with_equal_position_followed_by_unfeasible():
+    assert check_consecutive("=1", "2") is False
 
 
 def test_calculate_adjusted_ratings():
