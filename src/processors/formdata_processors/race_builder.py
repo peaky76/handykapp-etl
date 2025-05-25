@@ -23,7 +23,7 @@ failed_combos_by_race: dict[int, set] = {}
 def get_position_num(runner):
     pos = runner.position
 
-    if "=" not in pos:
+    if pos.isdigit():
         return int(pos)
 
     return int(pos.split("p")[0].replace("=", ""))
