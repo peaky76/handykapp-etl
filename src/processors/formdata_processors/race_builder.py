@@ -30,6 +30,16 @@ def get_position_num(runner):
 
 
 @cache
+def runner_sort_value(runner):
+    pos = runner.position
+
+    if pos.isdigit():
+        return int(pos)
+
+    return int(pos.split("p")[0].replace("=", ""))
+
+
+@cache
 def is_finisher(runner: FormdataRunner) -> bool:
     return runner.position.isdigit() or "=" in runner.position
 
@@ -52,7 +62,7 @@ def calculate_adjusted_ratings(weights, allowances, form_ratings):
 def all_duplicate_positions_have_equals(runners):
     """Check if all duplicate positions have equals in them"""
     # Get position numbers for all finishers
-    position_nums = [get_position_num(r) for r in runners if is_finisher(r)]
+    position_nums = [runner_sort_value(r) for r in runners if is_finisher(r)]
 
     # Find position numbers that appear multiple times
     position_counts = Counter(position_nums)
@@ -65,7 +75,7 @@ def all_duplicate_positions_have_equals(runners):
     # For each duplicate position number, check all matching runners have "=" in position
     for pos_num in duplicate_positions:
         matching_runners = [
-            r for r in runners if is_finisher(r) and get_position_num(r) == pos_num
+            r for r in runners if is_finisher(r) and runner_sort_value(r) == pos_num
         ]
         if not all("=" in r.position for r in matching_runners):
             return False
@@ -135,11 +145,11 @@ def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> FormdataR
 def filtered_combinations(runners, race_number_of_runners):
     """Generate only potentially valid combinations based on race knowledge"""
     # Sort runners by position first (finishers with position "1" first)
-    finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
+    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
     non_finishers = [r for r in runners if not is_finisher(r)]
 
     not_enough_runners = len(finishers) + len(non_finishers) < race_number_of_runners
-    no_winner = get_position_num(finishers[0]) != 1 if finishers else True
+    no_winner = runner_sort_value(finishers[0]) != 1 if finishers else True
     possibly_no_finishers = len(non_finishers) >= race_number_of_runners
 
     if not_enough_runners or (no_winner and not possibly_no_finishers):
@@ -162,7 +172,7 @@ def filtered_combinations(runners, race_number_of_runners):
             last_runner = combo[-1]
             potential_new_combo = [*combo, runner]
 
-            if get_position_num(runner) == get_position_num(last_runner):  # noqa: SIM102
+            if runner_sort_value(runner) == runner_sort_value(last_runner):  # noqa: SIM102
                 if "=" in runner.position and "=" in last_runner.position:
                     combos_to_keep.append(potential_new_combo)
                     continue
@@ -182,7 +192,7 @@ def check_race_complete(
         return unchanged
 
     # Sort runners first to reduce number of combinations
-    finishers = sorted([r for r in runners if is_finisher(r)], key=get_position_num)
+    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
 
     # Fast path: If we have exact number of finishers, check if they form a valid race
     if len(finishers) == race.number_of_runners and validate_positions(finishers):
@@ -212,7 +222,7 @@ def check_race_complete(
         if combo_key in race_memo:
             continue
 
-        finishers = sorted([r for r in combo if is_finisher(r)], key=get_position_num)
+        finishers = sorted([r for r in combo if is_finisher(r)], key=runner_sort_value)
 
         # Skip combinations with duplicate positions
         positions = [f.position for f in finishers]
