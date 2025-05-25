@@ -75,6 +75,60 @@ def calculate_adjusted_ratings(weights, allowances, form_ratings):
     ]
 
 
+def get_valid_combinations(
+    runners: list[FormdataRunner], number_of_runners: int
+) -> list[list[FormdataRunner]]:
+    """Generate all valid combinations of runners"""
+    if number_of_runners < 1:
+        raise ValueError("Number of runners must be at least 1")
+
+    if len(runners) < number_of_runners:
+        return []
+
+    if number_of_runners == 1:
+        return [[r] for r in runners]
+
+    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
+    non_finishers = [r for r in runners if not is_finisher(r)]
+
+    valid_combos = [[finishers[0]]]
+    for f in finishers[1:]:
+        carry_forward_combos = []
+
+        for vc in valid_combos:
+            if check_consecutive(vc[-1].position, f.position):
+                new_combo = [*vc, f]
+                carry_forward_combos.append(new_combo)
+                continue
+
+            if get_position_num(vc[-1].position) == get_position_num(f.position):
+                new_combo = [*vc[:-1], f]
+                carry_forward_combos.append(new_combo)
+                carry_forward_combos.append(vc)
+                continue
+
+            combo_complete = len(vc) == number_of_runners
+            if combo_complete:
+                carry_forward_combos.append(vc)
+                continue
+
+        valid_combos = carry_forward_combos
+        print(valid_combos)
+
+    final_combos = []
+    for vc in valid_combos:
+        if len(vc) == number_of_runners:
+            final_combos.append(vc)
+        if len(vc) < number_of_runners:
+            for non_finisher_combo in combinations(
+                non_finishers, number_of_runners - len(vc)
+            ):
+                final_combo = [*vc, *non_finisher_combo]
+                final_combos.append(final_combo)
+
+    return final_combos
+
+
 def all_duplicate_positions_have_equals(runners):
     """Check if all duplicate positions have equals in them"""
     # Get position numbers for all finishers

@@ -7,6 +7,7 @@ from processors.formdata_processors.race_builder import (
     check_consecutive,
     check_race_complete,
     get_position_num,
+    get_valid_combinations,
     is_finisher,
     is_monotonically_decreasing_or_equal,
     validate_positions,
@@ -168,6 +169,42 @@ def test_check_consecutive_when_run_of_ties_reaches_next_value():
 
 def test_check_consecutive_when_run_of_ties_does_not_reach_next_value():
     assert check_consecutive("=1", "5", 3) is False
+
+
+def test_get_valid_combinations_in_base_case(mocker):
+    r1a = mocker.Mock(position="1")
+    r1b = mocker.Mock(position="1")
+    r2a = mocker.Mock(position="2")
+    r2b = mocker.Mock(position="2")
+    r3a = mocker.Mock(position="3")
+    r3b = mocker.Mock(position="3")
+    r4a = mocker.Mock(position="4")
+    r4b = mocker.Mock(position="4")
+    actual = get_valid_combinations([r1a, r1b, r2a, r2b, r3a, r3b, r4a, r4b], 4)
+    expected = [
+        [r1a, r2a, r3a, r4a],
+        [r1b, r2a, r3a, r4a],
+        [r1a, r2b, r3a, r4a],
+        [r1b, r2b, r3a, r4a],
+        [r1a, r2a, r3b, r4a],
+        [r1b, r2a, r3b, r4a],
+        [r1a, r2a, r3a, r4b],
+        [r1b, r2a, r3a, r4b],
+        [r1a, r2b, r3b, r4a],
+        [r1b, r2b, r3b, r4a],
+        [r1a, r2b, r3a, r4b],
+        [r1b, r2b, r3a, r4b],
+        [r1a, r2a, r3b, r4b],
+        [r1b, r2a, r3b, r4b],
+        [r1a, r2b, r3b, r4b],
+        [r1b, r2b, r3b, r4b],
+    ]
+
+    assert len(actual) == len(expected)
+    for combo in expected:
+        assert combo in actual, (
+            f"Expected combination {combo} not found in actual combinations"
+        )
 
 
 def test_calculate_adjusted_ratings():
