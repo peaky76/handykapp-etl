@@ -2,8 +2,15 @@ import pytest
 
 from processors.formdata_processors.race_builder import (
     all_duplicate_positions_have_equals,
+    build_record,
+    calculate_adjusted_ratings,
     check_race_complete,
+    get_position_num,
+    is_finisher,
+    is_monotonically_decreasing_or_equal,
     validate_positions,
+    validate_ratings_vs_distances,
+    validate_ratings_vs_positions,
 )
 
 # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
@@ -76,6 +83,135 @@ def runners_with_equal_positions(mocker, div_one_runners):
 def runners_with_invalid_rank(mocker, div_one_runners):
     seventh = build_mock_runner(mocker, "7", 0, "9-10", 0, 80)
     return [*div_one_runners[:5], seventh]
+
+
+def test_get_position_num_with_numeric_position(mocker):
+    runner = mocker.Mock(position="3")
+    assert get_position_num(runner) == 3
+
+
+def test_get_position_num_with_equal_position(mocker):
+    runner = mocker.Mock(position="=2")
+    assert get_position_num(runner) == 2
+
+
+def test_get_position_num_with_steward_changed_position(mocker):
+    runner = mocker.Mock(position="2p3")
+    assert get_position_num(runner) == 2
+
+
+def test_get_position_num_with_non_completion(mocker):
+    runner = mocker.Mock(position="P")
+    with pytest.raises(ValueError):
+        get_position_num(runner)
+
+
+def test_is_finisher_with_numeric_position(mocker):
+    runner = mocker.Mock(position="3")
+    assert is_finisher(runner) is True
+
+
+def test_is_finisher_with_equal_position(mocker):
+    runner = mocker.Mock(position="=2")
+    assert is_finisher(runner) is True
+
+
+def test_is_finisher_with_non_numeric_position(mocker):
+    runner = mocker.Mock(position="P")
+    assert is_finisher(runner) is False
+
+
+def test_is_monotonically_decreasing_or_equal_with_decreasing_sequence():
+    assert is_monotonically_decreasing_or_equal((5, 4, 3, 2, 1)) is True
+
+
+def test_is_monotonically_decreasing_or_equal_with_equal_elements():
+    assert is_monotonically_decreasing_or_equal((5, 5, 4, 4, 3)) is True
+
+
+def test_is_monotonically_decreasing_or_equal_with_increasing_sequence():
+    assert is_monotonically_decreasing_or_equal((1, 2, 3, 4, 5)) is False
+
+
+def test_is_monotonically_decreasing_or_equal_with_mixed_sequence():
+    assert is_monotonically_decreasing_or_equal((5, 4, 6, 3, 2)) is False
+
+
+def test_calculate_adjusted_ratings():
+    weights = ("9-10", "9-7", "9-2")
+    allowances = (0, 3, 5)
+    form_ratings = (80, 75, None)
+
+    expected = [80 - (136 + 0), 75 - (133 + 3)]
+    result = calculate_adjusted_ratings(weights, allowances, form_ratings)
+
+    assert result == expected
+
+
+# def test_validate_ratings_vs_positions_with_valid_ratings(mocker):
+#     runner1 = mocker.Mock(weight="9-10", allowance=0, form_rating=80)
+#     runner2 = mocker.Mock(weight="9-7", allowance=0, form_rating=74)
+
+#     is_valid, ratings = validate_ratings_vs_positions([runner1, runner2])
+
+#     assert is_valid is True
+#     assert ratings == [-56, -59]
+
+
+# def test_validate_ratings_vs_positions_with_invalid_ratings(mocker):
+#     runner1 = mocker.Mock(weight="9-10", allowance=0, form_rating=70)  # Adjusted: -66
+#     runner2 = mocker.Mock(weight="9-7", allowance=0, form_rating=74)  # Adjusted: -59
+
+#     is_valid, ratings = validate_ratings_vs_positions([runner1, runner2])
+
+#     assert is_valid is False
+#     assert ratings == [-66, -59]
+
+
+# def test_validate_ratings_vs_distances_valid_case(mocker):
+#     finishers = [
+#         mocker.Mock(beaten_distance=0),
+#         mocker.Mock(beaten_distance=1.5),
+#         mocker.Mock(beaten_distance=3.0),
+#     ]
+#     adjusted_ratings = [-56, -59, -62]
+
+#     assert validate_ratings_vs_distances(finishers, adjusted_ratings) is True
+
+
+# def test_validate_ratings_vs_distances_with_inconsistent_ratios(mocker):
+#     finishers = [
+#         mocker.Mock(beaten_distance=0),
+#         mocker.Mock(beaten_distance=1.0),
+#         mocker.Mock(beaten_distance=10.0),
+#     ]
+#     adjusted_ratings = [-56, -58, -60]  # Inconsistent ratio between gaps
+
+#     assert validate_ratings_vs_distances(finishers, adjusted_ratings) is False
+
+
+# def test_validate_ratings_vs_distances_with_insufficient_data(mocker):
+#     finishers = [mocker.Mock(beaten_distance=0), mocker.Mock(beaten_distance=1.5)]
+#     adjusted_ratings = [-56, -59]
+
+#     # Should return True when we don't have enough data to validate
+#     assert validate_ratings_vs_distances(finishers, adjusted_ratings) is True
+
+
+# def test_build_record(mocker):
+#     race = mocker.Mock(model_dump=lambda: {"date": "2024-08-31", "course": "Beverley"})
+#     runners = [
+#         mocker.Mock(model_dump=lambda: {"name": "Horse1", "position": "1"}),
+#         mocker.Mock(model_dump=lambda: {"name": "Horse2", "position": "2"}),
+#     ]
+
+#     record = build_record(race, runners)
+
+#     assert record.date == "2024-08-31"
+#     assert record.course == "Beverley"
+#     assert len(record.runners) == 2
+#     assert record.runners[0]["name"] == "Horse1"
+#     assert record.runners[1]["position"] == "2"
 
 
 def test_all_duplicate_positions_have_equals_when_they_do(mocker):
