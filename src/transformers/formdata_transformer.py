@@ -444,7 +444,9 @@ def transform_races(record: FormdataRecord) -> list[PreMongoRace]:
         .convert(
             {
                 "datetime": lambda x, rec: pendulum.from_format(x, "YYYY-MM-DD")
-                + pendulum.duration(minutes=int(rec["distance_description"]))
+                + pendulum.duration(
+                    minutes=int(rec["distance_description"]) + (rec["division"] or 0)
+                )
                 + pendulum.duration(seconds=int(rec["number_of_runners"])),
                 "going_description": lambda x, rec: (
                     AWGoingDescription[x].name.title()  # type: ignore
@@ -495,11 +497,17 @@ def transform_races(record: FormdataRecord) -> list[PreMongoRace]:
         )
         .addfield(
             "title",
-            lambda rec: f"£{rec['prize']} {rec['distance_description']} {'Handicap ' if rec['is_handicap'] else ''}{rec['obstacle']}",
+            lambda rec: (
+                f"£{int(rec['prize']) * 1000} "
+                f"{rec['distance_description']} "
+                f"{'Handicap ' if rec['is_handicap'] else ''}"
+                f"{rec['obstacle'] if rec['obstacle'] else ''}"
+                f"{f' (Div {"A" if rec["division"] == 0 else "B"})' if rec['division'] else ''}"
+            ),
             index=0,
         )
         .convert("runners", lambda x: [transform_horse(FormdataRunner(**h)) for h in x])
-        .cutout("number_of_runners", "race_type")
+        .cutout("number_of_runners", "race_type", "division")
         .dicts()
     )
     return [PreMongoRace(**race) for race in transformed_races]

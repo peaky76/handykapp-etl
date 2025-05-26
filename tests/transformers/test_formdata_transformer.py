@@ -355,7 +355,7 @@ def test_transform_races_returns_correct_output():
         **{
             "date": "2024-06-01",
             "race_type": "Hc",
-            "win_prize": "5000",
+            "win_prize": "5",
             "course": "Kel",
             "number_of_runners": "5",
             "distance": "24",
