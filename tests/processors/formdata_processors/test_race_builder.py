@@ -363,6 +363,41 @@ def test_get_valid_combinations_when_distances_informative(mocker):
         )
 
 
+def test_get_valid_combinations_when_distances_alternate_between_feasible_and_not(
+    mocker,
+):
+    r1a = mocker.Mock(name="r1a", position="1", beaten_distance=0)
+    r1b = mocker.Mock(name="r1b", position="1", beaten_distance=0)
+    r2a = mocker.Mock(name="r2a", position="2", beaten_distance=1)
+    r2b = mocker.Mock(name="r2b", position="2", beaten_distance=0.5)
+    r3a = mocker.Mock(name="r3a", position="3", beaten_distance=1)
+    r3b = mocker.Mock(name="r3b", position="3", beaten_distance=0.75)
+    r4a = mocker.Mock(name="r4a", position="4", beaten_distance=2)
+    r4b = mocker.Mock(name="r4b", position="4", beaten_distance=2.25)
+
+    actual = get_valid_combinations([r1a, r1b, r2a, r2b, r3a, r3b, r4a, r4b], 4)
+    expected = [
+        [r1a, r2a, r3a, r4a],
+        [r1a, r2a, r3a, r4b],
+        [r1a, r2b, r3a, r4a],
+        [r1a, r2b, r3a, r4b],
+        [r1a, r2b, r3b, r4a],
+        [r1a, r2b, r3b, r4b],
+        [r1b, r2a, r3a, r4a],
+        [r1b, r2a, r3a, r4b],
+        [r1b, r2b, r3a, r4a],
+        [r1b, r2b, r3a, r4b],
+        [r1b, r2b, r3b, r4a],
+        [r1b, r2b, r3b, r4b],
+    ]
+
+    assert len(actual) == len(expected)
+    for combo in expected:
+        assert combo in actual, (
+            f"Expected combination {combo} not found in actual combinations"
+        )
+
+
 def test_calculate_adjusted_ratings():
     weights = ("9-10", "9-7", "9-2")
     allowances = (0, 3, 5)
