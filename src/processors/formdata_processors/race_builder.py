@@ -103,7 +103,11 @@ def get_valid_combinations(
         carry_forward_combos = []
 
         for vc in valid_combos:
-            if check_consecutive(vc[-1].position, f.position):
+            tied_count = get_consecutive_tied_count(vc)
+            print(f"Combo: {[r.position for r in vc]}, Tied count: {tied_count}")
+
+            if check_consecutive(vc[-1].position, f.position, tied_count):
+                print("Found a consecutive pair:", vc[-1].position, f.position)
                 new_combo = [*vc, f]
                 carry_forward_combos.append(new_combo)
                 continue
@@ -115,12 +119,17 @@ def get_valid_combinations(
                 continue
 
             combo_complete = len(vc) == number_of_runners
-            if combo_complete:
+            expecting_more = (
+                get_position_num(f.position)
+                < get_position_num(vc[-1].position) + tied_count
+            )
+            if combo_complete or expecting_more:
                 carry_forward_combos.append(vc)
                 continue
 
         valid_combos = carry_forward_combos
-        print(valid_combos)
+
+    print(valid_combos)
 
     final_combos = []
     for vc in valid_combos:

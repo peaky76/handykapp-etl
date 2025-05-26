@@ -257,6 +257,34 @@ def test_get_valid_combinations_in_base_case(mocker):
         )
 
 
+def test_get_valid_combinations_with_a_tied_position(mocker):
+    r1a = mocker.Mock(position="1")
+    r1b = mocker.Mock(position="1")
+    r2a = mocker.Mock(position="2")
+    r2b = mocker.Mock(position="=2")
+    r2c = mocker.Mock(position="=2")
+    r3 = mocker.Mock(position="3")
+    r4a = mocker.Mock(position="4")
+    r4b = mocker.Mock(position="4")
+    actual = get_valid_combinations([r1a, r1b, r2a, r2b, r2c, r3, r4a, r4b], 4)
+    expected = [
+        [r1a, r2a, r3, r4a],
+        [r1b, r2a, r3, r4a],
+        [r1a, r2b, r2c, r4a],
+        [r1b, r2b, r2c, r4a],
+        [r1a, r2a, r3, r4b],
+        [r1b, r2a, r3, r4b],
+        [r1a, r2b, r2c, r4b],
+        [r1b, r2b, r2c, r4b],
+    ]
+
+    assert len(actual) == len(expected)
+    for combo in expected:
+        assert combo in actual, (
+            f"Expected combination {combo} not found in actual combinations"
+        )
+
+
 def test_calculate_adjusted_ratings():
     weights = ("9-10", "9-7", "9-2")
     allowances = (0, 3, 5)
