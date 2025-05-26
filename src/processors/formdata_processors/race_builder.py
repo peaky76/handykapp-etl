@@ -1,4 +1,5 @@
 import gc
+import time
 from collections import Counter
 from functools import cache
 from itertools import combinations, pairwise
@@ -244,127 +245,127 @@ def build_record(race: FormdataRace, runners: list[FormdataRunner]) -> FormdataR
     return FormdataRecord(**record)
 
 
-def filtered_combinations(runners, race_number_of_runners):
-    """Generate only potentially valid combinations based on race knowledge"""
-    # Sort runners by position first (finishers with position "1" first)
-    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
-    non_finishers = [r for r in runners if not is_finisher(r)]
+# def filtered_combinations(runners, race_number_of_runners):
+#     """Generate only potentially valid combinations based on race knowledge"""
+#     # Sort runners by position first (finishers with position "1" first)
+#     finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
+#     non_finishers = [r for r in runners if not is_finisher(r)]
 
-    not_enough_runners = len(finishers) + len(non_finishers) < race_number_of_runners
-    no_winner = runner_sort_value(finishers[0]) != 1 if finishers else True
-    possibly_no_finishers = len(non_finishers) >= race_number_of_runners
+#     not_enough_runners = len(finishers) + len(non_finishers) < race_number_of_runners
+#     no_winner = runner_sort_value(finishers[0]) != 1 if finishers else True
+#     possibly_no_finishers = len(non_finishers) >= race_number_of_runners
 
-    if not_enough_runners or (no_winner and not possibly_no_finishers):
-        return []
+#     if not_enough_runners or (no_winner and not possibly_no_finishers):
+#         return []
 
-    possible_combos = []
+#     possible_combos = []
 
-    if possibly_no_finishers:
-        possible_combos = combinations(non_finishers, race_number_of_runners)
+#     if possibly_no_finishers:
+#         possible_combos = combinations(non_finishers, race_number_of_runners)
 
-    possible_combos += [finishers[0]]
+#     possible_combos += [finishers[0]]
 
-    for runner in finishers[1:]:
-        combos_to_keep = []
-        for combo in possible_combos:
-            if len(combo) == race_number_of_runners:
-                combos_to_keep.append(combo)
-                continue
+#     for runner in finishers[1:]:
+#         combos_to_keep = []
+#         for combo in possible_combos:
+#             if len(combo) == race_number_of_runners:
+#                 combos_to_keep.append(combo)
+#                 continue
 
-            last_runner = combo[-1]
-            potential_new_combo = [*combo, runner]
+#             last_runner = combo[-1]
+#             potential_new_combo = [*combo, runner]
 
-            if runner_sort_value(runner) == runner_sort_value(last_runner):  # noqa: SIM102
-                if "=" in runner.position and "=" in last_runner.position:
-                    combos_to_keep.append(potential_new_combo)
-                    continue
+#             if runner_sort_value(runner) == runner_sort_value(last_runner):  # noqa: SIM102
+#                 if "=" in runner.position and "=" in last_runner.position:
+#                     combos_to_keep.append(potential_new_combo)
+#                     continue
 
-        if all(len(combo) == race_number_of_runners for combo in possible_combos):
-            break
+#         if all(len(combo) == race_number_of_runners for combo in possible_combos):
+#             break
 
-    return possible_combos
+#     return possible_combos
 
 
-def check_race_complete(
-    race: FormdataRace, runners: list[FormdataRunner]
-) -> RaceCompleteCheckResult:
-    unchanged: RaceCompleteCheckResult = {"complete": [], "todo": runners}
+# def check_race_complete(
+#     race: FormdataRace, runners: list[FormdataRunner]
+# ) -> RaceCompleteCheckResult:
+#     unchanged: RaceCompleteCheckResult = {"complete": [], "todo": runners}
 
-    if len(runners) < race.number_of_runners:
-        return unchanged
+#     if len(runners) < race.number_of_runners:
+#         return unchanged
 
-    # Sort runners first to reduce number of combinations
-    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
+#     # Sort runners first to reduce number of combinations
+#     finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
 
-    # Fast path: If we have exact number of finishers, check if they form a valid race
-    if len(finishers) == race.number_of_runners and validate_positions(finishers):
-        ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
-        if not ratings_valid:
-            return unchanged
+#     # Fast path: If we have exact number of finishers, check if they form a valid race
+#     if len(finishers) == race.number_of_runners and validate_positions(finishers):
+#         ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
+#         if not ratings_valid:
+#             return unchanged
 
-        if not validate_ratings_vs_distances(finishers, adjusted_ratings):
-            return unchanged
+#         if not validate_ratings_vs_distances(finishers, adjusted_ratings):
+#             return unchanged
 
-        # All validations passed - this is a complete race
-        return {"complete": finishers, "todo": []}
+#         # All validations passed - this is a complete race
+#         return {"complete": finishers, "todo": []}
 
-    # Get race hash for memo lookup
-    race_hash = hash(race)
+#     # Get race hash for memo lookup
+#     race_hash = hash(race)
 
-    # Initialize memo for this race if needed
-    if race_hash not in failed_combos_by_race:
-        failed_combos_by_race[race_hash] = set()
+#     # Initialize memo for this race if needed
+#     if race_hash not in failed_combos_by_race:
+#         failed_combos_by_race[race_hash] = set()
 
-    # Get the memo for this specific race
-    race_memo = failed_combos_by_race[race_hash]
+#     # Get the memo for this specific race
+#     race_memo = failed_combos_by_race[race_hash]
 
-    # # Slow path: Check all possible combinations of runners
-    for combo in filtered_combinations(runners, race.number_of_runners):
-        combo_key = frozenset(id(r) for r in combo)
-        if combo_key in race_memo:
-            continue
+#     # # Slow path: Check all possible combinations of runners
+#     for combo in filtered_combinations(runners, race.number_of_runners):
+#         combo_key = frozenset(id(r) for r in combo)
+#         if combo_key in race_memo:
+#             continue
 
-        finishers = sorted([r for r in combo if is_finisher(r)], key=runner_sort_value)
+#         finishers = sorted([r for r in combo if is_finisher(r)], key=runner_sort_value)
 
-        # Skip combinations with duplicate positions
-        positions = [f.position for f in finishers]
-        non_equal_positions = [p for p in positions if "=" not in p]
-        if len(non_equal_positions) != len(set(non_equal_positions)):
-            race_memo.add(combo_key)
-            continue
+#         # Skip combinations with duplicate positions
+#         positions = [f.position for f in finishers]
+#         non_equal_positions = [p for p in positions if "=" not in p]
+#         if len(non_equal_positions) != len(set(non_equal_positions)):
+#             race_memo.add(combo_key)
+#             continue
 
-        # Validate positions form a proper ranking
-        if not validate_positions(finishers):
-            race_memo.add(combo_key)
-            continue
+#         # Validate positions form a proper ranking
+#         if not validate_positions(finishers):
+#             race_memo.add(combo_key)
+#             continue
 
-        # Validate ratings if all runners have them
-        if all(runner.form_rating for runner in finishers):
-            ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
-            if not ratings_valid:
-                race_memo.add(combo_key)
-                continue
+#         # Validate ratings if all runners have them
+#         if all(runner.form_rating for runner in finishers):
+#             ratings_valid, adjusted_ratings = validate_ratings_vs_positions(finishers)
+#             if not ratings_valid:
+#                 race_memo.add(combo_key)
+#                 continue
 
-            if not validate_ratings_vs_distances(finishers, adjusted_ratings):
-                race_memo.add(combo_key)
-                continue
+#             if not validate_ratings_vs_distances(finishers, adjusted_ratings):
+#                 race_memo.add(combo_key)
+#                 continue
 
-        # Skip if non-finishers in this combo but unprocessed runners remain
-        if len(finishers) != len(combo) and len(runners) != len(combo):
-            race_memo.add(combo_key)
-            continue
+#         # Skip if non-finishers in this combo but unprocessed runners remain
+#         if len(finishers) != len(combo) and len(runners) != len(combo):
+#             race_memo.add(combo_key)
+#             continue
 
-        # Found a valid combination
-        # Clear memo for this race since we don't need it anymore
-        failed_combos_by_race.pop(race_hash, None)
+#         # Found a valid combination
+#         # Clear memo for this race since we don't need it anymore
+#         failed_combos_by_race.pop(race_hash, None)
 
-        return {
-            "complete": list(combo),
-            "todo": [r for r in runners if r not in combo],
-        }
+#         return {
+#             "complete": list(combo),
+#             "todo": [r for r in runners if r not in combo],
+#         }
 
-    # No valid combinations found
-    return {"complete": [], "todo": runners}
+#     # No valid combinations found
+#     return {"complete": [], "todo": runners}
 
 
 def race_builder():
@@ -413,56 +414,27 @@ def race_builder():
                 else:
                     race_dict[race] = [runner]
 
-                check_result = check_race_complete(race, race_dict[race])
-
-                if len(complete := check_result["complete"]):
-                    record = build_record(race, complete)
-                    r.send(
-                        (
-                            record,
-                            transform_races,
-                            "formdata",
-                            "racing_research",
-                        )
-                    )
-                    race_count += 1
-                    if race_count and race_count % 100 == 0:
-                        logger.info(
-                            f"Memo sizes: {sum(len(memo) for memo in failed_combos_by_race.values())} combinations across {len(failed_combos_by_race)} races"
-                        )
-                        gc.collect()
-
-                race_dict[race] = check_result["todo"]
-
-                check_result = check_race_complete(race, race_dict[race])
-
-                if len(complete := check_result["complete"]):
-                    record = build_record(race, complete)
-                    r.send(
-                        (
-                            record,
-                            transform_races,
-                            "formdata",
-                            "racing_research",
-                        )
-                    )
-                    race_count += 1
-                    if race_count and race_count % 100 == 0:
-                        logger.info(
-                            f"Memo sizes: {sum(len(memo) for memo in failed_combos_by_race.values())} combinations across {len(failed_combos_by_race)} races"
-                        )
-                        gc.collect()
-
-                race_dict[race] = check_result["todo"]
-
-                if len(race_dict[race]) == 0:
-                    del race_dict[race]
-
     except GeneratorExit:
+        added_races = []
+        for race in race_dict:
+            if len(race_dict[race]) == race.number_of_runners:
+                record = build_record(race, race_dict[race])
+                r.send(
+                    (
+                        record,
+                        transform_races,
+                        "formdata",
+                        "racing_research",
+                    )
+                )
+                added_races.append(race)
+
         logger.info(f"Built {race_count} races")
         for race, runners in race_dict.items():
-            logger.info(f"\nRace: {race.course} {race.date}")
-            logger.info(f"Runners ({len(runners)}/{race.number_of_runners}):")
-            for runner in runners:
-                logger.info(f"  {runner.name} ({runner.position})")
+            if race not in added_races:
+                logger.info(f"\nRace: {race.course} {race.date}")
+                logger.info(f"Runners ({len(runners)}/{race.number_of_runners}):")
+                for runner in runners:
+                    logger.info(f"  {runner.name} ({runner.position})")
+                time.sleep(0.1)
         r.close()

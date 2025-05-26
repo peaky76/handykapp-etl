@@ -2,18 +2,18 @@ import pytest
 
 from processors.formdata_processors.race_builder import (
     all_duplicate_positions_have_equals,
-    build_record,
+    # build_record,
     calculate_adjusted_ratings,
     check_consecutive,
-    check_race_complete,
+    # check_race_complete,
     get_consecutive_tied_count,
     get_position_num,
     get_valid_combinations,
     is_finisher,
     is_monotonically_decreasing_or_equal,
     validate_positions,
-    validate_ratings_vs_distances,
-    validate_ratings_vs_positions,
+    # validate_ratings_vs_distances,
+    # validate_ratings_vs_positions,
 )
 
 INCREASE_FN = (
@@ -521,149 +521,149 @@ def test_validate_positions_when_non_consecutive(mocker):
     assert validate_positions([runner_1, runner_2]) is False
 
 
-# Single races
-def test_check_race_complete_when_not_enough_runners(race):
-    runners = []
-    actual = check_race_complete(race, runners)
+# # Single races
+# def test_check_race_complete_when_not_enough_runners(race):
+#     runners = []
+#     actual = check_race_complete(race, runners)
 
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
-
-
-def test_check_race_complete_when_exact_number_of_runners_in_valid_rank(
-    race, div_one_runners
-):
-    runners = div_one_runners
-    actual = check_race_complete(race, runners)
-
-    assert actual["complete"] == runners
-    assert actual["todo"] == []
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(
-    race, runners_with_invalid_rank
-):
-    runners = runners_with_invalid_rank
-    actual = check_race_complete(race, runners)
+# def test_check_race_complete_when_exact_number_of_runners_in_valid_rank(
+#     race, div_one_runners
+# ):
+#     runners = div_one_runners
+#     actual = check_race_complete(race, runners)
 
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
-
-
-def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some_equal(
-    race, runners_with_equal_positions
-):
-    runners = runners_with_equal_positions
-    actual = check_race_complete(race, runners)
-
-    assert actual["complete"] == runners
-    assert actual["todo"] == []
+#     assert actual["complete"] == runners
+#     assert actual["todo"] == []
 
 
-def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non_completion(
-    race, div_one_runners, non_finisher
-):
-    runners = [*div_one_runners[:5], non_finisher]
-    actual = check_race_complete(race, runners)
+# def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank(
+#     race, runners_with_invalid_rank
+# ):
+#     runners = runners_with_invalid_rank
+#     actual = check_race_complete(race, runners)
 
-    assert actual["complete"] == runners
-    assert actual["todo"] == []
-
-
-# Multiple races
-def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_non_completion(
-    race, div_one_runners, non_finisher
-):
-    runners = [*div_one_runners[:3], non_finisher, *div_one_runners[4:]]
-    actual = check_race_complete(race, runners)
-
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_exact_number_of_runners_but_mixed_divs(
-    race, div_one_runners, div_two_runners
-):
-    runners = [*div_one_runners[:3], *div_two_runners[3:]]
-    actual = check_race_complete(race, runners)
+# def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_and_some_equal(
+#     race, runners_with_equal_positions
+# ):
+#     runners = runners_with_equal_positions
+#     actual = check_race_complete(race, runners)
 
-    assert len(runners) == 6
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
-
-
-def test_check_race_complete_with_mixed_divs_with_potentially_conflicting_non_equal_ranks(
-    race, div_one_runners, div_two_runners
-):
-    runners = [*div_one_runners[:4], div_two_runners[3], div_two_runners[5]]
-    actual = check_race_complete(race, runners)
-
-    assert len(runners) == 6
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
+#     assert actual["complete"] == runners
+#     assert actual["todo"] == []
 
 
-def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_but_not_ratings(
-    race, div_one_runners, div_two_runners
-):
-    runners = [*div_one_runners[:3], *div_two_runners[3:]]
-    actual = check_race_complete(race, runners)
+# def test_check_race_complete_when_exact_number_of_runners_in_valid_rank_with_non_completion(
+#     race, div_one_runners, non_finisher
+# ):
+#     runners = [*div_one_runners[:5], non_finisher]
+#     actual = check_race_complete(race, runners)
 
-    assert len(runners) == 6
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
-
-
-def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_and_ratings(
-    race, div_one_runners, div_two_runners
-):
-    runners = [*div_one_runners[:5], div_two_runners[5]]
-    actual = check_race_complete(race, runners)
-
-    assert len(runners) == 6
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
+#     assert actual["complete"] == runners
+#     assert actual["todo"] == []
 
 
-def test_check_race_complete_when_extra_runners_and_not_enough_from_one_div(
-    race, div_one_runners, div_two_runners
-):
-    runners = [*div_one_runners[:3], *div_two_runners[2:]]
-    actual = check_race_complete(race, runners)
+# # Multiple races
+# def test_check_race_complete_when_exact_number_of_runners_in_invalid_rank_with_non_completion(
+#     race, div_one_runners, non_finisher
+# ):
+#     runners = [*div_one_runners[:3], non_finisher, *div_one_runners[4:]]
+#     actual = check_race_complete(race, runners)
 
-    assert len(runners) == 7
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
-
-
-def test_check_race_complete_when_extra_runners_but_one_complete_div(
-    race, div_one_runners, div_two_runners
-):
-    runners = [div_one_runners[3], *div_two_runners]
-    actual = check_race_complete(race, runners)
-
-    assert len(runners) == 7
-    assert actual["complete"] == div_two_runners
-    assert actual["todo"] == [div_one_runners[3]]
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_indeterminate_non_finisher(
-    race, div_one_runners, div_two_runners, non_finisher
-):
-    runners = [*div_two_runners[:5], *div_one_runners[:5], non_finisher]
-    actual = check_race_complete(race, runners)
+# def test_check_race_complete_when_exact_number_of_runners_but_mixed_divs(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [*div_one_runners[:3], *div_two_runners[3:]]
+#     actual = check_race_complete(race, runners)
 
-    assert len(runners) == 11
-    assert actual["complete"] == []
-    assert actual["todo"] == runners
+#     assert len(runners) == 6
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
 
 
-def test_check_race_complete_when_no_ratings(race, div_one_runners):
-    runners = div_one_runners
-    for runner in runners:
-        runner.form_rating = None
+# def test_check_race_complete_with_mixed_divs_with_potentially_conflicting_non_equal_ranks(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [*div_one_runners[:4], div_two_runners[3], div_two_runners[5]]
+#     actual = check_race_complete(race, runners)
 
-    actual = check_race_complete(race, runners)
+#     assert len(runners) == 6
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
 
-    assert actual["complete"] == runners
-    assert actual["todo"] == []
+
+# def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_but_not_ratings(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [*div_one_runners[:3], *div_two_runners[3:]]
+#     actual = check_race_complete(race, runners)
+
+#     assert len(runners) == 6
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
+
+
+# def test_check_race_complete_with_mixed_divs_which_would_fit_ranks_and_ratings(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [*div_one_runners[:5], div_two_runners[5]]
+#     actual = check_race_complete(race, runners)
+
+#     assert len(runners) == 6
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
+
+
+# def test_check_race_complete_when_extra_runners_and_not_enough_from_one_div(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [*div_one_runners[:3], *div_two_runners[2:]]
+#     actual = check_race_complete(race, runners)
+
+#     assert len(runners) == 7
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
+
+
+# def test_check_race_complete_when_extra_runners_but_one_complete_div(
+#     race, div_one_runners, div_two_runners
+# ):
+#     runners = [div_one_runners[3], *div_two_runners]
+#     actual = check_race_complete(race, runners)
+
+#     assert len(runners) == 7
+#     assert actual["complete"] == div_two_runners
+#     assert actual["todo"] == [div_one_runners[3]]
+
+
+# def test_check_race_complete_when_indeterminate_non_finisher(
+#     race, div_one_runners, div_two_runners, non_finisher
+# ):
+#     runners = [*div_two_runners[:5], *div_one_runners[:5], non_finisher]
+#     actual = check_race_complete(race, runners)
+
+#     assert len(runners) == 11
+#     assert actual["complete"] == []
+#     assert actual["todo"] == runners
+
+
+# def test_check_race_complete_when_no_ratings(race, div_one_runners):
+#     runners = div_one_runners
+#     for runner in runners:
+#         runner.form_rating = None
+
+#     actual = check_race_complete(race, runners)
+
+#     assert actual["complete"] == runners
+#     assert actual["todo"] == []
