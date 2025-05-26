@@ -171,6 +171,31 @@ def test_check_consecutive_when_run_of_ties_does_not_reach_next_value():
     assert check_consecutive("=1", "5", 3) is False
 
 
+def test_get_valid_combinations_with_no_runners():
+    actual = get_valid_combinations([], 4)
+    expected = []
+
+    assert actual == expected
+
+
+def test_get_valid_combinations_with_one_runner(mocker):
+    r1 = mocker.Mock(position="1")
+    r2 = mocker.Mock(position="1")
+    actual = get_valid_combinations([r1, r2], 1)
+    expected = [[r1], [r2]]
+
+    assert actual == expected
+
+
+def test_get_valid_combinations_when_fewer_runners_than_required(mocker):
+    r1 = mocker.Mock(position="1")
+    r2 = mocker.Mock(position="2")
+    actual = get_valid_combinations([r1, r2], 3)
+    expected = []
+
+    assert actual == expected
+
+
 def test_get_valid_combinations_in_base_case(mocker):
     r1a = mocker.Mock(position="1")
     r1b = mocker.Mock(position="1")
