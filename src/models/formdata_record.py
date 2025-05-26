@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import Field
 
 from .formdata_race import FormdataRace
@@ -8,3 +10,4 @@ class FormdataRecord(FormdataRace):
     runners: list[FormdataRunner] = Field(
         default_factory=list, description="List of runners in the race"
     )
+    division: Optional[int] = None
