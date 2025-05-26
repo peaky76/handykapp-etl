@@ -135,17 +135,28 @@ def get_valid_combinations(
                 new_combo = [*vc, f]
                 keep_combo = True
 
-            if keep_combo:
-                carry_forward_combos.append(vc)
-
             if new_combo and len(new_combo) <= number_of_runners:
                 btn_dists = tuple(
                     r.beaten_distance for r in new_combo if is_finisher(r)
                 )
                 if is_monotonically_increasing_or_equal(btn_dists):
                     carry_forward_combos.append(new_combo)
+                else:
+                    keep_combo = True
+
+            if keep_combo:
+                carry_forward_combos.append(vc)
 
         valid_combos = carry_forward_combos
+
+    print(
+        "\n".join(
+            [
+                ",".join([f"{f.name}: {f.beaten_distance}" for f in vc])
+                for vc in valid_combos
+            ]
+        )
+    )
 
     return [vc for vc in valid_combos if len(vc) == number_of_runners]
 
