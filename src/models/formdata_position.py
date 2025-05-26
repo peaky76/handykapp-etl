@@ -12,6 +12,8 @@ def validate_position(v: str) -> str:
         r"^\d+$"  # Simple digit (e.g., "1", "2", "10")
         r"|^=\d+$"  # Equals sign followed by digit (e.g., "=1", "=2")
         r"|^\d+p\d+$"  # Digit followed by 'p' and another digit (e.g., "1p2", "3p4")
+        r"|^=\d+p\d+$"  # Equals sign, then digit followed by 'p' and another digit (e.g., "=1p2")
+        r"|^\d+d+$"  # Digit followed by 'd' (e.g., "3d")
         r"|^[a-z]$"  # Any single lowercase letter (e.g., "p", "u", "f")
     )
 
