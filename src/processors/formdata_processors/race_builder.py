@@ -75,6 +75,13 @@ def calculate_adjusted_ratings(weights, allowances, form_ratings):
     ]
 
 
+def get_consecutive_tied_count(runners: list[FormdataRunner]) -> int:
+    return next(
+        (i for i, r in enumerate(reversed(runners)) if "=" not in r.position),
+        len(runners),
+    )
+
+
 def get_valid_combinations(
     runners: list[FormdataRunner], number_of_runners: int
 ) -> list[list[FormdataRunner]]:

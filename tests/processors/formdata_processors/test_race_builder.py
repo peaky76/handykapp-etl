@@ -6,6 +6,7 @@ from processors.formdata_processors.race_builder import (
     calculate_adjusted_ratings,
     check_consecutive,
     check_race_complete,
+    get_consecutive_tied_count,
     get_position_num,
     get_valid_combinations,
     is_finisher,
@@ -169,6 +170,30 @@ def test_check_consecutive_when_run_of_ties_reaches_next_value():
 
 def test_check_consecutive_when_run_of_ties_does_not_reach_next_value():
     assert check_consecutive("=1", "5", 3) is False
+
+
+def test_get_consecutive_tied_count_when_zero(mocker):
+    r1 = mocker.Mock(position="1")
+    r2 = mocker.Mock(position="2")
+    r3 = mocker.Mock(position="3")
+
+    assert get_consecutive_tied_count([r1, r2, r3]) == 0
+
+
+def test_get_consecutive_tied_count_when_one_tie(mocker):
+    r1 = mocker.Mock(position="1")
+    r2 = mocker.Mock(position="2")
+    r3 = mocker.Mock(position="=3")
+
+    assert get_consecutive_tied_count([r1, r2, r3]) == 1
+
+
+def test_get_consecutive_tied_count_when_multiple_ties(mocker):
+    r1 = mocker.Mock(position="1")
+    r2 = mocker.Mock(position="=2")
+    r3 = mocker.Mock(position="=2")
+
+    assert get_consecutive_tied_count([r1, r2, r3]) == 2
 
 
 def test_get_valid_combinations_with_no_runners():
