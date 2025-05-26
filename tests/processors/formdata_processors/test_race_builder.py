@@ -285,6 +285,42 @@ def test_get_valid_combinations_with_a_tied_position(mocker):
         )
 
 
+def test_get_valid_combinations_with_non_finisher(mocker):
+    r1a = mocker.Mock(position="1")
+    r1b = mocker.Mock(position="1")
+    r2a = mocker.Mock(position="2")
+    r2b = mocker.Mock(position="2")
+    r3a = mocker.Mock(position="3")
+    r3b = mocker.Mock(position="3")
+    r4 = mocker.Mock(position="4")
+    r0 = mocker.Mock(position="P")
+    actual = get_valid_combinations([r1a, r1b, r2a, r2b, r3a, r3b, r4, r0], 4)
+    expected = [
+        [r1a, r2a, r3a, r4],
+        [r1b, r2a, r3a, r4],
+        [r1a, r2b, r3a, r4],
+        [r1b, r2b, r3a, r4],
+        [r1a, r2a, r3b, r4],
+        [r1b, r2a, r3b, r4],
+        [r1a, r2a, r3a, r0],
+        [r1b, r2a, r3a, r0],
+        [r1a, r2b, r3b, r4],
+        [r1b, r2b, r3b, r4],
+        [r1a, r2b, r3a, r0],
+        [r1b, r2b, r3a, r0],
+        [r1a, r2a, r3b, r0],
+        [r1b, r2a, r3b, r0],
+        [r1a, r2b, r3b, r0],
+        [r1b, r2b, r3b, r0],
+    ]
+
+    assert len(actual) == len(expected)
+    for combo in expected:
+        assert combo in actual, (
+            f"Expected combination {combo} not found in actual combinations"
+        )
+
+
 def test_calculate_adjusted_ratings():
     weights = ("9-10", "9-7", "9-2")
     allowances = (0, 3, 5)

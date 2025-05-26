@@ -53,7 +53,6 @@ def is_monotonically_decreasing_or_equal(seq: tuple[float]) -> bool:
 def check_consecutive(
     position_a: FormdataPosition, position_b: FormdataPosition, run_of_ties: int = 0
 ) -> bool:
-    """Check if two runners have consecutive positions"""
     if "=" in position_a:
         if get_position_num(position_a) == get_position_num(position_b):
             return "=" in position_b
@@ -95,54 +94,51 @@ def get_valid_combinations(
     if number_of_runners == 1:
         return [[r] for r in runners]
 
-    finishers = sorted([r for r in runners if is_finisher(r)], key=runner_sort_value)
-    non_finishers = [r for r in runners if not is_finisher(r)]
+    sorted_runners = sorted(runners, key=runner_sort_value)
+    non_finisher_count = len([r for r in sorted_runners if not is_finisher(r)])
 
-    valid_combos = [[finishers[0]]]
-    for f in finishers[1:]:
+    valid_combos = [[sorted_runners[0]]]
+    for f in sorted_runners[1:]:
         carry_forward_combos = []
 
         for vc in valid_combos:
+            last = vc[-1].position
+            this = f.position
             tied_count = get_consecutive_tied_count(vc)
-            print(f"Combo: {[r.position for r in vc]}, Tied count: {tied_count}")
 
-            if check_consecutive(vc[-1].position, f.position, tied_count):
-                print("Found a consecutive pair:", vc[-1].position, f.position)
-                new_combo = [*vc, f]
-                carry_forward_combos.append(new_combo)
-                continue
-
-            if get_position_num(vc[-1].position) == get_position_num(f.position):
-                new_combo = [*vc[:-1], f]
-                carry_forward_combos.append(new_combo)
-                carry_forward_combos.append(vc)
-                continue
+            last_num = get_position_num(last) if is_finisher(vc[-1]) else None
+            this_num = get_position_num(this) if is_finisher(f) else None
+            both_finishers = last_num and this_num
+            same_positions = last_num == this_num
+            expecting_more = both_finishers and this_num < last_num + tied_count
 
             combo_complete = len(vc) == number_of_runners
-            expecting_more = (
-                get_position_num(f.position)
-                < get_position_num(vc[-1].position) + tied_count
-            )
-            if combo_complete or expecting_more:
+            could_have_non_finishers = len(vc) + non_finisher_count >= number_of_runners
+
+            keep_combo = combo_complete or expecting_more
+            new_combo = None
+
+            if both_finishers and check_consecutive(last, this, tied_count):
+                new_combo = [*vc, f]
+                keep_combo = could_have_non_finishers
+
+            elif same_positions:
+                new_combo = [*vc[:-1], f]
+                keep_combo = True
+
+            elif not is_finisher(f):
+                new_combo = [*vc, f]
+                keep_combo = True
+
+            if keep_combo:
                 carry_forward_combos.append(vc)
-                continue
+
+            if new_combo and len(new_combo) <= number_of_runners:
+                carry_forward_combos.append(new_combo)
 
         valid_combos = carry_forward_combos
 
-    print(valid_combos)
-
-    final_combos = []
-    for vc in valid_combos:
-        if len(vc) == number_of_runners:
-            final_combos.append(vc)
-        if len(vc) < number_of_runners:
-            for non_finisher_combo in combinations(
-                non_finishers, number_of_runners - len(vc)
-            ):
-                final_combo = [*vc, *non_finisher_combo]
-                final_combos.append(final_combo)
-
-    return final_combos
+    return [vc for vc in valid_combos if len(vc) == number_of_runners]
 
 
 def all_duplicate_positions_have_equals(runners):
