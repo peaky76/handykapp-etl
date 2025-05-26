@@ -16,6 +16,10 @@ from processors.formdata_processors.race_builder import (
     validate_ratings_vs_positions,
 )
 
+INCREASE_FN = (
+    "processors.formdata_processors.race_builder.is_monotonically_increasing_or_equal"
+)
+
 # Based on https://www.racingpost.com/results/6/beverley/2024-08-31/873840
 BEV_DIV_ONE_DATA = [
     ["1", -0.3, "9-10", 0, 80],  # -56
@@ -230,6 +234,9 @@ def test_get_valid_combinations_in_base_case(mocker):
     r3b = mocker.Mock(position="3")
     r4a = mocker.Mock(position="4")
     r4b = mocker.Mock(position="4")
+
+    mocker.patch(INCREASE_FN, return_value=True)
+
     actual = get_valid_combinations([r1a, r1b, r2a, r2b, r3a, r3b, r4a, r4b], 4)
     expected = [
         [r1a, r2a, r3a, r4a],
@@ -266,6 +273,9 @@ def test_get_valid_combinations_with_a_tied_position(mocker):
     r3 = mocker.Mock(position="3")
     r4a = mocker.Mock(position="4")
     r4b = mocker.Mock(position="4")
+
+    mocker.patch(INCREASE_FN, return_value=True)
+
     actual = get_valid_combinations([r1a, r1b, r2a, r2b, r2c, r3, r4a, r4b], 4)
     expected = [
         [r1a, r2a, r3, r4a],
@@ -294,6 +304,9 @@ def test_get_valid_combinations_with_non_finisher(mocker):
     r3b = mocker.Mock(position="3")
     r4 = mocker.Mock(position="4")
     r0 = mocker.Mock(position="P")
+
+    mocker.patch(INCREASE_FN, return_value=True)
+
     actual = get_valid_combinations([r1a, r1b, r2a, r2b, r3a, r3b, r4, r0], 4)
     expected = [
         [r1a, r2a, r3a, r4],

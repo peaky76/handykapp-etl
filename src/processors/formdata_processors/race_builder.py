@@ -50,6 +50,11 @@ def is_monotonically_decreasing_or_equal(seq: tuple[float]) -> bool:
 
 
 @cache
+def is_monotonically_increasing_or_equal(seq: tuple[float]) -> bool:
+    return all(a <= b for a, b in zip(seq, seq[1:]))
+
+
+@cache
 def check_consecutive(
     position_a: FormdataPosition, position_b: FormdataPosition, run_of_ties: int = 0
 ) -> bool:
@@ -134,7 +139,11 @@ def get_valid_combinations(
                 carry_forward_combos.append(vc)
 
             if new_combo and len(new_combo) <= number_of_runners:
-                carry_forward_combos.append(new_combo)
+                btn_dists = tuple(
+                    r.beaten_distance for r in new_combo if is_finisher(r)
+                )
+                if is_monotonically_increasing_or_equal(btn_dists):
+                    carry_forward_combos.append(new_combo)
 
         valid_combos = carry_forward_combos
 
