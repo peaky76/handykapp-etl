@@ -1,8 +1,8 @@
 import gc
+from collections import Counter
 from functools import cache, lru_cache
 from itertools import combinations, pairwise
 from typing import Literal, TypeAlias
-from collections import Counter
 
 from compytition import RankList
 from horsetalk import RaceWeight
@@ -16,7 +16,7 @@ RaceCompleteCheckResult: TypeAlias = dict[
     Literal["complete", "todo"], list[FormdataRunner]
 ]
 
-failed_combos_by_race = {}
+failed_combos_by_race: dict[int, set] = {}
 
 
 @cache
