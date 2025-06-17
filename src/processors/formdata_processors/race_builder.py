@@ -1,8 +1,7 @@
-import gc
 import time
 from collections import Counter
 from functools import cache
-from itertools import combinations, pairwise
+from itertools import pairwise
 from typing import Literal, TypeAlias
 
 from compytition import RankList
@@ -114,9 +113,14 @@ def get_valid_combinations(
 
             last_num = get_position_num(last) if is_finisher(vc[-1]) else None
             this_num = get_position_num(this) if is_finisher(f) else None
-            both_finishers = last_num and this_num
+            both_finishers = bool(last_num and this_num)
             same_positions = last_num == this_num
-            expecting_more = both_finishers and this_num < last_num + tied_count
+            expecting_more = (
+                both_finishers
+                and this_num
+                and last_num
+                and this_num < last_num + tied_count
+            )
 
             combo_complete = len(vc) == number_of_runners
             could_have_non_finishers = len(vc) + non_finisher_count >= number_of_runners
@@ -189,7 +193,7 @@ def all_duplicate_positions_have_equals(runners):
 
 def validate_positions(runners):
     try:
-        RankList(r.position for r in runners)
+        RankList([r.position for r in runners])
         return all_duplicate_positions_have_equals(runners)
 
     except ValueError:
