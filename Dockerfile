@@ -1,4 +1,4 @@
-FROM prefecthq/prefect:2.14-python3.11
+FROM prefecthq/prefect:3.4.20-python3.13
 
 RUN groupadd -r nonroot
 RUN useradd -r -g nonroot nonroot
