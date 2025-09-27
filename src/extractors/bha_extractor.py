@@ -20,25 +20,25 @@ UPDATE_DAY = pendulum.TUESDAY
 LAST_UPDATE_STR = str(get_last_occurrence_of(UPDATE_DAY)).replace("-", "")
 
 
-@task(tags=["BHA"], task_run_name="fetch_bha_{data}")
-def fetch(data):
+@task(tags=["BHA"], task_run_name="fetch_bha_{file}")
+def fetch(file):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36"
     }
-    return fetch_content(f"{SOURCE}{FILES[data]}", headers=headers)
+    return fetch_content(f"{SOURCE}{FILES[file]}", headers=headers)
 
 
-@task(tags=["BHA"], task_run_name="save_bha_{data}")
-def save(data, content):
-    filename = f"{DESTINATION}bha_{data}_{LAST_UPDATE_STR}.csv"
+@task(tags=["BHA"], task_run_name="save_bha_{file}")
+def save(file, content):
+    filename = f"{DESTINATION}bha_{file}_{LAST_UPDATE_STR}.csv"
     write_file(content, filename)
 
 
 @flow
 def bha_extractor():
-    for data in FILES:
-        content = fetch(data)
-        save(data, content)
+    for file in FILES:
+        content = fetch(file)
+        save(file, content)
 
 
 if __name__ == "__main__":
