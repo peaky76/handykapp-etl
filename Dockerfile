@@ -12,9 +12,11 @@ COPY /src /opt/handykapp-etl/src
 COPY pyproject.toml poetry.lock settings.toml /opt/handykapp-etl/
 WORKDIR /opt/handykapp-etl
 
+# Fix permissions so nonroot user can write to the working directory
+RUN chmod -R 777 /opt/handykapp-etl
+
 # Install packages in the system Python
 RUN poetry config virtualenvs.create false
-RUN poetry config virtualenvs.prefer-active-python true
-RUN poetry install --only main
+RUN poetry install --only main --no-root
 
 USER nonroot
