@@ -4,7 +4,7 @@
 
 # Generic metadata about this project
 name: handykapp-etl
-prefect-version: 2.14.3
+prefect-version: 3.4.20
 
 # build section allows you to manage and build docker images
 build:
@@ -30,7 +30,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 0 1 * * 3
       timezone: UTC
@@ -44,7 +45,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 1 0 * * 1
       timezone: UTC
@@ -58,7 +60,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 30 1 * * 1,3,5
       timezone: UTC
@@ -72,7 +75,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 0 2 * * *
       timezone: UTC
@@ -86,7 +90,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 30 9 * * *
       timezone: UTC
@@ -100,7 +105,8 @@ deployments:
     work_pool:
       name: municipal
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
     schedule:
       cron: 0 10 * * *
       timezone: UTC
@@ -110,9 +116,10 @@ deployments:
     version:
     tags: []
     description:
-    entrypoint: src\loaders\test_loader.py:test_load
+    entrypoint: src\loaders\test_loader.py:load_nothing_and_log
     parameters: {}
     work_pool:
       name: paddling
       work_queue_name:
-      job_variables: {}
+      job_variables:
+        image: peaky76/prefect-poetry-peaky:latest
