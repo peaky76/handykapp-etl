@@ -18,7 +18,7 @@ pybet = "^0.8.3"
 pydantic = "^2.11.9"
 pydantic-extra-types = "^2.10.5"
 pymongo = "^4.15.1"
-python = "~3.12"
+python = "~3.13"
 python-dotenv = "^1.1.1"
 pymupdf = "^1.22.5" # NB >=1.23 interprets Irish apostrophe as some sort of file end marker
 
