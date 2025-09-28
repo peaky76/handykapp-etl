@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from prefect import flow
+from prefect import flow, get_run_logger
 
 from extractors.rapid_horseracing_extractor import (
     rapid_horseracing_extractor,  # type: ignore
@@ -12,7 +12,12 @@ from extractors.rapid_horseracing_extractor import (
 from extractors.theracingapi_extractor import (
     theracingapi_racecards_extractor,  # type: ignore
 )
-from loaders.test_loader import load_nothing_and_log  # type: ignore
+
+
+@flow
+def load_nothing_and_log():
+    logger = get_run_logger()
+    logger.info("I've run, but done nothing.")
 
 
 @flow
