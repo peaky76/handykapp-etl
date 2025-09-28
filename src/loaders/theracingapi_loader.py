@@ -54,8 +54,11 @@ def load_theracingapi_data(*, from_date=None):
         contents = read_file(file)
         for dec in contents["racecards"]:
             data = {k: v for k, v in dec.items() if k != "off_dt"}
-            record = TheRacingApiRacecard(**data)
-            r.send((record, transform_races, file, "theracingapi"))
+            try:
+                record = TheRacingApiRacecard(**data)
+                r.send((record, transform_races, file, "theracingapi"))
+            except Exception as e:
+                logger.error(f"Unable to process Racing API racecard {file}: {e}")
 
     r.close()
 
