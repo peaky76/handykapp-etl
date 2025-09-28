@@ -51,7 +51,7 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
 
     racecourses = get_all_racecourses()
     surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
-    course_name = race.course.lower()
+    course_name = race.course.lower().replace("(", "").replace(")", "").strip()
     if course_name == "newmarket":
         course_name = apply_newmarket_workaround(
             pendulum.parse(str(race.datetime))
