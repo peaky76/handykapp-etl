@@ -1,5 +1,7 @@
 import csv
 import json
+import datetime
+from typing import Literal, Union
 
 import pendulum
 from prefect import get_run_logger
@@ -67,3 +69,10 @@ def log_validation_problem(problem):
     msg = f"{problem['error']} in row {problem['row']} for {problem['field']}: {problem['value']}"
     logger = get_run_logger()
     logger.warning(msg)
+
+
+type NewmarketRacecourse = Literal["Newmarket July", "Newmarket Rowley"]
+
+
+def apply_newmarket_workaround(date: pendulum.DateTime) -> NewmarketRacecourse:
+    return "Newmarket July" if date.month in (6, 7, 8) else "Newmarket Rowley"

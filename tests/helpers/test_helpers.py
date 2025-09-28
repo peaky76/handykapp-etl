@@ -6,6 +6,7 @@ from pendulum import TUESDAY, parse
 
 from src.clients.spaces_client import SpacesClient
 from src.helpers.helpers import (
+    apply_newmarket_workaround,
     fetch_content,
     get_files,
     get_last_occurrence_of,
@@ -22,6 +23,7 @@ PENDULUM_IMPORT = "src.helpers.helpers.pendulum"
 def mock_spaces_client(mocker):
     mock_client = mocker.patch("src.helpers.helpers.SpacesClient.get")
     return mock_client.return_value
+
 
 def test_fetch_content_when_successful(mocker):
     resp = mocker.patch("src.helpers.helpers.get")
@@ -56,17 +58,23 @@ def test_get_files_modified_after(mock_spaces_client):
 
 
 def test_read_file_for_csv(mock_spaces_client):
-    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes("foo,bar,baz", "utf-8"))}
+    mock_spaces_client.get_object.return_value = {
+        "Body": MagicMock(read=lambda: bytes("foo,bar,baz", "utf-8"))
+    }
     assert read_file("foo.csv") == [["foo", "bar", "baz"]]
 
 
 def test_read_file_for_json(mock_spaces_client):
-    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes('{"foo": "bar"}', "utf-8"))}
+    mock_spaces_client.get_object.return_value = {
+        "Body": MagicMock(read=lambda: bytes('{"foo": "bar"}', "utf-8"))
+    }
     assert read_file("foo.json") == {"foo": "bar"}
 
 
 def test_stream_file(mock_spaces_client):
-    mock_spaces_client.get_object.return_value = {"Body": MagicMock(read=lambda: bytes("foobar", "utf-8"))}
+    mock_spaces_client.get_object.return_value = {
+        "Body": MagicMock(read=lambda: bytes("foobar", "utf-8"))
+    }
     actual = stream_file("foo.csv")
     assert isinstance(actual, bytes)
     assert actual.decode("utf-8") == "foobar"
@@ -103,3 +111,19 @@ def test_log_validation_problem(mocker):
     }
     log_validation_problem(problem)
     assert logger().warning.called
+
+
+def test_apply_newmarket_workaround_for_early_rowley():
+    assert apply_newmarket_workaround(parse("2023-05-01")) == "Newmarket Rowley"
+
+
+def test_apply_newmarket_workaround_for_early_july():
+    assert apply_newmarket_workaround(parse("2023-06-11")) == "Newmarket July"
+
+
+def test_apply_newmarket_workaround_for_late_july():
+    assert apply_newmarket_workaround(parse("2023-08-15")) == "Newmarket July"
+
+
+def test_apply_newmarket_workaround_for_late_rowley():
+    assert apply_newmarket_workaround(parse("2023-09-01")) == "Newmarket Rowley"

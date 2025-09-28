@@ -6,6 +6,7 @@ from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
+from helpers import apply_newmarket_workaround
 from models import PreMongoRace
 from models.pre_mongo_runner import PreMongoRunner
 from processors.runner_processor import runner_processor
@@ -50,12 +51,17 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
 
     racecourses = get_all_racecourses()
     surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
+    course_name = race.course.lower()
+    if course_name == "newmarket":
+        course_name = apply_newmarket_workaround(
+            pendulum.parse(str(race.datetime))
+        ).lower()
 
     for racecourse in racecourses:
         if (
             (
-                racecourse["name"].lower() == race.course.lower()
-                or racecourse["formal_name"].lower() == race.course.lower()
+                racecourse["name"].lower() == course_name
+                or racecourse["formal_name"].lower() == course_name
             )
             and racecourse.get("surface") in surface_options
             and racecourse.get("code") == race.code
