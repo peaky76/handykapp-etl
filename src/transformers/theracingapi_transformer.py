@@ -2,17 +2,11 @@
 import sys
 from pathlib import Path
 
-from models import PreMongoRace, PreMongoRunner
-from transformers.validators import ensure_datetime
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
 
 import pendulum
 import petl  # type: ignore
 import tomllib
-
-# from helpers import get_files, log_validation_problem, read_file
 from horsetalk import (  # type: ignore
     CoatColour,
     Gender,
@@ -23,10 +17,14 @@ from horsetalk import (  # type: ignore
     RaceGrade,
 )
 
-# from loaders.theracingapi_loader import declaration_processor
-# from prefect import flow, get_run_logger, task
-from models import TheRacingApiRacecard, TheRacingApiRunner
+from models import (
+    PreMongoRace,
+    PreMongoRunner,
+    TheRacingApiRacecard,
+    TheRacingApiRunner,
+)
 from transformers.parsers import parse_code, parse_obstacle
+from transformers.validators import ensure_datetime
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -104,7 +102,6 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
                 "going": "going_description",
                 "pattern": "race_grade",
                 "distance_f": "distance_description",
-                # "runners": "horses",
             },
         )
         .addfield(
