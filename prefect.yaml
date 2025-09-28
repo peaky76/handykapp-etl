@@ -51,11 +51,11 @@ deployments:
       cron: 0 2 * * *
       timezone: UTC
       day_or: true
-  - name: database_load
+  - name: nuclear_reload
     version:
     tags: []
     description:
-    entrypoint: src\runners\database_runner.py:database_runner
+    entrypoint: src\loaders\main_loader.py:nuclear_reload
     parameters: {}
     work_pool:
       name: municipal
@@ -66,34 +66,3 @@ deployments:
       cron: 1 0 * * 1,3,5
       timezone: UTC
       day_or: true
-  - name: streamlined-lfo
-    version:
-    tags: []
-    description:
-    entrypoint: src\loaders\formdata_loader.py:load_formdata_only
-    parameters: {}
-    work_pool:
-      name: municipal
-      work_queue_name:
-      job_variables:
-        image: peaky76/prefect-poetry-peaky:latest
-    schedule:
-      cron: 30 1 * * 1,3,5
-      timezone: UTC
-      day_or: true
-  - name: streamlined-trali
-    version:
-    tags: []
-    description:
-    entrypoint: src\loaders\theracingapi_loader.py:increment_theracingapi_data
-    parameters: {}
-    work_pool:
-      name: municipal
-      work_queue_name:
-      job_variables:
-        image: peaky76/prefect-poetry-peaky:latest
-    schedule:
-      cron: 0 10 * * *
-      timezone: UTC
-      day_or: true
-      active: true
