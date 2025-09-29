@@ -75,3 +75,12 @@ class SpacesClient:
         client.put_object(
             Bucket=cls.BUCKET_NAME, Key=filename, Body=content, ACL="private"
         )
+
+    @classmethod
+    def edit_json_file(cls, filename, edit_func):
+        data = cls.read_file(filename)
+        modified_data = edit_func(data)
+        json_content = json.dumps(modified_data, indent=2, ensure_ascii=False)
+        cls.write_file(json_content, filename)
+
+        return modified_data
