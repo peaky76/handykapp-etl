@@ -61,7 +61,7 @@ def nuclear_reload():
     spec_database()
     load_racecourses()
     load_theracingapi_data()
-    load_rapid_horseracing_data()
+    # load_rapid_horseracing_data()
 
 
 if __name__ == "__main__":
