@@ -66,6 +66,33 @@ def horse_2_data():
 
 
 @pytest.fixture
+def horse_3_data():
+    return TheRacingApiRunner(
+        **{
+            "horse": "Spycatcher",
+            "age": "5",
+            "sex": "horse",
+            "sex_code": "H",
+            "colour": "b",
+            "region": "IRE",
+            "dam": "Damask",
+            "sire": "Vadamos",
+            "damsire": "Red Clubs",
+            "trainer": "K R Burke",
+            "owner": "Highclere Tbredracing-Adriana Zaefferer",
+            "number": "6",
+            "draw": "5",
+            "headgear": "",
+            "lbs": "130",
+            "ofr": "106",
+            "jockey": "Pierre-Louis Jamin(3)",
+            "last_run": "301",
+            "form": "13270-",
+        },
+    )
+
+
+@pytest.fixture
 def racecard_data(horse_1_data, horse_2_data):
     return TheRacingApiRacecard(
         **{
@@ -159,6 +186,31 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
         official_rating=76,
     )
     actual = transform_horse(horse_2_data, pendulum.parse("2023-10-03"))
+    assert actual == expected
+
+
+def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker):
+    mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
+    expected = PreMongoRunner(
+        name="SPYCATCHER",
+        sex="M",
+        country="IRE",
+        year=2018,
+        colour="Bay",
+        sire="VADAMOS",
+        dam="DAMASK",
+        damsire="RED CLUBS",
+        trainer="K R Burke",
+        owner="Highclere Tbredracing-Adriana Zaefferer",
+        jockey="Pierre-Louis Jamin",
+        allowance=3,
+        saddlecloth=6,
+        draw=5,
+        headgear=None,
+        lbs_carried=130,
+        official_rating=106,
+    )
+    actual = transform_horse(horse_3_data, pendulum.parse("2023-10-03"))
     assert actual == expected
 
 
