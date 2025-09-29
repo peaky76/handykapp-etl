@@ -24,6 +24,7 @@ class MongoHorse(BaseModel):
     country: str = Field(..., min_length=2, max_length=3)
     year: int
     sex: Optional[Literal["M", "F"]] = None
+    is_gelded: Optional[bool] = None
     breed: Optional[str] = None
     colour: Optional[str] = None
     sire: Optional[PyObjectId] = None
