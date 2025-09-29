@@ -1,5 +1,6 @@
 from typing import Literal, Optional
 
+from pendulum import Date
 from pydantic import BaseModel, Field
 from pydantic_extra_types.pendulum_dt import Duration
 
@@ -9,7 +10,7 @@ class PreMongoRunner(BaseModel):
     country: Optional[str] = Field(default=None, min_length=2, max_length=3)
     year: Optional[int] = None
     sex: Optional[Literal["M", "F"]] = None
-    is_gelded: Optional[bool] = None
+    gelded_from: Optional[Date] = None
     colour: Optional[str] = None
     owner: Optional[str] = None
     lbs_carried: Optional[int] = None
