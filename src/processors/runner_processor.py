@@ -1,11 +1,12 @@
 from functools import cache, wraps
 
+from pendulum import Date
 from prefect import get_run_logger
 from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import MongoHorse, PyObjectId
+from models import MongoHorse, MongoOperation, PreMongoRunner, PyObjectId
 from processors.person_processor import person_processor
 
 from .utils import compact
@@ -63,12 +64,52 @@ def get_sire_id(name: str | None) -> PyObjectId | None:
     return get_horse_id_by_name_and_sex(name, "M")
 
 
-def make_update_dictionary(horse):
+def create_gelding_operation(date: Date) -> MongoOperation:
+    return {
+        "operation_type": "gelding",
+        "date": date,
+    }
+
+
+def get_operations(horse: PreMongoRunner) -> list[MongoOperation]:
+    if not horse.gelded_from:
+        return []
+
+    return [create_gelding_operation(horse.gelded_from)]
+
+
+def make_operations_update(
+    horse: PreMongoRunner, db_horse: MongoHorse
+) -> list[MongoOperation] | None:
+    if not hasattr(horse, "gelded_from") or not horse.gelded_from:
+        return None
+
+    operations = db_horse.get("operations")
+
+    if not operations:
+        return get_operations(horse)
+
+    gelding_op = next(op for op in operations if op.get("operation_type") == "gelding")
+    non_gelding_ops = [op for op in operations if op.get("operation_type") != "gelding"]
+
+    if not gelding_op:
+        return [*operations, create_gelding_operation(horse.gelded_from)]
+
+    current_date = gelding_op.get("date")
+
+    if current_date is None or horse.gelded_from < current_date:
+        return [*non_gelding_ops, create_gelding_operation(horse.gelded_from)]
+
+    return [operations]
+
+
+def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
     return compact(
         {
             "colour": horse.colour,
             "sire": get_sire_id(horse.sire),
             "dam": get_dam_id(horse.dam),
+            "operations": make_operations_update(horse, db_horse),
         }
     )
 
@@ -96,7 +137,8 @@ def runner_processor():
             if horse_id:
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": horse_id}, {"$set": make_update_dictionary(horse)}
+                        {"_id": horse_id},
+                        {"$set": make_update_dictionary(horse, db_horse)},
                     )
                 )
                 logger.debug(f"{horse.name} updated")
@@ -113,6 +155,7 @@ def runner_processor():
                                 "colour": horse.colour,
                                 "sire": get_sire_id(horse.sire),
                                 "dam": get_dam_id(horse.dam),
+                                "operations": get_operations(horse),
                             }
                         )
                     ).inserted_id
