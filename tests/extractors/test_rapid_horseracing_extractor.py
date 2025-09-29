@@ -52,18 +52,22 @@ def test_get_headers(mocker):
 
 def test_get_unfetched_race_ids(mocker):
     mocker.patch(
-        "src.extractors.rapid_horseracing_extractor.get_files"
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.get_files"
     ).return_value = ["file1", "file2"]
     mocker.patch(
-        "src.extractors.rapid_horseracing_extractor.read_file"
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.read_file"
     ).return_value = [{"id_race": 999}]
     expected = [999, 999]
     assert expected == get_unfetched_race_ids.fn("2020-01-01")
 
 
 def test_extract_result(mocker):
-    write_file = mocker.patch("src.extractors.rapid_horseracing_extractor.write_file")
-    mocker.patch("src.extractors.rapid_horseracing_extractor.get_headers").return_value = {
+    write_file = mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.write_file"
+    )
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.get_headers"
+    ).return_value = {
         "x-rapidapi-host": "rapidapi.com",
         "x-rapidapi-key": "mock_key",
     }
@@ -84,8 +88,12 @@ def test_extract_result(mocker):
 
 
 def test_extract_racecards(mocker):
-    write_file = mocker.patch("src.extractors.rapid_horseracing_extractor.write_file")
-    mocker.patch("src.extractors.rapid_horseracing_extractor.get_headers").return_value = {
+    write_file = mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.write_file"
+    )
+    mocker.patch(
+        "src.extractors.rapid_horseracing_extractor.get_headers"
+    ).return_value = {
         "x-rapidapi-host": "rapidapi.com",
         "x-rapidapi-key": "mock_key",
     }
@@ -108,7 +116,7 @@ def test_extract_racecards(mocker):
 
 def test_get_next_racecard_date_when_date_available(mocker):
     mocker.patch(
-        "src.extractors.rapid_horseracing_extractor.get_files"
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.get_files"
     ).return_value = [
         "rapid_api_racecards_20200101.json",
         "rapid_api_racecards_20200102.json",
@@ -121,7 +129,7 @@ def test_get_next_racecard_date_when_date_available(mocker):
 
 def test_get_next_racecard_date_when_no_dates_left(mocker):
     mocker.patch(
-        "src.extractors.rapid_horseracing_extractor.get_files"
+        "src.extractors.rapid_horseracing_extractor.SpacesClient.get_files"
     ).return_value = [
         "rapid_api_racecards_20200101.json",
         "rapid_api_racecards_20200102.json",

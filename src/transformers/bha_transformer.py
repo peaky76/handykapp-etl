@@ -8,7 +8,8 @@ import tomllib
 from horsetalk import Gender  # type: ignore
 from prefect import flow, task
 
-from helpers import get_files, log_validation_problem, stream_file
+from clients import SpacesClient
+from helpers import log_validation_problem
 from models.mongo_horse import MongoHorse
 from transformers.validators import (
     validate_horse,
@@ -29,7 +30,7 @@ def get_csv(csv_type="ratings", date="latest"):
     search_string = "" if date == "latest" else date
     csvs = [
         csv
-        for csv in list(get_files(SOURCE))
+        for csv in list(SpacesClient.get_files(SOURCE))
         if csv_type in csv and search_string in csv
     ]
     return csvs[idx] if csvs else None
@@ -37,7 +38,7 @@ def get_csv(csv_type="ratings", date="latest"):
 
 @task(tags=["BHA"])
 def read_csv(csv):
-    source = petl.MemorySource(stream_file(csv))
+    source = petl.MemorySource(SpacesClient.stream_file(csv))
     return petl.fromcsv(source)
 
 

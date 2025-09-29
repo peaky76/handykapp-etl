@@ -10,7 +10,8 @@ import tomllib
 from prefect import flow, task
 from prefect.blocks.system import Secret
 
-from helpers.helpers import fetch_content, write_file
+from clients import SpacesClient
+from helpers.helpers import fetch_content
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -43,7 +44,7 @@ def extract_racecards(day="tomorrow", region_codes=["gb", "ire"]):
     content = fetch_content(source, params=params, headers=headers)
     date_str = pendulum.now().add(days=1).format("YYYYMMDD")
     filename = f"{DESTINATION}racecards/theracingapi_racecards_{date_str}.json"
-    write_file(content, filename)
+    SpacesClient.write_file(content, filename)
 
 
 @flow

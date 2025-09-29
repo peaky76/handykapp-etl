@@ -1,7 +1,7 @@
 import pendulum
 from horsetalk import RacingCode
 
-from models import FormdataRunner, FormdataRecord, PreMongoRace, PreMongoRunner
+from models import FormdataRecord, FormdataRunner, PreMongoRace, PreMongoRunner
 from transformers.formdata_transformer import (
     adjust_rr_name,
     extract_dist_going,
@@ -18,7 +18,7 @@ from transformers.formdata_transformer import (
     transform_races,
 )
 
-FORMDATA_FETCH = "transformers.formdata_transformer.get_files"
+FORMDATA_FETCH = "transformers.formdata_transformer.SpacesClient.get_files"
 FORMDATA_FILENAMES = [
     "formdata_190630.pdf",
     "formdata_200628.pdf",

@@ -9,7 +9,7 @@ import petl  # type: ignore
 import tomllib
 from nameparser import HumanName  # type: ignore
 
-from helpers import read_file
+from clients import SpacesClient
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -19,7 +19,7 @@ SOURCE = settings["core"]["spaces_dir"]
 
 def transform_jockey_ratings():
     filename = f"{SOURCE}jockeys/jockey_ratings_historic.csv"
-    data = read_file(filename)
+    data = SpacesClient.read_file(filename)
 
     jockey_ratings = {}
     for row in petl.data(data).dicts():

@@ -8,7 +8,7 @@ from src.transformers.bha_transformer import (
     validate_ratings_data,
 )
 
-GET_FILES_IMPORT = "src.transformers.bha_transformer.get_files"
+GET_FILES_IMPORT = "src.transformers.bha_transformer.SpacesClient.get_files"
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def test_get_csv_returns_none_if_no_files_found(mocker):
 
 def test_read_csv(mocker):
     mocker.patch(
-        "src.transformers.bha_transformer.stream_file",
+        "src.transformers.bha_transformer.SpacesClient.stream_file",
         return_value=bytes("foo,bar,baz", "utf-8"),
     )
     assert petl.header(read_csv.fn("foobar.csv")) == ("foo", "bar", "baz")

@@ -1,3 +1,5 @@
+import csv
+import json
 from typing import Any, Optional
 
 import boto3  # type: ignore
@@ -6,6 +8,7 @@ from prefect.blocks.system import Secret
 
 class SpacesClient:
     _client: Optional[boto3.client] = None
+    BUCKET_NAME = "peaky76"
 
     @classmethod
     def _create(cls) -> boto3.client:
@@ -26,3 +29,49 @@ class SpacesClient:
             cls._client = cls._create()
         return cls._client
 
+    @classmethod
+    def get_files(cls, dirname, modified_after=None):
+        continuation_token = ""
+        client = cls.get()
+        while True:
+            response = client.list_objects_v2(
+                Bucket=cls.BUCKET_NAME,
+                Prefix=dirname,
+                ContinuationToken=continuation_token,
+            )
+            files = response.get("Contents", [])
+            continuation_token = response.get("NextContinuationToken")
+
+            def within_date(x):
+                return modified_after is None or x.get("LastModified") > modified_after
+
+            yield from [
+                key
+                for file in files
+                if "." in (key := file.get("Key")) and within_date(file)
+            ]
+            if not response.get("IsTruncated"):
+                break
+
+    @classmethod
+    def stream_file(cls, file_path):
+        client = cls.get()
+        obj = client.get_object(Bucket=cls.BUCKET_NAME, Key=file_path)
+        return obj["Body"].read()
+
+    @classmethod
+    def read_file(cls, file_path):
+        file_type = file_path.split(".")[-1]
+        output = {
+            "csv": lambda x: list(csv.reader(x.splitlines())),
+            "json": lambda x: json.loads(x),
+        }
+        stream = cls.stream_file(file_path).decode("utf-8")
+        return output[file_type](stream)
+
+    @classmethod
+    def write_file(cls, content, filename):
+        client = cls.get()
+        client.put_object(
+            Bucket=cls.BUCKET_NAME, Key=filename, Body=content, ACL="private"
+        )
