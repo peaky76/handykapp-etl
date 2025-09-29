@@ -15,6 +15,7 @@ from horsetalk import (  # type: ignore
     RaceClass,
     RaceDistance,
     RaceGrade,
+    Sex,
 )
 
 from models import (
@@ -66,6 +67,12 @@ def transform_horse(
             lambda rec: int(rec["jockey"].split("(")[1].split(")")[0])
             if "(" in rec["jockey"]
             else 0,
+        )
+        .addfield(
+            "is_gelded",
+            lambda rec: not x.has_testes
+            if (x := Gender[rec["sex"]]).sex == Sex.MALE
+            else None,
         )
         .convert(
             {
