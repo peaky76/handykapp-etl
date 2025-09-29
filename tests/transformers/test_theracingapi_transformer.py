@@ -142,6 +142,7 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
     expected = PreMongoRunner(
         name="HORTZADAR",
         sex="M",
+        is_gelded=True,
         country="GB",
         year=2015,
         colour="Bay",
@@ -194,6 +195,7 @@ def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker
     expected = PreMongoRunner(
         name="SPYCATCHER",
         sex="M",
+        is_gelded=False,
         country="IRE",
         year=2018,
         colour="Bay",
