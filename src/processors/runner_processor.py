@@ -121,7 +121,7 @@ def runner_processor():
                     added_count += 1
                 except DuplicateKeyError:
                     logger.warning(
-                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex})"
+                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex}) in race {race_id}"
                     )
                     skipped_count += 1
                 except ValueError as e:
