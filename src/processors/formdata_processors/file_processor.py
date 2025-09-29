@@ -1,7 +1,7 @@
 import fitz  # type: ignore
 from prefect import get_run_logger
 
-from helpers import stream_file
+from clients import SpacesClient
 from transformers.formdata_transformer import get_formdata_date
 
 from .page_processor import page_processor
@@ -21,7 +21,7 @@ def file_processor():
             logger.info(f"Processing {file}")
 
             date = get_formdata_date(file)
-            doc = fitz.open("pdf", stream_file(file))
+            doc = fitz.open("pdf", SpacesClient.stream_file(file))
             for page in doc:
                 p.send((page, date))
                 page_count += 1

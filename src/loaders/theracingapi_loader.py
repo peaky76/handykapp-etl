@@ -8,8 +8,8 @@ import pendulum
 import tomllib
 from prefect import flow, get_run_logger
 
+from clients import SpacesClient
 from clients import mongo_client as client
-from helpers import get_files, read_file
 from models import TheRacingApiRacecard
 from processors.record_processor import record_processor
 from transformers.theracingapi_transformer import transform_races
@@ -44,14 +44,14 @@ def load_theracingapi_data(*, from_date=None):
 
     r = record_processor()
     next(r)
-    for file in get_files(f"{SOURCE}racecards"):
+    for file in SpacesClient.get_files(f"{SOURCE}racecards"):
         if from_date:
             file_date = pendulum.parse(file.split(".")[0][-8:])
             if file_date < from_date:
                 continue
 
         logger.info(f"Reading {file}")
-        contents = read_file(file)
+        contents = SpacesClient.read_file(file)
         for dec in contents["racecards"]:
             data = {k: v for k, v in dec.items() if k != "off_dt"}
             try:

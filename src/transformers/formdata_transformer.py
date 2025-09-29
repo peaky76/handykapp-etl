@@ -28,7 +28,7 @@ from peak_utility.names.corrections import (
 from peak_utility.text.case import normal  # type: ignore
 from prefect import get_run_logger
 
-from helpers import get_files
+from clients import SpacesClient
 from models import (
     FormdataHorse,
     FormdataRecord,
@@ -344,7 +344,11 @@ def get_formdata_date(filename: str) -> pendulum.Date:
 def get_formdatas(
     *, code: RacingCode | None = None, after_year: int = 0, for_refresh: bool = False
 ) -> list[str]:
-    base = [file for file in get_files(SOURCE) if int(file[-10:-8]) > after_year]
+    base = [
+        file
+        for file in SpacesClient.get_files(SOURCE)
+        if int(file[-10:-8]) > after_year
+    ]
     flat = [file for file in base if "nh" not in file]
     nh = [file for file in base if "nh" in file]
 

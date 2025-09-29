@@ -8,7 +8,8 @@ import pendulum
 import tomllib
 from prefect import flow, task
 
-from helpers import fetch_content, get_last_occurrence_of, write_file
+from clients import SpacesClient
+from helpers import fetch_content, get_last_occurrence_of
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -31,7 +32,7 @@ def fetch(file):
 @task(tags=["BHA"], task_run_name="save_bha_{file}")
 def save(file, content):
     filename = f"{DESTINATION}bha_{file}_{LAST_UPDATE_STR}.csv"
-    write_file(content, filename)
+    SpacesClient.write_file(content, filename)
 
 
 @flow

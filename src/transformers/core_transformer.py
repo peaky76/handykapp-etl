@@ -20,7 +20,8 @@ from horsetalk import (  # type: ignore
 from peak_utility.text.case import snake  # type: ignore
 from prefect import flow, task
 
-from helpers import get_files, log_validation_problem, stream_file
+from clients import SpacesClient
+from helpers import log_validation_problem
 from transformers.validators import validate_in_enum
 
 with open("settings.toml", "rb") as f:
@@ -31,9 +32,9 @@ SOURCE = settings["core"]["spaces_dir"]
 
 @task(tags=["Core"], name="get_racecourses_csv")
 def read_csvs():
-    for csv in list(get_files(SOURCE)):
+    for csv in list(SpacesClient.get_files(SOURCE)):
         if "edited" in csv:
-            source = petl.MemorySource(stream_file(csv))
+            source = petl.MemorySource(SpacesClient.stream_file(csv))
             yield petl.fromcsv(source)
 
 

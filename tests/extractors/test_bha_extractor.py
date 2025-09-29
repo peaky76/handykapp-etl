@@ -23,7 +23,7 @@ def test_fetch(mocker):
 
 
 def test_save(mocker):
-    write_file = mocker.patch("src.extractors.bha_extractor.write_file")
+    write_file = mocker.patch("src.extractors.bha_extractor.SpacesClient.write_file")
     mocker.patch("src.extractors.bha_extractor.DESTINATION", "example/")
     mocker.patch("src.extractors.bha_extractor.LAST_UPDATE_STR", "20210101")
 
