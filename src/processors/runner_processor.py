@@ -5,7 +5,7 @@ from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import PyObjectId
+from models import MongoHorse, PyObjectId
 from processors.person_processor import person_processor
 
 from .utils import compact
@@ -30,12 +30,10 @@ def cache_if_found(func):
 
 
 @cache_if_found
-def get_horse_id(name: str, country: str, year: int, sex: str) -> PyObjectId | None:
-    found_horse = db.horses.find_one(
+def get_horse(name: str, country: str, year: int, sex: str) -> MongoHorse | None:
+    return db.horses.find_one(
         compact({"name": name, "country": country, "year": year, "sex": sex}),
-        {"_id": 1},
     )
-    return found_horse["_id"] if found_horse else None
 
 
 @cache
@@ -92,7 +90,8 @@ def runner_processor():
         while True:
             horse, race_id, source = yield
 
-            horse_id = get_horse_id(horse.name, horse.country, horse.year, horse.sex)
+            db_horse = get_horse(horse.name, horse.country, horse.year, horse.sex)
+            horse_id = db_horse["_id"] if db_horse else None
 
             if horse_id:
                 bulk_operations.append(
