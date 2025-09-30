@@ -20,7 +20,7 @@ class MongoOfficialRatings(BaseModel):
 
 class MongoHorse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str = Field(..., min_length=3, max_length=21)
+    name: str = Field(..., min_length=2, max_length=21)
     country: str = Field(..., min_length=2, max_length=3)
     year: int
     sex: Optional[Literal["M", "F"]] = None
