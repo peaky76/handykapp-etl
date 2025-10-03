@@ -50,7 +50,13 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
         return rr_code_to_course_dict().get(race.course)
 
     racecourses = get_all_racecourses()
-    surface_options = ["Tapeta", "Polytrack"] if race.surface == "AW" else ["Turf"]
+    surface_options = (
+        ["Tapeta", "Polytrack"]
+        if race.surface == "AW"
+        else ["Sand"]
+        if race.surface == "Sand"
+        else ["Turf"]
+    )
     course_name = race.course.lower().replace("(", "").replace(")", "").strip()
     if course_name == "newmarket":
         course_name = apply_newmarket_workaround(
