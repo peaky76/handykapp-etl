@@ -1,3 +1,4 @@
+from .bha_ratings_record import BHARatingsRecord
 from .formdata_horse import FormdataHorse
 from .formdata_race import FormdataRace
 from .formdata_record import FormdataRecord  # Assuming this is the correct import
@@ -9,6 +10,7 @@ from .mongo_race import MongoRace
 from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .mongo_runner import MongoRunner
+from .pre_mongo_horse import PreMongoHorse
 from .pre_mongo_race import PreMongoRace
 from .pre_mongo_runner import PreMongoRunner
 from .py_object_id import PyObjectId
@@ -18,6 +20,7 @@ from .theracingapi_racecard import TheRacingApiRacecard
 from .theracingapi_runner import TheRacingApiRunner
 
 __all__ = [
+    "BHARatingsRecord",
     "FormdataHorse",
     "FormdataRace",
     "FormdataRecord",
@@ -30,6 +33,7 @@ __all__ = [
     "MongoRacecourse",
     "MongoReferences",
     "MongoRunner",
+    "PreMongoHorse",
     "PreMongoRace",
     "PreMongoRunner",
     "PyObjectId",
