@@ -3,20 +3,14 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import Gender  # type: ignore
+from horsetalk import Gender, Horse  # type: ignore
 from prefect import flow, task
 
 from clients import SpacesClient
-from helpers import log_validation_problem
-from models.mongo_horse import MongoHorse
-from transformers.validators import (
-    validate_horse,
-    validate_rating,
-    validate_sex,
-    validate_year,
-)
+from models import BHARatingsRecord, PreMongoHorse
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
@@ -43,88 +37,63 @@ def read_csv(csv):
 
 
 @task(tags=["BHA"])
-def transform_ratings_data(data) -> list[MongoHorse]:
+def transform_ratings(
+    record: BHARatingsRecord, date_time: pendulum.DateTime
+) -> PreMongoHorse:
+    data = petl.fromdicts([record.model_dump()])
+
     used_fields = (
-        "Name",
-        "Year",
-        "Sex",
-        "Sire",
-        "Dam",
-        "Trainer",
-        "Flat rating",
-        "AWT rating",
-        "Chase rating",
-        "Hurdle rating",
+        "name",
+        "year",
+        "sex",
+        "sire",
+        "dam",
+        "trainer",
+        "flat_rating",
+        "awt_rating",
+        "chase_rating",
+        "hurdle_rating",
     )
     rating_types = ["flat", "aw", "chase", "hurdle"]
-    return (
+    transformed_record = (
         petl.cut(data, used_fields)
-        .rename({x: x.replace(" rating", "").lower() for x in used_fields})
+        .rename({x: x.replace("_rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
+        .addfield("country", lambda rec: Horse(rec["name"]).country.name)
         .addfield(
-            "operations",
-            lambda rec: [{"type": "gelding", "date": None}]
-            if rec["sex"] == "GELDING"
-            else None,
+            "gelded_from",
+            lambda rec: date_time.date() if rec["sex"] == "GELDING" else None,
         )
-        .convert({"sex": lambda x: Gender[x].sex.name[0]})  # type: ignore
+        .convert(
+            {"sex": lambda x: Gender[x].sex.name[0], "name": lambda x: Horse(x).name}
+        )  # type: ignore
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types)
-        .dicts()
+        .dicts()[0]
     )
+    return PreMongoHorse(**transformed_record)
 
 
-@task(tags=["BHA"])
-def validate_ratings_data(data) -> bool:
-    header = (
-        "Name",
-        "Year",
-        "Sex",
-        "Sire",
-        "Dam",
-        "Trainer",
-        "Flat rating",
-        "Diff Flat",
-        "Flat Clltrl",
-        "AWT rating",
-        "Diff AWT",
-        "AWT Clltrl",
-        "Chase rating",
-        "Diff Chase",
-        "Chase Clltrl",
-        "Hurdle rating",
-        "Diff Hurdle",
-        "Hurdle Clltrl",
-    )
-    constraints = [
-        {"name": "name_str", "field": "Name", "assertion": validate_horse},
-        {"name": "year_valid", "field": "Year", "assertion": validate_year},
-        {"name": "sex_valid", "field": "Sex", "assertion": validate_sex},
-        {"name": "sire_str", "field": "Sire", "assertion": validate_horse},
-        {"name": "dam_str", "field": "Dam", "assertion": validate_horse},
-        {"name": "trainer_str", "field": "Trainer", "test": str},
-        {"name": "flat_valid", "field": "Flat rating", "assertion": validate_rating},
-        {"name": "awt_valid", "field": "AWT rating", "assertion": validate_rating},
-        {"name": "chase_valid", "field": "Chase rating", "assertion": validate_rating},
-        {
-            "name": "hurdle_rating_int",
-            "field": "Hurdle rating",
-            "assertion": validate_rating,
-        },
-    ]
-    validator = {"header": header, "constraints": constraints}
-    return petl.validate(data, **validator)
+def convert_header_to_field_name(header: str) -> str:
+    return header.strip().lower().replace(" ", "_")
+
+
+def csv_row_to_dict(header_row, data_row):
+    return dict(zip(header_row, data_row))
 
 
 @flow
 def bha_transformer():
     csv = get_csv()
     data = read_csv(csv)
-    problems = validate_ratings_data(data)
-    for problem in problems.dicts():
-        log_validation_problem(problem)
-    return transform_ratings_data(data)
+
+    rows = list(data)
+    header = [convert_header_to_field_name(col) for col in rows[0]]
+
+    for data_row in rows[1:]:
+        row_dict = csv_row_to_dict(header, data_row)
+        record = BHARatingsRecord(**row_dict)
 
 
 if __name__ == "__main__":

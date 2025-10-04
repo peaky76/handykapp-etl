@@ -1,11 +1,14 @@
+import pendulum
 import petl
 import pytest
 
+from models import BHARatingsRecord
 from src.transformers.bha_transformer import (
+    convert_header_to_field_name,
+    csv_row_to_dict,
     get_csv,
     read_csv,
-    transform_ratings_data,
-    validate_ratings_data,
+    transform_ratings,
 )
 
 GET_FILES_IMPORT = "src.transformers.bha_transformer.SpacesClient.get_files"
@@ -13,13 +16,15 @@ GET_FILES_IMPORT = "src.transformers.bha_transformer.SpacesClient.get_files"
 
 @pytest.fixture
 def mock_data():
-    return [
+    rows = [
         row.split(",")
         for row in [
             "Name,Year,Sex,Sire,Dam,Trainer,Flat rating,Diff Flat,Flat Clltrl,AWT rating,Diff AWT,AWT Clltrl,Chase rating,Diff Chase,Chase Clltrl,Hurdle rating,Diff Hurdle,Hurdle Clltrl",
             "A DAY TO DREAM (IRE),2020,GELDING,ADAAY (IRE),TARA TOO (IRE),Ollie Pears,49,,,,,,,,,,,",
         ]
     ]
+    header = [convert_header_to_field_name(col) for col in rows[0]]
+    return BHARatingsRecord(**csv_row_to_dict(header, rows[1]))
 
 
 def test_get_csv_returns_latest_ratings_by_default(mocker):
@@ -73,15 +78,19 @@ def test_read_csv(mocker):
     assert petl.header(read_csv.fn("foobar.csv")) == ("foo", "bar", "baz")
 
 
-def test_transform_ratings_data_returns_correct_output(mock_data):
+def test_transform_ratings_returns_correct_output(mock_data):
+    date_time = pendulum.now()
     expected = {
-        "name": "A DAY TO DREAM (IRE)",
+        "name": "A DAY TO DREAM",
+        "country": "IRE",
         "year": 2020,
         "sex": "M",
+        "colour": None,
+        "owner": None,
         "trainer": "Ollie Pears",
         "sire": "ADAAY (IRE)",
         "dam": "TARA TOO (IRE)",
-        "operations": [{"type": "gelding", "date": None}],
+        "gelded_from": date_time.date(),
         "ratings": {
             "flat": 49,
             "aw": None,
@@ -89,17 +98,5 @@ def test_transform_ratings_data_returns_correct_output(mock_data):
             "hurdle": None,
         },
     }
-    actual = transform_ratings_data.fn(mock_data)[0]
+    actual = transform_ratings.fn(mock_data, date_time).model_dump()
     assert expected == actual
-
-
-def test_validate_ratings_data_returns_no_problems_for_correct_data(mock_data):
-    problems = validate_ratings_data.fn(mock_data)
-    assert len(problems.dicts()) == 0
-
-
-def test_validate_ratings_data_returns_problems_for_incorrect_data(mock_data):
-    mock_data[1][0] = "A DAY TO DREAM"
-    problems = validate_ratings_data.fn(mock_data)
-    assert len(problems.dicts()) == 1
-    assert problems.dicts()[0]["field"] == "Name"
