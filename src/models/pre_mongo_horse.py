@@ -17,4 +17,16 @@ class PreMongoHorse(BaseModel):
     trainer: Optional[str] = None
     sire: Optional[str] = None
     dam: Optional[str] = None
+    damsire: Optional[str] = None
     ratings: Optional[MongoOfficialRatings] = None
+
+    model_config = {"frozen": True}
+
+    def __hash__(self):
+        return hash(
+            (
+                self.name,
+                self.country,
+                self.year,
+            )
+        )
