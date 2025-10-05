@@ -71,9 +71,9 @@ def create_gelding_operation(date: Date) -> MongoOperation:
     }
 
 
-def get_operations(horse: PreMongoRunner) -> list[MongoOperation]:
+def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
     if not horse.gelded_from:
-        return []
+        return None
 
     return [create_gelding_operation(horse.gelded_from)]
 
