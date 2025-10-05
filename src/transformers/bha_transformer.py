@@ -5,35 +5,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
-import tomllib
 from horsetalk import Gender, Horse  # type: ignore
-from prefect import flow, task
+from prefect import task
 
-from clients import SpacesClient
 from models import BHARatingsRecord, PreMongoHorse
-
-with open("settings.toml", "rb") as f:
-    settings = tomllib.load(f)
-
-SOURCE = settings["bha"]["spaces_dir"]
-
-
-@task(tags=["BHA"], task_run_name="get_{date}_{csv_type}_csv")
-def get_csv(csv_type="ratings", date="latest"):
-    idx = -1 if date == "latest" else 0
-    search_string = "" if date == "latest" else date
-    csvs = [
-        csv
-        for csv in list(SpacesClient.get_files(SOURCE))
-        if csv_type in csv and search_string in csv
-    ]
-    return csvs[idx] if csvs else None
-
-
-@task(tags=["BHA"])
-def read_csv(csv):
-    source = petl.MemorySource(SpacesClient.stream_file(csv))
-    return petl.fromcsv(source)
 
 
 @task(tags=["BHA"])
@@ -75,27 +50,5 @@ def transform_ratings(
     return PreMongoHorse(**transformed_record)
 
 
-def convert_header_to_field_name(header: str) -> str:
-    return header.strip().lower().replace(" ", "_")
-
-
-def csv_row_to_dict(header_row, data_row):
-    return dict(zip(header_row, data_row))
-
-
-@flow
-def bha_transformer():
-    csv = get_csv()
-    data = read_csv(csv)
-
-    rows = list(data)
-    header = [convert_header_to_field_name(col) for col in rows[0]]
-
-    for data_row in rows[1:]:
-        row_dict = csv_row_to_dict(header, data_row)
-        record = BHARatingsRecord(**row_dict)
-
-
 if __name__ == "__main__":
-    data = bha_transformer()  # type: ignore
-    print(data)
+    print("Cannot run bha_transformer.py as a script.")
