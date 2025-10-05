@@ -1,3 +1,4 @@
+import datetime
 import re
 from typing import Annotated, Literal, Optional
 
@@ -44,6 +45,7 @@ Rating = Annotated[
 
 
 class BHARatingsRecord(BaseModel):
+    date: datetime.date = Field(..., description="Date and time of the rating")
     name: HorseName = Field(..., description="Name of the horse")
     year: BirthYear = Field(..., description="Birth year of the horse")
     sex: Literal["GELDING", "FILLY", "COLT"] = Field(

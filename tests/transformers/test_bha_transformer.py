@@ -1,17 +1,19 @@
+import datetime
+
 import pendulum
 import petl
 import pytest
 
 from models import BHARatingsRecord
-from src.transformers.bha_transformer import (
+from src.loaders.bha_loader import (
     convert_header_to_field_name,
     csv_row_to_dict,
     get_csv,
     read_csv,
-    transform_ratings,
 )
+from src.transformers.bha_transformer import transform_ratings
 
-GET_FILES_IMPORT = "src.transformers.bha_transformer.SpacesClient.get_files"
+GET_FILES_IMPORT = "src.loaders.bha_loader.SpacesClient.get_files"
 
 
 @pytest.fixture
@@ -24,7 +26,10 @@ def mock_data():
         ]
     ]
     header = [convert_header_to_field_name(col) for col in rows[0]]
-    return BHARatingsRecord(**csv_row_to_dict(header, rows[1]))
+    row_dict = csv_row_to_dict(header, rows[1])
+    now = pendulum.now()
+    row_dict["date"] = datetime.date(now.year, now.month, now.day)
+    return BHARatingsRecord(**row_dict)
 
 
 def test_get_csv_returns_latest_ratings_by_default(mocker):
@@ -72,14 +77,14 @@ def test_get_csv_returns_none_if_no_files_found(mocker):
 
 def test_read_csv(mocker):
     mocker.patch(
-        "src.transformers.bha_transformer.SpacesClient.stream_file",
+        "src.loaders.bha_loader.SpacesClient.stream_file",
         return_value=bytes("foo,bar,baz", "utf-8"),
     )
     assert petl.header(read_csv.fn("foobar.csv")) == ("foo", "bar", "baz")
 
 
 def test_transform_ratings_returns_correct_output(mock_data):
-    date_time = pendulum.now()
+    # transform_ratings now takes only the BHARatingsRecord and returns PreMongoHorse
     expected = {
         "name": "A DAY TO DREAM",
         "country": "IRE",
@@ -90,7 +95,8 @@ def test_transform_ratings_returns_correct_output(mock_data):
         "trainer": "Ollie Pears",
         "sire": "ADAAY (IRE)",
         "dam": "TARA TOO (IRE)",
-        "gelded_from": date_time.date(),
+        "damsire": None,
+        "gelded_from": mock_data.date,
         "ratings": {
             "flat": 49,
             "aw": None,
@@ -98,5 +104,5 @@ def test_transform_ratings_returns_correct_output(mock_data):
             "hurdle": None,
         },
     }
-    actual = transform_ratings.fn(mock_data, date_time).model_dump()
+    actual = transform_ratings.fn(mock_data).model_dump()
     assert expected == actual

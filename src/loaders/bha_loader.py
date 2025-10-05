@@ -8,6 +8,8 @@ from transformers.bha_transformer import transform_ratings
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import datetime
+import pendulum
 import petl
 import tomllib
 from prefect import flow, get_run_logger, task
@@ -19,7 +21,7 @@ db = client.handykapp
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
-SOURCE = settings["bha"]["spaces_dir"]
+SOURCE = settings["bha"]["spaces_dir"]  # Directory where BHA CSV files are stored
 
 
 @task(tags=["BHA"], task_run_name="get_{date}_{csv_type}_csv")
@@ -58,6 +60,9 @@ def load_bha_data():
 
     csv = get_csv()
     data = read_csv(csv)
+    date_str = csv.split("_")[-1].split(".")[0]  # Remove file extension
+    pendulum_date = pendulum.from_format(date_str, "YYYYMMDD")
+    date = datetime.date(pendulum_date.year, pendulum_date.month, pendulum_date.day)
 
     rows = list(data)
     header = [convert_header_to_field_name(col) for col in rows[0]]
@@ -65,7 +70,7 @@ def load_bha_data():
     for data_row in rows[1:]:
         row_dict = csv_row_to_dict(header, data_row)
         try:
-            record = BHARatingsRecord(**row_dict)
+            record = BHARatingsRecord(**row_dict, date=date)
             r.send((record, transform_ratings, csv, "bha"))
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")

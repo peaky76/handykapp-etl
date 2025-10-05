@@ -3,7 +3,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-import pendulum
 import petl  # type: ignore
 from horsetalk import Gender, Horse  # type: ignore
 from prefect import task
@@ -12,12 +11,11 @@ from models import BHARatingsRecord, PreMongoHorse
 
 
 @task(tags=["BHA"])
-def transform_ratings(
-    record: BHARatingsRecord, date_time: pendulum.DateTime
-) -> PreMongoHorse:
+def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
     data = petl.fromdicts([record.model_dump()])
 
     used_fields = (
+        "date",
         "name",
         "year",
         "sex",
@@ -38,7 +36,7 @@ def transform_ratings(
         .addfield("country", lambda rec: Horse(rec["name"]).country.name)
         .addfield(
             "gelded_from",
-            lambda rec: date_time.date() if rec["sex"] == "GELDING" else None,
+            lambda rec: rec["date"] if rec["sex"] == "GELDING" else None,
         )
         .convert(
             {"sex": lambda x: Gender[x].sex.name[0], "name": lambda x: Horse(x).name}
