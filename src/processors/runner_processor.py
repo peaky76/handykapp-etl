@@ -110,7 +110,7 @@ def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
             "sire": get_sire_id(horse.sire),
             "dam": get_dam_id(horse.dam),
             "operations": make_operations_update(horse, db_horse),
-            "ratings": horse.get("ratings", None),
+            "ratings": horse.ratings,
         }
     )
 
@@ -157,7 +157,7 @@ def runner_processor():
                                 "sire": get_sire_id(horse.sire),
                                 "dam": get_dam_id(horse.dam),
                                 "operations": get_operations(horse),
-                                "ratings": horse.get("ratings", None),
+                                "ratings": horse.ratings,
                             }
                         )
                     ).inserted_id
