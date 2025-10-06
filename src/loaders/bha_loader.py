@@ -71,6 +71,7 @@ def load_bha_data():
         row_dict = csv_row_to_dict(header, data_row)
         try:
             record = BHARatingsRecord(**row_dict, date=date)
+            logger.debug(f"Processing BHA ratings from {csv} for {record.horse.name}")
             r.send((record, transform_ratings, csv, "bha"))
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")
