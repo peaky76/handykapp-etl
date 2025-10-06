@@ -9,6 +9,7 @@ from pymongo import ASCENDING as ASC
 
 from clients import mongo_client as client
 from loaders.bha_loader import load_bha_data
+from loaders.formdata_loader import load_formdata
 from loaders.racecourse_loader import load_racecourses
 from loaders.theracingapi_loader import load_theracingapi_data
 
@@ -62,6 +63,7 @@ def nuclear_reload():
     load_racecourses()
     load_theracingapi_data()
     load_bha_data()
+    load_formdata()
 
 
 if __name__ == "__main__":
