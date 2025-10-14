@@ -12,7 +12,6 @@ db = client.handykapp
 def ratings_processor() -> Generator[None, PreMongoHorse, None]:
     logger = get_run_logger()
     logger.info("Starting ratings processor")
-    added_count = 0
     updated_count = 0
     skipped_count = 0
 
