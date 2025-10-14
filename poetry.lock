@@ -1912,14 +1912,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "3.4.22"
+version = "3.4.23"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = "<3.14,>=3.9"
 groups = ["main"]
 files = [
-    {file = "prefect-3.4.22-py3-none-any.whl", hash = "sha256:41743e2817195e1ef8fdef2e65c4b16da1308cf8f5dd1a85e679c8cbe7186710"},
-    {file = "prefect-3.4.22.tar.gz", hash = "sha256:4b46a793e9907a4c8539b04bb2fdbc609c9810f690d7673a3bc8d0c9aebdfc84"},
+    {file = "prefect-3.4.23-py3-none-any.whl", hash = "sha256:0422861f0d1729d56546501eeebadf255ddf21b8041aa2bc2715168b4eb615bb"},
+    {file = "prefect-3.4.23.tar.gz", hash = "sha256:5c6800737bd577ede070fa3852f608235c715e72a897d41fd3b9317f67fde8c3"},
 ]
 
 [package.dependencies]
@@ -1975,7 +1975,7 @@ typing-extensions = ">=4.10.0,<5.0.0"
 uv = ">=0.6.0"
 uvicorn = ">=0.14.0,<0.29.0 || >0.29.0"
 websockets = ">=13.0,<16.0"
-whenever = {version = ">=0.7.3,<0.9.0", markers = "python_version >= \"3.13\""}
+whenever = {version = ">=0.7.3,<0.10.0", markers = "python_version >= \"3.13\""}
 
 [package.extras]
 aws = ["prefect-aws (>=0.5.8)"]
@@ -3720,4 +3720,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.13"
-content-hash = "fed7c9c9fadfb78705a7b782db9548a7ce71e2b7a72cd544aa5136de1682e726"
+content-hash = "2bc1d5b00d410cc29ce7da3709947cfbc5dd8adfcf36a51f189bc8b9d1043468"
