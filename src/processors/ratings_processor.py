@@ -36,7 +36,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                 bulk_operations.append(
                     UpdateOne(
                         {"_id": horse_id},
-                        {"$set": {"ratings": horse.ratings}},
+                        {"$set": {"ratings": horse.ratings.model_dump()}},
                     )
                 )
                 logger.debug(f"{horse.name} updated")
