@@ -44,14 +44,14 @@ def record_processor():
 
                 for race in results:
                     try:
-                        # if race.code == "Flat":
-                        r.send((race, source))
-                        with transform_count_lock:
-                            transform_count += 1
-                            if transform_count % 25 == 0:
-                                logger.info(
-                                    f"Read {transform_count} races. Current: {race.datetime} at {race.course}"
-                                )
+                        if race.code == "Flat":
+                            r.send((race, source))
+                            with transform_count_lock:
+                                transform_count += 1
+                                if transform_count % 25 == 0:
+                                    logger.info(
+                                        f"Read {transform_count} races. Current: {race.datetime} at {race.course}"
+                                    )
                     except Exception as e:  # noqa: PERF203
                         logger.error(
                             f"Error during processing of race in {filename}: {e}"
