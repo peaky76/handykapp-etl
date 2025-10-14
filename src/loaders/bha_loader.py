@@ -59,19 +59,23 @@ def load_bha_data():
     next(r)
 
     csv = get_csv()
+    logger.info(f"Got CSV file: {csv}")
+
     data = read_csv(csv)
     date_str = csv.split("_")[-1].split(".")[0]  # Remove file extension
     pendulum_date = pendulum.from_format(date_str, "YYYYMMDD")
     date = datetime.date(pendulum_date.year, pendulum_date.month, pendulum_date.day)
 
     rows = list(data)
+    logger.info(f"Total rows in CSV: {len(rows)}")
+
     header = [convert_header_to_field_name(col) for col in rows[0]]
 
     for data_row in rows[1:]:
         row_dict = csv_row_to_dict(header, data_row)
         try:
             record = BHARatingsRecord(**row_dict, date=date)
-            logger.debug(f"Processing BHA ratings from {csv} for {record.horse.name}")
+            logger.info(f"Successfully created record for {record.name}")
             r.send((record, transform_ratings, csv, "bha"))
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")
