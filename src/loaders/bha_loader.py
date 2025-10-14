@@ -2,10 +2,6 @@
 import sys
 from pathlib import Path
 
-from models.bha_ratings_record import BHARatingsRecord
-from processors import ratings_processor
-from transformers.bha_transformer import transform_ratings
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import datetime
@@ -17,6 +13,9 @@ from prefect import flow, get_run_logger, task
 
 from clients import SpacesClient
 from clients import mongo_client as client
+from models.bha_ratings_record import BHARatingsRecord
+from processors import ratings_processor
+from transformers.bha_transformer import transform_ratings
 
 db = client.handykapp
 
@@ -54,7 +53,7 @@ def csv_row_to_dict(header_row, data_row):
 @flow
 def load_bha_data():
     logger = get_run_logger()
-    logger.info("Starting theracingapi loader")
+    logger.info("Starting BHA loader")
 
     r = ratings_processor()
     next(r)
@@ -77,7 +76,7 @@ def load_bha_data():
         try:
             record = BHARatingsRecord(**row_dict, date=date)
             transformed_ratings = transform_ratings(record)
-            logger.info(f"Successfully transformed record for {record.name}")
+            logger.debug(f"Successfully transformed record for {record.name}")
             r.send(transformed_ratings)
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")
