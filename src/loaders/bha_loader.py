@@ -3,12 +3,13 @@ import sys
 from pathlib import Path
 
 from models.bha_ratings_record import BHARatingsRecord
-from processors import record_processor
+from processors import runner_processor
 from transformers.bha_transformer import transform_ratings
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import datetime
+
 import pendulum
 import petl
 import tomllib
@@ -55,7 +56,7 @@ def load_bha_data():
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
-    r = record_processor()
+    r = runner_processor()
     next(r)
 
     csv = get_csv()
@@ -75,8 +76,9 @@ def load_bha_data():
         row_dict = csv_row_to_dict(header, data_row)
         try:
             record = BHARatingsRecord(**row_dict, date=date)
+            transformed_ratings = transform_ratings(record)
             logger.info(f"Successfully created record for {record.name}")
-            r.send((record, transform_ratings, csv, "bha"))
+            r.send((transformed_ratings, None, "bha"))
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")
 
