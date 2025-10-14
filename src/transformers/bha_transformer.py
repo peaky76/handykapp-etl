@@ -5,12 +5,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import petl  # type: ignore
 from horsetalk import Gender, Horse  # type: ignore
-from prefect import task
 
 from models import BHARatingsRecord, PreMongoHorse
 
 
-@task(tags=["BHA"])
 def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
     data = petl.fromdicts([record.model_dump()])
 
