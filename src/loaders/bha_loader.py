@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 from models.bha_ratings_record import BHARatingsRecord
-from processors import runner_processor
+from processors import ratings_processor
 from transformers.bha_transformer import transform_ratings
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -56,7 +56,7 @@ def load_bha_data():
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
-    r = runner_processor()
+    r = ratings_processor()
     next(r)
 
     csv = get_csv()
