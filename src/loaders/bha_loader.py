@@ -78,7 +78,7 @@ def load_bha_data():
             record = BHARatingsRecord(**row_dict, date=date)
             transformed_ratings = transform_ratings(record)
             logger.info(f"Successfully transformed record for {record.name}")
-            r.send((transformed_ratings, None, "bha"))
+            r.send(transformed_ratings)
         except Exception as e:
             logger.error(f"Unable to process BHA ratings {csv}: {e}")
 
