@@ -23,7 +23,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
             horse = yield
 
             try:
-                horse_id = db.horses.find_one(
+                horse_doc = db.horses.find_one(
                     {
                         "name": horse.name,
                         "country": horse.country,
@@ -33,13 +33,13 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                     {"_id": 1},
                 )
 
-                if not horse_id:
+                if not horse_doc:
                     skipped_count += 1
                     continue
 
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": horse_id},
+                        {"_id": horse_doc["_id"]},
                         {"$set": {"ratings": horse.ratings.model_dump()}},
                     )
                 )
