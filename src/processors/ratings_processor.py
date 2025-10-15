@@ -16,7 +16,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
     skipped_count = 0
 
     bulk_operations = []
-    bulk_threshold = 100
+    bulk_threshold = 50
 
     try:
         while True:
@@ -34,7 +34,6 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                 )
 
                 if not horse_id:
-                    logger.warning(f"No db record found for {horse.name}")
                     skipped_count += 1
                     continue
 
@@ -44,10 +43,8 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                         {"$set": {"ratings": horse.ratings.model_dump()}},
                     )
                 )
-                logger.debug(f"{horse.name} updated")
                 updated_count += 1
             except ValueError as e:
-                logger.warning(e)
                 skipped_count += 1
 
             if bulk_operations and len(bulk_operations) >= bulk_threshold:
