@@ -34,7 +34,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                 )
 
                 if not horse_id:
-                    logger.warning(f"No db record found for ${horse.name}")
+                    logger.warning(f"No db record found for {horse.name}")
                     skipped_count += 1
                     continue
 
