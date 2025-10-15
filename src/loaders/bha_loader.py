@@ -60,8 +60,10 @@ def load_bha_data():
 
     csv = get_csv()
     logger.info(f"Got CSV file: {csv}")
+    print(f"DEBUG: About to read CSV: {csv}")
 
     data = read_csv(csv)
+    print("DEBUG: CSV read completed")
     date_str = csv.split("_")[-1].split(".")[0]  # Remove file extension
     pendulum_date = pendulum.from_format(date_str, "YYYYMMDD")
     date = datetime.date(pendulum_date.year, pendulum_date.month, pendulum_date.day)
