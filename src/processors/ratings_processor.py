@@ -44,7 +44,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                     )
                 )
                 updated_count += 1
-            except ValueError as e:
+            except Exception as e:
                 skipped_count += 1
 
             if bulk_operations and len(bulk_operations) >= bulk_threshold:
