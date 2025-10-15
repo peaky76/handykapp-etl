@@ -22,17 +22,22 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
         while True:
             horse = yield
 
-            horse_id = db.horses.find_one(
-                {
-                    "name": horse.name,
-                    "country": horse.country,
-                    "year": horse.year,
-                    "sex": horse.sex,
-                },
-                {"_id": 1},
-            )
-
             try:
+                horse_id = db.horses.find_one(
+                    {
+                        "name": horse.name,
+                        "country": horse.country,
+                        "year": horse.year,
+                        "sex": horse.sex,
+                    },
+                    {"_id": 1},
+                )
+
+                if not horse_id:
+                    logger.warning(f"No db record found for ${horse.name}")
+                    skipped_count += 1
+                    continue
+
                 bulk_operations.append(
                     UpdateOne(
                         {"_id": horse_id},
