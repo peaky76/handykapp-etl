@@ -63,54 +63,54 @@ def entry_processor():
 
             # Formdata table processing
 
-            existing_entry = db.formdata.find_one(
-                {
-                    "name": horse.name,
-                    "country": horse.country,
-                    "year": horse.year,
-                }
-            )
+            # existing_entry = db.formdata.find_one(
+            #     {
+            #         "name": horse.name,
+            #         "country": horse.country,
+            #         "year": horse.year,
+            #     }
+            # )
 
-            if existing_entry:
-                existing_horse = FormdataHorse.model_validate(existing_entry)
-                runs = existing_horse.runs
+            # if existing_entry:
+            #     existing_horse = FormdataHorse.model_validate(existing_entry)
+            #     runs = existing_horse.runs
 
-                for new_run in horse.runs:
-                    matched_run = next(
-                        (r for r in runs if r.date == new_run.date),
-                        None,
-                    )
-                    if matched_run:
-                        runs.remove(matched_run)
-                    runs.append(new_run)
+            #     for new_run in horse.runs:
+            #         matched_run = next(
+            #             (r for r in runs if r.date == new_run.date),
+            #             None,
+            #         )
+            #         if matched_run:
+            #             runs.remove(matched_run)
+            #         runs.append(new_run)
 
-                bulk_operations.append(
-                    UpdateOne(
-                        {
-                            "name": horse.name,
-                            "country": horse.country,
-                            "year": horse.year,
-                        },
-                        {
-                            "$set": {
-                                "runs": [run.model_dump() for run in runs],
-                                "prize_money": horse.prize_money,
-                                "trainer": horse.trainer,
-                                "trainer_form": horse.trainer_form,
-                            }
-                        },
-                    )
-                )
-            else:
-                bulk_operations.append(InsertOne(horse.model_dump()))
+            #     bulk_operations.append(
+            #         UpdateOne(
+            #             {
+            #                 "name": horse.name,
+            #                 "country": horse.country,
+            #                 "year": horse.year,
+            #             },
+            #             {
+            #                 "$set": {
+            #                     "runs": [run.model_dump() for run in runs],
+            #                     "prize_money": horse.prize_money,
+            #                     "trainer": horse.trainer,
+            #                     "trainer_form": horse.trainer_form,
+            #                 }
+            #             },
+            #         )
+            #     )
+            # else:
+            #     bulk_operations.append(InsertOne(horse.model_dump()))
 
-            # Execute bulk operations when threshold is reached
-            if len(bulk_operations) >= bulk_threshold:
-                db.formdata.bulk_write(bulk_operations)
-                bulk_operations = []
+            # # Execute bulk operations when threshold is reached
+            # if len(bulk_operations) >= bulk_threshold:
+            #     db.formdata.bulk_write(bulk_operations)
+            #     bulk_operations = []
 
-            if processed_count % 100 == 0:
-                logger.info(f"Processed {processed_count} horses into Formdata table")
+            # if processed_count % 100 == 0:
+            #     logger.info(f"Processed {processed_count} horses into Formdata table")
 
             # Result line processing
             found_horse = find_horse(horse.name, horse.country, horse.year)
