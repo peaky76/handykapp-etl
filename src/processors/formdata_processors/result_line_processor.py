@@ -20,6 +20,9 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
 
             racecourse_id = rr_code_to_course_dict().get(run.course)
 
+            if not racecourse_id:
+                logger.warning(f"No racecourse found for {run.course}")
+
             found_race = db.races.find_one(
                 {
                     "racecourse": racecourse_id,
