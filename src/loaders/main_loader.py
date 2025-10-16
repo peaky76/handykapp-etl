@@ -58,11 +58,11 @@ def spec_database():
 
 @flow
 def nuclear_reload():
-    drop_database()
-    spec_database()
-    load_racecourses()
-    load_theracingapi_data()
-    load_bha_data()
+    # drop_database()
+    # spec_database()
+    # load_racecourses()
+    # load_theracingapi_data()
+    # load_bha_data()
     load_formdata()
 
 
