@@ -71,14 +71,19 @@ def load_bha_data():
 
     header = [convert_header_to_field_name(col) for col in rows[0]]
 
-    try:
-        for data_row in rows[1:]:
-            row_dict = csv_row_to_dict(header, data_row)
+    for data_row in rows[1:]:
+        row_dict = csv_row_to_dict(header, data_row)
+        try:
             record = BHARatingsRecord(**row_dict, date=date)
+        except (ValueError, TypeError) as e:
+            logger.error(f"Unable to create BHA record from row: {e}")
+            continue
+
+        try:
             transformed_ratings = transform_ratings(record)
             r.send(transformed_ratings)
-    except Exception as e:
-        logger.error(f"Unable to process BHA ratings {csv}: {e}")
+        except Exception as e:
+            logger.error(f"Unable to process BHA ratings for {record.name}: {e}")
 
     r.close()
 
