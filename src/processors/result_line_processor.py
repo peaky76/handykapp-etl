@@ -90,6 +90,8 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                             "going": str(Going(run.going)),
                             "runners.$.finishing_position": run.position,
                             "runners.$.beaten_distance": run.beaten_distance,
+                            "runners.$.time_rating": run.time_rating,
+                            "runners.$.form_rating": run.form_rating,
                         }
                     },
                 )
