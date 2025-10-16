@@ -1,6 +1,5 @@
 from prefect import get_run_logger
 
-from processors.result_line_processor import result_line_processor
 from transformers.formdata_transformer import (
     create_horse,
     create_run,
@@ -20,10 +19,8 @@ def word_processor():
     adding_horses = False
     adding_runs = False
 
-    # ep = entry_processor()
-    # next(ep)
-    rl = result_line_processor()
-    next(rl)
+    ep = entry_processor()
+    next(ep)
 
     try:
         while True:
@@ -68,9 +65,7 @@ def word_processor():
 
             # Add horses/runs to db
             if horse_switch and horse:
-                # ep.send(horse)
-                for run in horse.runs:
-                    rl.send((horse, run))
+                ep.send(horse)
                 horse = None
 
             # Add words to horses/runs
@@ -80,5 +75,4 @@ def word_processor():
                 run_args.append(word)
 
     except GeneratorExit:
-        # ep.close()
-        rl.close()
+        ep.close()

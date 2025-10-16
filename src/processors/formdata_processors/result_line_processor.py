@@ -1,5 +1,4 @@
 from collections.abc import Generator
-from functools import cache
 
 from horsetalk import Going
 from prefect import get_run_logger
@@ -11,57 +10,15 @@ from processors.race_processor import rr_code_to_course_dict
 db = client.handykapp
 
 
-@cache
-def find_horse(name: str, country: str, year: int):
-    """Find horse by name, handling punctuation differences."""
-    # First try exact match
-    result = db.horses.find_one(
-        {"name": name, "country": country, "year": year},
-        {"_id": 1},
-    )
-
-    if result:
-        return result
-
-    # If no exact match, try regex that allows apostrophes in db names
-    # Convert "JOHNS BOY" to pattern that matches "JOHN'S BOY"
-    # Insert optional apostrophe after each character
-    pattern = ""
-    for char in name:
-        if char.isalpha():
-            pattern += char + "'?"
-        else:
-            pattern += char
-
-    return db.horses.find_one(
-        {
-            "name": {"$regex": f"^{pattern}$", "$options": "i"},
-            "country": country,
-            "year": year,
-        },
-        {"_id": 1},
-    )
-
-
 def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun], None]:
     logger = get_run_logger()
     logger.info("Starting result line processor")
-    updated_count = 0
-    skipped_count = 0
 
     try:
         while True:
             horse, run = yield
 
             racecourse_id = rr_code_to_course_dict().get(run.course)
-            found_horse = find_horse(horse.name, horse.country, horse.year)
-
-            if not found_horse:
-                logger.warning(
-                    f"Horse {horse.name} {horse.country} {horse.year} not found in db, skipping result"
-                )
-                skipped_count += 1
-                continue
 
             found_race = db.races.find_one(
                 {
@@ -77,14 +34,14 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                             run.date,
                         ]
                     },
-                    "runners.horse": found_horse["_id"],
+                    "runners.horse": horse["_id"],
                 }
             )
 
             if found_race:
                 race_id = found_race["_id"]
                 db.races.update_one(
-                    {"_id": race_id, "runners.horse": found_horse["_id"]},
+                    {"_id": race_id, "runners.horse": horse["_id"]},
                     {
                         "$set": {
                             "going": str(Going(run.going)),
@@ -99,6 +56,4 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                     f"Added result for {horse.name} in race at {run.course} on {run.date}"
                 )
     except GeneratorExit:
-        logger.info(
-            f"Finished processing result lines. Added results for {updated_count} runs, skipped {skipped_count}"
-        )
+        logger.info("Finished processing results.")
