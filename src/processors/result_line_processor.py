@@ -12,8 +12,32 @@ db = client.handykapp
 
 @cache
 def find_horse(name: str, country: str, year: int):
-    return db.horses.find_one(
+    """Find horse by name, handling punctuation differences."""
+    # First try exact match
+    result = db.horses.find_one(
         {"name": name, "country": country, "year": year},
+        {"_id": 1},
+    )
+
+    if result:
+        return result
+
+    # If no exact match, try regex that allows apostrophes in db names
+    # Convert "JOHNS BOY" to pattern that matches "JOHN'S BOY"
+    # Insert optional apostrophe after each character
+    pattern = ""
+    for char in name:
+        if char.isalpha():
+            pattern += char + "'?"
+        else:
+            pattern += char
+
+    return db.horses.find_one(
+        {
+            "name": {"$regex": f"^{pattern}$", "$options": "i"},
+            "country": country,
+            "year": year,
+        },
         {"_id": 1},
     )
 
