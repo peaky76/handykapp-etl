@@ -53,7 +53,7 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                     },
                 )
                 logger.debug(
-                    f"Added result for {horse.name} in race at {run.course} on {run.date}"
+                    f"Added result for {horse['_id']} in race at {run.course} on {run.date}"
                 )
     except GeneratorExit:
         logger.info("Finished processing results.")
