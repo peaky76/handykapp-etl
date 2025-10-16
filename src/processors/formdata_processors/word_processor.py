@@ -70,7 +70,7 @@ def word_processor():
             if horse_switch and horse:
                 ep.send(horse)
                 for run in horse.runs:
-                    rl.send(horse, run)
+                    rl.send((horse, run))
                 horse = None
 
             # Add words to horses/runs
