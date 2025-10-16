@@ -1,6 +1,7 @@
 from collections.abc import Generator
 from functools import cache
 
+from horsetalk import Going
 from prefect import get_run_logger
 
 from clients import mongo_client as client
@@ -86,7 +87,7 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                     {"_id": race_id, "runners.horse": found_horse["_id"]},
                     {
                         "$set": {
-                            "going": run.going,
+                            "going": str(Going(run.going)),
                             "runners.$.finishing_position": run.position,
                             "runners.$.beaten_distance": run.beaten_distance,
                         }
