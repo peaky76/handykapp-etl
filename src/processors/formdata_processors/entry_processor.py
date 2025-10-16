@@ -1,11 +1,11 @@
 from functools import cache
 
 from prefect import get_run_logger
-from pymongo import InsertOne, UpdateOne
 
+# from pymongo import InsertOne, UpdateOne
 from clients import mongo_client as client
-from models.formdata_horse import FormdataHorse
 
+# from models.formdata_horse import FormdataHorse
 from .result_line_processor import result_line_processor
 
 db = client.handykapp
