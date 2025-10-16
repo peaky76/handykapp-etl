@@ -42,7 +42,7 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                                     "date": "$datetime",
                                 }
                             },
-                            run.date.strftime("%Y-%m-%d"),
+                            run.date,
                         ]
                     },
                     "runners.horse": found_horse["_id"],
