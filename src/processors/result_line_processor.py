@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from functools import cache
 
 from prefect import get_run_logger
 
@@ -7,6 +8,14 @@ from models import FormdataHorse, FormdataRun
 from processors.race_processor import rr_code_to_course_dict
 
 db = client.handykapp
+
+
+@cache
+def find_horse(name: str, country: str, year: int):
+    return db.horses.find_one(
+        {"name": name, "country": country, "year": year},
+        {"_id": 1},
+    )
 
 
 def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun], None]:
@@ -20,14 +29,12 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
             horse, run = yield
 
             racecourse_id = rr_code_to_course_dict().get(run.course)
-
-            found_horse = db.horses.find_one(
-                {"name": horse.name, "country": horse.country, "year": horse.year},
-                {"_id": 1},
-            )
+            found_horse = find_horse(horse.name, horse.country, horse.year)
 
             if not found_horse:
-                logger.warning(f"Horse {horse.name} not found in db, skipping result")
+                logger.warning(
+                    f"Horse {horse.name} {horse.country} {horse.year} not found in db, skipping result"
+                )
                 skipped_count += 1
                 continue
 
