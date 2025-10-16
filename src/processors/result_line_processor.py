@@ -55,6 +55,7 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                     {"_id": race_id, "runners.horse": found_horse["_id"]},
                     {
                         "$set": {
+                            "going": run.going,
                             "runners.$.finishing_position": run.position,
                             "runners.$.beaten_distance": run.beaten_distance,
                         }
