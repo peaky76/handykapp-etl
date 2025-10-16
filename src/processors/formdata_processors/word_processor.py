@@ -20,8 +20,8 @@ def word_processor():
     adding_horses = False
     adding_runs = False
 
-    ep = entry_processor()
-    next(ep)
+    # ep = entry_processor()
+    # next(ep)
     rl = result_line_processor()
     next(rl)
 
@@ -68,7 +68,7 @@ def word_processor():
 
             # Add horses/runs to db
             if horse_switch and horse:
-                ep.send(horse)
+                # ep.send(horse)
                 for run in horse.runs:
                     rl.send((horse, run))
                 horse = None
@@ -80,5 +80,5 @@ def word_processor():
                 run_args.append(word)
 
     except GeneratorExit:
-        ep.close()
-        rb.close()
+        # ep.close()
+        rl.close()
