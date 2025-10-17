@@ -1,12 +1,13 @@
 import pendulum
 import pytest
 
-from models import PreMongoRace, PreMongoRunner
+from models import PreMongoEntry, PreMongoRace, PreMongoRunner
 from models.rapid_record import RapidRecord
 from models.rapid_runner import RapidRunner
 from transformers.rapid_horseracing_transformer import (
     transform_horse,
     transform_results,
+    transform_results_as_entries,
 )
 
 
@@ -37,12 +38,12 @@ def horse_data():
 
 
 @pytest.fixture
-def result_data():
+def result_data(horse_data):
     return RapidRecord(
         **{
             "id_race": "123456",
             "course": "Lucksin Downs",
-            "date": "2020-01-01 16:00:00",
+            "date": "2023-03-08 16:00:00",
             "title": "LUCKSIN HANDICAP (5)",
             "distance": "1m2f",
             "age": "3",
@@ -52,13 +53,14 @@ def result_data():
             "finish_time": "",
             "prize": "\u00a32794",
             "class": "5",
-            "horses": [],
+            "horses": [horse_data.model_dump()],
         }
     )
 
 
-def test_transform_horse_returns_correct_output(horse_data):
-    expected = PreMongoRunner(
+@pytest.fixture
+def expected_runner():
+    return PreMongoRunner(
         name="DOBBIN",
         country="IRE",
         year=2020,
@@ -67,31 +69,46 @@ def test_transform_horse_returns_correct_output(horse_data):
         trainer="A Trainer",
         lbs_carried=140,
         saddlecloth="1",
-        days_since_prev_run=1,
-        non_runner=False,
-        form="1-2-3",
         finishing_position="1",
         official_position="1",
         beaten_distance=1.5,
         owner="A Owner",
         sire="THE SIRE",
-        sire_country="GB",
         dam="THE DAM",
-        dam_country="FR",
         official_rating=None,
         sp="8",
-        odds=[],
-        finishing_time=None,
+        time=None,
     )
+
+
+@pytest.fixture
+def expected_entry():
+    return PreMongoEntry(
+        name="DOBBIN",
+        country="IRE",
+        year=2020,
+        rapid_id="123456",
+        jockey="A Jockey",
+        trainer="A Trainer",
+        lbs_carried=140,
+        saddlecloth="1",
+        owner="A Owner",
+        sire="THE SIRE",
+        dam="THE DAM",
+        official_rating=None,
+    )
+
+
+def test_transform_horse_returns_correct_output(horse_data, expected_runner):
     actual = transform_horse(horse_data, pendulum.parse("2023-03-08"))
-    assert actual == expected
+    assert actual == expected_runner
 
 
-def test_transform_results_returns_correct_output(result_data):
+def test_transform_results_returns_correct_output(result_data, expected_runner):
     expected = PreMongoRace(
         rapid_id="123456",
         course="Lucksin Downs",
-        datetime="2020-01-01T16:00:00+00:00",
+        datetime="2023-03-08T16:00:00+00:00",
         title="LUCKSIN HANDICAP (5)",
         is_handicap=True,
         obstacle=None,
@@ -100,11 +117,33 @@ def test_transform_results_returns_correct_output(result_data):
         distance_description="1m2f",
         age_restriction="3",
         going_description="Soft (Good to Soft in places)",
-        finished=True,
-        cancelled=False,
         prize="£2794",
         race_class="5",
-        runners=[],
+        runners=[expected_runner],
     )
     actual = transform_results(result_data)[0]
+    assert actual == expected
+
+
+def test_transform_results_as_entries_returns_correct_output(
+    result_data, expected_entry
+):
+    expected = PreMongoRace(
+        rapid_id="123456",
+        course="Lucksin Downs",
+        datetime="2023-03-08T16:00:00+00:00",
+        title="LUCKSIN HANDICAP (5)",
+        is_handicap=True,
+        obstacle=None,
+        surface="Turf",
+        code="Flat",
+        distance_description="1m2f",
+        age_restriction="3",
+        going_description="Soft (Good to Soft in places)",
+        prize="£2794",
+        race_class="5",
+        runners=[expected_entry],
+    )
+
+    actual = transform_results_as_entries(result_data)[0]
     assert actual == expected
