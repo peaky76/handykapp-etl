@@ -9,6 +9,7 @@ import petl  # type: ignore
 import tomllib
 from horsetalk import (  # type: ignore
     CoatColour,
+    Country,
     Gender,
     Headgear,
     HorseAge,
@@ -59,7 +60,11 @@ def transform_horse(
         )
         .addfield(
             "year",
-            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
+            lambda rec: HorseAge(
+                rec["age"],
+                context_date=race_date,
+                hemisphere=Country[rec["country"]].hemisphere,
+            )._official_dob.year,
             index=3,
         )
         .addfield(
