@@ -4,10 +4,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from typing import Optional
-
 import pendulum
 import tomllib
+from pendulum import Date
 from prefect import flow, get_run_logger
 
 from clients import SpacesClient
@@ -40,7 +39,7 @@ def increment_theracingapi_data():
 
 
 @flow
-def load_theracingapi_data(*, from_date: Optional[pendulum.date] = None):
+def load_theracingapi_data(*, from_date: Date | None = None):
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
