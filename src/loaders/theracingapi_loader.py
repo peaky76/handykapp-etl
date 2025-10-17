@@ -38,7 +38,7 @@ def increment_theracingapi_data():
 
 
 @flow
-def load_theracingapi_data(*, from_date=None):
+def load_theracingapi_data(*, from_date: pendulum.date | None = None):
     logger = get_run_logger()
     logger.info("Starting theracingapi loader")
 
@@ -46,7 +46,7 @@ def load_theracingapi_data(*, from_date=None):
     next(r)
     for file in SpacesClient.get_files(f"{SOURCE}racecards"):
         if from_date:
-            file_date = pendulum.parse(file.split(".")[0][-8:])
+            file_date = pendulum.parse(file.split(".")[0][-8:]).date()
             if file_date < from_date:
                 continue
 

@@ -2,8 +2,11 @@
 import sys
 from pathlib import Path
 
+from loaders.rapid_horseracing_loader import load_rapid_horseracing_entries
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import pendulum
 from prefect import flow, task
 from pymongo import ASCENDING as ASC
 
@@ -61,7 +64,9 @@ def nuclear_reload():
     drop_database()
     spec_database()
     load_racecourses()
-    load_theracingapi_data()
+    switch_date = pendulum.parse("2023-03-11").date()
+    load_rapid_horseracing_entries(until_date=switch_date)
+    load_theracingapi_data(from_date=switch_date)
     load_bha_data()
     load_formdata()
 
