@@ -163,7 +163,7 @@ def transform_results_as_entries(record: RapidRecord) -> list[PreMongoRace]:
             **{
                 **race.model_dump(exclude={"runners"}),
                 "runners": [
-                    PreMongoEntry(
+                    PreMongoRunner(
                         **{
                             k: v
                             for k, v in runner.model_dump().items()
