@@ -13,6 +13,7 @@ import petl  # type: ignore
 import tomllib
 from horsetalk import (  # type: ignore
     AWGoingDescription,
+    Country,
     HorseAge,
     Horselength,
     RaceWeight,
@@ -63,14 +64,18 @@ def transform_horse(
                 "beaten_distance": lambda x: float(Horselength(x)) if x else None,
             }
         )
-        .addfield(
-            "year",
-            lambda rec: HorseAge(rec["age"], context_date=race_date)._official_dob.year,
-        )
         .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1])
         .addfield("name", lambda rec: parse_horse(rec["horse"])[0])
         .addfield("sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1])
         .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1])
+        .addfield(
+            "year",
+            lambda rec: HorseAge(
+                rec["age"],
+                context_date=race_date,
+                hemisphere=Country[rec["country"]].hemisphere,
+            )._official_dob.year,
+        )
         .addfield(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
