@@ -10,6 +10,7 @@ from .mongo_race import MongoRace
 from .mongo_racecourse import MongoRacecourse
 from .mongo_references import MongoReferences
 from .mongo_runner import MongoRunner
+from .pre_mongo_entry import PreMongoEntry
 from .pre_mongo_horse import PreMongoHorse
 from .pre_mongo_race import PreMongoRace
 from .pre_mongo_runner import PreMongoRunner
@@ -33,6 +34,7 @@ __all__ = [
     "MongoRacecourse",
     "MongoReferences",
     "MongoRunner",
+    "PreMongoEntry",
     "PreMongoHorse",
     "PreMongoRace",
     "PreMongoRunner",
