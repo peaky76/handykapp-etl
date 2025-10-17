@@ -19,7 +19,7 @@ from horsetalk import (  # type: ignore
     RaceWeight,
 )
 
-from models import PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
+from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
     parse_code,
     parse_horse,
@@ -151,6 +151,31 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
         .dicts()
     )
     return [PreMongoRace(**race) for race in transformed_races]
+
+
+def transform_results_as_entries(record: RapidRecord) -> list[PreMongoRace]:
+    base = transform_results(record)
+
+    entry_fields = set(PreMongoEntry.model_fields.keys())
+
+    return [
+        PreMongoRace(
+            **{
+                **race.model_dump(exclude={"runners"}),
+                "runners": [
+                    PreMongoEntry(
+                        **{
+                            k: v
+                            for k, v in runner.model_dump().items()
+                            if k in entry_fields
+                        }
+                    )
+                    for runner in race.runners
+                ],
+            }
+        )
+        for race in base
+    ]
 
 
 if __name__ == "__main__":
