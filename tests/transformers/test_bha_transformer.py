@@ -104,5 +104,5 @@ def test_transform_ratings_returns_correct_output(mock_data):
             "hurdle": None,
         },
     }
-    actual = transform_ratings.fn(mock_data).model_dump()
+    actual = transform_ratings(mock_data).model_dump()
     assert expected == actual
