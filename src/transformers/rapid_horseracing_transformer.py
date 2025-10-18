@@ -123,15 +123,13 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             "surface",
             lambda rec: normal(
                 (
-                    (
-                        next(iter(Going.multiparse(x).values()))
-                        if "COURSE" in x.upper()
-                        else Going(x)
-                    ).surface.name
-                ).title()
-                if (x := rec["going_description"])
-                else None
-            ),
+                    next(iter(Going.multiparse(x).values()))
+                    if "COURSE" in x.upper()
+                    else Going(x)
+                ).surface.name
+            ).title()
+            if (x := rec["going_description"])
+            else None,
         )
         .addfield("code", lambda rec: parse_code(rec["obstacle"], rec["title"]))
         .addfield(
