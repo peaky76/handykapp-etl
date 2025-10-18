@@ -65,9 +65,9 @@ def nuclear_reload():
     load_racecourses()
     switch_date = pendulum.parse("2023-03-11").date()
     load_rapid_horseracing_entries(until_date=switch_date)
-    # load_theracingapi_data()
-    # load_bha_data()
-    # load_formdata()
+    load_theracingapi_data()
+    load_bha_data()
+    load_formdata()
 
 
 if __name__ == "__main__":
