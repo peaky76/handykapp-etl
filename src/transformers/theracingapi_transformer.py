@@ -20,7 +20,7 @@ from horsetalk import (  # type: ignore
 )
 
 from models import (
-    PreMongoEntry,
+    PreMongoRunner,
     PreMongoRace,
     TheRacingApiRacecard,
     TheRacingApiRunner,
@@ -44,7 +44,7 @@ def build_datetime(date_str: str, time_str: str) -> str:
 
 def transform_horse(
     runner: TheRacingApiRunner, race_date: pendulum.DateTime = pendulum.now()
-) -> PreMongoEntry:
+) -> PreMongoRunner:
     data = petl.fromdicts([runner.model_dump()])
 
     transformed_horse = (
@@ -99,7 +99,7 @@ def transform_horse(
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]
     )
-    return PreMongoEntry(**transformed_horse)
+    return PreMongoRunner(**transformed_horse)
 
 
 def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
