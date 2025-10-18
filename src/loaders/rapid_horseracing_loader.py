@@ -37,23 +37,16 @@ def load_rapid_horseracing_entries(
 
     files = SpacesClient.get_files(f"{SOURCE}results")
 
-    valid_files = []
     for file in files:
         if file != "results_to_do_list.json":
+            data = SpacesClient.read_file(file)
             try:
-                data = SpacesClient.read_file(file)
                 record = RapidRecord(**data)
-                if pendulum.parse(record.date).date() < until_date:
-                    valid_files.append((file, record))
-                else:
-                    break
+                if pendulum.parse(record.date).date() >= until_date:
+                    continue
+                r.send((record, transform_results_as_entries, file, "rapid"))
             except Exception:
-                logger.error(f"Unable to read/parse {file} during filtering")
-
-    logger.info(f"Processing {len(valid_files)} files before {until_date}")
-
-    for file, record in valid_files:
-        r.send((record, transform_results_as_entries, file, "rapid"))
+                logger.error(f"Unable to create a record from {file}")
 
     r.close()
 
