@@ -124,7 +124,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
                 else Going(x)
             )
             .surface.name.title()
-            .replace("_", "")
+            .replace("_", " ")
             if (x := rec["going_description"])
             else None,
         )
