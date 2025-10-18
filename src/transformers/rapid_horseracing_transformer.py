@@ -1,8 +1,6 @@
 # To allow running as a script
 import sys
-from enum import Enum
 from pathlib import Path
-from typing import cast
 
 from transformers.validators import ensure_datetime
 
@@ -18,7 +16,6 @@ from horsetalk import (
     Horselength,
     RaceWeight,
 )
-from peak_utility.text.case import normal
 
 from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
@@ -121,13 +118,13 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]))
         .addfield(
             "surface",
-            lambda rec: normal(
-                (
-                    next(iter(Going.multiparse(x).values()))
-                    if "COURSE" in x.upper()
-                    else Going(x)
-                ).surface.name
-            ).title()
+            lambda rec: (
+                next(iter(Going.multiparse(x).values()))
+                if "COURSE" in x.upper()
+                else Going(x)
+            )
+            .surface.name.title()
+            .replace("_", "")
             if (x := rec["going_description"])
             else None,
         )
