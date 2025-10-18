@@ -11,13 +11,14 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pendulum
 import petl  # type: ignore
 import tomllib
-from horsetalk import (  # type: ignore
-    AWGoingDescription,
+from horsetalk import (
     Country,
+    Going,
     HorseAge,
     Horselength,
     RaceWeight,
 )
+from peak_utility.text.case import normal
 
 from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
@@ -120,21 +121,16 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
         .addfield("obstacle", lambda rec: parse_obstacle(rec["title"]))
         .addfield(
             "surface",
-            lambda rec: (
-                "AW"
-                if any(
-                    x.name in rec["going_description"].upper()
-                    for x in cast(type[Enum], AWGoingDescription)
-                )
-                else "Turf"
-                if rec["going_description"]
+            lambda rec: normal(
+                (
+                    (
+                        next(iter(Going.multiparse(x).values()))
+                        if "COURSE" in x.upper()
+                        else Going(x)
+                    ).surface.name
+                ).title()
+                if (x := rec["going_description"])
                 else None
-                # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
-                # TODO: Handle mixed meetings as multiparse returns a list and only first used here
-                # Going(rec["going_description"]).surface.name.title()
-                # if "COURSE" not in rec["going_description"].upper()
-                # else next(iter(Going.multiparse(rec["going_description"]).values())).surface.name.title()
-                # )
             ),
         )
         .addfield("code", lambda rec: parse_code(rec["obstacle"], rec["title"]))
