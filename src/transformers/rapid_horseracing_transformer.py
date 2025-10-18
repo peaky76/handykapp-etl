@@ -127,6 +127,8 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
                     for x in cast(type[Enum], AWGoingDescription)
                 )
                 else "Turf"
+                if rec["going_decription"]
+                else None
                 # TODO: Reinstate when Horsetalk is updated (needs prefect to update to pendulum > 3)
                 # TODO: Handle mixed meetings as multiparse returns a list and only first used here
                 # Going(rec["going_description"]).surface.name.title()
