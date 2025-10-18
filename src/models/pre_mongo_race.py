@@ -3,7 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from .pre_mongo_entry import PreMongoEntry
 from .pre_mongo_runner import PreMongoRunner
 
 
@@ -23,7 +22,7 @@ class PreMongoRace(BaseModel):
     rating_restriction: Optional[str] = None
     prize: Optional[str] = None
     going_description: Optional[str] = None
-    runners: list[PreMongoEntry | PreMongoRunner] = []
+    runners: list[PreMongoRunner] = []
 
     model_config = {"frozen": True}
 

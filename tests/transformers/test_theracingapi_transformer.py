@@ -1,7 +1,7 @@
 import pendulum
 import pytest
 
-from models import PreMongoEntry, PreMongoRace
+from models import PreMongoRace, PreMongoRunner
 from models.theracingapi_racecard import TheRacingApiRacecard
 from models.theracingapi_runner import TheRacingApiRunner
 from transformers.theracingapi_transformer import (
@@ -139,7 +139,7 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
     horse_1_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
-    expected = PreMongoEntry(
+    expected = PreMongoRunner(
         name="HORTZADAR",
         sex="M",
         is_gelded=True,
@@ -167,7 +167,7 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
     horse_2_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
-    expected = PreMongoEntry(
+    expected = PreMongoRunner(
         name="TELE RED",
         sex="F",
         country="GB",
@@ -192,7 +192,7 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
 
 def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
-    expected = PreMongoEntry(
+    expected = PreMongoRunner(
         name="SPYCATCHER",
         sex="M",
         is_gelded=False,

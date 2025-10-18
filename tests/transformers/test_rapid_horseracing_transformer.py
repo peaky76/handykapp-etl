@@ -83,7 +83,7 @@ def expected_runner():
 
 @pytest.fixture
 def expected_entry():
-    return PreMongoEntry(
+    return PreMongoRunner(
         name="DOBBIN",
         country="IRE",
         year=2020,
