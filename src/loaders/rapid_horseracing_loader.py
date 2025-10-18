@@ -38,7 +38,7 @@ def load_rapid_horseracing_entries(
     files = SpacesClient.get_files(f"{SOURCE}results")
 
     for file in files:
-        if file != "results_to_do_list.json":
+        if "results_to_do_list.json" not in file:
             data = SpacesClient.read_file(file)
             try:
                 record = RapidRecord(**data)
