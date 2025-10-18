@@ -11,7 +11,7 @@ class PreMongoRace(BaseModel):
     rapid_id: Optional[str] = None
     course: str
     obstacle: Optional[str] = None
-    surface: str
+    surface: Optional[str] = None
     code: str
     datetime: datetime
     title: str
