@@ -53,9 +53,9 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
     surface_options = (
         ["Tapeta", "Polytrack"]
         if race.surface == "AW"
-        else ["Sand"]
-        if race.surface == "Sand"
-        else ["Turf"]
+        else [race.surface]
+        if race.surface
+        else ["Tapeta", "Polytrack", "Sand", "Turf"]
     )
     course_name = race.course.lower().replace("(", "").replace(")", "").strip()
     if course_name == "newmarket":
