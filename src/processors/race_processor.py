@@ -52,7 +52,7 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
     racecourses = get_all_racecourses()
     surface_options = (
         ["Tapeta", "Polytrack"]
-        if race.surface == "AW"
+        if race.surface == "AW" or race.surface == "All Weather"
         else [race.surface]
         if race.surface
         else ["Tapeta", "Polytrack", "Sand", "Turf"]
