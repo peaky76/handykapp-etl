@@ -158,34 +158,9 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
 
                 try:
                     for horse in race.runners:
-                        if horse.sire:
-                            r.send(
-                                (
-                                    PreMongoRunner(name=horse.sire, sex="M"),
-                                    None,
-                                    source,
-                                )
-                            )
-
-                        if horse.damsire:
-                            r.send(
-                                (
-                                    PreMongoRunner(name=horse.damsire, sex="M"),
-                                    None,
-                                    source,
-                                )
-                            )
-
-                        if horse.dam:
-                            r.send(
-                                (
-                                    PreMongoRunner(
-                                        name=horse.dam, sex="F", sire=horse.damsire
-                                    ),
-                                    None,
-                                    source,
-                                )
-                            )
+                        for parent in (horse.sire, horse.damsire, horse.dam):
+                            if parent:
+                                r.send((parent, None, source))
 
                         if race_id:
                             r.send((horse, race_id, source))
