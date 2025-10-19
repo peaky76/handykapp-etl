@@ -203,32 +203,19 @@ def runner_processor():
                         }
                     },
                 )
-                if horse.trainer:
-                    p.send(
-                        (
-                            {
-                                "name": horse.trainer,
-                                "role": "trainer",
-                                "race_id": race_id,
-                                "runner_id": horse_id,
-                            },
-                            source,
-                            {},
+                for role in ("trainer", "jockey"):
+                    if person_name := getattr(horse, role, None):
+                        p.send(
+                            (
+                                {
+                                    "name": person_name,
+                                    "role": role,
+                                    "race_id": race_id,
+                                    "runner_id": horse_id,
+                                },
+                                source,
+                            )
                         )
-                    )
-                if horse.jockey:
-                    p.send(
-                        (
-                            {
-                                "name": horse.jockey,
-                                "role": "jockey",
-                                "race_id": race_id,
-                                "runner_id": horse_id,
-                            },
-                            source,
-                            {},
-                        )
-                    )
 
     except GeneratorExit:
         # Process any remaining bulk operations

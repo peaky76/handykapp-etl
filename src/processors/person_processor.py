@@ -1,9 +1,11 @@
+from collections.abc import Generator
+
 from nameparser import HumanName  # type: ignore
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
-from models import PyObjectId
+from models import PreMongoPerson, PyObjectId
 
 db = client.handykapp
 
@@ -23,7 +25,7 @@ def preload_person_cache(names, source):
     return cache
 
 
-def person_processor():
+def person_processor() -> Generator[None, tuple[PreMongoPerson, str], None]:
     logger = get_run_logger()
     logger.info("Starting person processor")
     person_cache: dict[tuple[str, str], PyObjectId] = {}
@@ -35,11 +37,12 @@ def person_processor():
 
     try:
         while True:
-            person, source, ratings = yield
+            person, source = yield
             name = person["name"]
             race_id = person.get("race_id")
             runner_id = person.get("runner_id")
             role = person.get("role")
+            ratings = person.get("ratings")
 
             # Add to pending batch
             pending_people.add(name)
