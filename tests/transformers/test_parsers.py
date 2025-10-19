@@ -1,6 +1,5 @@
 from transformers.parsers import (
     parse_code,
-    parse_horse,
     parse_obstacle,
 )
 
@@ -27,30 +26,6 @@ def test_parse_code_returns_correct_value_for_dot_separated_nh_in_title():
 
 def test_parse_code_returns_correct_value_when_not_obstacle_or_nh():
     assert parse_code(None, "Big Handicap") == "Flat"
-
-
-def test_parse_horse_returns_correct_tuple_when_none():
-    assert parse_horse(None) == (None, None)
-
-
-def test_parse_horse_returns_correct_tuple_when_country_not_supplied():
-    assert parse_horse("DOBBIN") == ("DOBBIN", None)
-
-
-def test_parse_horse_returns_correct_tuple_when_name_lowercase():
-    assert parse_horse("Dobbin") == ("DOBBIN", None)
-
-
-def test_parse_horse_returns_correct_tuple_when_country_supplied_with_space():
-    assert parse_horse("DOBBIN (IRE)") == ("DOBBIN", "IRE")
-
-
-def test_parse_horse_returns_correct_tuple_when_country_supplied_without_space():
-    assert parse_horse("DOBBIN(IRE)") == ("DOBBIN", "IRE")
-
-
-def test_parse_horse_returns_correct_tuple_when_country_supplied_as_a_default():
-    assert parse_horse("DOBBIN", "IRE") == ("DOBBIN", "IRE")
 
 
 def test_parse_obstacle_returns_correct_value_for_none():

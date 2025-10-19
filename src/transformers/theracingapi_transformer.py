@@ -2,6 +2,8 @@
 import sys
 from pathlib import Path
 
+from helpers.helpers import horse_name_to_pre_mongo_horse
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
@@ -85,9 +87,9 @@ def transform_horse(
                 "sex": lambda x: Gender[x].sex.name[0],  # type: ignore
                 "age": int,
                 "colour": lambda x: CoatColour[x].name.title(),  # type: ignore
-                "sire": lambda x: x.upper(),
-                "dam": lambda x: x.upper(),
-                "damsire": lambda x: x.upper(),
+                "sire": lambda x: horse_name_to_pre_mongo_horse(x),
+                "dam": lambda x: horse_name_to_pre_mongo_horse(x),
+                "damsire": lambda x: horse_name_to_pre_mongo_horse(x),
                 "saddlecloth": int,
                 "draw": int,
                 "lbs_carried": int,

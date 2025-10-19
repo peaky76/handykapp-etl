@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 
+from helpers.helpers import horse_name_to_pre_mongo_horse
 from transformers.validators import ensure_datetime
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -68,17 +69,15 @@ def transform_horse(
                 "non_runner": lambda x: bool(int(x)),
                 "lbs_carried": lambda x: RaceWeight(x).lb,
                 "sp": lambda x: x or None,
-                "sire": lambda x: parse_horse(x)[0],
-                "dam": lambda x: parse_horse(x)[0],
+                "sire": lambda x: horse_name_to_pre_mongo_horse(x),
+                "dam": lambda x: horse_name_to_pre_mongo_horse(x),
                 "beaten_distance": lambda x: float(Horselength(x)) if x else None,
                 "jockey": lambda x: standardise_name(x),
                 "trainer": lambda x: standardise_name(x),
             }
         )
         .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1])
-        .addfield("name", lambda rec: parse_horse(rec["horse"])[0])
-        .addfield("sire_country", lambda rec: parse_horse(rec["sire"], "GB")[1])
-        .addfield("dam_country", lambda rec: parse_horse(rec["dam"], "GB")[1])
+        .addfield("name", lambda rec: parse_horse(rec["horse"])[0])  #
         .addfield(
             "year",
             lambda rec: HorseAge(
