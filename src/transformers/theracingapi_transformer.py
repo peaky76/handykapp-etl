@@ -87,9 +87,9 @@ def transform_horse(
                 "sex": lambda x: Gender[x].sex.name[0],  # type: ignore
                 "age": int,
                 "colour": lambda x: CoatColour[x].name.title(),  # type: ignore
-                "sire": lambda x: horse_name_to_pre_mongo_horse(x),
-                "dam": lambda x: horse_name_to_pre_mongo_horse(x),
-                "damsire": lambda x: horse_name_to_pre_mongo_horse(x),
+                "sire": lambda x: horse_name_to_pre_mongo_horse(x, "M"),
+                "dam": lambda x: horse_name_to_pre_mongo_horse(x, "F"),
+                "damsire": lambda x: horse_name_to_pre_mongo_horse(x, "M"),
                 "saddlecloth": int,
                 "draw": int,
                 "lbs_carried": int,
