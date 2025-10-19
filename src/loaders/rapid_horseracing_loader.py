@@ -37,7 +37,7 @@ def load_rapid_horseracing_entries(
 
     source_location = f"{SOURCE}results"
     files = SpacesClient.get_files(source_location)
-    logger.info(f"Found {len(files)} files to process in {source_location}")
+    logger.info(f"Processing files from {source_location}")
 
     for file in files:
         if "results_to_do_list.json" not in file:
