@@ -3,6 +3,7 @@ from collections.abc import Generator
 from prefect import get_run_logger
 from pymongo import UpdateOne
 
+from clients import get_horse
 from clients import mongo_client as client
 from models import PreMongoHorse
 
@@ -23,15 +24,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
             horse = yield
 
             try:
-                horse_doc = db.horses.find_one(
-                    {
-                        "name": horse.name,
-                        "country": horse.country,
-                        "year": horse.year,
-                        "sex": horse.sex,
-                    },
-                    {"_id": 1},
-                )
+                horse_doc = get_horse(horse.name, horse.country, horse.year, horse.sex)
 
                 if not horse_doc:
                     skipped_count += 1
