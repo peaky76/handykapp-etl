@@ -2,6 +2,7 @@ from collections.abc import Generator
 from functools import cache
 
 import pendulum
+from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
 
@@ -11,8 +12,6 @@ from models import PreMongoRace
 from models.pre_mongo_runner import PreMongoRunner
 from processors.runner_processor import runner_processor
 from transformers.validators import ensure_datetime
-
-from .utils import compact
 
 db = client.handykapp
 
