@@ -8,7 +8,6 @@ from pymongo.errors import DuplicateKeyError
 from clients.mongo_client import get_dam_id, get_horse, get_sire_id, mongo_client
 from helpers.helpers import get_operations, make_operations_update
 from models import MongoHorse, PreMongoHorse, PreMongoRunner
-from processors.person_processor import person_processor
 
 db = mongo_client.handykapp
 
@@ -47,9 +46,6 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
     added_count = 0
     updated_count = 0
     skipped_count = 0
-
-    p = person_processor()
-    next(p)
 
     bulk_operations = []
     bulk_threshold = 100
@@ -99,4 +95,3 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
         logger.info(
             f"Finished processing horses. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
         )
-        p.close()
