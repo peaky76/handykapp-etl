@@ -114,7 +114,10 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
         while True:
             race, source = yield
 
-            log_description = f"{pendulum.parse(str(race.datetime)).format('Do MMM YYYY HH:mm')} {race.title} at {race.course} ({race.surface}) from {source}"
+            datetime_str = pendulum.parse(str(race.datetime)).format(
+                "Do MMM YYYY HH:mm"
+            )
+            log_description = f"{datetime_str} {race.title} at {race.course} ({race.surface}) from {source}"
 
             if racecourse_id := get_racecourse_id(race, source):
                 found_race = db.races.find_one(
@@ -138,18 +141,18 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                             )
                         },
                     )
-                    logger.debug(f"{race.datetime} at {race.course} updated")
+                    logger.debug(f"{datetime_str} at {race.course} updated")
                     updated_count += 1
                 else:
                     try:
                         race_id = db.races.insert_one(
                             make_update_dictionary(race, racecourse_id)
                         ).inserted_id
-                        logger.debug(f"{race.datetime} at {race.course} added to db")
+                        logger.debug(f"{datetime_str} at {race.course} added to db")
                         added_count += 1
                     except DuplicateKeyError:
                         logger.warning(
-                            f"Duplicate race for {race.datetime} at {race.course}"
+                            f"Duplicate race for {datetime_str} at {race.course}"
                         )
                         skipped_count += 1
 
