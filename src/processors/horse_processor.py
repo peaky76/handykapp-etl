@@ -1,56 +1,32 @@
 from collections.abc import Generator
 
-from pendulum import Date
+from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients.mongo_client import get_dam_id, get_horse, get_sire_id, mongo_client
-from models import MongoHorse, MongoOperation, PreMongoHorse, PreMongoRunner
+from helpers.helpers import get_operations, make_operations_update
+from models import MongoHorse, PreMongoHorse, PreMongoRunner
 from processors.person_processor import person_processor
-
-from .utils import compact
 
 db = mongo_client.handykapp
 
 
-def create_gelding_operation(date: Date) -> MongoOperation:
-    return {
-        "operation_type": "gelding",
-        "date": date,
-    }
-
-
-def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
-    if not horse.gelded_from:
-        return None
-
-    return [create_gelding_operation(horse.gelded_from)]
-
-
-def make_operations_update(
-    horse: PreMongoRunner, db_horse: MongoHorse
-) -> list[MongoOperation] | None:
-    if not hasattr(horse, "gelded_from") or not horse.gelded_from:
-        return None
-
-    operations = db_horse.get("operations")
-
-    if not operations:
-        return get_operations(horse)
-
-    gelding_op = next(op for op in operations if op.get("operation_type") == "gelding")
-    non_gelding_ops = [op for op in operations if op.get("operation_type") != "gelding"]
-
-    if not gelding_op:
-        return [*operations, create_gelding_operation(horse.gelded_from)]
-
-    current_date = gelding_op.get("date")
-
-    if current_date is None or horse.gelded_from < current_date:
-        return [*non_gelding_ops, create_gelding_operation(horse.gelded_from)]
-
-    return [operations]
+def make_insert_dictionary(horse: PreMongoHorse):
+    return compact(
+        {
+            "name": horse.name,
+            "sex": horse.sex,
+            "year": horse.year,
+            "country": horse.country,
+            "colour": horse.colour,
+            "sire": get_sire_id(horse.sire),
+            "dam": get_dam_id(horse.dam),
+            "operations": get_operations(horse),
+            "ratings": horse.ratings,
+        }
+    )
 
 
 def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
@@ -80,7 +56,7 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
 
     try:
         while True:
-            horse, race_id, source = yield
+            horse = yield
 
             db_horse = get_horse(horse.name, horse.country, horse.year, horse.sex)
             horse_id = db_horse["_id"] if db_horse else None
@@ -96,26 +72,12 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
                 updated_count += 1
             else:
                 try:
-                    horse_id = db.horses.insert_one(
-                        compact(
-                            {
-                                "name": horse.name,
-                                "sex": horse.sex,
-                                "year": horse.year,
-                                "country": horse.country,
-                                "colour": horse.colour,
-                                "sire": get_sire_id(horse.sire),
-                                "dam": get_dam_id(horse.dam),
-                                "operations": get_operations(horse),
-                                "ratings": horse.ratings,
-                            }
-                        )
-                    ).inserted_id
+                    db.horses.insert_one(make_insert_dictionary(horse))
                     logger.debug(f"{horse.name} added to db")
                     added_count += 1
                 except DuplicateKeyError:
                     logger.warning(
-                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex}) in race {race_id}"
+                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex})"
                     )
                     skipped_count += 1
                 except ValueError as e:
@@ -128,45 +90,6 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
                 logger.debug(f"Processed {len(bulk_operations)} bulk horse operations")
                 bulk_operations = []
 
-            # Add horse to race
-            if race_id:
-                db.races.update_one(
-                    {"_id": race_id},
-                    {
-                        "$push": {
-                            "runners": compact(
-                                {
-                                    "horse": horse_id,
-                                    "owner": horse.owner,
-                                    "allowance": horse.allowance,
-                                    "saddlecloth": horse.saddlecloth,
-                                    "draw": horse.draw,
-                                    "headgear": horse.headgear,
-                                    "lbs_carried": horse.lbs_carried,
-                                    "official_rating": horse.official_rating,
-                                    "finishing_position": horse.finishing_position,
-                                    "official_position": horse.official_position,
-                                    "beaten_distance": horse.beaten_distance,
-                                    "sp": horse.sp,
-                                }
-                            )
-                        }
-                    },
-                )
-                for role in ("trainer", "jockey"):
-                    if person_name := getattr(horse, role, None):
-                        p.send(
-                            (
-                                {
-                                    "name": person_name,
-                                    "role": role,
-                                    "race_id": race_id,
-                                    "runner_id": horse_id,
-                                },
-                                source,
-                            )
-                        )
-
     except GeneratorExit:
         # Process any remaining bulk operations
         if bulk_operations:
@@ -174,6 +97,6 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
             logger.debug(f"Processed {len(bulk_operations)} remaining bulk operations")
 
         logger.info(
-            f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
+            f"Finished processing horses. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
         )
         p.close()
