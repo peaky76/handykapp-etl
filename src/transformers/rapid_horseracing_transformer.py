@@ -16,6 +16,7 @@ from horsetalk import (
     Horselength,
     RaceWeight,
 )
+from peak_utility.names import eirify, scotify
 
 from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
@@ -28,6 +29,16 @@ with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
+
+
+def standardise_name(name: str) -> str:
+    if name == "Non Runner":
+        return ""
+
+    if name.upper().startswith("IRELAND"):
+        name = name.upper().replace("IRELAND", "").title()
+
+    return eirify(scotify(name))
 
 
 def transform_horse(
@@ -60,6 +71,8 @@ def transform_horse(
                 "sire": lambda x: parse_horse(x)[0],
                 "dam": lambda x: parse_horse(x)[0],
                 "beaten_distance": lambda x: float(Horselength(x)) if x else None,
+                "jockey": lambda x: standardise_name(x),
+                "trainer": lambda x: standardise_name(x),
             }
         )
         .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1])
