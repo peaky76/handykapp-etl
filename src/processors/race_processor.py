@@ -114,7 +114,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
         while True:
             race, source = yield
 
-            log_description = f"{ensure_datetime(pendulum.parse(str(race.datetime))).format('Do MMM YYYY HH:mm')} {race.title} at {race.course} ({race.surface}) from {source}"
+            log_description = f"{pendulum.parse(str(race.datetime)).format('Do MMM YYYY HH:mm')} {race.title} at {race.course} ({race.surface}) from {source}"
 
             if racecourse_id := get_racecourse_id(race, source):
                 found_race = db.races.find_one(

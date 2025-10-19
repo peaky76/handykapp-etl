@@ -9,12 +9,6 @@ from horsetalk import (  # type: ignore
 )
 
 
-def ensure_datetime(value):
-    if not isinstance(value, pendulum.DateTime):
-        raise ValueError(f"Expected pendulum.DateTime, got {type(value).__name__}")
-    return value
-
-
 def validate_class(race_class):
     return race_class == "" or 0 < int(race_class) < 8
 
