@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from functools import cache, wraps
 
 from pendulum import Date
@@ -115,7 +116,7 @@ def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
     )
 
 
-def runner_processor():
+def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str], None]:
     logger = get_run_logger()
     logger.info("Starting runner processor")
     added_count = 0
