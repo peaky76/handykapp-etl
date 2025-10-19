@@ -6,7 +6,7 @@ from peak_utility.listish import compact
 from prefect import get_run_logger
 from requests import get
 
-from models import PreMongoHorse
+from models import MongoHorse, MongoOperation, PreMongoHorse, PreMongoRunner
 
 
 def fetch_content(url, params=None, headers=None):
@@ -44,3 +44,42 @@ def horse_name_to_pre_mongo_horse(
         }
     )
     return PreMongoHorse(params)
+
+
+def create_gelding_operation(date: pendulum.Date) -> MongoOperation:
+    return {
+        "operation_type": "gelding",
+        "date": date,
+    }
+
+
+def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
+    if not horse.gelded_from:
+        return None
+
+    return [create_gelding_operation(horse.gelded_from)]
+
+
+def make_operations_update(
+    horse: PreMongoRunner, db_horse: MongoHorse
+) -> list[MongoOperation] | None:
+    if not hasattr(horse, "gelded_from") or not horse.gelded_from:
+        return None
+
+    operations = db_horse.get("operations")
+
+    if not operations:
+        return get_operations(horse)
+
+    gelding_op = next(op for op in operations if op.get("operation_type") == "gelding")
+    non_gelding_ops = [op for op in operations if op.get("operation_type") != "gelding"]
+
+    if not gelding_op:
+        return [*operations, create_gelding_operation(horse.gelded_from)]
+
+    current_date = gelding_op.get("date")
+
+    if current_date is None or horse.gelded_from < current_date:
+        return [*non_gelding_ops, create_gelding_operation(horse.gelded_from)]
+
+    return [operations]
