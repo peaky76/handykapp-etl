@@ -20,8 +20,8 @@ from horsetalk import (  # type: ignore
 )
 
 from models import (
-    PreMongoRunner,
     PreMongoRace,
+    PreMongoRunner,
     TheRacingApiRacecard,
     TheRacingApiRunner,
 )
