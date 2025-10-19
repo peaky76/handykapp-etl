@@ -13,6 +13,7 @@ from .mongo_references import MongoReferences
 from .mongo_runner import MongoRunner
 from .pre_mongo_entry import PreMongoEntry
 from .pre_mongo_horse import PreMongoHorse
+from .pre_mongo_person import PreMongoPerson
 from .pre_mongo_race import PreMongoRace
 from .pre_mongo_runner import PreMongoRunner
 from .py_object_id import PyObjectId
@@ -38,6 +39,7 @@ __all__ = [
     "MongoRunner",
     "PreMongoEntry",
     "PreMongoHorse",
+    "PreMongoPerson",
     "PreMongoRace",
     "PreMongoRunner",
     "PyObjectId",
