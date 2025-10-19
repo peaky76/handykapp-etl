@@ -1,8 +1,12 @@
 from typing import Literal
 
 import pendulum
+from horsetalk import Horse
+from peak_utility.listish import compact
 from prefect import get_run_logger
 from requests import get
+
+from models import PreMongoHorse
 
 
 def fetch_content(url, params=None, headers=None):
@@ -26,3 +30,14 @@ type NewmarketRacecourse = Literal["Newmarket July", "Newmarket Rowley"]
 
 def apply_newmarket_workaround(date: pendulum.DateTime) -> NewmarketRacecourse:
     return "Newmarket July" if date.month in (6, 7, 8) else "Newmarket Rowley"
+
+
+def horse_name_to_pre_mongo_horse(name: str) -> PreMongoHorse:
+    horse = Horse(name)
+    params = compact(
+        {
+            "name": horse.name,
+            "country": horse.country,
+        }
+    )
+    return PreMongoHorse(params)
