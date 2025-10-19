@@ -1,14 +1,15 @@
 from collections.abc import Generator
 
-from peak_utility.listish import compact
 from pendulum import Date
 from prefect import get_run_logger
 from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients.mongo_client import get_dam_id, get_horse, get_sire_id, mongo_client
-from models import MongoHorse, MongoOperation, PreMongoRunner, PyObjectId
+from models import MongoHorse, MongoOperation, PreMongoHorse, PreMongoRunner
 from processors.person_processor import person_processor
+
+from .utils import compact
 
 db = mongo_client.handykapp
 
@@ -64,7 +65,7 @@ def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
     )
 
 
-def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str], None]:
+def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
     logger = get_run_logger()
     logger.info("Starting runner processor")
     added_count = 0
