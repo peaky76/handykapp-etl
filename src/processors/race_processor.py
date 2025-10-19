@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
 from helpers import apply_newmarket_workaround
 from models import PreMongoRace
-from processors.runner_processor import runner_processor
+from processors import horse_processor, runner_processor
 
 db = client.handykapp
 
@@ -104,6 +104,9 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
     updated_count = 0
     skipped_count = 0
 
+    h = horse_processor()
+    next(h)
+
     r = runner_processor()
     next(r)
 
@@ -157,7 +160,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                     for horse in race.runners:
                         for parent in (horse.sire, horse.damsire, horse.dam):
                             if parent:
-                                r.send((parent, None, source))
+                                h.send(parent)
 
                         if race_id:
                             r.send((horse, race_id, source))
