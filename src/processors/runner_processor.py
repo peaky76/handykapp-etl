@@ -5,7 +5,7 @@ from prefect import get_run_logger
 from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
-from clients.mongo_client import get_dam_id, get_horse, get_sire_id, mongo_client
+from clients.mongo_client import get_horse, mongo_client
 from helpers.helpers import get_operations, make_operations_update
 from models import MongoHorse, PreMongoRunner, PyObjectId
 from processors.person_processor import person_processor
@@ -17,8 +17,8 @@ def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
     return compact(
         {
             "colour": horse.colour,
-            "sire": get_sire_id(horse.sire),
-            "dam": get_dam_id(horse.dam),
+            "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
+            "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
             "operations": make_operations_update(horse, db_horse),
             "ratings": horse.ratings,
         }
@@ -64,8 +64,12 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                                 "year": horse.year,
                                 "country": horse.country,
                                 "colour": horse.colour,
-                                "sire": get_sire_id(horse.sire),
-                                "dam": get_dam_id(horse.dam),
+                                "sire": x["_id"]
+                                if (x := get_horse(horse.sire))
+                                else None,
+                                "dam": x["_id"]
+                                if (x := get_horse(horse.dam))
+                                else None,
                                 "operations": get_operations(horse),
                                 "ratings": horse.ratings,
                             }
