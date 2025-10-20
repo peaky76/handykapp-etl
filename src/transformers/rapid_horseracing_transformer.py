@@ -9,7 +9,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
-import tomllib
 from horsetalk import (
     Country,
     Going,
@@ -25,11 +24,6 @@ from transformers.parsers import (
     parse_code,
     parse_obstacle,
 )
-
-with open("settings.toml", "rb") as f:
-    settings = tomllib.load(f)
-
-SOURCE = settings["rapid_horseracing"]["spaces_dir"]
 
 
 def standardise_name(name: str) -> str:
