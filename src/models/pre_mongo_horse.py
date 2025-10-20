@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Literal
 
@@ -15,9 +17,9 @@ class PreMongoHorse(BaseModel):
     colour: str | None = None
     owner: str | None = None
     trainer: str | None = None
-    sire: str | None = None
-    dam: str | None = None
-    damsire: str | None = None
+    sire: PreMongoHorse | None = None
+    dam: PreMongoHorse | None = None
+    damsire: PreMongoHorse | None = None
     ratings: MongoOfficialRatings | None = None
 
     model_config = {"frozen": True}
