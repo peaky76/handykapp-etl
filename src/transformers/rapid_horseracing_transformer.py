@@ -16,7 +16,7 @@ from horsetalk import (
     Horselength,
     RaceWeight,
 )
-from peak_utility.names import eirify, scotify
+from peak_utility.names.corrections import eirify, scotify
 
 from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
