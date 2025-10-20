@@ -38,8 +38,15 @@ def horse_name_to_pre_mongo_horse(
     sex: Literal["M", "F"] | None = None,
     sire: PreMongoHorse | None = None,
     default_country: str | None = None,
-) -> PreMongoHorse:
+) -> PreMongoHorse | None:
+    if not name:
+        return None
+
     horse = Horse(name)
+
+    if not horse:
+        return None
+
     name = horse.name
     country = horse.country.name if horse.country else None
 
