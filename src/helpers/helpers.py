@@ -43,7 +43,7 @@ def horse_name_to_pre_mongo_horse(
     params = compact(
         {
             "name": horse.name,
-            "country": horse.country or default_country,
+            "country": horse.country.name or default_country,
             "sex": sex,
             "sire": sire,
         }
