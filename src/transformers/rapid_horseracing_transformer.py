@@ -13,6 +13,7 @@ import tomllib
 from horsetalk import (
     Country,
     Going,
+    Horse,
     HorseAge,
     Horselength,
     RaceWeight,
@@ -22,7 +23,6 @@ from peak_utility.names import eirify, scotify
 from models import PreMongoEntry, PreMongoRace, PreMongoRunner, RapidRecord, RapidRunner
 from transformers.parsers import (
     parse_code,
-    parse_horse,
     parse_obstacle,
 )
 
@@ -76,8 +76,8 @@ def transform_horse(
                 "trainer": lambda x: standardise_name(x),
             }
         )
-        .addfield("country", lambda rec: parse_horse(rec["horse"], "GB")[1])
-        .addfield("name", lambda rec: parse_horse(rec["horse"])[0])  #
+        .addfield("country", lambda rec: Horse(rec["horse"]).country or "GB")
+        .addfield("name", lambda rec: Horse(rec["horse"]).name)  #
         .addfield(
             "year",
             lambda rec: HorseAge(
