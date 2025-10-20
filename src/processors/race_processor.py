@@ -176,4 +176,5 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
         logger.info(
             f"Finished processing races. Updated {updated_count} races, added {added_count}, skipped {skipped_count}"
         )
+        h.close()
         r.close()
