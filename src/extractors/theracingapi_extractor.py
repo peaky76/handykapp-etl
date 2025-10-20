@@ -11,7 +11,7 @@ from prefect import flow, task
 from prefect.blocks.system import Secret
 
 from clients import SpacesClient
-from helpers.helpers import fetch_content
+from helpers import fetch_content
 
 with open("settings.toml", "rb") as f:
     settings = tomllib.load(f)
