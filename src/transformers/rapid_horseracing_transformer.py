@@ -73,7 +73,7 @@ def transform_horse(
                 "trainer": lambda x: standardise_name(x),
             }
         )
-        .addfield("country", lambda rec: Horse(rec["horse"]).country or "GB")
+        .addfield("country", lambda rec: Horse(rec["horse"]).country.name or "GB")
         .addfield("name", lambda rec: Horse(rec["horse"]).name)  #
         .addfield(
             "year",
