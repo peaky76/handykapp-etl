@@ -6,23 +6,14 @@ from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients.mongo_client import get_horse, mongo_client
-from helpers.helpers import get_operations, make_operations_update
-from models import MongoHorse, PreMongoRunner, PyObjectId
+from models import PreMongoRunner, PyObjectId
+from processors.horse_processor import (
+    make_horse_insert_dictionary,
+    make_horse_update_dictionary,
+)
 from processors.person_processor import person_processor
 
 db = mongo_client.handykapp
-
-
-def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
-    return compact(
-        {
-            "colour": horse.colour,
-            "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
-            "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
-            "operations": make_operations_update(horse, db_horse),
-            "ratings": horse.ratings,
-        }
-    )
 
 
 def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str], None]:
@@ -49,7 +40,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                 bulk_operations.append(
                     UpdateOne(
                         {"_id": horse_id},
-                        {"$set": make_update_dictionary(horse, db_horse)},
+                        {"$set": make_horse_update_dictionary(horse, db_horse)},
                     )
                 )
                 logger.debug(f"{horse.name} updated")
@@ -57,23 +48,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
             else:
                 try:
                     horse_id = db.horses.insert_one(
-                        compact(
-                            {
-                                "name": horse.name,
-                                "sex": horse.sex,
-                                "year": horse.year,
-                                "country": horse.country,
-                                "colour": horse.colour,
-                                "sire": x["_id"]
-                                if (x := get_horse(horse.sire))
-                                else None,
-                                "dam": x["_id"]
-                                if (x := get_horse(horse.dam))
-                                else None,
-                                "operations": get_operations(horse),
-                                "ratings": horse.ratings,
-                            }
-                        )
+                        make_horse_insert_dictionary(horse)
                     ).inserted_id
                     logger.debug(f"{horse.name} added to db")
                     added_count += 1

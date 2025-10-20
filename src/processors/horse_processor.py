@@ -12,7 +12,19 @@ from models import MongoHorse, PreMongoHorse, PreMongoRunner
 db = mongo_client.handykapp
 
 
-def make_insert_dictionary(horse: PreMongoHorse):
+def make_horse_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
+    return compact(
+        {
+            "colour": horse.colour,
+            "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
+            "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
+            "operations": make_operations_update(horse, db_horse),
+            "ratings": horse.ratings,
+        }
+    )
+
+
+def make_horse_insert_dictionary(horse: PreMongoHorse):
     return compact(
         {
             "name": horse.name,
@@ -23,18 +35,6 @@ def make_insert_dictionary(horse: PreMongoHorse):
             "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
             "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
             "operations": get_operations(horse),
-            "ratings": horse.ratings,
-        }
-    )
-
-
-def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
-    return compact(
-        {
-            "colour": horse.colour,
-            "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
-            "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
-            "operations": make_operations_update(horse, db_horse),
             "ratings": horse.ratings,
         }
     )
@@ -61,14 +61,14 @@ def horse_processor() -> Generator[None, PreMongoHorse, None]:
                 bulk_operations.append(
                     UpdateOne(
                         {"_id": horse_id},
-                        {"$set": make_update_dictionary(horse, db_horse)},
+                        {"$set": make_horse_update_dictionary(horse, db_horse)},
                     )
                 )
                 logger.debug(f"{horse.name} updated")
                 updated_count += 1
             else:
                 try:
-                    db.horses.insert_one(make_insert_dictionary(horse))
+                    db.horses.insert_one(make_horse_insert_dictionary(horse))
                     logger.debug(f"{horse.name} added to db")
                     added_count += 1
                 except DuplicateKeyError:
