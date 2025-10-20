@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import petl  # type: ignore
 from horsetalk import Gender, Horse  # type: ignore
 
+from helpers import horse_name_to_pre_mongo_horse
 from models import BHARatingsRecord, PreMongoHorse
 
 
@@ -37,7 +38,16 @@ def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
             lambda rec: rec["date"] if rec["sex"] == "GELDING" else None,
         )
         .convert(
-            {"sex": lambda x: Gender[x].sex.name[0], "name": lambda x: Horse(x).name}
+            {
+                "sex": lambda x: Gender[x].sex.name[0],
+                "name": lambda x: Horse(x).name,
+                "sire": lambda x: horse_name_to_pre_mongo_horse(
+                    x, sex="M", default_country="GB"
+                ),
+                "dam": lambda x: horse_name_to_pre_mongo_horse(
+                    x, sex="F", default_country="GB"
+                ),
+            }
         )  # type: ignore
         .addfield("ratings", lambda rec: {rtg: rec[rtg] for rtg in rating_types})
         .cutout(*rating_types)

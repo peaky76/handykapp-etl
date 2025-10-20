@@ -4,7 +4,7 @@ import pendulum
 import petl
 import pytest
 
-from models import BHARatingsRecord
+from models import BHARatingsRecord, PreMongoHorse
 from src.loaders.bha_loader import (
     convert_header_to_field_name,
     csv_row_to_dict,
@@ -85,6 +85,8 @@ def test_read_csv(mocker):
 
 def test_transform_ratings_returns_correct_output(mock_data):
     # transform_ratings now takes only the BHARatingsRecord and returns PreMongoHorse
+    sire = PreMongoHorse(name="ADAAY", country="IRE", sex="M")
+    dam = PreMongoHorse(name="TARA TOO", country="IRE", sex="F")
     expected = {
         "name": "A DAY TO DREAM",
         "country": "IRE",
@@ -93,8 +95,8 @@ def test_transform_ratings_returns_correct_output(mock_data):
         "colour": None,
         "owner": None,
         "trainer": "Ollie Pears",
-        "sire": "ADAAY (IRE)",
-        "dam": "TARA TOO (IRE)",
+        "sire": sire.model_dump(),
+        "dam": dam.model_dump(),
         "damsire": None,
         "gelded_from": mock_data.date,
         "ratings": {

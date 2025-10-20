@@ -1,7 +1,7 @@
 import pendulum
 import pytest
 
-from models import PreMongoRace, PreMongoRunner
+from models import PreMongoHorse, PreMongoRace, PreMongoRunner
 from models.theracingapi_racecard import TheRacingApiRacecard
 from models.theracingapi_runner import TheRacingApiRunner
 from transformers.theracingapi_transformer import (
@@ -139,6 +139,9 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
     horse_1_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
+    sire = PreMongoHorse(name="SEPOY", sex="M")
+    damsire = PreMongoHorse(name="DYNAFORMER", sex="M")
+    dam = PreMongoHorse(name="CLOUDS OF MAGELLAN", sex="F", sire=damsire)
     expected = PreMongoRunner(
         name="HORTZADAR",
         sex="M",
@@ -146,9 +149,9 @@ def test_transform_horse_returns_correct_output_when_professional_jockey(
         country="GB",
         year=2015,
         colour="Bay",
-        sire="SEPOY",
-        dam="CLOUDS OF MAGELLAN",
-        damsire="DYNAFORMER",
+        sire=sire,
+        dam=dam,
+        damsire=damsire,
         trainer="David Omeara",
         owner="Akela Thoroughbreds Limited",
         jockey="Mark Winn",
@@ -167,15 +170,18 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
     horse_2_data, mocker
 ):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
+    sire = PreMongoHorse(name="TELESCOPE", sex="M")
+    damsire = PreMongoHorse(name="RED CLUBS", sex="M")
+    dam = PreMongoHorse(name="HARDY BLUE", sex="F", sire=damsire)
     expected = PreMongoRunner(
         name="TELE RED",
         sex="F",
         country="GB",
         year=2017,
         colour="Bay",
-        sire="TELESCOPE",
-        dam="HARDY BLUE",
-        damsire="RED CLUBS",
+        sire=sire,
+        dam=dam,
+        damsire=damsire,
         trainer="K R Burke",
         owner="John Kenny",
         jockey="Brandon Wilkie",
@@ -192,6 +198,9 @@ def test_transform_horse_returns_correct_output_when_apprentice_jockey(
 
 def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker):
     mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
+    sire = PreMongoHorse(name="VADAMOS", sex="M")
+    damsire = PreMongoHorse(name="RED CLUBS", sex="M")
+    dam = PreMongoHorse(name="DAMASK", sex="F", sire=damsire)
     expected = PreMongoRunner(
         name="SPYCATCHER",
         sex="M",
@@ -199,9 +208,9 @@ def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker
         country="IRE",
         year=2018,
         colour="Bay",
-        sire="VADAMOS",
-        dam="DAMASK",
-        damsire="RED CLUBS",
+        sire=sire,
+        dam=dam,
+        damsire=damsire,
         trainer="K R Burke",
         owner="Highclere Tbredracing-Adriana Zaefferer",
         jockey="Pierre-Louis Jamin",

@@ -76,7 +76,7 @@ def transform_horse(
         .addfield(
             "country", lambda rec: (Horse(rec["horse"]).country or Country.GB).name
         )
-        .addfield("name", lambda rec: Horse(rec["horse"]).name)  #
+        .addfield("name", lambda rec: Horse(rec["horse"]).name.upper())
         .addfield(
             "year",
             lambda rec: HorseAge(
