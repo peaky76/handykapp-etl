@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from helpers.helpers import horse_name_to_pre_mongo_horse
+from helpers import horse_name_to_pre_mongo_horse
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -27,7 +27,6 @@ from models import (
     TheRacingApiRunner,
 )
 from transformers.parsers import parse_code, parse_obstacle
-from transformers.validators import ensure_datetime
 
 
 def build_datetime(date_str: str, time_str: str) -> str:
@@ -155,7 +154,7 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
             lambda rec: [
                 transform_horse(
                     TheRacingApiRunner(**h),
-                    ensure_datetime(pendulum.parse(rec["datetime"])),
+                    pendulum.parse(rec["datetime"]),
                 )
                 for h in rec["runners"]
             ],
