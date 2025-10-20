@@ -33,7 +33,10 @@ def apply_newmarket_workaround(date: pendulum.DateTime) -> NewmarketRacecourse:
 
 
 def horse_name_to_pre_mongo_horse(
-    name: str, sex: Literal["M", "F"] | None = None
+    name: str,
+    *,
+    sex: Literal["M", "F"] | None = None,
+    sire: PreMongoHorse | None = None,
 ) -> PreMongoHorse:
     horse = Horse(name)
     params = compact(
@@ -41,6 +44,7 @@ def horse_name_to_pre_mongo_horse(
             "name": horse.name,
             "country": horse.country,
             "sex": sex,
+            "sire": sire,
         }
     )
     return PreMongoHorse(params)

@@ -87,15 +87,21 @@ def transform_horse(
                 "sex": lambda x: Gender[x].sex.name[0],  # type: ignore
                 "age": int,
                 "colour": lambda x: CoatColour[x].name.title(),  # type: ignore
-                "sire": lambda x: horse_name_to_pre_mongo_horse(x, "M"),
-                "dam": lambda x: horse_name_to_pre_mongo_horse(x, "F"),
-                "damsire": lambda x: horse_name_to_pre_mongo_horse(x, "M"),
+                "sire": lambda x: horse_name_to_pre_mongo_horse(x, sex="M"),
+                "damsire": lambda x: horse_name_to_pre_mongo_horse(x, sex="M"),
                 "saddlecloth": int,
                 "draw": int,
                 "lbs_carried": int,
                 "headgear": lambda x: Headgear[x].name.title() if x else None,  # type: ignore
                 "official_rating": int,
                 "jockey": lambda x: x.split("(")[0].strip(),
+            }
+        )
+        .convert(
+            {
+                "dam": lambda x, rec: horse_name_to_pre_mongo_horse(
+                    x, sex="F", sire=rec["sire"]
+                ),
             }
         )
         .cutout("sex_code", "last_run", "form", "age")
