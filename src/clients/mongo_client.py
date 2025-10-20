@@ -29,26 +29,13 @@ def cache_if_found(func):
 
 @cache_if_found
 def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
-    horse = db.horses.find_one(
-        compact(
-            {
-                "name": horse.name,
-                "country": horse.country,
-                "year": horse.year,
-                "sex": horse.sex,
-            }
-        ),
-    )
-    if horse:
-        return horse
-
     return db.horses.find_one(
         compact(
             {
                 "name": horse.name,
                 "country": horse.country,
                 "year": horse.year,
-                "sex": None,
+                "sex": horse.sex,
             }
         ),
     )
