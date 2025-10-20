@@ -14,7 +14,7 @@ from prefect import flow, get_run_logger, task
 from clients import SpacesClient
 from clients import mongo_client as client
 from models.bha_ratings_record import BHARatingsRecord
-from processors import ratings_processor
+from processors.ratings_processor import ratings_processor
 from transformers.bha_transformer import transform_ratings
 
 db = client.handykapp

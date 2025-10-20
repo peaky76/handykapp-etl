@@ -11,7 +11,7 @@ from prefect import flow, get_run_logger
 from clients import SpacesClient
 from clients import mongo_client as client
 from models import RapidRecord
-from processors import record_processor
+from processors.record_processor import record_processor
 from transformers.rapid_horseracing_transformer import (
     transform_results,
     transform_results_as_entries,
