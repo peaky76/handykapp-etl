@@ -40,10 +40,13 @@ def horse_name_to_pre_mongo_horse(
     default_country: str | None = None,
 ) -> PreMongoHorse:
     horse = Horse(name)
+    name = horse.name
+    country = horse.country.name if horse.country else None
+
     params = compact(
         {
-            "name": horse.name,
-            "country": horse.country.name or default_country,
+            "name": name,
+            "country": country or default_country,
             "sex": sex,
             "sire": sire,
         }
