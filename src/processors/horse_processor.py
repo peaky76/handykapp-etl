@@ -54,7 +54,7 @@ def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
         while True:
             horse = yield
 
-            db_horse = get_horse(horse.name, horse.country, horse.year, horse.sex)
+            db_horse = get_horse(horse)
             horse_id = db_horse["_id"] if db_horse else None
 
             if horse_id:

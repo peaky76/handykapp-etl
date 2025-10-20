@@ -3,7 +3,7 @@ from functools import cache, wraps
 from peak_utility.listish import compact
 from pymongo import MongoClient
 
-from models import MongoHorse, PyObjectId
+from models import MongoHorse, PreMongoHorse, PyObjectId
 
 mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
 
@@ -28,15 +28,29 @@ def cache_if_found(func):
 
 
 @cache_if_found
-def get_horse(name: str, country: str, year: int, sex: str) -> MongoHorse | None:
+def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
     horse = db.horses.find_one(
-        compact({"name": name, "country": country, "year": year, "sex": sex}),
+        compact(
+            {
+                "name": horse.name,
+                "country": horse.country,
+                "year": horse.year,
+                "sex": horse.sex,
+            }
+        ),
     )
     if horse:
         return horse
 
     return db.horses.find_one(
-        compact({"name": name, "country": country, "year": year, "sex": None}),
+        compact(
+            {
+                "name": horse.name,
+                "country": horse.country,
+                "year": horse.year,
+                "sex": None,
+            }
+        ),
     )
 
 
