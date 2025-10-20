@@ -5,8 +5,10 @@ from src.helpers.helpers import (
     apply_newmarket_workaround,
     fetch_content,
     get_last_occurrence_of,
+    horse_name_to_pre_mongo_horse,
     log_validation_problem,
 )
+from src.models import PreMongoHorse
 
 PENDULUM_IMPORT = "src.helpers.helpers.pendulum"
 
@@ -66,3 +68,34 @@ def test_apply_newmarket_workaround_for_late_july():
 
 def test_apply_newmarket_workaround_for_late_rowley():
     assert apply_newmarket_workaround(parse("2023-09-01")) == "Newmarket Rowley"
+
+
+def test_horse_name_to_pre_mongo_horse_with_basic_name():
+    result = horse_name_to_pre_mongo_horse("Sea The Stars (IRE)")
+    assert result.name == "SEA THE STARS"
+    assert result.country == "IRE"
+    assert result.sex is None
+    assert result.sire is None
+
+
+def test_horse_name_to_pre_mongo_horse_with_sex():
+    result = horse_name_to_pre_mongo_horse("Frankel (GB)", sex="M")
+    assert result.name == "FRANKEL"
+    assert result.country == "GB"
+    assert result.sex == "M"
+
+
+def test_horse_name_to_pre_mongo_horse_with_sire():
+    sire = PreMongoHorse(name="Galileo", sex="M")
+    result = horse_name_to_pre_mongo_horse("Enable (GB)", sex="F", sire=sire)
+    assert result.name == "ENABLE"
+    assert result.country == "GB"
+    assert result.sex == "F"
+    assert result.sire.name == "Galileo"
+    assert result.sire.sex == "M"
+
+
+def test_horse_name_to_pre_mongo_horse_with_default_country():
+    result = horse_name_to_pre_mongo_horse("Mystery Horse", default_country="FR")
+    assert result.name == "MYSTERY HORSE"
+    assert result.country == "FR"

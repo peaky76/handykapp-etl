@@ -91,11 +91,11 @@ def transform_horse(
             }
         )
         .convert(
-            {
-                "dam": lambda x, rec: horse_name_to_pre_mongo_horse(
-                    x, sex="F", sire=rec["sire"]
-                ),
-            }
+            "dam",
+            lambda x, rec: horse_name_to_pre_mongo_horse(
+                x, sex="F", sire=rec["damsire"]
+            ),
+            pass_row=True,
         )
         .cutout("sex_code", "last_run", "form", "age")
         .dicts()[0]

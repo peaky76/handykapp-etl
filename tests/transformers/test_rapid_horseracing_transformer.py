@@ -1,7 +1,7 @@
 import pendulum
 import pytest
 
-from models import PreMongoEntry, PreMongoRace, PreMongoRunner
+from models import PreMongoHorse, PreMongoRace, PreMongoRunner
 from models.rapid_record import RapidRecord
 from models.rapid_runner import RapidRunner
 from transformers.rapid_horseracing_transformer import (
@@ -59,7 +59,25 @@ def result_data(horse_data):
 
 
 @pytest.fixture
-def expected_runner():
+def expected_sire():
+    return PreMongoHorse(
+        name="THE SIRE",
+        country="GB",
+        sex="M",
+    )
+
+
+@pytest.fixture
+def expected_dam():
+    return PreMongoHorse(
+        name="THE DAM",
+        country="FR",
+        sex="F",
+    )
+
+
+@pytest.fixture
+def expected_runner(expected_sire, expected_dam):
     return PreMongoRunner(
         name="DOBBIN",
         country="IRE",
@@ -73,8 +91,8 @@ def expected_runner():
         official_position="1",
         beaten_distance=1.5,
         owner="A Owner",
-        sire="THE SIRE",
-        dam="THE DAM",
+        sire=expected_sire,
+        dam=expected_dam,
         official_rating=None,
         sp="8",
         time=None,
@@ -82,7 +100,7 @@ def expected_runner():
 
 
 @pytest.fixture
-def expected_entry():
+def expected_entry(expected_sire, expected_dam):
     return PreMongoRunner(
         name="DOBBIN",
         country="IRE",
@@ -93,8 +111,8 @@ def expected_entry():
         lbs_carried=140,
         saddlecloth="1",
         owner="A Owner",
-        sire="THE SIRE",
-        dam="THE DAM",
+        sire=expected_sire,
+        dam=expected_dam,
         official_rating=None,
     )
 

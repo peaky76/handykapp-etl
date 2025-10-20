@@ -45,13 +45,13 @@ def horse_name_to_pre_mongo_horse(
 
     params = compact(
         {
-            "name": name,
+            "name": name.upper(),
             "country": country or default_country,
             "sex": sex,
-            "sire": sire,
+            "sire": sire.model_dump() if sire else None,
         }
     )
-    return PreMongoHorse(params)
+    return PreMongoHorse(**params)
 
 
 def create_gelding_operation(date: pendulum.Date) -> MongoOperation:
