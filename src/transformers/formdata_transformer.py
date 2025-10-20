@@ -506,6 +506,7 @@ def transform_races(record: FormdataRecord) -> list[PreMongoRace]:
             ),
             index=0,
         )
+        .convert("prize", lambda x: str(int(x) * 1000))
         .convert("runners", lambda x: [transform_horse(FormdataRunner(**h)) for h in x])
         .cutout("number_of_runners", "race_type", "division")
         .dicts()
