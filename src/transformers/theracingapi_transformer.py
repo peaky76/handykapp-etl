@@ -8,7 +8,6 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import pendulum
 import petl  # type: ignore
-import tomllib
 from horsetalk import (  # type: ignore
     CoatColour,
     Country,
@@ -29,11 +28,6 @@ from models import (
 )
 from transformers.parsers import parse_code, parse_obstacle
 from transformers.validators import ensure_datetime
-
-with open("settings.toml", "rb") as f:
-    settings = tomllib.load(f)
-
-SOURCE = settings["theracingapi"]["spaces_dir"]
 
 
 def build_datetime(date_str: str, time_str: str) -> str:
