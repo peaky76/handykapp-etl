@@ -37,12 +37,13 @@ def horse_name_to_pre_mongo_horse(
     *,
     sex: Literal["M", "F"] | None = None,
     sire: PreMongoHorse | None = None,
+    default_country: str | None = None,
 ) -> PreMongoHorse:
     horse = Horse(name)
     params = compact(
         {
             "name": horse.name,
-            "country": horse.country,
+            "country": horse.country or default_country,
             "sex": sex,
             "sire": sire,
         }

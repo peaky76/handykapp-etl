@@ -69,8 +69,12 @@ def transform_horse(
                 "non_runner": lambda x: bool(int(x)),
                 "lbs_carried": lambda x: RaceWeight(x).lb,
                 "sp": lambda x: x or None,
-                "sire": lambda x: horse_name_to_pre_mongo_horse(x, sex="M"),
-                "dam": lambda x: horse_name_to_pre_mongo_horse(x, sex="F"),
+                "sire": lambda x: horse_name_to_pre_mongo_horse(
+                    x, sex="M", default_country="GB"
+                ),
+                "dam": lambda x: horse_name_to_pre_mongo_horse(
+                    x, sex="F", default_country="GB"
+                ),
                 "beaten_distance": lambda x: float(Horselength(x)) if x else None,
                 "jockey": lambda x: standardise_name(x),
                 "trainer": lambda x: standardise_name(x),
