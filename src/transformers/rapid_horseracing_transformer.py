@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 from helpers.helpers import horse_name_to_pre_mongo_horse
-from transformers.validators import ensure_datetime
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -144,7 +143,7 @@ def transform_results(record: RapidRecord) -> list[PreMongoRace]:
             lambda rec: [
                 transform_horse(
                     RapidRunner(**h),
-                    race_date=ensure_datetime(pendulum.parse(rec["datetime"])),
+                    pendulum.parse(rec["datetime"]),
                     finishing_time=rec["finish_time"],
                 )
                 for h in rec["horses"]
