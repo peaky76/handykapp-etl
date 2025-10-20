@@ -3,8 +3,8 @@ from collections.abc import Generator
 from prefect import get_run_logger
 from pymongo import UpdateOne
 
-from clients import get_horse
 from clients import mongo_client as client
+from clients.mongo_client import get_horse
 from models import PreMongoHorse
 
 db = client.handykapp
