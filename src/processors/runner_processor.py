@@ -42,7 +42,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
         while True:
             horse, race_id, source = yield
 
-            db_horse = get_horse(horse.name, horse.country, horse.year, horse.sex)
+            db_horse = get_horse(horse)
             horse_id = db_horse["_id"] if db_horse else None
 
             if horse_id:

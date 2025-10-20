@@ -24,7 +24,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
             horse = yield
 
             try:
-                horse_doc = get_horse(horse.name, horse.country, horse.year, horse.sex)
+                horse_doc = get_horse(horse)
 
                 if not horse_doc:
                     skipped_count += 1
