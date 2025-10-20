@@ -74,8 +74,7 @@ def transform_horse(
             }
         )
         .addfield(
-            "country",
-            lambda rec: x.name if (x := Horse(rec["horse"]).country) else "GB",
+            "country", lambda rec: (Horse(rec["horse"]).country or Country.GB).name
         )
         .addfield("name", lambda rec: Horse(rec["horse"]).name)  #
         .addfield(
