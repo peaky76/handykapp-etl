@@ -40,7 +40,7 @@ def make_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
     )
 
 
-def horse_processor() -> Generator[None, tuple[PreMongoHorse, str], None]:
+def horse_processor() -> Generator[None, PreMongoHorse, None]:
     logger = get_run_logger()
     logger.info("Starting runner processor")
     added_count = 0
