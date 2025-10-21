@@ -3,15 +3,16 @@ import json
 from typing import Any
 
 import boto3  # type: ignore
+from botocore.client import BaseClient
 from prefect.blocks.system import Secret
 
 
 class SpacesClient:
-    _client: boto3.client | None = None
+    _client: BaseClient | None = None
     BUCKET_NAME = "peaky76"
 
     @classmethod
-    def _create(cls) -> boto3.client:
+    def _create(cls) -> BaseClient:
         session = boto3.session.Session()
         spaces_key: Any = Secret.load("spaces-key")
         spaces_secret: Any = Secret.load("spaces-secret")
@@ -24,7 +25,7 @@ class SpacesClient:
         )
 
     @classmethod
-    def get(cls) -> boto3.client:
+    def get(cls) -> BaseClient:
         if cls._client is None:
             cls._client = cls._create()
         return cls._client
