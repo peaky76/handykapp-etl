@@ -69,9 +69,11 @@ ignore = [
     "PT011",
     # Temporary overrides
     "FBT003",
-    "C901",
     "PTH123",
     "PYI024",
     "F841",
     "FURB118"
 ]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
