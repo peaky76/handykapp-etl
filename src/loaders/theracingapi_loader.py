@@ -15,7 +15,7 @@ from models import TheRacingApiRacecard
 from processors.record_processor import record_processor
 from transformers.theracingapi_transformer import transform_races
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["theracingapi"]["spaces_dir"]

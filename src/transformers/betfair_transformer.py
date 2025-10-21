@@ -1,3 +1,4 @@
+import pathlib
 import re
 
 import pendulum
@@ -11,7 +12,7 @@ from helpers import log_validation_problem
 from models.mongo_betfair_horserace_bet_history import MongoBetfairHorseraceBetHistory
 from models.mongo_betfair_horserace_pnl import MongoBetfairHorseracePnl
 
-with open("settings.toml", "rb") as f:
+with pathlib.Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["betfair"]["spaces_dir"]

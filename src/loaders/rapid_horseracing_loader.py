@@ -17,7 +17,7 @@ from transformers.rapid_horseracing_transformer import (
     transform_results_as_entries,
 )
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["rapid_horseracing"]["spaces_dir"]
