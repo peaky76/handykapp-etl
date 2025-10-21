@@ -4,6 +4,7 @@ from prefect import get_run_logger
 
 # from pymongo import InsertOne, UpdateOne
 from clients import mongo_client as client
+from models import MongoHorse
 
 # from models.formdata_horse import FormdataHorse
 from .result_line_processor import result_line_processor
@@ -12,16 +13,15 @@ db = client.handykapp
 
 
 @cache
-def find_horse(name: str, country: str, year: int):
+def find_horse(name: str, country: str, year: int) -> MongoHorse | None:
     """Find horse by name, handling punctuation differences."""
     # First try exact match
     result = db.horses.find_one(
         {"name": name, "country": country, "year": year},
-        {"_id": 1},
     )
 
     if result:
-        return result
+        return MongoHorse.model_validate(result)
 
     # If no exact match, try regex that allows apostrophes in db names
     # Convert "JOHNS BOY" to pattern that matches "JOHN'S BOY"
@@ -33,14 +33,15 @@ def find_horse(name: str, country: str, year: int):
         else:
             pattern += char
 
-    return db.horses.find_one(
+    result = db.horses.find_one(
         {
             "name": {"$regex": f"^{pattern}$", "$options": "i"},
             "country": country,
             "year": year,
         },
-        {"_id": 1},
     )
+
+    return MongoHorse.model_validate(result) if result else None
 
 
 def entry_processor():
