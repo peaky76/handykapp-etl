@@ -84,7 +84,7 @@ def transform_horse(
             lambda rec: HorseAge(
                 rec["age"],
                 context_date=race_date,
-                hemisphere=Country[rec["country"]].hemisphere,
+                hemisphere=Country[rec["country"]].hemisphere,  # type: ignore[attr-defined]
             )._official_dob.year,
         )
         .addfield(
