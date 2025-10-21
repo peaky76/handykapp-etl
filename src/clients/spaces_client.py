@@ -1,13 +1,13 @@
 import csv
 import json
-from typing import Any, Optional
+from typing import Any
 
 import boto3  # type: ignore
 from prefect.blocks.system import Secret
 
 
 class SpacesClient:
-    _client: Optional[boto3.client] = None
+    _client: boto3.client | None = None
     BUCKET_NAME = "peaky76"
 
     @classmethod

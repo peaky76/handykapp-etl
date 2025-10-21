@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -8,18 +7,18 @@ from .py_object_id import PyObjectId
 
 
 class MongoRace(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    rapid_id: Optional[str] = None
+    id: PyObjectId | None = Field(alias="_id", default=None)
+    rapid_id: str | None = None
     racecourse: PyObjectId
     datetime: datetime
     title: str
-    is_handicap: Optional[bool] = None
-    obstacle: Optional[str] = None
+    is_handicap: bool | None = None
+    obstacle: str | None = None
     distance_description: str
-    race_grade: Optional[str] = None
-    race_class: Optional[int] = None
-    age_restriction: Optional[str] = None
-    rating_restriction: Optional[str] = None
-    prize: Optional[str] = None
-    going_description: Optional[str] = None
+    race_grade: str | None = None
+    race_class: int | None = None
+    age_restriction: str | None = None
+    rating_restriction: str | None = None
+    prize: str | None = None
+    going_description: str | None = None
     runners: list[MongoRunner] = []

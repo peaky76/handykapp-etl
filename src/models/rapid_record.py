@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 from .rapid_runner import RapidRunner
@@ -15,9 +13,7 @@ class RapidRecord(BaseModel):
     going: str = Field(..., description="Going description for the race")
     finished: bool = Field(..., description="Indicates if the race is finished")
     canceled: bool = Field(..., description="Indicates if the race is canceled")
-    finish_time: Optional[str] = Field(None, description="Finish time of the race")
-    prize: Optional[str] = Field(None, description="Prize money for the race")
-    race_class: Optional[str] = Field(
-        None, alias="class", description="Class of the race"
-    )
+    finish_time: str | None = Field(None, description="Finish time of the race")
+    prize: str | None = Field(None, description="Prize money for the race")
+    race_class: str | None = Field(None, alias="class", description="Class of the race")
     horses: list[RapidRunner] = Field(..., description="List of runners in the race")
