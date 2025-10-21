@@ -32,8 +32,8 @@ def make_horse_insert_dictionary(horse: PreMongoHorse):
             "year": horse.year,
             "country": horse.country,
             "colour": horse.colour,
-            "sire": x["_id"] if (x := get_horse(horse.sire)) else None,
-            "dam": x["_id"] if (x := get_horse(horse.dam)) else None,
+            "sire": x["_id"] if horse.sire and (x := get_horse(horse.sire)) else None,
+            "dam": x["_id"] if horse.dam and (x := get_horse(horse.dam)) else None,
             "operations": get_operations(horse),
             "ratings": horse.ratings,
         }
