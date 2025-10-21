@@ -66,7 +66,7 @@ def create_gelding_operation(date: Date) -> MongoOperation:
     return MongoOperation(operation_type="gelding", date=date)
 
 
-def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
+def get_operations(horse: PreMongoHorse) -> list[MongoOperation] | None:
     if not horse.gelded_from:
         return None
 
@@ -74,7 +74,7 @@ def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
 
 
 def make_operations_update(
-    horse: PreMongoRunner, db_horse: MongoHorse
+    horse: PreMongoHorse, db_horse: MongoHorse
 ) -> list[MongoOperation] | None:
     if not hasattr(horse, "gelded_from") or not horse.gelded_from:
         return None

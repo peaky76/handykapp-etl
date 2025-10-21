@@ -7,12 +7,12 @@ from pymongo.errors import DuplicateKeyError
 
 from clients.mongo_client import get_horse, mongo_client
 from helpers import get_operations, make_operations_update
-from models import MongoHorse, PreMongoHorse, PreMongoRunner
+from models import MongoHorse, PreMongoHorse
 
 db = mongo_client.handykapp
 
 
-def make_horse_update_dictionary(horse: PreMongoRunner, db_horse: MongoHorse):
+def make_horse_update_dictionary(horse: PreMongoHorse, db_horse: MongoHorse):
     return compact(
         {
             "colour": horse.colour,
