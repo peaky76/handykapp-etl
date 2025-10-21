@@ -7,7 +7,7 @@ from prefect import get_run_logger
 from pydantic_extra_types.pendulum_dt import Date
 from requests import get
 
-from models import MongoHorse, MongoOperation, PreMongoHorse, PreMongoRunner
+from models import MongoHorse, MongoOperation, PreMongoHorse
 
 
 def fetch_content(url, params=None, headers=None):
