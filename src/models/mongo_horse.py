@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -8,26 +8,26 @@ from .py_object_id import PyObjectId
 
 class MongoOperation(BaseModel):
     operation_type: str
-    date: Optional[datetime.date] = None
+    date: datetime.date | None = None
 
 
 class MongoOfficialRatings(BaseModel):
-    flat: Optional[int] = None
-    aw: Optional[int] = None
-    chase: Optional[int] = None
-    hurdle: Optional[int] = None
+    flat: int | None = None
+    aw: int | None = None
+    chase: int | None = None
+    hurdle: int | None = None
 
 
 class MongoHorse(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    id: PyObjectId | None = Field(alias="_id", default=None)
     name: str = Field(..., min_length=2, max_length=21)
     country: str = Field(..., min_length=2, max_length=3)
     year: int
-    sex: Optional[Literal["M", "F"]] = None
-    breed: Optional[str] = None
-    colour: Optional[str] = None
-    sire: Optional[PyObjectId] = None
-    dam: Optional[PyObjectId] = None
-    trainer: Optional[PyObjectId] = None
-    operations: Optional[list[MongoOperation]] = None
-    ratings: Optional[MongoOfficialRatings] = None
+    sex: Literal["M", "F"] | None = None
+    breed: str | None = None
+    colour: str | None = None
+    sire: PyObjectId | None = None
+    dam: PyObjectId | None = None
+    trainer: PyObjectId | None = None
+    operations: list[MongoOperation] | None = None
+    ratings: MongoOfficialRatings | None = None

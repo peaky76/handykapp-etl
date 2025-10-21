@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -7,10 +6,9 @@ from .py_object_id import PyObjectId
 
 
 class MongoBetfairHorseracePnl(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    id: PyObjectId | None = Field(alias="_id", default=None)
     racecourse: str
     race_datetime: datetime
-    race_description: Optional[str] = None
+    race_description: str | None = None
     profit_loss: float
-    places: Optional[int] = None
-    
+    places: int | None = None

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -15,14 +15,14 @@ ContourType = Literal["Flat", "Undulating", "Uphill"]
 
 
 class MongoRacecourse(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    id: PyObjectId | None = Field(alias="_id", default=None)
     name: str
-    formal_name: Optional[str] = None
-    code: Optional[CodeType] = None
-    surface: Optional[SurfaceType] = None
+    formal_name: str | None = None
+    code: CodeType | None = None
+    surface: SurfaceType | None = None
     obstacle: ObstacleType | None
-    shape: Optional[ShapeType] = None
-    handedness: Optional[Handedness] = None
-    style: Optional[StyleType] = None
-    contour: Optional[ContourType] = None
-    references: Optional[MongoReferences] = None
+    shape: ShapeType | None = None
+    handedness: Handedness | None = None
+    style: StyleType | None = None
+    contour: ContourType | None = None
+    references: MongoReferences | None = None

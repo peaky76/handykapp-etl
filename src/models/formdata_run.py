@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 from .formdata_position import FormdataPosition
@@ -12,12 +10,12 @@ class FormdataRun(BaseModel):
     course: str = Field(..., min_length=3, max_length=3)
     number_of_runners: int
     weight: str = Field(..., pattern=r"^\d{1,2}-\d{1,2}$")
-    headgear: Optional[str] = None
-    allowance: Optional[int] = None
+    headgear: str | None = None
+    allowance: int | None = None
     jockey: str
     position: FormdataPosition
-    beaten_distance: Optional[float] = None
-    time_rating: Optional[int] = None
+    beaten_distance: float | None = None
+    time_rating: int | None = None
     distance: float
     going: str
-    form_rating: Optional[int] = None
+    form_rating: int | None = None

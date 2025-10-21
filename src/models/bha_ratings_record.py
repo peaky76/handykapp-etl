@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, BeforeValidator, Field
 
@@ -27,7 +27,7 @@ def empty_string_to_none(v):
     return v
 
 
-def validate_rating(v: Optional[int]) -> Optional[int]:
+def validate_rating(v: int | None) -> int | None:
     if v is None:
         return v
     if not (0 <= v <= 240):
@@ -38,7 +38,7 @@ def validate_rating(v: Optional[int]) -> Optional[int]:
 HorseName = Annotated[str, AfterValidator(validate_horse)]
 BirthYear = Annotated[int, AfterValidator(validate_year)]
 Rating = Annotated[
-    Optional[int],
+    int | None,
     BeforeValidator(empty_string_to_none),
     AfterValidator(validate_rating),
 ]
@@ -55,14 +55,14 @@ class BHARatingsRecord(BaseModel):
     dam: HorseName = Field(..., description="Name of the dam")
     trainer: str = Field(..., description="Name of the trainer")
     flat_rating: Rating = Field(None, description="Flat rating")
-    diff_flat: Optional[str] = Field(None, description="Difference in flat rating")
-    flat_clltrl: Optional[str] = Field(None, description="Flat collateral info")
+    diff_flat: str | None = Field(None, description="Difference in flat rating")
+    flat_clltrl: str | None = Field(None, description="Flat collateral info")
     awt_rating: Rating = Field(None, description="All-weather track rating")
-    diff_awt: Optional[str] = Field(None, description="Difference in AWT rating")
-    awt_clltrl: Optional[str] = Field(None, description="AWT collateral info")
+    diff_awt: str | None = Field(None, description="Difference in AWT rating")
+    awt_clltrl: str | None = Field(None, description="AWT collateral info")
     chase_rating: Rating = Field(None, description="Chase rating")
-    diff_chase: Optional[str] = Field(None, description="Difference in chase rating")
-    chase_clltrl: Optional[str] = Field(None, description="Chase collateral info")
+    diff_chase: str | None = Field(None, description="Difference in chase rating")
+    chase_clltrl: str | None = Field(None, description="Chase collateral info")
     hurdle_rating: Rating = Field(None, description="Hurdle rating")
-    diff_hurdle: Optional[str] = Field(None, description="Difference in hurdle rating")
-    hurdle_clltrl: Optional[str] = Field(None, description="Hurdle collateral info")
+    diff_hurdle: str | None = Field(None, description="Difference in hurdle rating")
+    hurdle_clltrl: str | None = Field(None, description="Hurdle collateral info")

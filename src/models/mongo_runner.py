@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_extra_types.pendulum_dt import Duration
@@ -9,23 +9,23 @@ from .py_object_id import PyObjectId
 
 class MongoRunner(BaseModel):
     horse: PyObjectId
-    sex: Optional[Literal["M", "F"]] = None
-    gelded_from: Optional[datetime.date] = None
-    colour: Optional[str] = None
-    owner: Optional[str] = None
-    lbs_carried: Optional[int] = None
-    allowance: Optional[int] = None
-    saddlecloth: Optional[int] = None
-    draw: Optional[int] = None
-    headgear: Optional[str] = None
-    official_rating: Optional[int] = None
-    trainer: Optional[PyObjectId] = None
-    jockey: Optional[PyObjectId] = None
-    sire: Optional[PyObjectId] = None
-    dam: Optional[PyObjectId] = None
-    damsire: Optional[PyObjectId] = None
-    finishing_position: Optional[str] = None
-    official_position: Optional[str] = None
-    beaten_distance: Optional[float] = None
-    time: Optional[Duration] = None
-    sp: Optional[str] = None
+    sex: Literal["M", "F"] | None = None
+    gelded_from: datetime.date | None = None
+    colour: str | None = None
+    owner: str | None = None
+    lbs_carried: int | None = None
+    allowance: int | None = None
+    saddlecloth: int | None = None
+    draw: int | None = None
+    headgear: str | None = None
+    official_rating: int | None = None
+    trainer: PyObjectId | None = None
+    jockey: PyObjectId | None = None
+    sire: PyObjectId | None = None
+    dam: PyObjectId | None = None
+    damsire: PyObjectId | None = None
+    finishing_position: str | None = None
+    official_position: str | None = None
+    beaten_distance: float | None = None
+    time: Duration | None = None
+    sp: str | None = None
