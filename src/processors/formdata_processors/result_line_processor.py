@@ -4,13 +4,13 @@ from horsetalk import Going
 from prefect import get_run_logger
 
 from clients import mongo_client as client
-from models import FormdataHorse, FormdataRun
+from models import FormdataRun, MongoHorse
 from processors.race_processor import rr_code_to_course_dict
 
 db = client.handykapp
 
 
-def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun], None]:
+def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], None]:
     logger = get_run_logger()
     logger.info("Starting result line processor")
 
@@ -37,14 +37,14 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                             run.date,
                         ]
                     },
-                    "runners.horse": horse["_id"],
+                    "runners.horse": horse.id,
                 }
             )
 
             if found_race:
                 race_id = found_race["_id"]
                 db.races.update_one(
-                    {"_id": race_id, "runners.horse": horse["_id"]},
+                    {"_id": race_id, "runners.horse": horse.id},
                     {
                         "$set": {
                             "going_assessment": str(Going(run.going)),
@@ -56,11 +56,11 @@ def result_line_processor() -> Generator[None, tuple[FormdataHorse, FormdataRun]
                     },
                 )
                 logger.debug(
-                    f"Added result for {horse['_id']} in race at {run.course} on {run.date}"
+                    f"Added result for {horse.id} in race at {run.course} on {run.date}"
                 )
             else:
                 logger.warning(
-                    f"No race found for {horse['_id']} at {run.course} on {run.date}"
+                    f"No race found for {horse.id} at {run.course} on {run.date}"
                 )
     except GeneratorExit:
         logger.info("Finished processing results.")
