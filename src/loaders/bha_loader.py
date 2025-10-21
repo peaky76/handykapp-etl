@@ -19,7 +19,7 @@ from transformers.bha_transformer import transform_ratings
 
 db = client.handykapp
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 SOURCE = settings["bha"]["spaces_dir"]  # Directory where BHA CSV files are stored
 

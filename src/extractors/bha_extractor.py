@@ -11,7 +11,7 @@ from prefect import flow, task
 from clients import SpacesClient
 from helpers import fetch_content, get_last_occurrence_of
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["bha"]["source_dir"]

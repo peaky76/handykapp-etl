@@ -38,7 +38,7 @@ from models import (
     PreMongoRunner,
 )
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["formdata"]["spaces_dir"]

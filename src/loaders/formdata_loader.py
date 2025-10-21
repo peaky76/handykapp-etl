@@ -14,7 +14,7 @@ from clients import mongo_client as client
 from processors.formdata_processors import file_processor
 from transformers.formdata_transformer import get_formdatas
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["formdata"]["spaces_dir"]

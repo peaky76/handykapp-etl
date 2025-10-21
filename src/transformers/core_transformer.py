@@ -24,7 +24,7 @@ from clients import SpacesClient
 from helpers import log_validation_problem
 from transformers.validators import validate_in_enum
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["core"]["spaces_dir"]

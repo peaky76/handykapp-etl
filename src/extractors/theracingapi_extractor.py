@@ -13,7 +13,7 @@ from prefect.blocks.system import Secret
 from clients import SpacesClient
 from helpers import fetch_content
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["theracingapi"]["source_dir"]

@@ -11,7 +11,7 @@ from nameparser import HumanName  # type: ignore
 
 from clients import SpacesClient
 
-with open("settings.toml", "rb") as f:
+with Path("settings.toml").open("rb") as f:
     settings = tomllib.load(f)
 
 SOURCE = settings["core"]["spaces_dir"]
