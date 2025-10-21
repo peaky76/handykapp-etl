@@ -501,7 +501,7 @@ def transform_races(record: FormdataRecord) -> list[PreMongoRace]:
                 f"£{int(rec['prize']) * 1000} "
                 f"{rec['distance_description']} "
                 f"{'Handicap ' if rec['is_handicap'] else ''}"
-                f"{rec['obstacle'] if rec['obstacle'] else ''}"
+                f"{rec['obstacle'] or ''}"
                 f"{f' (Div {"A" if rec["division"] == 0 else "B"})' if rec['division'] else ''}"
             ),
             index=0,
