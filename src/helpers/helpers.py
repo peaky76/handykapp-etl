@@ -62,10 +62,7 @@ def horse_name_to_pre_mongo_horse(
 
 
 def create_gelding_operation(date: pendulum.Date) -> MongoOperation:
-    return {
-        "operation_type": "gelding",
-        "date": date,
-    }
+    return MongoOperation(operation_type="gelding", date=date)
 
 
 def get_operations(horse: PreMongoRunner) -> list[MongoOperation] | None:
@@ -81,20 +78,20 @@ def make_operations_update(
     if not hasattr(horse, "gelded_from") or not horse.gelded_from:
         return None
 
-    operations = db_horse.get("operations")
+    operations = db_horse.operations
 
     if not operations:
         return get_operations(horse)
 
-    gelding_op = next(op for op in operations if op.get("operation_type") == "gelding")
-    non_gelding_ops = [op for op in operations if op.get("operation_type") != "gelding"]
+    gelding_op = next((op for op in operations if op.operation_type == "gelding"), None)
+    non_gelding_ops = [op for op in operations if op.operation_type != "gelding"]
 
     if not gelding_op:
         return [*operations, create_gelding_operation(horse.gelded_from)]
 
-    current_date = gelding_op.get("date")
+    current_date = gelding_op.date
 
     if current_date is None or horse.gelded_from < current_date:
         return [*non_gelding_ops, create_gelding_operation(horse.gelded_from)]
 
-    return [operations]
+    return operations
