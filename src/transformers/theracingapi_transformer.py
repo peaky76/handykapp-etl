@@ -154,7 +154,7 @@ def transform_races(record: TheRacingApiRacecard) -> list[PreMongoRace]:
             lambda rec: [
                 transform_horse(
                     TheRacingApiRunner(**h),
-                    pendulum.parse(rec["datetime"]),
+                    pendulum.parse(rec["datetime"]),  # type: ignore[arg-type]
                 )
                 for h in rec["runners"]
             ],

@@ -47,7 +47,7 @@ def load_theracingapi_data(*, from_date: Date | None = None):
     next(r)
     for file in SpacesClient.get_files(f"{SOURCE}racecards"):
         if from_date:
-            file_date = pendulum.parse(file.split(".")[0][-8:]).date()
+            file_date = pendulum.parse(file.split(".")[0][-8:]).date()  # type: ignore[union-attr]
             if file_date < from_date:
                 continue
 
