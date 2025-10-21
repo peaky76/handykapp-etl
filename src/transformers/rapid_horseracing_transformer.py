@@ -6,6 +6,8 @@ from helpers import horse_name_to_pre_mongo_horse
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import operator
+
 import pendulum
 import petl  # type: ignore
 from horsetalk import (
@@ -89,7 +91,7 @@ def transform_horse(
             "finishing_time",
             lambda rec: finishing_time if rec["finishing_position"] == 1 else None,
         )
-        .addfield("official_position", lambda rec: rec["finishing_position"])
+        .addfield("official_position", operator.itemgetter("finishing_position"))
         .cutout("horse", "age")
         .dicts()[0]
     )

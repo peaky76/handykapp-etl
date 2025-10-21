@@ -48,7 +48,7 @@ def entry_processor():
     logger.info("Starting entry processor")
 
     bulk_operations = []
-    bulk_threshold = 50
+    # bulk_threshold = 50
     updated_count = 0
     skipped_count = 0
     processed_count = 0
