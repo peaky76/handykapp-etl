@@ -33,7 +33,9 @@ def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
         .rename({x: x.replace("_rating", "").lower() for x in used_fields})
         .rename({"awt": "aw"})
         .convert({"year": int, "flat": int, "aw": int, "chase": int, "hurdle": int})
-        .addfield("country", lambda rec: Horse(rec["name"]).country.name)
+        .addfield(
+            "country", lambda rec: x.name if (x := Horse(rec["name"]).country) else None
+        )
         .addfield(
             "gelded_from",
             lambda rec: pendulum.instance(rec["date"])
