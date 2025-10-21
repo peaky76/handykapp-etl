@@ -71,7 +71,7 @@ def transform_horse(
         .addfield(
             "gelded_from",
             lambda rec: (race_date - pendulum.duration(days=1)).date
-            if (x := Gender[rec["sex"]]) == Sex.MALE and x.has_testes
+            if (x := Gender[rec["sex"]]) == Sex.MALE and x.has_testes  # type: ignore[misc]
             else None,
         )
         .convert(

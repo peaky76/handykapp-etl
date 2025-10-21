@@ -42,7 +42,7 @@ def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
         )
         .convert(
             {
-                "sex": lambda x: Gender[x].sex.name[0],
+                "sex": lambda x: Gender[x].sex.name[0],  # type: ignore[misc]
                 "name": lambda x: Horse(x).name,
                 "sire": lambda x: horse_name_to_pre_mongo_horse(
                     x, sex="M", default_country="GB"
