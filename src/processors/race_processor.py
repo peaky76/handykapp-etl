@@ -166,7 +166,10 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
                         if race_id:
                             r.send((horse, race_id, source))
                 except Exception as e:
-                    logger.error(f"Error processing {log_description}: {e}")
+                    logger.error(
+                        f"Error processing {log_description}: {type(e).__name__}: {e}",
+                        exc_info=True,
+                    )
             else:
                 logger.error(
                     f"Unable to add {log_description}: No matching racecourse found"
