@@ -58,7 +58,7 @@ def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
     course_name = race.course.lower().replace("(", "").replace(")", "").strip()
     if course_name == "newmarket":
         course_name = apply_newmarket_workaround(
-            pendulum.parse(str(race.datetime))
+            pendulum.parse(str(race.datetime))  # type: ignore[arg-type]
         ).lower()
 
     for racecourse in racecourses:
@@ -115,7 +115,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
         while True:
             race, source = yield
 
-            datetime_str = pendulum.parse(str(race.datetime)).format(
+            datetime_str = pendulum.parse(str(race.datetime)).format(  # type: ignore[union-attr]
                 "Do MMM YYYY HH:mm"
             )
             log_description = f"{datetime_str} {race.title} at {race.course} ({race.surface}) from {source}"

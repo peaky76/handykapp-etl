@@ -44,7 +44,7 @@ def load_rapid_horseracing_entries(
             data = SpacesClient.read_file(file)
             try:
                 record = RapidRecord(**data)
-                if pendulum.parse(record.date).date() >= until_date:
+                if pendulum.parse(record.date).date() >= until_date:  # type: ignore[union-attr]
                     continue
                 r.send((record, transform_results_as_entries, file, "rapid"))
             except Exception:
