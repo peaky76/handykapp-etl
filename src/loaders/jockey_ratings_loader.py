@@ -6,6 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, get_run_logger
 
+from models import PreMongoPerson
 from processors.person_processor import person_processor
 from transformers.jockey_ratings_transformer import transform_jockey_ratings
 
@@ -20,7 +21,7 @@ def load_jockey_ratings():
 
     for jockey, rating in transform_jockey_ratings().items():
         ratings = {k: v for k, v in rating.items() if v}
-        p.send(({"name": jockey, "role": "jockey", "ratings": ratings}, "rr"))
+        p.send((PreMongoPerson(name=jockey, role="jockey", ratings=ratings), "rr"))
 
     p.close()
 

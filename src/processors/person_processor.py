@@ -38,11 +38,11 @@ def person_processor() -> Generator[None, tuple[PreMongoPerson, str], None]:
     try:
         while True:
             person, source = yield
-            name = person["name"]
-            race_id = person.get("race_id")
-            runner_id = person.get("runner_id")
-            role = person.get("role")
-            ratings = person.get("ratings")
+            name = person.name
+            race_id = person.race_id
+            runner_id = person.runner_id
+            role = person.role
+            ratings = person.ratings if person.ratings else None
 
             # Add to pending batch
             pending_people.add(name)
