@@ -42,7 +42,7 @@ def person_processor() -> Generator[None, tuple[PreMongoPerson, str], None]:
             race_id = person.race_id
             runner_id = person.runner_id
             role = person.role
-            ratings = person.ratings if person.ratings else None
+            ratings = person.ratings or None
 
             # Add to pending batch
             pending_people.add(name)
