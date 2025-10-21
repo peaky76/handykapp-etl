@@ -3,6 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+import pendulum
 import petl  # type: ignore
 from horsetalk import Gender, Horse  # type: ignore
 
@@ -35,7 +36,9 @@ def transform_ratings(record: BHARatingsRecord) -> PreMongoHorse:
         .addfield("country", lambda rec: Horse(rec["name"]).country.name)
         .addfield(
             "gelded_from",
-            lambda rec: rec["date"] if rec["sex"] == "GELDING" else None,
+            lambda rec: pendulum.instance(rec["date"])
+            if rec["sex"] == "GELDING"
+            else None,
         )
         .convert(
             {
