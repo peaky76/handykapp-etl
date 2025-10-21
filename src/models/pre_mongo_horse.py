@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Literal
 
-import pendulum
 from pydantic import BaseModel, Field
+from pydantic_extra_types.pendulum_dt import Date
 
 from models.mongo_horse import MongoOfficialRatings
 
@@ -13,7 +13,7 @@ class PreMongoHorse(BaseModel):
     country: str | None = Field(default=None, min_length=2, max_length=3)
     year: int | None = None
     sex: Literal["M", "F"] | None = None
-    gelded_from: pendulum.Date | None = None
+    gelded_from: Date | None = None
     colour: str | None = None
     owner: str | None = None
     trainer: str | None = None

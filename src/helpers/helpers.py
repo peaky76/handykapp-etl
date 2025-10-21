@@ -4,6 +4,7 @@ import pendulum
 from horsetalk import Horse
 from peak_utility.listish import compact
 from prefect import get_run_logger
+from pydantic_extra_types.pendulum_dt import Date
 from requests import get
 
 from models import MongoHorse, MongoOperation, PreMongoHorse, PreMongoRunner
@@ -61,7 +62,7 @@ def horse_name_to_pre_mongo_horse(
     return PreMongoHorse(**params)
 
 
-def create_gelding_operation(date: pendulum.Date) -> MongoOperation:
+def create_gelding_operation(date: Date) -> MongoOperation:
     return MongoOperation(operation_type="gelding", date=date)
 
 

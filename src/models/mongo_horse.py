@@ -1,14 +1,14 @@
-import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
+from pydantic_extra_types.pendulum_dt import Date
 
 from .py_object_id import PyObjectId
 
 
 class MongoOperation(BaseModel):
     operation_type: str
-    date: datetime.date | None = None
+    date: Date | None = None
 
 
 class MongoOfficialRatings(BaseModel):

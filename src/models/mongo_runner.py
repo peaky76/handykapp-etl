@@ -1,8 +1,7 @@
 from typing import Literal
 
-import pendulum
 from pydantic import BaseModel
-from pydantic_extra_types.pendulum_dt import Duration
+from pydantic_extra_types.pendulum_dt import Date, Duration
 
 from .py_object_id import PyObjectId
 
@@ -10,7 +9,7 @@ from .py_object_id import PyObjectId
 class MongoRunner(BaseModel):
     horse: PyObjectId
     sex: Literal["M", "F"] | None = None
-    gelded_from: pendulum.Date | None = None
+    gelded_from: Date | None = None
     colour: str | None = None
     owner: str | None = None
     lbs_carried: int | None = None
