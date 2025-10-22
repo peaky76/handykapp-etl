@@ -35,7 +35,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
 
             db_horse = get_horse(horse)
 
-            if db_horse.id:
+            if db_horse:
                 bulk_operations.append(
                     UpdateOne(
                         {"_id": db_horse.id},
