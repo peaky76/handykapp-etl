@@ -1,4 +1,4 @@
-name: ci/cd
+name: CI
 
 on:
   push:
@@ -9,8 +9,11 @@ on:
       - master
 
 jobs:
-  testing:
+  checks:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        check: [types, linting, unit-tests]
     steps:
       - name: Checkout master branch
         uses: actions/checkout@v5
@@ -38,19 +41,22 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ steps.python-version.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
         run: poetry install --no-root
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
       - name: Run static type checking
+        if: matrix.check == 'types'
         run: poetry run mypy src
 
       - name: Run linters
+        if: matrix.check == 'linting'
         run: poetry run ruff check src --preview
 
       - name: Run tests
+        if: matrix.check == 'unit-tests'
         run: poetry run pytest --cov-fail-under=75
 
       # - name: Prefect login
