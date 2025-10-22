@@ -29,7 +29,7 @@ def cache_if_found(func):
 
 @cache_if_found
 def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
-    horse = db.horses.find_one(
+    db_horse = db.horses.find_one(
         compact(
             {
                 "name": horse.name,
@@ -39,6 +39,6 @@ def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
             }
         ),
     )
-    if not horse:
+    if not db_horse:
         return None
     return MongoHorse.model_validate(horse)
