@@ -34,15 +34,15 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
             horse, race_id, source = yield
 
             db_horse = get_horse(horse)
-            horse_id = db_horse["_id"] if db_horse else None
 
-            if horse_id:
+            if db_horse.id:
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": horse_id},
+                        {"_id": db_horse.id},
                         {"$set": make_horse_update_dictionary(horse, db_horse)},
                     )
                 )
+                horse_id = db_horse.id
                 logger.debug(f"{horse.name} updated")
                 updated_count += 1
             else:
