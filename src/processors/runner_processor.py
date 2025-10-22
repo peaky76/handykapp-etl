@@ -57,9 +57,11 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                         f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex}) in race {race_id}"
                     )
                     skipped_count += 1
+                    continue
                 except ValueError as e:
                     logger.warning(e)
                     skipped_count += 1
+                    continue
 
             # Process bulk operations when threshold reached
             if bulk_operations and len(bulk_operations) >= bulk_threshold:
