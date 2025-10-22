@@ -39,4 +39,6 @@ def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
             }
         ),
     )
+    if not horse:
+        return None
     return MongoHorse.model_validate(horse)
