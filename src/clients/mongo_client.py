@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import lru_cache
 
 from peak_utility.listish import compact
 from pymongo import MongoClient
@@ -11,25 +11,9 @@ mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
 db = mongo_client.handykapp
 
 
-def cache_if_found(func):
-    cache = {}
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        key = (args, tuple(sorted(kwargs.items())))
-        if key in cache:
-            return cache[key]
-        result = func(*args, **kwargs)
-        if result is not None:  # Only cache when we find something
-            cache[key] = result
-        return result
-
-    return wrapper
-
-
-@cache_if_found
-def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
-    db_horse = db.horses.find_one(
+@lru_cache(maxsize=15000)
+def _get_horse_dict(horse: PreMongoHorse) -> dict | None:
+    return db.horses.find_one(
         compact(
             {
                 "name": horse.name,
@@ -39,6 +23,10 @@ def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
             }
         ),
     )
+
+
+def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
+    db_horse = _get_horse_dict(horse)
     if not db_horse:
         return None
     return MongoHorse.model_validate(db_horse)
