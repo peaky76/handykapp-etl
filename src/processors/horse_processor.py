@@ -16,8 +16,10 @@ def make_horse_update_dictionary(horse: PreMongoHorse, db_horse: MongoHorse):
     return compact(
         {
             "colour": horse.colour,
-            "sire": get_horse(horse.sire).id if horse.sire else None,
-            "dam": get_horse(horse.dam).id if horse.dam else None,
+            "sire": sire.id
+            if (horse.sire and (sire := get_horse(horse.sire)))
+            else None,
+            "dam": dam.id if (horse.dam and (dam := get_horse(horse.dam))) else None,
             "operations": make_operations_update(horse, db_horse),
             "ratings": horse.ratings,
         }
@@ -32,8 +34,10 @@ def make_horse_insert_dictionary(horse: PreMongoHorse):
             "year": horse.year,
             "country": horse.country,
             "colour": horse.colour,
-            "sire": get_horse(horse.sire).id if horse.sire else None,
-            "dam": get_horse(horse.dam).id if horse.dam else None,
+            "sire": sire.id
+            if (horse.sire and (sire := get_horse(horse.sire)))
+            else None,
+            "dam": dam.id if (horse.dam and (dam := get_horse(horse.dam))) else None,
             "operations": get_operations(horse),
             "ratings": horse.ratings,
         }
