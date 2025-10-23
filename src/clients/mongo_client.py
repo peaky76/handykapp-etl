@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import wraps
 
 from peak_utility.listish import compact
 from pymongo import MongoClient
@@ -11,7 +11,31 @@ mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
 db = mongo_client.handykapp
 
 
-@lru_cache(maxsize=15000)
+def cache_if_found(maxsize=None):
+    def decorator(func):
+        cache = {}
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            key = (args, tuple(sorted(kwargs.items())))
+            if key in cache:
+                return cache[key]
+            result = func(*args, **kwargs)
+            if result is not None:  # Only cache when we find something
+                cache[key] = result
+                # Limit cache size
+                if maxsize and len(cache) > maxsize:
+                    # Remove oldest 1000 entries
+                    for _ in range(1000):
+                        cache.pop(next(iter(cache)))
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+@cache_if_found(maxsize=15000)
 def _get_horse_dict(horse: PreMongoHorse) -> dict | None:
     return db.horses.find_one(
         compact(
