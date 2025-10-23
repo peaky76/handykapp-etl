@@ -49,12 +49,12 @@ def horse_name_to_pre_mongo_horse(
         return None
 
     name = horse.name
-    country = horse.country.name if horse.country else None
+    country = horse.country.name if horse.country else default_country
 
     params = compact(
         {
             "name": name.upper(),
-            "country": country or default_country,
+            "country": country,
             "sex": sex,
             "sire": sire.model_dump() if sire else None,
         }
