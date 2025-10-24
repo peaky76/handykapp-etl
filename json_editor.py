@@ -113,9 +113,9 @@ def edit_json_interactively(file_path):
                 return True
             print("✗ Changes discarded")
             return False
-        else:
-            print("No changes made")
-            return True
+
+        print("No changes made")
+        return True
 
     except Exception as e:
         print(f"✗ Error: {e}")
