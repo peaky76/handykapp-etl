@@ -37,16 +37,10 @@ def cache_if_found(maxsize=None):
 
 @cache_if_found(maxsize=15000)
 def _get_horse_dict(horse: PreMongoHorse) -> dict | None:
-    return db.horses.find_one(
-        compact(
-            {
-                "name": horse.name,
-                "country": horse.country,
-                "year": horse.year,
-                "sex": horse.sex,
-            }
-        ),
-    )
+    base = {"name": horse.name, "country": horse.country, "year": horse.year}
+    search = db.horses.find_one
+
+    return search(base) or search(compact(base) | {"sex": horse.sex})
 
 
 def get_horse(horse: PreMongoHorse) -> MongoHorse | None:
