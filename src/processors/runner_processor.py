@@ -53,9 +53,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                     logger.debug(f"{horse.name} added to db")
                     added_count += 1
                 except DuplicateKeyError:
-                    logger.warning(
-                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex}) in race {race_id}"
-                    )
+                    logger.warning(f"Duplicate horse: {horse}) in race {race_id}")
                     skipped_count += 1
                     continue
                 except ValueError as e:
