@@ -79,9 +79,7 @@ def horse_processor() -> Generator[None, PreMongoHorse, None]:
                     logger.debug(f"{horse.name} added to db")
                     added_count += 1
                 except DuplicateKeyError:
-                    logger.warning(
-                        f"Duplicate horse: {horse.name} ({horse.country}) {horse.year} ({horse.sex})"
-                    )
+                    logger.warning(f"Duplicate horse: {horse})")
                     skipped_count += 1
                 except ValueError as e:
                     logger.warning(e)
