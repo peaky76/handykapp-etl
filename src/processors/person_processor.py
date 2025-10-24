@@ -1,6 +1,5 @@
 from collections.abc import Generator
 
-from bson import ObjectId
 from nameparser import HumanName  # type: ignore
 from prefect import get_run_logger
 from pymongo.errors import DuplicateKeyError
@@ -107,13 +106,7 @@ def person_processor() -> Generator[None, tuple[PreMongoPerson, str], None]:
             if race_id:
                 db.races.update_one(
                     {"_id": race_id, "runners.horse": runner_id},
-                    {
-                        "$set": {
-                            f"runners.$.{role}": ObjectId(found_id)
-                            if isinstance(found_id, str)
-                            else found_id
-                        }
-                    },
+                    {"$set": {f"runners.$.{role}": found_id}},
                 )
 
     except GeneratorExit:

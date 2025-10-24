@@ -1,6 +1,5 @@
 from collections.abc import Generator
 
-from bson import ObjectId
 from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo import UpdateOne
@@ -39,11 +38,11 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
             if db_horse:
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": db_horse.id},
+                        {"_id": db_horse["_id"]},
                         {"$set": make_horse_update_dictionary(horse, db_horse)},
                     )
                 )
-                horse_id = db_horse.id
+                horse_id = db_horse["_id"]
                 logger.debug(f"{horse.name} updated")
                 updated_count += 1
             else:
@@ -78,9 +77,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                         "$push": {
                             "runners": compact(
                                 {
-                                    "horse": ObjectId(horse_id)
-                                    if isinstance(horse_id, str)
-                                    else horse_id,
+                                    "horse": horse_id,
                                     "owner": horse.owner,
                                     "allowance": horse.allowance,
                                     "saddlecloth": horse.saddlecloth,
@@ -105,9 +102,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                                     name=person_name,
                                     role=role,  # type: ignore[arg-type]
                                     race_id=race_id,
-                                    runner_id=ObjectId(horse_id)
-                                    if isinstance(horse_id, str)
-                                    else horse_id,
+                                    runner_id=horse_id,
                                 ),
                                 source,
                             )
