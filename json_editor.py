@@ -32,9 +32,9 @@ def edit_json_interactively(file_path):
         data = SpacesClient.read_file(file_path)
         print("✓ File loaded successfully")
 
-        # Create a temporary file
+        # Create a temporary file with UTF-8 encoding
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
+            mode="w", suffix=".json", delete=False, encoding="utf-8"
         ) as tmp_file:
             json.dump(data, tmp_file, indent=2, ensure_ascii=False)
             tmp_path = tmp_file.name

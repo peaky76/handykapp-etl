@@ -73,6 +73,8 @@ class SpacesClient:
     @classmethod
     def write_file(cls, content, filename):
         client = cls.get()
+        if isinstance(content, str):
+            content = content.encode("utf-8")
         client.put_object(
             Bucket=cls.BUCKET_NAME, Key=filename, Body=content, ACL="private"
         )
