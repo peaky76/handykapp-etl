@@ -4,7 +4,6 @@ from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
-from bson import ObjectId
 
 from clients.mongo_client import get_horse, mongo_client
 from helpers import get_operations, make_operations_update
@@ -17,10 +16,10 @@ def make_horse_update_dictionary(horse: PreMongoHorse, db_horse: MongoHorse):
     return compact(
         {
             "colour": horse.colour,
-            "sire": ObjectId(sire.id)
+            "sire": sire["_id"]
             if (horse.sire and (sire := get_horse(horse.sire)))
             else None,
-            "dam": ObjectId(dam.id)
+            "dam": dam["_id"]
             if (horse.dam and (dam := get_horse(horse.dam)))
             else None,
             "operations": make_operations_update(horse, db_horse),
@@ -37,10 +36,10 @@ def make_horse_insert_dictionary(horse: PreMongoHorse):
             "year": horse.year,
             "country": horse.country,
             "colour": horse.colour,
-            "sire": ObjectId(sire.id)
+            "sire": sire["_id"]
             if (horse.sire and (sire := get_horse(horse.sire)))
             else None,
-            "dam": ObjectId(dam.id)
+            "dam": dam["_id"]
             if (horse.dam and (dam := get_horse(horse.dam)))
             else None,
             "operations": get_operations(horse),
