@@ -12,7 +12,7 @@ def test_mongo_horse_init_with_sufficient_fields():
 
 def test_mongo_horse_init_with_insufficient_fields():
     with pytest.raises(ValidationError):
-        MongoHorse(name="Dobbin", sex="M", colour="Bay")
+        MongoHorse(sex="M", colour="Bay")
 
 
 def test_mongo_horse_init_with_incorrect_fields():
