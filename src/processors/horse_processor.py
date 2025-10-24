@@ -67,7 +67,7 @@ def horse_processor() -> Generator[None, PreMongoHorse, None]:
             if db_horse:
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": db_horse.id},
+                        {"_id": db_horse["_id"]},
                         {"$set": make_horse_update_dictionary(horse, db_horse)},
                     )
                 )
