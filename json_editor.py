@@ -46,17 +46,15 @@ def edit_json_interactively(file_path):
         # This will work on Windows, Mac, and Linux
         try:
             # Try VSCode first - use shell=True to find it in PATH
-            result = subprocess.run(
-                ["code", "--wait", tmp_path], check=True, shell=True
-            )
+            subprocess.run(["code", "--wait", tmp_path], check=True, shell=True)
         except (subprocess.CalledProcessError, FileNotFoundError):
             try:
                 # Try notepad on Windows
-                result = subprocess.run(["notepad", tmp_path], check=True, shell=True)
+                subprocess.run(["notepad", tmp_path], check=True, shell=True)
             except (subprocess.CalledProcessError, FileNotFoundError):
                 try:
                     # Try nano on Unix-like systems
-                    result = subprocess.run(["nano", tmp_path], check=True, shell=True)
+                    subprocess.run(["nano", tmp_path], check=True, shell=True)
                 except (subprocess.CalledProcessError, FileNotFoundError):
                     print(
                         "Could not find a suitable editor. Please edit the file manually:"
