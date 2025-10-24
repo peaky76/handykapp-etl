@@ -1,5 +1,6 @@
 from collections.abc import Generator
 
+from bson import ObjectId
 from peak_utility.listish import compact
 from prefect import get_run_logger
 from pymongo import UpdateOne
@@ -77,7 +78,9 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                         "$push": {
                             "runners": compact(
                                 {
-                                    "horse": horse_id,
+                                    "horse": ObjectId(horse_id)
+                                    if isinstance(horse_id, str)
+                                    else horse_id,
                                     "owner": horse.owner,
                                     "allowance": horse.allowance,
                                     "saddlecloth": horse.saddlecloth,
@@ -102,7 +105,9 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                                     name=person_name,
                                     role=role,  # type: ignore[arg-type]
                                     race_id=race_id,
-                                    runner_id=horse_id,
+                                    runner_id=ObjectId(horse_id)
+                                    if isinstance(horse_id, str)
+                                    else horse_id,
                                 ),
                                 source,
                             )
