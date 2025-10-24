@@ -21,7 +21,7 @@ class MongoOfficialRatings(BaseModel):
 class MongoHorse(BaseModel):
     id: PyObjectId | None = Field(alias="_id", default=None)
     name: str = Field(..., min_length=2, max_length=21)
-    country: str | None = Field(min_length=2, max_length=3)
+    country: str | None = Field(default=None, min_length=2, max_length=3)
     year: int | None = None
     sex: Literal["M", "F"] | None = None
     breed: str | None = None
