@@ -37,10 +37,15 @@ def cache_if_found(maxsize=None):
 
 @cache_if_found(maxsize=15000)
 def _get_horse_dict(horse: PreMongoHorse) -> dict | None:
-    base = {"name": horse.name, "country": horse.country, "year": horse.year}
     search = db.horses.find_one
+    base = {"name": horse.name, "country": horse.country, "year": horse.year}
+    name_regex = "".join(char + "'?" if char.isalpha() else char for char in horse.name)
 
-    return search(base) or search(compact(base) | {"sex": horse.sex})
+    return (
+        search(base)
+        or search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
+        or search(compact(base) | {"sex": horse.sex})
+    )
 
 
 def get_horse(horse: PreMongoHorse) -> MongoHorse | None:

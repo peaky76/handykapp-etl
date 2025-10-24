@@ -1,47 +1,13 @@
-from functools import cache
-
 from prefect import get_run_logger
 
 # from pymongo import InsertOne, UpdateOne
 from clients import mongo_client as client
-from models import MongoHorse
+from models import PreMongoHorse
 
 # from models.formdata_horse import FormdataHorse
 from .result_line_processor import result_line_processor
 
 db = client.handykapp
-
-
-@cache
-def find_horse(name: str, country: str, year: int) -> MongoHorse | None:
-    """Find horse by name, handling punctuation differences."""
-    # First try exact match
-    result = db.horses.find_one(
-        {"name": name, "country": country, "year": year},
-    )
-
-    if result:
-        return MongoHorse.model_validate(result)
-
-    # If no exact match, try regex that allows apostrophes in db names
-    # Convert "JOHNS BOY" to pattern that matches "JOHN'S BOY"
-    # Insert optional apostrophe after each character
-    pattern = ""
-    for char in name:
-        if char.isalpha():
-            pattern += char + "'?"
-        else:
-            pattern += char
-
-    result = db.horses.find_one(
-        {
-            "name": {"$regex": f"^{pattern}$", "$options": "i"},
-            "country": country,
-            "year": year,
-        },
-    )
-
-    return MongoHorse.model_validate(result) if result else None
 
 
 def entry_processor():
@@ -114,7 +80,10 @@ def entry_processor():
             #     logger.info(f"Processed {processed_count} horses into Formdata table")
 
             # Result line processing
-            found_horse = find_horse(horse.name, horse.country, horse.year)
+            horse_for_search = PreMongoHorse(
+                name=horse.name, country=horse.country, year=horse.year
+            )
+            found_horse = client.get_horse(horse_for_search)
 
             if not found_horse:
                 logger.warning(
