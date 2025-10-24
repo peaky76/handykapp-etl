@@ -3,7 +3,7 @@ from functools import wraps
 from peak_utility.listish import compact
 from pymongo import MongoClient
 
-from models import MongoHorse, PreMongoHorse
+from models import PreMongoHorse
 
 mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
 
