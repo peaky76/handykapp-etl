@@ -66,7 +66,10 @@ def person_processor() -> Generator[None, tuple[PreMongoPerson, str], None]:
                 found_person = None
                 name_parts = HumanName(name)
 
-                possibilities = db.people.find({"last": name_parts.last})
+                # Only fetch fields we need for matching - much faster
+                possibilities = db.people.find(
+                    {"last": name_parts.last}, {"_id": 1, "first": 1, "title": 1}
+                )
                 for possibility in possibilities:
                     if name_parts.first == possibility["first"] or (
                         name_parts.first
