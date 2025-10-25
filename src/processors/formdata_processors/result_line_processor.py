@@ -37,14 +37,14 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
                             run.date,
                         ]
                     },
-                    "runners.horse": horse.id,
+                    "runners.horse": horse["_id"],
                 }
             )
 
             if found_race:
                 race_id = found_race["_id"]
                 db.races.update_one(
-                    {"_id": race_id, "runners.horse": horse.id},
+                    {"_id": race_id, "runners.horse": horse["_id"]},
                     {
                         "$set": {
                             "going_assessment": str(Going(run.going)),
@@ -56,11 +56,11 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
                     },
                 )
                 logger.debug(
-                    f"Added result for {horse.id} in race at {run.course} on {run.date}"
+                    f"Added result for {horse['_id']} in race at {run.course} on {run.date}"
                 )
             else:
                 logger.warning(
-                    f"No race found for {horse.id} at {run.course} on {run.date}"
+                    f"No race found for {horse['_id']} at {run.course} on {run.date}"
                 )
     except GeneratorExit:
         logger.info("Finished processing results.")
