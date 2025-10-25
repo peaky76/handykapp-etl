@@ -2,6 +2,7 @@ from prefect import get_run_logger
 
 # from pymongo import InsertOne, UpdateOne
 from clients import mongo_client as client
+from clients.mongo_client import get_horse
 from models import PreMongoHorse
 
 # from models.formdata_horse import FormdataHorse
@@ -83,7 +84,7 @@ def entry_processor():
             horse_for_search = PreMongoHorse(
                 name=horse.name, country=horse.country, year=horse.year
             )
-            found_horse = client.get_horse(horse_for_search)
+            found_horse = get_horse(horse_for_search)
 
             if not found_horse:
                 logger.warning(
