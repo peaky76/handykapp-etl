@@ -35,14 +35,18 @@ def cache_if_found(maxsize=None):
     return decorator
 
 
-@cache_if_found(maxsize=15000)
+@cache_if_found(maxsize=50000)
 def get_horse(horse: PreMongoHorse) -> dict | None:
     search = db.horses.find_one
     base = {"name": horse.name, "country": horse.country, "year": horse.year}
-    name_regex = "".join(char + "'?" if char.isalpha() else char for char in horse.name)
 
-    return (
-        search(base)
-        or search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
-        or search(compact(base) | {"sex": horse.sex})
-    )
+    result = search(base)
+    if result:
+        return result
+
+    result = search(compact(base) | {"sex": horse.sex})
+    if result:
+        return result
+
+    name_regex = "".join(char + "'?" if char.isalpha() else char for char in horse.name)
+    return search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
