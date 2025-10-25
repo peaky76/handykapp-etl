@@ -41,6 +41,8 @@ def spec_database():
     db.horses.create_index("name")
     db.horses.create_index("sire")
     db.horses.create_index("dam")
+    db.people.create_index("last")
+    db.people.create_index([("last", ASC), ("first", ASC)])
     db.people.create_index(
         [("last", ASC), ("first", ASC), ("middle", ASC)], unique=True
     )
