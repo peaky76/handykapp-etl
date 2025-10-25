@@ -1,5 +1,6 @@
 # To allow running as a script
 import sys
+import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -45,6 +46,7 @@ def load_theracingapi_data(*, from_date: Date | None = None):
 
     r = record_processor()
     next(r)
+    record_count = 0
     for file in SpacesClient.get_files(f"{SOURCE}racecards"):
         if from_date:
             file_date = pendulum.parse(file.split(".")[0][-8:]).date()  # type: ignore[union-attr]
@@ -58,6 +60,10 @@ def load_theracingapi_data(*, from_date: Date | None = None):
             try:
                 record = TheRacingApiRacecard(**data)
                 r.send((record, transform_races, file, "theracingapi"))
+                record_count += 1
+                # Add small sleep every 50 races to prevent CPU saturation
+                if record_count % 50 == 0:
+                    time.sleep(0.1)
             except Exception as e:
                 logger.error(f"Unable to process Racing API racecard {file}: {e}")
 

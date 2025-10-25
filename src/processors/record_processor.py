@@ -25,8 +25,7 @@ def record_processor():
     r = race_processor()
     next(r)
 
-    # Create thread pool for parallel transformations
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         try:
             while True:
                 record, transformer, filename, source = yield

@@ -27,7 +27,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
     next(p)
 
     bulk_operations = []
-    bulk_threshold = 100
+    bulk_threshold = 500
 
     try:
         while True:
