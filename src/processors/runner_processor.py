@@ -26,8 +26,12 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
     p = person_processor()
     next(p)
 
-    bulk_operations = []
-    bulk_threshold = 500
+    horse_updates = []
+    horse_update_threshold = 500
+
+    # Batch race runner updates
+    race_updates = {}  # {race_id: [runner_docs]}
+    race_update_threshold = 20  # Update races when we have 20 races worth of runners
 
     try:
         while True:
@@ -36,7 +40,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
             db_horse = get_horse(horse)
 
             if db_horse:
-                bulk_operations.append(
+                horse_updates.append(
                     UpdateOne(
                         {"_id": db_horse["_id"]},
                         {"$set": make_horse_update_dictionary(horse, db_horse)},
@@ -61,37 +65,43 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                     skipped_count += 1
                     continue
 
-            # Process bulk operations when threshold reached
-            if bulk_operations and len(bulk_operations) >= bulk_threshold:
-                db.horses.bulk_write(bulk_operations)
-                logger.debug(f"Processed {len(bulk_operations)} bulk horse operations")
-                bulk_operations = []
+            # Process horse updates when threshold reached
+            if horse_updates and len(horse_updates) >= horse_update_threshold:
+                db.horses.bulk_write(horse_updates)
+                logger.debug(f"Processed {len(horse_updates)} bulk horse operations")
+                horse_updates = []
 
-            # Add horse to race
             if race_id:
-                db.races.update_one(
-                    {"_id": race_id},
-                    {
-                        "$push": {
-                            "runners": compact(
-                                {
-                                    "horse": horse_id,
-                                    "owner": horse.owner,
-                                    "allowance": horse.allowance,
-                                    "saddlecloth": horse.saddlecloth,
-                                    "draw": horse.draw,
-                                    "headgear": horse.headgear,
-                                    "lbs_carried": horse.lbs_carried,
-                                    "official_rating": horse.official_rating,
-                                    "finishing_position": horse.finishing_position,
-                                    "official_position": horse.official_position,
-                                    "beaten_distance": horse.beaten_distance,
-                                    "sp": horse.sp,
-                                }
-                            )
+                if race_id not in race_updates:
+                    race_updates[race_id] = []
+
+                race_updates[race_id].append(
+                    compact(
+                        {
+                            "horse": horse_id,
+                            "owner": horse.owner,
+                            "allowance": horse.allowance,
+                            "saddlecloth": horse.saddlecloth,
+                            "draw": horse.draw,
+                            "headgear": horse.headgear,
+                            "lbs_carried": horse.lbs_carried,
+                            "official_rating": horse.official_rating,
+                            "finishing_position": horse.finishing_position,
+                            "official_position": horse.official_position,
+                            "beaten_distance": horse.beaten_distance,
+                            "sp": horse.sp,
                         }
-                    },
+                    )
                 )
+
+                if len(race_updates) >= race_update_threshold:
+                    for rid, runners in race_updates.items():
+                        db.races.update_one(
+                            {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
+                        )
+                    logger.debug(f"Updated {len(race_updates)} races with runners")
+                    race_updates = {}
+
                 for role in ("trainer", "jockey"):
                     if person_name := getattr(horse, role, None):
                         p.send(
@@ -107,10 +117,18 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                         )
 
     except GeneratorExit:
-        # Process any remaining bulk operations
-        if bulk_operations:
-            db.horses.bulk_write(bulk_operations)
-            logger.debug(f"Processed {len(bulk_operations)} remaining bulk operations")
+        # Process any remaining horse updates
+        if horse_updates:
+            db.horses.bulk_write(horse_updates)
+            logger.debug(f"Processed {len(horse_updates)} remaining bulk operations")
+
+        # Process any remaining race updates
+        if race_updates:
+            for rid, runners in race_updates.items():
+                db.races.update_one(
+                    {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
+                )
+            logger.debug(f"Updated {len(race_updates)} remaining races with runners")
 
         logger.info(
             f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
