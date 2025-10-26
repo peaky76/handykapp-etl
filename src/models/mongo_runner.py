@@ -28,3 +28,4 @@ class MongoRunner(BaseModel):
     beaten_distance: float | None = None
     time: Duration | None = None
     sp: str | None = None
+    ratings: dict[str, int] | None = None
