@@ -68,8 +68,8 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
                             "going_assessment": going_assessment,
                             "runners.$.finishing_position": run.position,
                             "runners.$.beaten_distance": run.beaten_distance,
-                            "runners.$.time_rating": run.time_rating,
-                            "runners.$.form_rating": run.form_rating,
+                            "runners.$.ratings.rr_time": run.time_rating,
+                            "runners.$.ratings.rr_form": run.form_rating,
                         }
                     },
                 )
