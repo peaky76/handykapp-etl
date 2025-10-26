@@ -18,10 +18,13 @@ db = client.handykapp
 @cache
 def rr_code_to_course_dict():
     source = db.racecourses.find(
-        projection={"_id": 2, "references": {"racing_research": 1}}
+        projection={"_id": 1, "surface": 1, "references.racing_research": 1}
     )
     return {
-        racecourse["references"]["racing_research"]: racecourse["_id"]
+        (
+            racecourse["references"]["racing_research"],
+            racecourse["surface"],
+        ): racecourse["_id"]
         for racecourse in source
     }
 
@@ -45,7 +48,7 @@ def get_all_racecourses():
 
 def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
     if source == "racing_research":
-        return rr_code_to_course_dict().get(race.course)
+        return rr_code_to_course_dict().get((race.course, race.surface))
 
     racecourses = get_all_racecourses()
     surface_options = (
