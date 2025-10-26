@@ -56,7 +56,7 @@ def get_horse(horse: PreMongoHorse) -> dict | None:
 
 
 @cache
-def rr_code_to_course_dict():
+def rr_code_to_course_dict() -> dict:
     source = db.racecourses.find(
         projection={"_id": 1, "surface": 1, "references.racing_research": 1}
     )
@@ -66,6 +66,8 @@ def rr_code_to_course_dict():
             Surface[racecourse["surface"]],
         ): racecourse["_id"]
         for racecourse in source
+        if racecourse["surface"]
+        != "Sand"  # Can remove this once Going.SAND available in horsetalk
     }
 
 
