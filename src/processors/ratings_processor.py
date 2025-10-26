@@ -43,7 +43,8 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
                     )
                 )
                 updated_count += 1
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to add ratings to {horse.name}: {e}")
                 skipped_count += 1
 
             if bulk_operations and len(bulk_operations) >= bulk_threshold:
