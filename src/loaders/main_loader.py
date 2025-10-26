@@ -62,12 +62,12 @@ def spec_database():
 
 @flow
 def nuclear_reload():
-    drop_database()
-    spec_database()
-    load_racecourses()
-    switch_date = pendulum.parse("2023-03-11").date()
-    load_rapid_horseracing_entries(until_date=switch_date)
-    load_theracingapi_data()
+    # drop_database()
+    # spec_database()
+    # load_racecourses()
+    # switch_date = pendulum.parse("2023-03-11").date()
+    # load_rapid_horseracing_entries(until_date=switch_date)
+    # load_theracingapi_data()
     load_bha_data()
     load_formdata()
 
