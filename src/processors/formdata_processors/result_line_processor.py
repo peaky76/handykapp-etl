@@ -18,10 +18,12 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
         while True:
             horse, run = yield
 
-            racecourse_id = rr_code_to_course_dict().get(run.course)
+            surface = Going(run.going).surface
+            racecourse_id = rr_code_to_course_dict().get((run.course, surface))
 
             if not racecourse_id:
-                logger.warning(f"No racecourse found for {run.course}")
+                logger.warning(f"No racecourse found for {run.course} ({surface})")
+                continue
 
             found_race = db.races.find_one(
                 {
