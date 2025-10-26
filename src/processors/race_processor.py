@@ -8,6 +8,7 @@ from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
 from clients.mongo_client import get_racecourse_id
 from models import PreMongoRace
+from models.pre_mongo_race_course_details import PreMongoRaceCourseDetails
 from processors.horse_processor import horse_processor
 from processors.runner_processor import runner_processor
 
@@ -55,7 +56,7 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
             )
             log_description = f"{datetime_str} {race.title} at {race.course} ({race.surface}) from {source}"
 
-            if racecourse_id := get_racecourse_id(race, source):
+            if racecourse_id := get_racecourse_id(race.to_course_details(), source):
                 found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,

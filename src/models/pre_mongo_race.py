@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from .pre_mongo_race_course_details import PreMongoRaceCourseDetails
 from .pre_mongo_runner import PreMongoRunner
 
 
@@ -34,4 +35,12 @@ class PreMongoRace(BaseModel):
                 self.code,
                 self.datetime,
             )
+        )
+
+    def to_course_details(self) -> PreMongoRaceCourseDetails:
+        return PreMongoRaceCourseDetails(
+            course=self.course,
+            obstacle=self.obstacle,
+            surface=self.surface,
+            code=self.code,
         )

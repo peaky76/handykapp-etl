@@ -6,7 +6,7 @@ from peak_utility.listish import compact
 from pymongo import MongoClient
 
 from helpers import apply_newmarket_workaround
-from models import PreMongoHorse, PreMongoRace
+from models import PreMongoHorse, PreMongoRaceCourseDetails
 
 mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
 
@@ -86,7 +86,8 @@ def get_all_racecourses():
     )
 
 
-def get_racecourse_id(race: PreMongoRace, source: str) -> str | None:
+@cache
+def get_racecourse_id(race: PreMongoRaceCourseDetails, source: str) -> str | None:
     if source == "racing_research":
         return rr_code_to_course_dict().get((race.course, race.surface))
 
