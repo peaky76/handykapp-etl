@@ -32,7 +32,7 @@ def ratings_processor() -> Generator[None, PreMongoHorse, None]:
 
                 bulk_operations.append(
                     UpdateOne(
-                        {"_id": horse_doc.id},
+                        {"_id": horse_doc["_id"]},
                         {
                             "$set": {
                                 "ratings": horse.ratings.model_dump()
