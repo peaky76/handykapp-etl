@@ -9,6 +9,14 @@ from models import FormdataRun, MongoHorse
 
 db = client.handykapp
 
+FORMDATA_AW_GOINGS = {
+    "s": "Slow",
+    "d": "Standard to Slow",
+    "g": "Standard",
+    "m": "Standard to Fast",
+    "f": "Fast",
+}
+
 
 def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], None]:
     logger = get_run_logger()
@@ -45,11 +53,19 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
 
             if found_race:
                 race_id = found_race["_id"]
+
+                going_assessment = str(
+                    Going(
+                        run.going
+                        if surface == "Turf"
+                        else FORMDATA_AW_GOINGS.get(run.going)
+                    )
+                )
                 db.races.update_one(
                     {"_id": race_id, "runners.horse": horse["_id"]},
                     {
                         "$set": {
-                            "going_assessment": str(Going(run.going)),
+                            "going_assessment": going_assessment,
                             "runners.$.finishing_position": run.position,
                             "runners.$.beaten_distance": run.beaten_distance,
                             "runners.$.time_rating": run.time_rating,
