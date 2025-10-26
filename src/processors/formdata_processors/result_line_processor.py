@@ -4,8 +4,8 @@ from horsetalk import Going
 from prefect import get_run_logger
 
 from clients import mongo_client as client
+from clients.mongo_client import rr_code_to_course_dict
 from models import FormdataRun, MongoHorse
-from processors.race_processor import rr_code_to_course_dict
 
 db = client.handykapp
 

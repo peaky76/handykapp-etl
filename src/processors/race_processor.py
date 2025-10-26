@@ -8,7 +8,6 @@ from pymongo.errors import DuplicateKeyError
 from clients import mongo_client as client
 from clients.mongo_client import get_racecourse_id
 from models import PreMongoRace
-from models.pre_mongo_race_course_details import PreMongoRaceCourseDetails
 from processors.horse_processor import horse_processor
 from processors.runner_processor import runner_processor
 
