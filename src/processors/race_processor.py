@@ -8,6 +8,7 @@ from pymongo.errors import DuplicateKeyError
 
 from clients import mongo_client as client
 from helpers import apply_newmarket_workaround
+from horsetalk import Surface
 from models import PreMongoRace
 from processors.horse_processor import horse_processor
 from processors.runner_processor import runner_processor
@@ -23,7 +24,7 @@ def rr_code_to_course_dict():
     return {
         (
             racecourse["references"]["racing_research"],
-            racecourse["surface"],
+            Surface[racecourse["surface"]],
         ): racecourse["_id"]
         for racecourse in source
     }
