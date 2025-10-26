@@ -18,7 +18,7 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
         while True:
             horse, run = yield
 
-            surface = Going(run.going).surface
+            surface = "AW" if run.going.lower() == run.going else "Turf"
             racecourse_id = rr_code_to_course_dict().get((run.course, surface))
 
             if not racecourse_id:
