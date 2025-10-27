@@ -2,6 +2,12 @@
 import sys
 from pathlib import Path
 
+import pendulum
+
+from loaders.racecourse_loader import load_racecourses
+from loaders.rapid_horseracing_loader import load_rapid_horseracing_entries
+from loaders.theracingapi_loader import load_theracingapi_data
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from prefect import flow, task
@@ -58,12 +64,12 @@ def spec_database():
 
 @flow
 def nuclear_reload():
-    # drop_database()
-    # spec_database()
-    # load_racecourses()
-    # switch_date = pendulum.parse("2023-03-11").date()
-    # load_rapid_horseracing_entries(until_date=switch_date)
-    # load_theracingapi_data()
+    drop_database()
+    spec_database()
+    load_racecourses()
+    switch_date = pendulum.parse("2023-03-11").date()
+    load_rapid_horseracing_entries(until_date=switch_date)
+    load_theracingapi_data()
     load_bha_data()
     load_formdata()
 
