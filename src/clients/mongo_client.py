@@ -63,7 +63,7 @@ def rr_code_to_course_dict() -> dict:
     return {
         (
             racecourse["references"]["racing_research"],
-            racecourse["surface"],
+            racecourse["surface"] if racecourse["surface"] == "Turf" else "AW",
         ): racecourse["_id"]
         for racecourse in source
         if racecourse["surface"]
