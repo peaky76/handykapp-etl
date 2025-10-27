@@ -26,13 +26,6 @@ def log_validation_problem(problem):
     logger.warning(msg)
 
 
-type NewmarketRacecourse = Literal["Newmarket July", "Newmarket Rowley"]
-
-
-def apply_newmarket_workaround(date: pendulum.DateTime) -> NewmarketRacecourse:
-    return "Newmarket July" if date.month in (6, 7, 8) else "Newmarket Rowley"
-
-
 def horse_name_to_pre_mongo_horse(
     name: str,
     *,
