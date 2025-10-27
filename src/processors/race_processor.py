@@ -55,7 +55,9 @@ def race_processor() -> Generator[None, tuple[PreMongoRace, str], None]:
             )
             log_description = f"{datetime_str} {race.title} at {race.course} ({race.surface}) from {source}"
 
-            if racecourse_id := get_racecourse_id(race.to_course_details(), source):
+            if racecourse_id := get_racecourse_id(
+                race.to_course_details(), race.datetime, source
+            ):
                 found_race = db.races.find_one(
                     {
                         "racecourse": racecourse_id,

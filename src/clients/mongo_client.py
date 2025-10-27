@@ -1,11 +1,11 @@
+from datetime import datetime
 from functools import cache, wraps
+from typing import Literal
 
 import pendulum
-from horsetalk import Surface
 from peak_utility.listish import compact
 from pymongo import MongoClient
 
-from helpers import apply_newmarket_workaround
 from models import PreMongoHorse, PreMongoRaceCourseDetails
 
 mongo_client = MongoClient("mongodb://localhost:27017/")  # type: ignore
@@ -55,6 +55,13 @@ def get_horse(horse: PreMongoHorse) -> dict | None:
     return search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
 
 
+type NewmarketRacecourse = Literal["Newmarket July", "Newmarket Rowley"]
+
+
+def apply_newmarket_workaround(date: pendulum.DateTime) -> NewmarketRacecourse:
+    return "Newmarket July" if date.month in (6, 7, 8) else "Newmarket Rowley"
+
+
 @cache
 def rr_code_to_course_dict() -> dict:
     source = db.racecourses.find(
@@ -89,7 +96,9 @@ def get_all_racecourses():
 
 
 @cache
-def get_racecourse_id(race: PreMongoRaceCourseDetails, source: str) -> str | None:
+def get_racecourse_id(
+    race: PreMongoRaceCourseDetails, datetime: datetime, source: str
+) -> str | None:
     if source == "racing_research":
         return rr_code_to_course_dict().get((race.course, race.surface))
 
@@ -104,7 +113,7 @@ def get_racecourse_id(race: PreMongoRaceCourseDetails, source: str) -> str | Non
     course_name = race.course.lower().replace("(", "").replace(")", "").strip()
     if course_name == "newmarket":
         course_name = apply_newmarket_workaround(
-            pendulum.parse(str(race.datetime))  # type: ignore[arg-type]
+            pendulum.parse(str(datetime))  # type: ignore[arg-type]
         ).lower()
 
     for racecourse in racecourses:
