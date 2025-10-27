@@ -1,5 +1,4 @@
 from .helpers import (
-    apply_newmarket_workaround,
     fetch_content,
     get_last_occurrence_of,
     get_operations,
@@ -9,7 +8,6 @@ from .helpers import (
 )
 
 __all__ = [
-    "apply_newmarket_workaround",
     "fetch_content",
     "get_last_occurrence_of",
     "get_operations",
