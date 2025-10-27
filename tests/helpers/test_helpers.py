@@ -2,7 +2,6 @@ import pytest
 from pendulum import TUESDAY, parse
 
 from src.helpers.helpers import (
-    apply_newmarket_workaround,
     fetch_content,
     get_last_occurrence_of,
     horse_name_to_pre_mongo_horse,
@@ -52,22 +51,6 @@ def test_log_validation_problem(mocker):
     }
     log_validation_problem(problem)
     assert logger().warning.called
-
-
-def test_apply_newmarket_workaround_for_early_rowley():
-    assert apply_newmarket_workaround(parse("2023-05-01")) == "Newmarket Rowley"
-
-
-def test_apply_newmarket_workaround_for_early_july():
-    assert apply_newmarket_workaround(parse("2023-06-11")) == "Newmarket July"
-
-
-def test_apply_newmarket_workaround_for_late_july():
-    assert apply_newmarket_workaround(parse("2023-08-15")) == "Newmarket July"
-
-
-def test_apply_newmarket_workaround_for_late_rowley():
-    assert apply_newmarket_workaround(parse("2023-09-01")) == "Newmarket Rowley"
 
 
 def test_horse_name_to_pre_mongo_horse_with_basic_name():
