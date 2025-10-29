@@ -47,11 +47,16 @@ def get_horse(horse: PreMongoHorse) -> dict | None:
     if result:
         return result
 
-    result = search(compact(base) | {"sex": horse.sex})
+    result = search(compact(base) | {"name": horse.name, "sex": horse.sex})
     if result:
         return result
 
-    name_regex = "".join(char + "'?" if char.isalpha() else char for char in horse.name)
+    name_regex = horse.name.replace("'", "'?")
+    if "'" not in horse.name:
+        name_regex = "".join(
+            char + "'?" if char.isalpha() else char for char in name_regex
+        )
+
     return search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
 
 
