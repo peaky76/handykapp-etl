@@ -38,6 +38,21 @@ def cache_if_found(maxsize=None):
     return decorator
 
 
+def create_apostrophe_regex(name: str) -> str:
+    name_regex = name.replace("'", "'?")
+    if "'" not in name:
+        name_regex = "".join(
+            char + "'?" if char.isalpha() else char for char in name_regex
+        )
+    return name_regex
+
+
+def update_horse_name_if_needed(horse: PreMongoHorse, result: dict) -> None:
+    if "'" in horse.name and "'" not in result["name"]:
+        db.horses.update_one({"_id": result["_id"]}, {"$set": {"name": horse.name}})
+        result["name"] = horse.name
+
+
 @cache_if_found(maxsize=50000)
 def get_horse(horse: PreMongoHorse) -> dict | None:
     search = db.horses.find_one
@@ -51,13 +66,20 @@ def get_horse(horse: PreMongoHorse) -> dict | None:
     if result:
         return result
 
-    name_regex = horse.name.replace("'", "'?")
-    if "'" not in horse.name:
-        name_regex = "".join(
-            char + "'?" if char.isalpha() else char for char in name_regex
-        )
+    result = search(
+        base
+        | {
+            "name": {
+                "$regex": f"^{create_apostrophe_regex(horse.name)}$",
+                "$options": "i",
+            }
+        }
+    )
 
-    return search(base | {"name": {"$regex": f"^{name_regex}$", "$options": "i"}})
+    if result:
+        update_horse_name_if_needed(horse, result)
+
+    return result
 
 
 type NewmarketRacecourse = Literal["Newmarket July", "Newmarket Rowley"]
