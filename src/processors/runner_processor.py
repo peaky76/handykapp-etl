@@ -29,9 +29,10 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
     horse_updates = []
     horse_update_threshold = 500
 
-    # Batch race runner updates
-    race_updates = {}  # {race_id: [runner_docs]}
-    race_update_threshold = 20  # Update races when we have 20 races worth of runners
+    race_updates = {}
+    race_update_threshold = 20
+
+    pending_people = []
 
     try:
         while True:
@@ -94,27 +95,34 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                     )
                 )
 
+                pending_people.extend(
+                    [
+                        (
+                            PreMongoPerson(
+                                name=person_name,
+                                role=role,
+                                race_id=race_id,
+                                runner_id=horse_id,
+                            ),
+                            source,
+                        )
+                        for role in ("trainer", "jockey")
+                        if (person_name := getattr(horse, role, None))
+                    ]
+                )
+
                 if len(race_updates) >= race_update_threshold:
                     for rid, runners in race_updates.items():
                         db.races.update_one(
                             {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
                         )
                     logger.debug(f"Updated {len(race_updates)} races with runners")
-                    race_updates = {}
 
-                for role in ("trainer", "jockey"):
-                    if person_name := getattr(horse, role, None):
-                        p.send(
-                            (
-                                PreMongoPerson(
-                                    name=person_name,
-                                    role=role,  # type: ignore[arg-type]
-                                    race_id=race_id,
-                                    runner_id=horse_id,
-                                ),
-                                source,
-                            )
-                        )
+                    for person_data in pending_people:
+                        p.send(person_data)
+
+                    race_updates = {}
+                    pending_people = []
 
     except GeneratorExit:
         # Process any remaining horse updates
@@ -129,6 +137,9 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                     {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
                 )
             logger.debug(f"Updated {len(race_updates)} remaining races with runners")
+
+        for person_data in pending_people:
+            p.send(person_data)
 
         logger.info(
             f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
