@@ -88,6 +88,7 @@ def transform_horse(
                 "headgear": lambda x: Headgear[x].name.title() if x else None,  # type: ignore
                 "official_rating": int,
                 "jockey": lambda x: x.split("(")[0].strip(),
+                "trainer": lambda x: x.split(", ")[0].strip(),
             }
         )
         .convert(

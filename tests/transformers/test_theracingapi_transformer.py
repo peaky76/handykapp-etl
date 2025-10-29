@@ -225,6 +225,38 @@ def test_transform_horse_returns_correct_output_when_entire(horse_3_data, mocker
     assert actual == expected
 
 
+def test_transform_horse_returns_correct_output_when_trainer_is_from_ireland(
+    horse_3_data, mocker
+):
+    mocker.patch("pendulum.now", return_value=pendulum.parse("2023-10-03"))
+    horse_3_data.trainer = "Paddy O'Reilly, Ireland"
+    sire = PreMongoHorse(name="VADAMOS", sex="M")
+    damsire = PreMongoHorse(name="RED CLUBS", sex="M")
+    dam = PreMongoHorse(name="DAMASK", sex="F", sire=damsire)
+    expected = PreMongoRunner(
+        name="SPYCATCHER",
+        sex="M",
+        is_gelded=False,
+        country="IRE",
+        year=2018,
+        colour="Bay",
+        sire=sire,
+        dam=dam,
+        damsire=damsire,
+        trainer="Paddy O'Reilly",
+        owner="Highclere Tbredracing-Adriana Zaefferer",
+        jockey="Pierre-Louis Jamin",
+        allowance=3,
+        saddlecloth=6,
+        draw=5,
+        headgear=None,
+        lbs_carried=130,
+        official_rating=106,
+    )
+    actual = transform_horse(horse_3_data, pendulum.parse("2023-10-03"))
+    assert actual == expected
+
+
 def test_transform_races_returns_correct_output(racecard_data):
     expected = PreMongoRace(
         course="Wolverhampton",
