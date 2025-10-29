@@ -9,3 +9,4 @@ class PreMongoEntry(PreMongoHorse):
     headgear: str | None = None
     official_rating: int | None = None
     jockey: str | None = None
+    trainer: str | None = None
