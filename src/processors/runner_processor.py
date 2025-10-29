@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from typing import Any
 
 from peak_utility.listish import compact
 from prefect import get_run_logger
@@ -14,6 +15,57 @@ from processors.horse_processor import (
 from processors.person_processor import person_processor
 
 db = mongo_client.handykapp
+
+
+def make_runner_dict(horse: PreMongoRunner, horse_id: PyObjectId) -> dict:
+    return compact(
+        {
+            "horse": horse_id,
+            "owner": horse.owner,
+            "allowance": horse.allowance,
+            "saddlecloth": horse.saddlecloth,
+            "draw": horse.draw,
+            "headgear": horse.headgear,
+            "lbs_carried": horse.lbs_carried,
+            "official_rating": horse.official_rating,
+            "finishing_position": horse.finishing_position,
+            "official_position": horse.official_position,
+            "beaten_distance": horse.beaten_distance,
+            "sp": horse.sp,
+        }
+    )
+
+
+def collect_people(
+    horse: PreMongoRunner, race_id: PyObjectId, horse_id: PyObjectId, source: str
+) -> list:
+    return [
+        (
+            PreMongoPerson(
+                name=person_name,
+                role=role,
+                race_id=race_id,
+                runner_id=horse_id,
+            ),
+            source,
+        )
+        for role in ("trainer", "jockey")
+        if (person_name := getattr(horse, role, None))
+    ]
+
+
+def flush_races_and_people(
+    race_updates: dict,
+    pending_people: list,
+    person_gen: Generator[None, tuple[PreMongoPerson, str], None],
+    logger: Any,
+):
+    for rid, runners in race_updates.items():
+        db.races.update_one({"_id": rid}, {"$push": {"runners": {"$each": runners}}})
+    logger.debug(f"Updated {len(race_updates)} races with runners")
+
+    for person_data in pending_people:
+        person_gen.send(person_data)
 
 
 def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str], None]:
@@ -72,74 +124,27 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
                 logger.debug(f"Processed {len(horse_updates)} bulk horse operations")
                 horse_updates = []
 
-            if race_id:
-                if race_id not in race_updates:
-                    race_updates[race_id] = []
+            if not race_id:
+                continue
 
-                race_updates[race_id].append(
-                    compact(
-                        {
-                            "horse": horse_id,
-                            "owner": horse.owner,
-                            "allowance": horse.allowance,
-                            "saddlecloth": horse.saddlecloth,
-                            "draw": horse.draw,
-                            "headgear": horse.headgear,
-                            "lbs_carried": horse.lbs_carried,
-                            "official_rating": horse.official_rating,
-                            "finishing_position": horse.finishing_position,
-                            "official_position": horse.official_position,
-                            "beaten_distance": horse.beaten_distance,
-                            "sp": horse.sp,
-                        }
-                    )
-                )
+            if race_id not in race_updates:
+                race_updates[race_id] = []
 
-                pending_people.extend(
-                    [
-                        (
-                            PreMongoPerson(
-                                name=person_name,
-                                role=role,
-                                race_id=race_id,
-                                runner_id=horse_id,
-                            ),
-                            source,
-                        )
-                        for role in ("trainer", "jockey")
-                        if (person_name := getattr(horse, role, None))
-                    ]
-                )
+            race_updates[race_id].append(make_runner_dict(horse, horse_id))
+            pending_people.extend(collect_people(horse, race_id, horse_id, source))
 
-                if len(race_updates) >= race_update_threshold:
-                    for rid, runners in race_updates.items():
-                        db.races.update_one(
-                            {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
-                        )
-                    logger.debug(f"Updated {len(race_updates)} races with runners")
-
-                    for person_data in pending_people:
-                        p.send(person_data)
-
-                    race_updates = {}
-                    pending_people = []
+            if len(race_updates) >= race_update_threshold:
+                flush_races_and_people(race_updates, pending_people, p, logger)
+                race_updates = {}
+                pending_people = []
 
     except GeneratorExit:
-        # Process any remaining horse updates
         if horse_updates:
             db.horses.bulk_write(horse_updates)
             logger.debug(f"Processed {len(horse_updates)} remaining bulk operations")
 
-        # Process any remaining race updates
         if race_updates:
-            for rid, runners in race_updates.items():
-                db.races.update_one(
-                    {"_id": rid}, {"$push": {"runners": {"$each": runners}}}
-                )
-            logger.debug(f"Updated {len(race_updates)} remaining races with runners")
-
-        for person_data in pending_people:
-            p.send(person_data)
+            flush_races_and_people(race_updates, pending_people, p, logger)
 
         logger.info(
             f"Finished processing runners. Updated {updated_count}, added {added_count}, skipped {skipped_count}"
