@@ -2,7 +2,7 @@
 spaces_dir = "handykapp/betfair/"
 
 [bha]
-source_dir = "https://api09.horseracing.software/bha/v1/ratings/csv/ratings"
+source_dir = "https://api09.horseracing.software/bha/v1/ratings/csv/"
 spaces_dir = "handykapp/bha/"
 
 [bha.files]
