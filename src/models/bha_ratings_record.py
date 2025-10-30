@@ -1,18 +1,15 @@
 import datetime
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from models.bha_shared_types import BirthYear, HorseName, Rating
+from models.bha_shared_types import BirthYear, HorseName, Rating, Sex
 
 
 class BHARatingsRecord(BaseModel):
     date: datetime.date = Field(..., description="Date and time of the rating")
     name: HorseName = Field(..., description="Name of the horse")
     year: BirthYear = Field(..., description="Birth year of the horse")
-    sex: Literal["GELDING", "FILLY", "COLT"] = Field(
-        ..., description="Sex/gender of the horse"
-    )
+    sex: Sex = Field(..., description="Sex/gender of the horse")
     sire: HorseName = Field(..., description="Name of the sire")
     dam: HorseName = Field(..., description="Name of the dam")
     trainer: str = Field(..., description="Name of the trainer")

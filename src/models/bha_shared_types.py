@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BeforeValidator
 
@@ -26,6 +26,19 @@ def empty_string_to_none(v):
     return v
 
 
+def validate_perf_fig(v: str) -> str:
+    if v != "-":
+        valid_keys = ["A", "H", "S", "T"]
+        key, val = v.split(":")
+
+        if key not in valid_keys:
+            raise ValueError(f"Invalid performance figure key: {key}")
+        if not (val.isdigit() or val == "x"):
+            raise ValueError(f"Invalid performance figure value: {val}")
+
+    return v
+
+
 def validate_rating(v: int | None) -> int | None:
     if v is None:
         return v
@@ -41,3 +54,5 @@ Rating = Annotated[
     BeforeValidator(empty_string_to_none),
     AfterValidator(validate_rating),
 ]
+Sex = Literal["GELDING", "FILLY", "COLT"]
+PerfFig = Annotated[str, AfterValidator(validate_perf_fig)]
