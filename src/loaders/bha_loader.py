@@ -9,6 +9,7 @@ import datetime
 import pendulum
 import petl
 import tomllib
+from peak_utility.number import Numbertext
 from prefect import flow, get_run_logger, task
 
 from clients import SpacesClient
@@ -43,7 +44,11 @@ def read_csv(csv):
 
 
 def convert_header_to_field_name(header: str) -> str:
-    return header.strip().lower().replace(" ", "_")
+    result = header.strip().lower().replace(" ", "_")
+    for digit in "123456789":
+        if digit in result:
+            result = result.replace(digit, str(Numbertext(digit)))
+    return result
 
 
 def csv_row_to_dict(header_row, data_row):

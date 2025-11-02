@@ -1,5 +1,3 @@
-import pytest
-
 from loaders.bha_loader import (
     convert_header_to_field_name,
     csv_row_to_dict,
@@ -11,6 +9,7 @@ def test_convert_header_to_field_name():
     assert convert_header_to_field_name("Flat rating") == "flat_rating"
     assert convert_header_to_field_name("AWT rating") == "awt_rating"
     assert convert_header_to_field_name("Name") == "name"
+    assert convert_header_to_field_name("2 runs ago") == "two_runs_ago"
 
 
 def test_csv_row_to_dict():
