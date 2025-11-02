@@ -7,8 +7,8 @@ from models.bha_shared_types import BirthYear, HorseName, PerfFig, Sex
 
 class BHAPerfFigsRecord(BaseModel):
     date: datetime.date = Field(..., description="Date and time of the rating")
-    name: HorseName = Field(..., description="Name of the horse")
-    year: BirthYear = Field(..., description="Birth year of the horse")
+    racehorse: HorseName = Field(..., description="Name of the horse")
+    yof: BirthYear = Field(..., description="Birth year of the horse")
     sex: Sex = Field(..., description="Sex/gender of the horse")
     trainer: str = Field(..., description="Name of the trainer")
     latest: PerfFig = Field(..., description="Latest performance figure")
