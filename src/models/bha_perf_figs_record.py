@@ -5,15 +5,15 @@ from pydantic import BaseModel, Field
 from models.bha_shared_types import BirthYear, HorseName, PerfFig, Sex
 
 
-class BHARatingsRecord(BaseModel):
+class BHAPerfFigsRecord(BaseModel):
     date: datetime.date = Field(..., description="Date and time of the rating")
     name: HorseName = Field(..., description="Name of the horse")
     year: BirthYear = Field(..., description="Birth year of the horse")
     sex: Sex = Field(..., description="Sex/gender of the horse")
     trainer: str = Field(..., description="Name of the trainer")
-    perf_figs: list[PerfFig] = Field(
-        ...,
-        min_length=6,
-        max_length=6,
-        description="List of ratings over the last 6 runs",
-    )
+    latest: PerfFig = Field(..., description="Latest performance figure")
+    two_runs_ago: PerfFig = Field(..., description="Performance figure 2 runs ago")
+    three_runs_ago: PerfFig = Field(..., description="Performance figure 3 runs ago")
+    four_runs_ago: PerfFig = Field(..., description="Performance figure 4 runs ago")
+    five_runs_ago: PerfFig = Field(..., description="Performance figure 5 runs ago")
+    six_runs_ago: PerfFig = Field(..., description="Performance figure 6 runs ago")

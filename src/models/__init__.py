@@ -1,3 +1,4 @@
+from .bha_perf_figs_record import BHAPerfFigsRecord
 from .bha_ratings_record import BHARatingsRecord
 from .formdata_horse import FormdataHorse
 from .formdata_position import FormdataPosition
@@ -24,6 +25,7 @@ from .theracingapi_racecard import TheRacingApiRacecard
 from .theracingapi_runner import TheRacingApiRunner
 
 __all__ = [
+    "BHAPerfFigsRecord",
     "BHARatingsRecord",
     "FormdataHorse",
     "FormdataPosition",
