@@ -6,6 +6,7 @@ from .formdata_race import FormdataRace
 from .formdata_record import FormdataRecord  # Assuming this is the correct import
 from .formdata_run import FormdataRun
 from .formdata_runner import FormdataRunner
+from .historic_rating_record import HistoricRatingRecord
 from .mongo_horse import MongoHorse, MongoOperation
 from .mongo_person import MongoPerson
 from .mongo_race import MongoRace
@@ -33,6 +34,7 @@ __all__ = [
     "FormdataRecord",
     "FormdataRun",
     "FormdataRunner",
+    "HistoricRatingRecord",
     "MongoHorse",
     "MongoOperation",
     "MongoPerson",
