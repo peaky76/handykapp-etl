@@ -23,15 +23,15 @@ python-dotenv = "^1.1.1"
 pymupdf = "^1.22.5" # NB >=1.23 interprets Irish apostrophe as some sort of file end marker
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.11.0"
+coverage = "^7.11.3"
 mongomock = "^4.3.0"
 mypy = "^1.18.2"
-pytest = "^8.4.2"
+pytest = "^9.0.1"
 pytest-cov = "^7.0.0"
 pytest-mock = "^3.15.1"
 radon = "^6.0.1"
-ruff = "^0.14.3"
-skylos = "^2.4.0"
+ruff = "^0.14.4"
+skylos = "^2.5.0"
 types-requests = "^2.32.4.20250913"
 
 [tool.mypy]
