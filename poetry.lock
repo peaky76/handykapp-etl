@@ -2371,14 +2371,14 @@ files = [
 
 [[package]]
 name = "pydantic"
-version = "2.12.4"
+version = "2.12.5"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic-2.12.4-py3-none-any.whl", hash = "sha256:92d3d202a745d46f9be6df459ac5a064fdaa3c1c4cd8adcfa332ccf3c05f871e"},
-    {file = "pydantic-2.12.4.tar.gz", hash = "sha256:0f8cb9555000a4b5b617f66bfd2566264c4984b27589d3b845685983e8ea85ac"},
+    {file = "pydantic-2.12.5-py3-none-any.whl", hash = "sha256:e561593fccf61e8a20fc46dfc2dfe075b8be7d0188df33f221ad1f0139180f9d"},
+    {file = "pydantic-2.12.5.tar.gz", hash = "sha256:4d351024c75c0f085a9febbb665ce8c0c6ec5d30e903bdb6394b7ede26aebb49"},
 ]
 
 [package.dependencies]
@@ -3457,6 +3457,8 @@ files = [
     {file = "ruamel.yaml.clib-0.2.14-cp39-cp39-win32.whl", hash = "sha256:6d5472f63a31b042aadf5ed28dd3ef0523da49ac17f0463e10fda9c4a2773352"},
     {file = "ruamel.yaml.clib-0.2.14-cp39-cp39-win_amd64.whl", hash = "sha256:8dd3c2cc49caa7a8d64b67146462aed6723a0495e44bf0aa0a2e94beaa8432f6"},
     {file = "ruamel.yaml.clib-0.2.14.tar.gz", hash = "sha256:803f5044b13602d58ea378576dd75aa759f52116a0232608e8fdada4da33752e"},
+    {file = "ruamel_yaml_clib-0.2.14-cp314-cp314-win32.whl", hash = "sha256:9b4104bf43ca0cd4e6f738cb86326a3b2f6eef00f417bd1e7efb7bdffe74c539"},
+    {file = "ruamel_yaml_clib-0.2.14-cp314-cp314-win_amd64.whl", hash = "sha256:13997d7d354a9890ea1ec5937a219817464e5cc344805b37671562a401ca3008"},
 ]
 
 [[package]]
@@ -4140,4 +4142,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.13"
-content-hash = "8c9b1253cbf3fdf18ce9faa0d53d1ce1b3e141378a904a4dbf2d94e62a315344"
+content-hash = "a9600b2bfde6f553ec039445fa4896cfe006a5d725669181df85e33f32d4327d"
