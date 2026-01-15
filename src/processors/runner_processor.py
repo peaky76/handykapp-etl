@@ -7,7 +7,7 @@ from pymongo import UpdateOne
 from pymongo.errors import DuplicateKeyError
 
 from clients.mongo_client import get_horse, mongo_client
-from models import PreMongoPerson, PreMongoRunner, PyObjectId
+from models import PreMongoPerson, PreMongoRunner, PyObjectId, Role
 from processors.horse_processor import (
     make_horse_insert_dictionary,
     make_horse_update_dictionary,
@@ -39,6 +39,7 @@ def make_runner_dict(horse: PreMongoRunner, horse_id: PyObjectId) -> dict:
 def collect_people(
     horse: PreMongoRunner, race_id: PyObjectId, horse_id: PyObjectId, source: str
 ) -> list:
+    roles: tuple[Role, ...] = ("trainer", "jockey")
     return [
         (
             PreMongoPerson(
@@ -49,7 +50,7 @@ def collect_people(
             ),
             source,
         )
-        for role in ("trainer", "jockey")
+        for role in roles
         if (person_name := getattr(horse, role, None))
     ]
 
@@ -81,7 +82,7 @@ def runner_processor() -> Generator[None, tuple[PreMongoRunner, PyObjectId, str]
     horse_updates = []
     horse_update_threshold = 500
 
-    race_updates = {}
+    race_updates: dict[PyObjectId, list[dict]] = {}
     race_update_threshold = 20
 
     pending_people = []
