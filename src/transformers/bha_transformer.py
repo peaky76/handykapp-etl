@@ -1,6 +1,9 @@
 import datetime
 import sys
 from pathlib import Path
+from typing import Literal, cast
+
+from models.mongo_racecourse import ObstacleType
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -8,6 +11,7 @@ import pendulum
 import petl  # type: ignore
 from horsetalk import Gender, Horse  # type: ignore
 from peak_utility.listish import compact
+from pydantic_extra_types.pendulum_dt import Date
 
 from helpers import horse_name_to_pre_mongo_horse
 from models import (
@@ -33,12 +37,18 @@ def transform_historic_rating(
     if val == "x":
         val = None
 
-    surface = "All Weather" if code == "A" else "Turf"
-    obstacle = "Hurdle" if code == "H" else "Chase" if code == "C" else None
+    surface: Literal["Turf", "All Weather"] = "All Weather" if code == "A" else "Turf"
+    obstacle: ObstacleType | None = (
+        cast(ObstacleType, "Hurdle")
+        if code == "H"
+        else cast(ObstacleType, "Chase")
+        if code == "C"
+        else None
+    )
 
     return HistoricRatingRecord(
         rating=int(val) if val is not None else None,
-        date_before=date_before,
+        date_before=cast(Date, pendulum.instance(date_before)),
         races_before=races_ago,
         surface=surface,
         obstacle=obstacle,
