@@ -34,8 +34,6 @@ def transform_historic_rating(
         return None
 
     code, val = perf_fig.split(":")
-    if val == "x":
-        val = None
 
     surface: Literal["Turf", "All Weather"] = "All Weather" if code == "A" else "Turf"
     obstacle: ObstacleType | None = (
@@ -47,7 +45,7 @@ def transform_historic_rating(
     )
 
     return HistoricRatingRecord(
-        rating=int(val) if val is not None else None,
+        rating=int(val) if val != "x" else None,
         date_before=cast(Date, pendulum.instance(date_before)),
         races_before=races_ago,
         surface=surface,
