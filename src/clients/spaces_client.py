@@ -35,6 +35,7 @@ class SpacesClient:
         continuation_token = ""
         client = cls.get()
         while True:
+            # NOSONAR - ExpectedBucketOwner is AWS S3 specific, not supported by DigitalOcean Spaces
             response = client.list_objects_v2(
                 Bucket=cls.BUCKET_NAME,
                 Prefix=dirname,
