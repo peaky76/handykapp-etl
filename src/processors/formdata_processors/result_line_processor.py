@@ -5,7 +5,7 @@ from prefect import get_run_logger
 
 from clients import mongo_client as client
 from clients.mongo_client import rr_code_to_course_dict
-from models import FormdataRun, MongoHorse
+from models import FormdataRun
 
 db = client.handykapp
 
@@ -18,7 +18,7 @@ FORMDATA_AW_GOINGS = {
 }
 
 
-def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], None]:
+def result_line_processor() -> Generator[None, tuple[dict, FormdataRun], None]:
     logger = get_run_logger()
     logger.info("Starting result line processor")
 
@@ -47,7 +47,7 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
                             run.date,
                         ]
                     },
-                    "runners.horse": horse.id,
+                    "runners.horse": horse["_id"],
                 }
             )
 
@@ -73,11 +73,11 @@ def result_line_processor() -> Generator[None, tuple[MongoHorse, FormdataRun], N
                     },
                 )
                 logger.debug(
-                    f"Added result for {horse.id} in race at {run.course} on {run.date}"
+                    f"Added result for {horse['_id']} in race at {run.course} on {run.date}"
                 )
             else:
                 logger.warning(
-                    f"No race found for {horse.id} at {run.course} on {run.date}"
+                    f"No race found for {horse['_id']} at {run.course} on {run.date}"
                 )
     except GeneratorExit:
         logger.info("Finished processing results.")
