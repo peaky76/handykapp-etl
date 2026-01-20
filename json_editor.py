@@ -66,7 +66,7 @@ def edit_json_interactively(file_path):
         edited_data = None
         for encoding in ["utf-8", "utf-8-sig", "latin-1", "cp1252"]:
             try:
-                with open(tmp_path, encoding=encoding) as f:
+                with Path(tmp_path).open(encoding=encoding) as f:
                     edited_data = json.load(f)
                     print("✓ JSON validation passed")
                     break
@@ -75,7 +75,7 @@ def edit_json_interactively(file_path):
 
         if edited_data is None:
             try:
-                with open(tmp_path, encoding="utf-8") as f:
+                with Path(tmp_path).open(encoding="utf-8") as f:
                     edited_data = json.load(f)
                     print("✓ JSON validation passed")
             except json.JSONDecodeError as e:
