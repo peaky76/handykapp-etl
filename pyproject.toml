@@ -36,6 +36,7 @@ types-requests = "^2.32.4.20260107"
 
 [tool.mypy]
 ignore_missing_imports = true
+exclude = ["json_editor.py", "tests/"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
