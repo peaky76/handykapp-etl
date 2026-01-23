@@ -1,0 +1,1 @@
+This repository follows shared agent rules in docs/agent-standards/AGENTS.md.
