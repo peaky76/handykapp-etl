@@ -2823,14 +2823,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prefect"
-version = "3.6.11"
+version = "3.6.13"
 description = "Workflow orchestration and management."
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "prefect-3.6.11-py3-none-any.whl", hash = "sha256:93a39ebb8fe252de2950023a256848f7466cbb50e8345cc52bdfbbd5dd856f2d"},
-    {file = "prefect-3.6.11.tar.gz", hash = "sha256:d83ff1ace0bd425c2bbd885b33125093f558298d90beee5d22d08f0bc094e2e5"},
+    {file = "prefect-3.6.13-py3-none-any.whl", hash = "sha256:a3343d69308f0dc1b73a87e533d424657f44cbff07b67cd53e5881a2564c14ca"},
+    {file = "prefect-3.6.13.tar.gz", hash = "sha256:ee0b39fa390c204ccb3762be00a729edd45c5aa54e0245951f8682f92bfb016b"},
 ]
 
 [package.dependencies]
@@ -2883,7 +2883,7 @@ semver = ">=3.0.4"
 sniffio = ">=1.3.0,<2.0.0"
 sqlalchemy = {version = ">=2.0,<3.0.0", extras = ["asyncio"]}
 toml = ">=0.10.0"
-typer = ">=0.16.0,<0.21.0"
+typer = ">=0.16.0,<0.22.0"
 typing-extensions = ">=4.10.0,<5.0.0"
 uvicorn = ">=0.14.0,<0.29.0 || >0.29.0"
 websockets = ">=15.0.1,<17.0"
@@ -5078,4 +5078,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.13"
-content-hash = "c1368d49cefacf064316c4969c35322fd0c71da5030fb68299c934925ace25cc"
+content-hash = "f25440fadf0e8f3632667a91400222cf6b848577afac93a6c4139d9e15e50361"
