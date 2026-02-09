@@ -5086,14 +5086,14 @@ files = [
 
 [[package]]
 name = "skylos"
-version = "3.2.0"
+version = "3.2.4"
 description = "An analysis tool for Python codebases"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "skylos-3.2.0-py3-none-any.whl", hash = "sha256:5a5d3c16940ad39ec799f667904de6dafd3069b9b8a660f19502d5954342655c"},
-    {file = "skylos-3.2.0.tar.gz", hash = "sha256:7a0902e96bf54537671b5d81af014dd0eeec3070128e530cdb26791a98287dac"},
+    {file = "skylos-3.2.4-py3-none-any.whl", hash = "sha256:dcdd8ef6bbad6a4813cf83b901912576140bc50ed9b11825a65335db0b073689"},
+    {file = "skylos-3.2.4.tar.gz", hash = "sha256:f1eeb6c3d59a5eea01be06f74c1249a7d9d1373e1524a42567656637addcc380"},
 ]
 
 [package.dependencies]
@@ -5104,6 +5104,7 @@ keyring = ">=25.7.0"
 libcst = ">=1.8.2"
 litellm = ">=1.81.3"
 networkx = "*"
+pytest = ">=9.0.2"
 pyyaml = "*"
 requests = "*"
 rich = ">=14.0.0"
@@ -6016,4 +6017,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.13"
-content-hash = "a3bffe08712801a779b2b7645973767621ce085fd71872360f4c3d0277793508"
+content-hash = "258015537a9e6f8225225d3d4903cddf908648df749fba9332f45902f7f245c8"
